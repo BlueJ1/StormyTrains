@@ -1,0 +1,737 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hamburg → Frankfurt Corridor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a single report column (prose at ~66ch) with full-width chart bands; the hero pairs the thesis with a map of the corridor drawn from the journeys themselves. */
+:root {
+  --paper: #f5f7f9;
+  --surface: #fcfcfd;
+  --ink: #111820;
+  --ink-2: #47505c;
+  --muted: #7a838f;
+  --grid: #e1e5ea;
+  --axis: #c2c9d1;
+  --accent: #0e6b70;
+  --track: #2b3440;
+
+  --sev-normal: #c9d0d8;
+  --sev-moderate: #86b6ef;
+  --sev-severe: #1c5cab;
+  --sev-canceled: #e34948;
+
+  --fam-1: #2a78d6;
+  --fam-2: #eb6834;
+  --fam-3: #1baf7a;
+  --fam-4: #eda100;
+  --fam-other: #a9b1ba;
+
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: 2.125rem;
+  --step-4: clamp(2.5rem, 6vw, 4.25rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0f1318;
+    --surface: #161b21;
+    --ink: #f1f4f7;
+    --ink-2: #bcc4cd;
+    --muted: #87909b;
+    --grid: #262d35;
+    --axis: #3a434d;
+    --accent: #52c1bf;
+    --track: #d5dce3;
+    --sev-normal: #3f4852;
+    --sev-moderate: #256abf;
+    --sev-severe: #86b6ef;
+    --sev-canceled: #e66767;
+    --fam-1: #3987e5;
+    --fam-2: #d95926;
+    --fam-3: #199e70;
+    --fam-4: #c98500;
+    --fam-other: #5d6671;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0f1318;
+  --surface: #161b21;
+  --ink: #f1f4f7;
+  --ink-2: #bcc4cd;
+  --muted: #87909b;
+  --grid: #262d35;
+  --axis: #3a434d;
+  --accent: #52c1bf;
+  --track: #d5dce3;
+  --sev-normal: #3f4852;
+  --sev-moderate: #256abf;
+  --sev-severe: #86b6ef;
+  --sev-canceled: #e66767;
+  --fam-1: #3987e5;
+  --fam-2: #d95926;
+  --fam-3: #199e70;
+  --fam-4: #c98500;
+  --fam-other: #5d6671;
+}
+
+* { box-sizing: border-box; }
+section > *, .chart > *, .hero > *, .hero-text > *, .two > *, .three > *, .qa > * { min-width: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  padding-inline: clamp(16px, 4vw, 40px);
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-stretch: 88%;
+  text-wrap: balance;
+  line-height: 1.1;
+  margin: 0;
+}
+h1 { font-size: var(--step-4); font-weight: 800; letter-spacing: -0.02em; }
+h1 .arrow { color: var(--accent); font-stretch: 100%; }
+h2 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: var(--step-1); font-weight: 700; font-stretch: 95%; }
+p { margin: 0; max-width: 66ch; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.eyebrow {
+  font-family: var(--font-display);
+  font-stretch: 110%;
+  font-weight: 700;
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.mono, .num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+
+/* Hero */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+  padding-block: clamp(32px, 6vw, 72px) 24px;
+}
+.hero-text { display: grid; gap: 20px; }
+.lede { font-size: var(--step-1); color: var(--ink-2); line-height: 1.5; }
+.figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 28px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--grid);
+}
+.figure { display: grid; gap: 6px; align-content: start; }
+.figure b {
+  font-family: var(--font-display);
+  font-stretch: 80%;
+  font-weight: 700;
+  font-size: var(--step-3);
+  line-height: 1;
+}
+.figure span { font-size: var(--step--1); color: var(--ink-2); line-height: 1.4; }
+.map-box { display: grid; gap: 8px; }
+.map-box figcaption { font-size: var(--step--1); color: var(--muted); }
+#map { width: 100%; }
+
+/* Sections */
+section { display: grid; gap: 20px; padding-block: 48px 8px; border-top: 1px solid var(--grid); margin-top: 40px; }
+.section-head { display: grid; gap: 10px; }
+.chart {
+  background: var(--surface);
+  border: 1px solid var(--grid);
+  border-radius: 8px;
+  padding: 18px 18px 12px;
+  display: grid;
+  gap: 12px;
+}
+.chart-title { font-family: var(--font-body); font-weight: 600; font-size: var(--step-0); }
+.chart-sub { font-size: var(--step--1); color: var(--muted); margin-top: -8px; }
+.plot { width: 100%; min-height: 60px; position: relative; }
+.plot svg { display: block; overflow: visible; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--step--1); color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.callout {
+  font-size: var(--step-1);
+  line-height: 1.45;
+  max-width: 60ch;
+  padding-left: 16px;
+  border-left: 3px solid var(--accent);
+  color: var(--ink);
+}
+
+/* SVG text */
+svg text { fill: var(--muted); font-family: var(--font-data); font-size: 11px; }
+svg text.lab { fill: var(--ink-2); font-family: var(--font-body); font-size: 12px; }
+svg text.lab-strong { fill: var(--ink); font-family: var(--font-body); font-size: 12px; font-weight: 600; }
+svg text.val { fill: var(--ink); font-size: 11px; }
+svg .gridline { stroke: var(--grid); stroke-width: 1; }
+svg .baseline { stroke: var(--axis); stroke-width: 1; }
+svg .hit { fill: transparent; cursor: default; }
+svg .mark { transition: opacity 120ms; }
+svg g.hov:hover .mark { opacity: 0.8; }
+@media (prefers-reduced-motion: reduce) { svg .mark { transition: none; } }
+
+/* Tables */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+th { font-weight: 600; color: var(--ink-2); font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+td.r, th.r { text-align: right; }
+td .num { white-space: nowrap; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px; }
+.minibar { display: flex; gap: 2px; height: 12px; min-width: 140px; }
+.minibar span { display: block; height: 100%; }
+.minibar span:first-child { border-radius: 3px 0 0 3px; }
+.minibar span:last-child { border-radius: 0 3px 3px 0; }
+.cellbar { display: flex; align-items: center; gap: 8px; }
+.cellbar .bar { height: 10px; border-radius: 0 3px 3px 0; background: var(--sev-severe); min-width: 2px; }
+details { font-size: var(--step--1); }
+details summary { cursor: pointer; color: var(--accent); width: fit-content; }
+details .table-wrap { margin-top: 8px; max-height: 320px; overflow: auto; }
+
+ul.notes { margin: 0; padding-left: 20px; display: grid; gap: 12px; max-width: 70ch; }
+ul.notes li::marker { color: var(--accent); }
+.qa { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.qa > div { display: grid; gap: 6px; padding: 16px; border: 1px solid var(--grid); border-radius: 8px; background: var(--surface); }
+.qa h3 { font-size: var(--step-0); font-stretch: 100%; }
+.qa p { font-size: 0.9375rem; color: var(--ink-2); }
+footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--grid); font-size: var(--step--1); color: var(--muted); display: grid; gap: 6px; }
+
+/* Tooltip */
+#tip {
+  position: fixed; z-index: 10; pointer-events: none;
+  background: var(--ink); color: var(--paper);
+  font-size: 12px; line-height: 1.45; padding: 7px 10px; border-radius: 6px;
+  max-width: 260px; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+#tip b { font-weight: 600; }
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; }
+  .map-box { max-width: 460px; }
+  .two, .three, .qa { grid-template-columns: 1fr; }
+}
+</style>
+
+
+<div id="tip" hidden></div>
+<div class="wrap">
+
+<header class="hero">
+  <div class="hero-text">
+    <div class="eyebrow">Project in Data Science · corridor analysis</div>
+    <h1>Hamburg <span class="arrow">→</span> Frankfurt</h1>
+    <p class="lede">Every ICE and IC run in our data that stopped at Hamburg Hbf and later at Frankfurt (Main) Hbf, from 1 July 2024 to 31 August 2026. How late the trains arrive, which routes they take, when things go wrong, and what that means for the prediction task. This page uses railway data only, with no weather.</p>
+    <div class="figures">
+      <div class="figure"><b>21,557</b><span>journeys over 792 days, about 27 a day, by 227 train numbers</span></div>
+      <div class="figure"><b>42.8%</b><span>of completed journeys reach Frankfurt less than 6 minutes late, DB's own definition of punctual</span></div>
+      <div class="figure"><b>8 min</b><span>median arrival delay; the mean is 17.4 min because of a long tail up to 380 min</span></div>
+      <div class="figure"><b>14.2%</b><span>severe (60+ min late) or canceled: the positive class of the binary target</span></div>
+    </div>
+  </div>
+  <figure class="map-box" style="margin:0">
+    <div class="plot" id="map" role="img" aria-label="Map of the routes taken from Hamburg to Frankfurt, with line width by number of journeys"></div>
+    <figcaption>Recorded stop-to-stop segments used by at least 300 journeys, drawn straight between station coordinates. Line width shows the number of journeys. Hover a station or segment for counts.</figcaption>
+  </figure>
+</header>
+
+<section id="outcomes">
+  <div class="section-head">
+    <div class="eyebrow">Outcomes</div>
+    <h2>Seven in ten within 20 minutes, four in ten punctual</h2>
+    <p>The severity classes follow the working definition in the project instructions. Delay is measured at Frankfurt (Main) Hbf as reported arrival minus scheduled arrival. A journey counts as canceled when its Hamburg Hbf departure or its Frankfurt arrival is canceled.</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Journeys by severity class</div>
+    <div class="plot" id="classbar"></div>
+    <div class="legend" id="classlegend"></div>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Arrival delay at Frankfurt (Main) Hbf, completed journeys</div>
+    <div class="chart-sub">5-minute bins, colored by severity class. <span id="histnote"></span></div>
+    <div class="plot" id="hist"></div>
+  </div>
+</section>
+
+<section id="routes">
+  <div class="section-head">
+    <div class="eyebrow">Routes</div>
+    <h2>One fast line and three slower ones</h2>
+    <p>The 21,557 journeys follow 388 recorded stop patterns. 66% take the high-speed line via Hannover and Kassel, with a median schedule of 3 h 42. 13% leave that line after Kassel for the older route through Gießen (4 h 40), 15% go west via Bremen, the Ruhr and Köln (6 h 03), and 5% via Berlin and Erfurt (6 h 31).</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap">
+      <table id="famtable">
+        <thead><tr><th>Route family</th><th class="r">Journeys</th><th class="r">Scheduled</th><th class="r">Median delay</th><th class="r">Severe or canceled</th><th>Class mix</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="legend" id="famclasslegend"></div>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Scheduled Hamburg → Frankfurt travel time</div>
+    <div class="chart-sub">Journeys per 15-minute band, by route family. <span id="schednote"></span></div>
+    <div class="plot" id="sched"></div>
+    <div class="legend" id="famlegend"></div>
+  </div>
+  <p class="callout">The routes fail in different ways. Via Köln the median arrival delay is 23 min, against 7 min on the high-speed line, and 38% of journeys are moderately late. Via Gießen the median delay is only 2 min, but 19% of journeys are canceled, and the route has almost no runs after December 2025.</p>
+</section>
+
+<section id="time">
+  <div class="section-head">
+    <div class="eyebrow">Over time</div>
+    <h2>January 2026 was the worst month</h2>
+    <p>The share of severe and canceled journeys swings between 6% and 26% from month to month. The worst months are January 2026, July 2026, July 2025, November 2024; the best are April 2026, December 2025, December 2024. In January 2026, 14.3% of journeys were canceled.</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Share of journeys that were moderate, severe or canceled, by month of departure</div>
+    <div class="chart-sub">The rest of each month, up to 100%, is normal or minor.</div>
+    <div class="plot" id="monthly"></div>
+    <div class="legend" id="monthlegend"></div>
+    <details><summary>Show the monthly table</summary><div class="table-wrap"><table id="monthtable"></table></div></details>
+  </div>
+  <div class="two">
+    <div class="chart">
+      <div class="chart-title">Severe or canceled, by scheduled Hamburg Hbf departure hour</div>
+      <div class="chart-sub">Departures at 11 and 16 h are worst, at about 20%. Early-morning trains do best. Paler columns have fewer than 300 journeys.</div>
+      <div class="plot" id="hourly"></div>
+    </div>
+    <div class="chart">
+      <div class="chart-title">Severe or canceled, by weekday</div>
+      <div class="chart-sub">Weekdays about 15%, weekends under 12%.</div>
+      <div class="plot" id="weekday"></div>
+    </div>
+  </div>
+</section>
+
+<section id="enroute">
+  <div class="section-head">
+    <div class="eyebrow">Along the way</div>
+    <h2>Most of the delay builds up before Hannover</h2>
+    <p>On the high-speed line, the share of trains at least 6 minutes late rises from 23% at Hamburg Hbf to 42% at Hannover, in the first hour and a quarter, and then more slowly to 56% at Frankfurt. The share at least 20 minutes late grows from 7% to 25%. 81% of all runs start before Hamburg Hbf, but unlike on the Frankfurt–München corridor this hardly matters: 24% of them leave Hamburg at least 6 minutes late, against 26% of trains that start there.</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Trains late at each stop, high-speed via Hannover and Kassel</div>
+    <div class="chart-sub">Departure delay, or arrival delay at Frankfurt. Canceled stops are left out. Stations served by at least 12% of this family's 14,246 journeys; not every run stops at every station.</div>
+    <div class="plot" id="buildup"></div>
+    <div class="legend"><span><i style="background:var(--sev-severe)"></i>20 min or more late</span><span><i style="background:var(--sev-moderate)"></i>6 to 19 min late</span></div>
+  </div>
+  <div class="section-head">
+    <p>This matters for the <em>during the journey</em> setting. The delay a train already has explains a growing part of its final delay: the correlation with the arrival delay at Frankfurt is <b class="mono">0.36</b> at Hamburg Hbf, <b class="mono">0.69</b> at Hannover and <b class="mono">0.79</b> at Kassel-Wilhelmshöhe. A train leaving Kassel-Wilhelmshöhe an hour or more late ends up severe or canceled 88% of the time.</p>
+  </div>
+  <div class="three" id="enroutegrid"></div>
+</section>
+
+<section id="cancel">
+  <div class="section-head">
+    <div class="eyebrow">Cancellations</div>
+    <h2>7.9% of journeys are canceled</h2>
+    <p>Of the 1,709 canceled journeys, 882 are canceled at both ends. Another 505 set off from Hamburg Hbf but never reached Frankfurt, and 322 were canceled at Hamburg Hbf but ran later in the journey. A further 707 journeys lost only intermediate stops. These are not counted as canceled under our definition, but they would be under a stricter one.</p>
+  </div>
+  <div class="chart">
+    <div class="plot" id="cancelbars"></div>
+  </div>
+</section>
+
+<section id="trains">
+  <div class="section-head">
+    <div class="eyebrow">Individual trains</div>
+    <h2>Gießen and Köln trains do worst</h2>
+    <p>Among the 30 train numbers with at least 300 journeys, the share of severe or canceled runs ranges from 3% to 33%. Three of the six least reliable run via Gießen: they are rarely late when they run, but often canceled. Two run via Köln, with median delays over 30 minutes. All six most reliable trains use the high-speed line and leave Hamburg between 03:20 and 10:24.</p>
+  </div>
+  <div class="two">
+    <div class="chart"><div class="chart-title">Least reliable</div><div class="table-wrap"><table id="worst"></table></div></div>
+    <div class="chart"><div class="chart-title">Most reliable</div><div class="table-wrap"><table id="best"></table></div></div>
+  </div>
+</section>
+
+<section id="quality">
+  <div class="section-head">
+    <div class="eyebrow">Data quality</div>
+    <h2>What to watch for in the data</h2>
+  </div>
+  <ul class="notes">
+    <li><b>Recorded stops changed on 3 November 2025.</b> Before that date the source only recorded about the 100 largest stations. 45.3% of earlier journeys have gaps in their stop numbering, against 1.9% afterwards. The dataset keeps only stations present in every month, so the set of stations is stable, but stop-level features from before and after that date should still be compared with care.</li>
+    <li><b>Stations missing from some months are dropped.</b> 7,099 of 159,543 recorded stops are at stations that are not in every monthly file, for example Celle Pbf, Marburg (Lahn), Siegburg/Bonn, Frankfurt am Main Flughafen Fernbahnhof. Journeys still pass through them; they are just not in the stop list.</li>
+    <li><b>Some journeys may have no live updates.</b> In 737 journeys the reported time equals the scheduled time at every stop. That could be a perfectly punctual train, or a train with no real-time data. 1,504 journeys arrive with exactly 0 minutes of delay.</li>
+    <li><b>Some arrivals are very early.</b> 459 completed journeys arrive 5 or more minutes early, one of them 70 minutes early. These are more likely timetable changes that were never recorded than real early running.</li>
+    <li><b>The source's own delay column is the wrong one for us.</b> <span class="mono">delay_in_min</span> gives the departure delay when a train continues beyond Frankfurt, so the arrival delay here is computed from the arrival times.</li>
+    <li><b>Only Frankfurt (Main) Hbf counts as the destination.</b> 5,339 further Hamburg Hbf runs reach Frankfurt only at the airport or at Frankfurt (Main) Süd and are not in this corridor. The airport station is also missing from some monthly files, so it is dropped from the stop lists.</li>
+  </ul>
+</section>
+
+<section id="next">
+  <div class="section-head">
+    <div class="eyebrow">For the project</div>
+    <h2>Questions this raises</h2>
+  </div>
+  <div class="qa">
+    <div><h3>Which runs are shared with the München corridors?</h3><p>2,559 runs (12%) continue from Frankfurt to München and are also Hamburg–München and Frankfurt–München journeys. A split into training and test data has to keep each run on one side.</p></div>
+    <div><h3>What happens to the Gießen route?</h3><p>It carries 13% of all journeys, almost all of them before January 2026. A test period in 2026 would contain a different mix of routes than the training period.</p></div>
+    <div><h3>Should the destination include the airport and Süd?</h3><p>Counting them would add about a quarter more runs, most of them at the airport. Whether they belong depends on whether the question is about Frankfurt Hbf or about reaching Frankfurt at all.</p></div>
+    <div><h3>How strong is the during-journey baseline?</h3><p>The delay at Kassel, about 80 minutes before Frankfurt, already correlates 0.79 with the final delay. A model has most room to add value at departure and around Hannover.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div>Source: <span class="mono">corridor_analysis/data/journeys.parquet</span> and <span class="mono">stops.parquet</span>, built by <span class="mono">corridor_analysis/extract.py</span> from the Deutsche Bahn timetable data collected by piebro/deutsche-bahn-data (CC BY 4.0). Stops are limited to stations present in all monthly files. Station coordinates from db-stations 5.0.2.</div>
+  <div>Delay classes: normal/minor under 20 min, moderate 20–59 min, severe 60 min or more, canceled if the Hamburg Hbf departure or Frankfurt arrival is canceled. Route families are our own grouping of the recorded stop patterns.</div>
+</footer>
+</div>
+
+<script>
+const D = {"key": "hamburg_frankfurt", "label": "Hamburg", "origin": "Hamburg Hbf", "short": "Hamburg Hbf", "destination": "Frankfurt (Main) Hbf", "dest_label": "Frankfurt", "overview": {"journeys": 21557, "days": 792, "first": "2024-07-01", "last": "2026-08-31", "per_day": 27.2, "train_numbers": 227, "routes": 388, "ice": 20822, "ic": 735, "sched_median": 234.0, "sched_min": 202.0, "sched_p10": 216.0, "sched_p90": 371.0, "delay_mean": 17.4, "delay_median": 8.0, "p90": 48.0, "p99": 124.0, "dmax": 380.0, "punctual_6": 0.4282, "under20": 0.7058, "classes": {"normal_minor": 14008, "moderate": 4494, "canceled": 1709, "severe": 1346}, "severe_or_canceled": 0.1417, "canceled": 0.0793, "early_5": 459, "early_min": -70.0}, "hist": [{"lo": -10, "n": 320}, {"lo": -5, "n": 2126}, {"lo": 0, "n": 5362}, {"lo": 5, "n": 2999}, {"lo": 10, "n": 1845}, {"lo": 15, "n": 1356}, {"lo": 20, "n": 1073}, {"lo": 25, "n": 868}, {"lo": 30, "n": 647}, {"lo": 35, "n": 514}, {"lo": 40, "n": 479}, {"lo": 45, "n": 352}, {"lo": 50, "n": 304}, {"lo": 55, "n": 257}, {"lo": 60, "n": 219}, {"lo": 65, "n": 170}, {"lo": 70, "n": 134}, {"lo": 75, "n": 118}, {"lo": 80, "n": 94}, {"lo": 85, "n": 98}, {"lo": 90, "n": 72}, {"lo": 95, "n": 48}, {"lo": 100, "n": 47}, {"lo": 105, "n": 41}, {"lo": 110, "n": 50}, {"lo": 115, "n": 30}, {"lo": 120, "n": 30}, {"lo": 125, "n": 19}, {"lo": 130, "n": 17}, {"lo": 135, "n": 21}, {"lo": 140, "n": 12}, {"lo": 145, "n": 18}, {"lo": 150, "n": 14}, {"lo": 155, "n": 15}, {"lo": 160, "n": 7}, {"lo": 165, "n": 5}, {"lo": 170, "n": 4}, {"lo": 175, "n": 4}], "hist_over180": 59, "hist_under_minus10": 148, "cdf": [{"x": -5, "p": 0.0161}, {"x": -4, "p": 0.0231}, {"x": -3, "p": 0.0342}, {"x": -2, "p": 0.0523}, {"x": -1, "p": 0.0809}, {"x": 0, "p": 0.1232}, {"x": 1, "p": 0.199}, {"x": 2, "p": 0.2535}, {"x": 3, "p": 0.3035}, {"x": 4, "p": 0.3511}, {"x": 5, "p": 0.3934}, {"x": 6, "p": 0.4282}, {"x": 7, "p": 0.4628}, {"x": 8, "p": 0.4936}, {"x": 9, "p": 0.5202}, {"x": 10, "p": 0.5445}, {"x": 11, "p": 0.5674}, {"x": 12, "p": 0.5874}, {"x": 13, "p": 0.6048}, {"x": 14, "p": 0.6217}, {"x": 15, "p": 0.6374}, {"x": 16, "p": 0.6538}, {"x": 17, "p": 0.6688}, {"x": 18, "p": 0.6815}, {"x": 19, "p": 0.6941}, {"x": 20, "p": 0.7058}, {"x": 21, "p": 0.7174}, {"x": 22, "p": 0.7287}, {"x": 23, "p": 0.739}, {"x": 24, "p": 0.7498}, {"x": 25, "p": 0.7598}, {"x": 26, "p": 0.77}, {"x": 27, "p": 0.7801}, {"x": 28, "p": 0.7879}, {"x": 29, "p": 0.7957}, {"x": 30, "p": 0.8036}, {"x": 31, "p": 0.8111}, {"x": 32, "p": 0.818}, {"x": 33, "p": 0.8227}, {"x": 34, "p": 0.8296}, {"x": 35, "p": 0.8362}, {"x": 36, "p": 0.8418}, {"x": 37, "p": 0.847}, {"x": 38, "p": 0.8528}, {"x": 39, "p": 0.8582}, {"x": 40, "p": 0.8621}, {"x": 41, "p": 0.8669}, {"x": 42, "p": 0.8722}, {"x": 43, "p": 0.8765}, {"x": 44, "p": 0.8821}, {"x": 45, "p": 0.8862}, {"x": 46, "p": 0.8903}, {"x": 47, "p": 0.8944}, {"x": 48, "p": 0.898}, {"x": 49, "p": 0.9006}, {"x": 50, "p": 0.9039}, {"x": 51, "p": 0.9069}, {"x": 52, "p": 0.9104}, {"x": 53, "p": 0.9135}, {"x": 54, "p": 0.9167}, {"x": 55, "p": 0.9192}, {"x": 56, "p": 0.9225}, {"x": 57, "p": 0.9252}, {"x": 58, "p": 0.9278}, {"x": 59, "p": 0.9297}, {"x": 60, "p": 0.9322}, {"x": 61, "p": 0.9343}, {"x": 62, "p": 0.9359}, {"x": 63, "p": 0.9386}, {"x": 64, "p": 0.941}, {"x": 65, "p": 0.9432}, {"x": 66, "p": 0.9452}, {"x": 67, "p": 0.9468}, {"x": 68, "p": 0.9487}, {"x": 69, "p": 0.9501}, {"x": 70, "p": 0.9518}, {"x": 71, "p": 0.953}, {"x": 72, "p": 0.9542}, {"x": 73, "p": 0.9555}, {"x": 74, "p": 0.9572}, {"x": 75, "p": 0.9585}, {"x": 76, "p": 0.9597}, {"x": 77, "p": 0.9612}, {"x": 78, "p": 0.9624}, {"x": 79, "p": 0.9635}, {"x": 80, "p": 0.9645}, {"x": 81, "p": 0.9654}, {"x": 82, "p": 0.9664}, {"x": 83, "p": 0.9674}, {"x": 84, "p": 0.9682}, {"x": 85, "p": 0.9692}, {"x": 86, "p": 0.9704}, {"x": 87, "p": 0.9714}, {"x": 88, "p": 0.9723}, {"x": 89, "p": 0.9732}, {"x": 90, "p": 0.9742}, {"x": 91, "p": 0.9749}, {"x": 92, "p": 0.9755}, {"x": 93, "p": 0.9765}, {"x": 94, "p": 0.9772}, {"x": 95, "p": 0.9778}, {"x": 96, "p": 0.9782}, {"x": 97, "p": 0.9788}, {"x": 98, "p": 0.9792}, {"x": 99, "p": 0.9798}, {"x": 100, "p": 0.9802}, {"x": 101, "p": 0.9809}, {"x": 102, "p": 0.9813}, {"x": 103, "p": 0.9818}, {"x": 104, "p": 0.9822}, {"x": 105, "p": 0.9826}, {"x": 106, "p": 0.9831}, {"x": 107, "p": 0.9834}, {"x": 108, "p": 0.9839}, {"x": 109, "p": 0.9844}, {"x": 110, "p": 0.9846}, {"x": 111, "p": 0.9849}, {"x": 112, "p": 0.9855}, {"x": 113, "p": 0.9859}, {"x": 114, "p": 0.9867}, {"x": 115, "p": 0.9872}, {"x": 116, "p": 0.9875}, {"x": 117, "p": 0.9878}, {"x": 118, "p": 0.988}, {"x": 119, "p": 0.9882}, {"x": 120, "p": 0.9887}], "monthly": [{"month": "2024-07", "n": 908, "mean": 16.9, "soc": 0.1421, "normal_minor": 0.6619, "moderate": 0.196, "severe": 0.0683, "canceled": 0.0738}, {"month": "2024-08", "n": 1008, "mean": 19.0, "soc": 0.13, "normal_minor": 0.5873, "moderate": 0.2827, "severe": 0.0546, "canceled": 0.0754}, {"month": "2024-09", "n": 1142, "mean": 18.5, "soc": 0.134, "normal_minor": 0.6252, "moderate": 0.2408, "severe": 0.0595, "canceled": 0.0744}, {"month": "2024-10", "n": 1157, "mean": 16.5, "soc": 0.1426, "normal_minor": 0.6283, "moderate": 0.229, "severe": 0.0501, "canceled": 0.0925}, {"month": "2024-11", "n": 1112, "mean": 23.4, "soc": 0.2041, "normal_minor": 0.5234, "moderate": 0.2725, "severe": 0.0899, "canceled": 0.1142}, {"month": "2024-12", "n": 1073, "mean": 12.9, "soc": 0.0792, "normal_minor": 0.7139, "moderate": 0.2069, "severe": 0.027, "canceled": 0.0522}, {"month": "2025-01", "n": 783, "mean": 13.6, "soc": 0.1188, "normal_minor": 0.705, "moderate": 0.1762, "severe": 0.0536, "canceled": 0.0651}, {"month": "2025-02", "n": 826, "mean": 12.8, "soc": 0.1065, "normal_minor": 0.7022, "moderate": 0.1913, "severe": 0.0303, "canceled": 0.0763}, {"month": "2025-03", "n": 763, "mean": 14.7, "soc": 0.1337, "normal_minor": 0.7143, "moderate": 0.152, "severe": 0.0511, "canceled": 0.0826}, {"month": "2025-04", "n": 601, "mean": 18.4, "soc": 0.1814, "normal_minor": 0.619, "moderate": 0.1997, "severe": 0.0582, "canceled": 0.1231}, {"month": "2025-05", "n": 771, "mean": 15.4, "soc": 0.1128, "normal_minor": 0.6861, "moderate": 0.201, "severe": 0.048, "canceled": 0.0649}, {"month": "2025-06", "n": 982, "mean": 16.7, "soc": 0.164, "normal_minor": 0.6263, "moderate": 0.2098, "severe": 0.055, "canceled": 0.109}, {"month": "2025-07", "n": 956, "mean": 20.7, "soc": 0.2123, "normal_minor": 0.5868, "moderate": 0.2008, "severe": 0.0795, "canceled": 0.1328}, {"month": "2025-08", "n": 908, "mean": 17.5, "soc": 0.1289, "normal_minor": 0.6894, "moderate": 0.1817, "severe": 0.0727, "canceled": 0.0562}, {"month": "2025-09", "n": 891, "mean": 17.0, "soc": 0.1212, "normal_minor": 0.6902, "moderate": 0.1886, "severe": 0.0696, "canceled": 0.0516}, {"month": "2025-10", "n": 966, "mean": 18.0, "soc": 0.1294, "normal_minor": 0.6211, "moderate": 0.2495, "severe": 0.0652, "canceled": 0.0642}, {"month": "2025-11", "n": 768, "mean": 16.4, "soc": 0.1081, "normal_minor": 0.7135, "moderate": 0.1784, "severe": 0.0638, "canceled": 0.0443}, {"month": "2025-12", "n": 824, "mean": 11.6, "soc": 0.0765, "normal_minor": 0.79, "moderate": 0.1335, "severe": 0.0413, "canceled": 0.0352}, {"month": "2026-01", "n": 685, "mean": 26.8, "soc": 0.2599, "normal_minor": 0.5182, "moderate": 0.2219, "severe": 0.1168, "canceled": 0.1431}, {"month": "2026-02", "n": 622, "mean": 16.2, "soc": 0.1254, "normal_minor": 0.6768, "moderate": 0.1977, "severe": 0.0579, "canceled": 0.0675}, {"month": "2026-03", "n": 625, "mean": 16.5, "soc": 0.1632, "normal_minor": 0.664, "moderate": 0.1728, "severe": 0.056, "canceled": 0.1072}, {"month": "2026-04", "n": 609, "mean": 10.3, "soc": 0.0591, "normal_minor": 0.8161, "moderate": 0.1248, "severe": 0.023, "canceled": 0.0361}, {"month": "2026-05", "n": 446, "mean": 12.2, "soc": 0.0987, "normal_minor": 0.7825, "moderate": 0.1188, "severe": 0.0493, "canceled": 0.0493}, {"month": "2026-06", "n": 502, "mean": 20.3, "soc": 0.1335, "normal_minor": 0.6375, "moderate": 0.2291, "severe": 0.0757, "canceled": 0.0578}, {"month": "2026-07", "n": 643, "mean": 24.4, "soc": 0.2177, "normal_minor": 0.5614, "moderate": 0.2208, "severe": 0.126, "canceled": 0.0918}, {"month": "2026-08", "n": 986, "mean": 23.7, "soc": 0.1836, "normal_minor": 0.5213, "moderate": 0.2951, "severe": 0.0872, "canceled": 0.0963}], "hourly": [{"hour": 0, "n": 14, "soc": 0.0714, "mean": 16.5, "sched": 292.0}, {"hour": 1, "n": 1, "soc": 0.0, "mean": 22.0, "sched": 336.0}, {"hour": 2, "n": 27, "soc": 0.1481, "mean": 16.5, "sched": 300.0}, {"hour": 3, "n": 319, "soc": 0.0313, "mean": 7.3, "sched": 264.0}, {"hour": 4, "n": 387, "soc": 0.0982, "mean": 11.4, "sched": 227.0}, {"hour": 5, "n": 926, "soc": 0.0896, "mean": 10.0, "sched": 226.0}, {"hour": 6, "n": 1708, "soc": 0.1294, "mean": 8.5, "sched": 222.0}, {"hour": 7, "n": 880, "soc": 0.1193, "mean": 17.4, "sched": 217.0}, {"hour": 8, "n": 1061, "soc": 0.1338, "mean": 12.4, "sched": 270.0}, {"hour": 9, "n": 1013, "soc": 0.1115, "mean": 17.2, "sched": 225.0}, {"hour": 10, "n": 1402, "soc": 0.1405, "mean": 11.9, "sched": 225.0}, {"hour": 11, "n": 1924, "soc": 0.1954, "mean": 22.8, "sched": 255.0}, {"hour": 12, "n": 1317, "soc": 0.1549, "mean": 16.8, "sched": 252.0}, {"hour": 13, "n": 1040, "soc": 0.1144, "mean": 20.5, "sched": 225.0}, {"hour": 14, "n": 1840, "soc": 0.1402, "mean": 17.5, "sched": 278.0}, {"hour": 15, "n": 981, "soc": 0.1427, "mean": 21.8, "sched": 222.0}, {"hour": 16, "n": 1550, "soc": 0.1974, "mean": 23.8, "sched": 280.0}, {"hour": 17, "n": 1028, "soc": 0.143, "mean": 23.4, "sched": 225.0}, {"hour": 18, "n": 1346, "soc": 0.1582, "mean": 18.9, "sched": 225.0}, {"hour": 19, "n": 1560, "soc": 0.159, "mean": 23.2, "sched": 322.0}, {"hour": 20, "n": 558, "soc": 0.1183, "mean": 18.1, "sched": 234.0}, {"hour": 21, "n": 3, "soc": 0.0, "mean": 6.3, "sched": 576.0}, {"hour": 22, "n": 655, "soc": 0.0962, "mean": 9.7, "sched": 496.0}, {"hour": 23, "n": 17, "soc": 0.0588, "mean": 6.8, "sched": 310.0}], "weekday": [{"wd": 0, "n": 3133, "soc": 0.1532, "mean": 17.9, "canc": 0.0827}, {"wd": 1, "n": 3086, "soc": 0.1504, "mean": 19.3, "canc": 0.0778}, {"wd": 2, "n": 3150, "soc": 0.1565, "mean": 18.8, "canc": 0.0879}, {"wd": 3, "n": 3172, "soc": 0.151, "mean": 18.8, "canc": 0.0892}, {"wd": 4, "n": 3114, "soc": 0.1468, "mean": 18.2, "canc": 0.0851}, {"wd": 5, "n": 2929, "soc": 0.1171, "mean": 13.9, "canc": 0.0686}, {"wd": 6, "n": 2973, "soc": 0.114, "mean": 14.5, "canc": 0.0619}], "families": [{"key": "hannover", "label": "High-speed via Hannover and Kassel", "via": "Harburg or Lüneburg and Uelzen, Hannover, Göttingen, Kassel, sometimes Fulda or Hanau", "n": 14246, "sched": 222.0, "mean": 15.6, "median": 7.0, "soc": 0.1152, "canc": 0.0611, "normal_minor": 0.706, "moderate": 0.1789, "severe": 0.0541, "canceled": 0.0611}, {"key": "giessen", "label": "Via Kassel and Gießen", "via": "As above to Kassel, then the older line through Marburg and Gießen", "n": 2890, "sched": 280.0, "mean": 9.5, "median": 2.0, "soc": 0.209, "canc": 0.1882, "normal_minor": 0.6623, "moderate": 0.1287, "severe": 0.0208, "canceled": 0.1882}, {"key": "koeln", "label": "Via Bremen, the Ruhr and Köln", "via": "Bremen, Osnabrück, Münster, the Ruhr, Köln, then the high-speed line or the Rhine valley via Koblenz and Mainz", "n": 3329, "sched": 363.0, "mean": 29.5, "median": 23.0, "soc": 0.1895, "canc": 0.0682, "normal_minor": 0.4269, "moderate": 0.3836, "severe": 0.1214, "canceled": 0.0682}, {"key": "berlin", "label": "Via Berlin and Erfurt", "via": "Berlin-Spandau, Berlin Hbf, Südkreuz, Leipzig or Halle, Erfurt, Fulda", "n": 1067, "sched": 391.0, "mean": 21.9, "median": 12.0, "soc": 0.1649, "canc": 0.0609, "normal_minor": 0.5604, "moderate": 0.2746, "severe": 0.104, "canceled": 0.0609}, {"key": "other", "label": "Diversions and rare patterns", "via": "Mostly via Bremen and Hannover; a few runs recorded with almost no stops", "n": 25, "sched": 306.0, "mean": 10.1, "median": 4.0, "soc": 0.12, "canc": 0.08, "normal_minor": 0.72, "moderate": 0.16, "severe": 0.04, "canceled": 0.08}], "sched_over": 24, "sched_hist": [{"lo": 195, "berlin": 0, "giessen": 0, "hannover": 329, "koeln": 0, "other": 0}, {"lo": 210, "berlin": 0, "giessen": 0, "hannover": 7343, "koeln": 0, "other": 1}, {"lo": 225, "berlin": 0, "giessen": 0, "hannover": 3310, "koeln": 0, "other": 4}, {"lo": 240, "berlin": 0, "giessen": 0, "hannover": 508, "koeln": 1, "other": 0}, {"lo": 255, "berlin": 0, "giessen": 0, "hannover": 1005, "koeln": 0, "other": 2}, {"lo": 270, "berlin": 0, "giessen": 2684, "hannover": 1240, "koeln": 2, "other": 1}, {"lo": 285, "berlin": 0, "giessen": 196, "hannover": 348, "koeln": 0, "other": 0}, {"lo": 300, "berlin": 0, "giessen": 7, "hannover": 82, "koeln": 0, "other": 13}, {"lo": 315, "berlin": 0, "giessen": 3, "hannover": 51, "koeln": 1290, "other": 0}, {"lo": 330, "berlin": 0, "giessen": 0, "hannover": 24, "koeln": 169, "other": 0}, {"lo": 345, "berlin": 0, "giessen": 0, "hannover": 2, "koeln": 49, "other": 0}, {"lo": 360, "berlin": 351, "giessen": 0, "hannover": 4, "koeln": 450, "other": 0}, {"lo": 375, "berlin": 95, "giessen": 0, "hannover": 0, "koeln": 510, "other": 0}, {"lo": 390, "berlin": 287, "giessen": 0, "hannover": 0, "koeln": 115, "other": 2}, {"lo": 405, "berlin": 21, "giessen": 0, "hannover": 0, "koeln": 42, "other": 0}, {"lo": 420, "berlin": 37, "giessen": 0, "hannover": 0, "koeln": 39, "other": 0}, {"lo": 435, "berlin": 169, "giessen": 0, "hannover": 0, "koeln": 12, "other": 1}, {"lo": 450, "berlin": 32, "giessen": 0, "hannover": 0, "koeln": 4, "other": 0}, {"lo": 465, "berlin": 31, "giessen": 0, "hannover": 0, "koeln": 0, "other": 0}, {"lo": 480, "berlin": 6, "giessen": 0, "hannover": 0, "koeln": 20, "other": 0}, {"lo": 495, "berlin": 26, "giessen": 0, "hannover": 0, "koeln": 506, "other": 1}, {"lo": 510, "berlin": 2, "giessen": 0, "hannover": 0, "koeln": 82, "other": 0}, {"lo": 525, "berlin": 2, "giessen": 0, "hannover": 0, "koeln": 22, "other": 0}], "buildup": [{"station": "Hamburg Hbf", "n": 13665, "mean": 5.1, "p20": 0.0698, "p6": 0.2326, "mins": 0.0}, {"station": "Hamburg-Harburg", "n": 3048, "mean": 5.0, "p20": 0.0614, "p6": 0.2215, "mins": 12.0}, {"station": "Lüneburg", "n": 2739, "mean": 6.5, "p20": 0.0814, "p6": 0.3176, "mins": 30.0}, {"station": "Uelzen", "n": 2499, "mean": 9.1, "p20": 0.1349, "p6": 0.4198, "mins": 43.0}, {"station": "Hannover Hbf", "n": 13711, "mean": 10.4, "p20": 0.1614, "p6": 0.4194, "mins": 78.0}, {"station": "Göttingen", "n": 12847, "mean": 12.0, "p20": 0.1878, "p6": 0.4631, "mins": 118.0}, {"station": "Kassel-Wilhelmshöhe", "n": 12806, "mean": 12.9, "p20": 0.2022, "p6": 0.4852, "mins": 139.0}, {"station": "Frankfurt (Main) Hbf", "n": 13512, "mean": 15.8, "p20": 0.2511, "p6": 0.5574, "mins": 221.0}], "main_family": "hannover", "main_n": 14246, "enroute": [{"station": "Hamburg Hbf", "n": 20353, "corr": 0.359, "rows": [{"b": "<6", "n": 15391, "soc": 0.0661, "final": 6.0}, {"b": "6–19", "n": 3496, "soc": 0.1061, "final": 14.0}, {"b": "20–39", "n": 1056, "soc": 0.2045, "final": 31.0}, {"b": "40–59", "n": 270, "soc": 0.4926, "final": 56.0}, {"b": "≥60", "n": 140, "soc": 0.8071, "final": 89.0}]}, {"station": "Hannover Hbf", "n": 16220, "corr": 0.687, "rows": [{"b": "<6", "n": 9445, "soc": 0.0341, "final": 3.0}, {"b": "6–19", "n": 4148, "soc": 0.0586, "final": 9.0}, {"b": "20–39", "n": 1668, "soc": 0.1265, "final": 26.0}, {"b": "40–59", "n": 544, "soc": 0.3235, "final": 49.0}, {"b": "≥60", "n": 415, "soc": 0.8964, "final": 87.0}]}, {"station": "Kassel-Wilhelmshöhe", "n": 15310, "corr": 0.786, "rows": [{"b": "<6", "n": 8007, "soc": 0.0279, "final": 2.0}, {"b": "6–19", "n": 4231, "soc": 0.0402, "final": 9.0}, {"b": "20–39", "n": 1808, "soc": 0.0951, "final": 27.0}, {"b": "40–59", "n": 710, "soc": 0.2437, "final": 47.0}, {"b": "≥60", "n": 554, "soc": 0.8827, "final": 83.0}]}], "origin_start": {"starts_here": 0.1914, "late_if_starts_here": 0.2551, "late_if_through": 0.2412}, "cancel": {"both": 882, "dest_only": 505, "origin_only": 322, "intermediate_only": 707}, "quality": {"no_update_journeys": 737, "zero_delay_arrivals": 1504, "gaps": 6876, "gap_before": 0.4527, "gap_after": 0.0192}, "trains_count": 30, "trains_worst": [{"train": "1575", "n": 323, "soc": 0.3251, "median": 0.0, "dep": "06:24", "sched": 284.0, "fam": "giessen", "type": "ICE"}, {"train": "1021", "n": 451, "soc": 0.2683, "median": 37.0, "dep": "16:10", "sched": 363.0, "fam": "koeln", "type": "ICE"}, {"train": "1579", "n": 314, "soc": 0.2643, "median": 0.0, "dep": "10:28", "sched": 280.0, "fam": "giessen", "type": "ICE"}, {"train": "927", "n": 523, "soc": 0.2581, "median": 34.0, "dep": "11:53", "sched": 380.0, "fam": "koeln", "type": "ICE"}, {"train": "1675", "n": 394, "soc": 0.2513, "median": 0.0, "dep": "16:28", "sched": 280.0, "fam": "giessen", "type": "ICE"}, {"train": "1683", "n": 391, "soc": 0.2455, "median": 5.0, "dep": "11:28", "sched": 255.0, "fam": "hannover", "type": "ICE"}], "trains_best": [{"train": "591", "n": 324, "soc": 0.0278, "median": 4.0, "dep": "03:20", "sched": 264.0, "fam": "hannover", "type": "ICE"}, {"train": "571", "n": 352, "soc": 0.0455, "median": 1.0, "dep": "05:14", "sched": 226.0, "fam": "hannover", "type": "ICE"}, {"train": "71", "n": 587, "soc": 0.0562, "median": 4.0, "dep": "06:18", "sched": 222.0, "fam": "hannover", "type": "ICE"}, {"train": "1097", "n": 332, "soc": 0.0873, "median": 4.0, "dep": "06:06", "sched": 206.0, "fam": "hannover", "type": "ICE"}, {"train": "573", "n": 553, "soc": 0.0886, "median": 4.0, "dep": "07:24", "sched": 216.0, "fam": "hannover", "type": "ICE"}, {"train": "75", "n": 587, "soc": 0.0903, "median": 6.0, "dep": "10:24", "sched": 216.0, "fam": "hannover", "type": "ICE"}], "map": {"segments": [{"a": "Hannover Hbf", "b": "Göttingen", "n": 16201}, {"a": "Göttingen", "b": "Kassel-Wilhelmshöhe", "n": 16164}, {"a": "Kassel-Wilhelmshöhe", "b": "Frankfurt (Main) Hbf", "n": 11679}, {"a": "Hamburg Hbf", "b": "Hannover Hbf", "n": 8871}, {"a": "Hamburg Hbf", "b": "Hamburg-Harburg", "n": 8550}, {"a": "Uelzen", "b": "Hannover Hbf", "n": 5578}, {"a": "Hamburg-Harburg", "b": "Lüneburg", "n": 4975}, {"a": "Lüneburg", "b": "Uelzen", "n": 4433}, {"a": "Kassel-Wilhelmshöhe", "b": "Gießen", "n": 2890}, {"a": "Gießen", "b": "Frankfurt (Main) Hbf", "n": 2885}, {"a": "Duisburg Hbf", "b": "Düsseldorf Hbf", "n": 2368}, {"a": "Essen Hbf", "b": "Duisburg Hbf", "n": 2338}, {"a": "Hamburg-Harburg", "b": "Bremen Hbf", "n": 2335}, {"a": "Bremen Hbf", "b": "Osnabrück Hbf", "n": 2231}, {"a": "Osnabrück Hbf", "b": "Münster (Westf) Hbf", "n": 2165}, {"a": "Düsseldorf Hbf", "b": "Köln Hbf", "n": 1788}, {"a": "Kassel-Wilhelmshöhe", "b": "Fulda", "n": 1565}, {"a": "Münster (Westf) Hbf", "b": "Dortmund Hbf", "n": 1517}, {"a": "Lüneburg", "b": "Hannover Hbf", "n": 1478}, {"a": "Köln Hbf", "b": "Frankfurt (Main) Hbf", "n": 1455}, {"a": "Mainz Hbf", "b": "Frankfurt (Main) Hbf", "n": 1421}, {"a": "Koblenz Hbf", "b": "Mainz Hbf", "n": 1391}, {"a": "Hanau Hbf", "b": "Frankfurt (Main) Hbf", "n": 1340}, {"a": "Fulda", "b": "Hanau Hbf", "n": 1329}, {"a": "Hamburg-Harburg", "b": "Hannover Hbf", "n": 1214}, {"a": "Hamburg Hbf", "b": "Uelzen", "n": 1163}, {"a": "Dortmund Hbf", "b": "Bochum Hbf", "n": 1114}, {"a": "Bochum Hbf", "b": "Essen Hbf", "n": 1112}, {"a": "Hamburg Hbf", "b": "Lüneburg", "n": 1085}, {"a": "Bonn Hbf", "b": "Koblenz Hbf", "n": 1054}, {"a": "Berlin Hauptbahnhof", "b": "Berlin Südkreuz", "n": 1035}, {"a": "Köln Hbf", "b": "Bonn Hbf", "n": 1014}, {"a": "Hannover Hbf", "b": "Frankfurt (Main) Hbf", "n": 917}, {"a": "Leipzig Hbf", "b": "Erfurt Hbf", "n": 793}, {"a": "Berlin Südkreuz", "b": "Leipzig Hbf", "n": 780}, {"a": "Berlin-Spandau", "b": "Berlin Hauptbahnhof", "n": 626}, {"a": "Münster (Westf) Hbf", "b": "Essen Hbf", "n": 594}, {"a": "Erfurt Hbf", "b": "Frankfurt (Main) Hbf", "n": 591}, {"a": "Hamm (Westf) Hbf", "b": "Dortmund Hbf", "n": 586}, {"a": "Fulda", "b": "Frankfurt (Main) Hbf", "n": 582}, {"a": "Düsseldorf Hbf", "b": "Köln Messe/Deutz", "n": 569}, {"a": "Wuppertal Hbf", "b": "Solingen Hbf", "n": 556}, {"a": "Dortmund Hbf", "b": "Hagen Hbf", "n": 551}, {"a": "Hagen Hbf", "b": "Wuppertal Hbf", "n": 549}, {"a": "Solingen Hbf", "b": "Köln Hbf", "n": 544}, {"a": "Münster (Westf) Hbf", "b": "Hamm (Westf) Hbf", "n": 532}, {"a": "Bremen Hbf", "b": "Münster (Westf) Hbf", "n": 517}, {"a": "Hamburg Hbf", "b": "Essen Hbf", "n": 509}, {"a": "Hamburg Hbf", "b": "Bremen Hbf", "n": 473}, {"a": "Hamburg Hbf", "b": "Berlin-Spandau", "n": 461}, {"a": "Köln Messe/Deutz", "b": "Koblenz Hbf", "n": 443}, {"a": "Hamburg Hbf", "b": "Berlin Hauptbahnhof", "n": 435}, {"a": "Erfurt Hbf", "b": "Fulda", "n": 423}], "stations": [{"name": "Berlin Hauptbahnhof", "lat": 52.525592, "lon": 13.369545, "n": 1062}, {"name": "Berlin Südkreuz", "lat": 52.475047, "lon": 13.365319, "n": 1035}, {"name": "Berlin-Spandau", "lat": 52.5346481, "lon": 13.1968975, "n": 631}, {"name": "Bochum Hbf", "lat": 51.478609, "lon": 7.223275, "n": 1115}, {"name": "Bonn Hbf", "lat": 50.732008, "lon": 7.097136, "n": 1063}, {"name": "Bremen Hbf", "lat": 53.083481, "lon": 8.813834, "n": 2808}, {"name": "Dortmund Hbf", "lat": 51.517896, "lon": 7.45929, "n": 2133}, {"name": "Duisburg Hbf", "lat": 51.429785, "lon": 6.775903, "n": 2484}, {"name": "Düsseldorf Hbf", "lat": 51.219962, "lon": 6.794319, "n": 2443}, {"name": "Erfurt Hbf", "lat": 50.972551, "lon": 11.038499, "n": 1038}, {"name": "Essen Hbf", "lat": 51.451355, "lon": 7.014793, "n": 2346}, {"name": "Frankfurt (Main) Hbf", "lat": 50.107145, "lon": 8.663789, "n": 21557}, {"name": "Fulda", "lat": 50.554723, "lon": 9.683977, "n": 2026}, {"name": "Gießen", "lat": 50.579059, "lon": 8.661462, "n": 2890}, {"name": "Göttingen", "lat": 51.536815, "lon": 9.926072, "n": 16209}, {"name": "Hagen Hbf", "lat": 51.362747, "lon": 7.460249, "n": 553}, {"name": "Hamburg Hbf", "lat": 53.552736, "lon": 10.006909, "n": 21557}, {"name": "Hamburg-Harburg", "lat": 53.455908, "lon": 9.991701, "n": 8551}, {"name": "Hamm (Westf) Hbf", "lat": 51.678078, "lon": 7.807821, "n": 608}, {"name": "Hanau Hbf", "lat": 50.120953, "lon": 8.929, "n": 1344}, {"name": "Hannover Hbf", "lat": 52.376761, "lon": 9.741021, "n": 17157}, {"name": "Kassel-Wilhelmshöhe", "lat": 51.313114, "lon": 9.446898, "n": 16201}, {"name": "Koblenz Hbf", "lat": 50.350929, "lon": 7.588345, "n": 1633}, {"name": "Köln Hbf", "lat": 50.94303, "lon": 6.958729, "n": 2600}, {"name": "Köln Messe/Deutz", "lat": 50.940874, "lon": 6.975001, "n": 608}, {"name": "Leipzig Hbf", "lat": 51.3454712, "lon": 12.3820639, "n": 803}, {"name": "Lüneburg", "lat": 53.249656, "lon": 10.41989, "n": 6060}, {"name": "Mainz Hbf", "lat": 50.001117, "lon": 8.25872, "n": 1426}, {"name": "Münster (Westf) Hbf", "lat": 51.956566, "lon": 7.635715, "n": 2694}, {"name": "Osnabrück Hbf", "lat": 52.272851, "lon": 8.061781, "n": 2242}, {"name": "Solingen Hbf", "lat": 51.160766, "lon": 7.004187, "n": 585}, {"name": "Uelzen", "lat": 52.969781, "lon": 10.553053, "n": 5604}, {"name": "Wuppertal Hbf", "lat": 51.254363, "lon": 7.149543, "n": 557}]}, "panel": {"stops_before_panel_filter": 159543, "stops_removed_outside_panel": 7099, "stations_removed_outside_panel": ["Andernach", "Bad Bevensen", "Bingen (Rhein) Hbf", "Büchen", "Celle Pbf", "Düsseldorf Flughafen", "Eisenach Hbf", "Frankfurt (Main) Flughafen Regionalbahnhof", "Frankfurt (Main) West", "Frankfurt am Main Flughafen Fernbahnhof", "Friedberg (Hess)", "Günzburg", "Hannover-Messe / Laatzen", "Köln Süd", "Ludwigslust", "Lutherstadt Wittenberg Hbf", "Marburg (Lahn)", "Offenbach (Main) Hbf", "Recklinghausen Hbf", "Remagen", "Siegburg/Bonn", "Treysa", "Wabern (Bz Kassel)", "Wittenberge"]}, "shared_runs": {"berlin": 695, "hamburg": 2559, "frankfurt": 2554}};
+/* Shared helpers for the corridor pages: formatting, tooltip, mark paths, resizing. */
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => n.toLocaleString("en-US");
+const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
+const css = (v) => `var(--${v})`;
+const hm = (m) => `${Math.floor(m / 60)} h ${String(Math.round(m % 60)).padStart(2, "0")}`;
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+const CLASSES = [
+  { key: "normal_minor", label: "Normal or minor (<20 min)", color: "sev-normal" },
+  { key: "moderate", label: "Moderate (20–59 min)", color: "sev-moderate" },
+  { key: "severe", label: "Severe (60+ min)", color: "sev-severe" },
+  { key: "canceled", label: "Canceled", color: "sev-canceled" },
+];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const mlabel = (s) => `${MONTHS[+s.slice(5) - 1]} ${s.slice(0, 4)}`;
+const WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/* Tooltip: any element with data-tip (HTML, built from our own data) shows it. */
+const tip = $("#tip");
+function showTip(html, x, y) {
+  tip.innerHTML = html; tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  let left = x + 14, top = y + 14;
+  if (left + r.width > innerWidth - 8) left = x - r.width - 14;
+  if (top + r.height > innerHeight - 8) top = y - r.height - 14;
+  tip.style.left = Math.max(8, left) + "px"; tip.style.top = Math.max(8, top) + "px";
+}
+document.addEventListener("pointermove", (e) => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (t) showTip(t.getAttribute("data-tip"), e.clientX, e.clientY);
+  else if (!e.target.closest || !e.target.closest("[data-cross]")) tip.hidden = true;
+});
+document.addEventListener("focusin", (e) => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (t) { const r = t.getBoundingClientRect(); showTip(t.getAttribute("data-tip"), r.right, r.top); }
+});
+document.addEventListener("focusout", () => { tip.hidden = true; });
+
+function niceMax(v, steps = 4) {
+  const raw = v / steps, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const n = [1, 2, 2.5, 5, 10].find((k) => k * mag >= raw) * mag;
+  return { max: n * steps, step: n };
+}
+// Column with 4px rounded data end, square at the baseline.
+function colPath(x, y, w, h, r = 4) {
+  if (h <= 0) return "";
+  r = Math.min(r, w / 2, h);
+  return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+}
+// Horizontal bar with 4px rounded data end.
+function barPath(x, y, w, h, r = 4) {
+  if (w <= 0) return "";
+  r = Math.min(r, h / 2, w);
+  return `M${x},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h - r}Q${x + w},${y + h} ${x + w - r},${y + h}H${x}Z`;
+}
+function legend(el, items) {
+  el.innerHTML = items.map((i) => `<span><i style="background:${css(i.color)}"></i>${i.label}</span>`).join("");
+}
+const charts = [];
+function register(fn) { charts.push(fn); fn(); }
+let resizeTimer;
+addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => charts.forEach((f) => f()), 120); });
+
+/* 100% bar of severity classes. */
+function classBar(el, counts, total, H = 54, labels = true) {
+  const W = el.clientWidth;
+  let x = 0, out = "";
+  CLASSES.forEach((c, i) => {
+    const n = counts[c.key] || 0, w = (n / total) * W, gap = i < CLASSES.length - 1 ? 2 : 0;
+    const d = i === 0 ? `M${x + 4},0H${x + w - gap}V28H${x + 4}Q${x},28 ${x},24V4Q${x},0 ${x + 4},0Z`
+      : i === CLASSES.length - 1 ? barPath(x, 0, w, 28) : `M${x},0H${x + w - gap}V28H${x}Z`;
+    out += `<g class="hov" data-tip="<b>${c.label}</b><br>${fmt(n)} journeys · ${pct(n / total)}"><path class="mark" d="${d}" fill="${css(c.color)}"/></g>`;
+    if (labels && w > 54) out += `<text class="val" x="${x + 2}" y="46">${pct(n / total)}</text>`;
+    x += w;
+  });
+  el.innerHTML = `<svg width="${W}" height="${H}">${out}</svg>`;
+}
+
+/* Line chart with a shared crosshair: series = [{label, color, points:[{x,y}]}]. */
+function lineChart(el, series, o) {
+  const W = el.clientWidth, H = o.height || 260, m = { l: 48, r: 12, t: 12, b: 34 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const xs = series[0].points.map((p) => p.x);
+  const x0 = o.xMin ?? Math.min(...xs), x1 = o.xMax ?? Math.max(...xs);
+  const X = (v) => m.l + ((v - x0) / (x1 - x0)) * iw, Y = (v) => m.t + ih - ((v - o.yMin) / (o.yMax - o.yMin)) * ih;
+  let g = "";
+  for (let v = o.yMin; v <= o.yMax + 1e-9; v += o.yStep) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${o.yFmt(v)}</text>`;
+  // Ticks at the plot edges are anchored inward so they stay clear of the y labels and the frame.
+  (o.xTicks(W) || []).forEach((t) => { const x = X(t.v), a = x < m.l + 24 ? "start" : x > W - m.r - 24 ? "end" : "middle"; g += `<text x="${x}" y="${H - m.b + 16}" text-anchor="${a}">${t.label}</text>`; });
+  (o.refs || []).forEach((r) => { g += `<line x1="${X(r.x)}" x2="${X(r.x)}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--axis)" stroke-dasharray="3 3"/><text x="${X(r.x) + 4}" y="${m.t + 10}">${r.label}</text>`; });
+  const lines = series.map((s) => {
+    // A missing value breaks the line rather than bridging the gap.
+    const d = s.points.map((p, i) => p.y == null ? "" : `${i && s.points[i - 1].y != null ? "L" : "M"}${X(p.x).toFixed(1)},${Y(p.y).toFixed(1)}`).join("");
+    return `<path d="${d}" fill="none" stroke="${css(s.color)}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }).join("");
+  const id = el.id;
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>${lines}<g id="${id}-cross" pointer-events="none"></g><rect data-cross="1" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/></svg>`;
+  const rect = el.querySelector("rect[data-cross]"), cross = el.querySelector(`#${id}-cross`);
+  const move = (clientX, clientY) => {
+    const b = rect.getBoundingClientRect();
+    const v = x0 + ((clientX - b.left) / b.width) * (x1 - x0);
+    let best = xs[0]; xs.forEach((x) => { if (Math.abs(x - v) < Math.abs(best - v)) best = x; });
+    const cx = X(best);
+    cross.innerHTML = `<line x1="${cx}" x2="${cx}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--ink-2)" stroke-width="1"/>` +
+      series.map((s) => { const p = s.points.find((q) => q.x === best); return p && p.y != null ? `<circle cx="${cx}" cy="${Y(p.y)}" r="4.5" fill="${css(s.color)}" stroke="var(--surface)" stroke-width="2"/>` : ""; }).join("");
+    showTip(`<b>${o.xFmt(best)}</b><br>` + series.map((s) => { const p = s.points.find((q) => q.x === best); return `${s.label}: ${p && p.y != null ? o.tipFmt(p) : "–"}`; }).join("<br>"), clientX, clientY);
+  };
+  rect.addEventListener("pointermove", (e) => move(e.clientX, e.clientY));
+  rect.addEventListener("pointerleave", () => { cross.innerHTML = ""; tip.hidden = true; });
+}
+
+const SLOTS = ["fam-1", "fam-2", "fam-3", "fam-4"];
+const FAM = {};
+D.families.forEach((f, i) => { FAM[f.key] = { ...f, color: f.key === "other" ? "fam-other" : SLOTS[i] }; });
+const FAM_ORDER = D.families.map((f) => f.key);
+
+/* Map with greedy label placement: larger stations first, first free side wins. */
+register(function drawMap() {
+  const el = $("#map"), W = el.clientWidth;
+  const st = D.map.stations, byName = Object.fromEntries(st.map((s) => [s.name, s]));
+  const kx = Math.cos(50.3 * Math.PI / 180);
+  const xs = st.map((s) => s.lon * kx), ys = st.map((s) => s.lat);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const padL = 64, padR = 72, padT = 18, padB = 24;
+  const scale = (W - padL - padR) / (maxX - minX);
+  const H = Math.round((maxY - minY) * scale + padT + padB);
+  const px = (s) => padL + (s.lon * kx - minX) * scale, py = (s) => padT + (maxY - s.lat) * scale;
+  const maxN = Math.max(...D.map.segments.map((s) => s.n));
+  const sw = (n) => 1.2 + 10 * Math.sqrt(n / maxN);
+  const segs = [...D.map.segments].sort((a, b) => a.n - b.n).map((s) => {
+    const a = byName[s.a], b = byName[s.b];
+    return `<line x1="${px(a)}" y1="${py(a)}" x2="${px(b)}" y2="${py(b)}" stroke="var(--track)" stroke-opacity="0.78" stroke-width="${sw(s.n)}" stroke-linecap="round"/>` +
+      `<line class="hit" x1="${px(a)}" y1="${py(a)}" x2="${px(b)}" y2="${py(b)}" stroke="transparent" stroke-width="${Math.max(12, sw(s.n) + 6)}" data-tip="<b>${esc(s.a)} → ${esc(s.b)}</b><br>${fmt(s.n)} journeys"/>`;
+  }).join("");
+  const rad = (s) => (s.n > 0.5 * D.overview.journeys ? 5.5 : s.n > 0.2 * D.overview.journeys ? 4.5 : 3.5);
+  const dots = st.map((s) => `<circle cx="${px(s)}" cy="${py(s)}" r="${rad(s)}" fill="var(--surface)" stroke="var(--track)" stroke-width="2" data-tip="<b>${esc(s.name)}</b><br>${fmt(s.n)} journeys stop here" tabindex="0"/>`).join("");
+  el.innerHTML = `<svg width="${W}" height="${H}">${segs}${dots}<g class="labels"></g></svg>`;
+  const svg = el.querySelector("svg"), g = svg.querySelector(".labels");
+  const short = (n) => n.replace(" Hauptbahnhof", " Hbf").replace(/ \(Main\)| \(Saale\)| \(Westf\)/, "").replace(/ Hbf$/, "").replace("Kassel-Wilhelmshöhe", "Kassel");
+  const ends = [D.origin, D.destination];
+  const placed = st.map((s) => { const r = rad(s) + 1; return { l: px(s) - r, r: px(s) + r, t: py(s) - r, b: py(s) + r }; });
+  const order = [...st].sort((a, b) => (ends.includes(b.name) - ends.includes(a.name)) || b.n - a.n);
+  const hit = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+  order.forEach((s) => {
+    const r = rad(s), x = px(s), y = py(s), major = ends.includes(s.name);
+    const name = major ? (s.name === D.origin ? D.short.replace(" Hauptbahnhof", " Hbf") : D.destination.replace(" Hauptbahnhof", " Hbf").replace(" (Main)", "")) : short(s.name);
+    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.setAttribute("class", major ? "lab-strong" : "lab"); t.textContent = name; g.appendChild(t);
+    const cands = [[x + r + 5, y + 4, "start"], [x - r - 5, y + 4, "end"], [x, y - r - 5, "middle"], [x, y + r + 14, "middle"]];
+    for (const [cx, cy, anchor] of cands) {
+      t.setAttribute("x", cx); t.setAttribute("y", cy); t.setAttribute("text-anchor", anchor);
+      const b = t.getBBox(), box = { l: b.x - 2, r: b.x + b.width + 2, t: b.y, b: b.y + b.height };
+      if (box.l >= 0 && box.r <= W && box.t >= 0 && box.b <= H && !placed.some((p) => hit(p, box))) { placed.push(box); return; }
+    }
+    t.remove();
+  });
+});
+
+/* Outcomes */
+legend($("#classlegend"), CLASSES);
+register(() => classBar($("#classbar"), D.overview.classes, D.overview.journeys));
+$("#histnote").textContent = `Not shown: ${fmt(D.hist_under_minus10)} journeys more than 10 min early and ${fmt(D.hist_over180)} 180 min or more late.`;
+register(function drawHist() {
+  const el = $("#hist"), W = el.clientWidth, H = 260, m = { l: 48, r: 10, t: 14, b: 34 };
+  const bins = D.hist, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const { max, step } = niceMax(Math.max(...bins.map((b) => b.n)));
+  const bw = iw / bins.length, w = Math.min(24, bw - 2), y = (v) => m.t + ih - (v / max) * ih;
+  let g = "";
+  for (let v = 0; v <= max; v += step) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+  const xOf = (min) => m.l + ((min + 10) / 5) * bw;
+  const bars = bins.map((b, i) => {
+    const color = b.lo < 20 ? "sev-normal" : b.lo < 60 ? "sev-moderate" : "sev-severe";
+    const x = m.l + i * bw + (bw - w) / 2;
+    return `<g class="hov" data-tip="<b>${b.lo} to ${b.lo + 4} min</b><br>${fmt(b.n)} journeys"><rect class="hit" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${ih}"/><path class="mark" d="${colPath(x, y(b.n), w, (b.n / max) * ih)}" fill="${css(color)}"/></g>`;
+  }).join("");
+  let ticks = "";
+  for (let t = 0; t <= 180; t += W < 560 ? 30 : 20) ticks += `<text x="${xOf(t)}" y="${H - m.b + 16}" text-anchor="middle">${t}</text>`;
+  ticks += `<text x="${W - m.r}" y="${H - 4}" text-anchor="end">minutes late</text>`;
+  const x6 = xOf(6);
+  const ref = `<line x1="${x6}" x2="${x6}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--ink-2)" stroke-width="1"/><text class="lab" x="${x6 + 6}" y="${m.t + 10}">6 min: DB's limit for punctual</text>`;
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}${bars}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>${ref}${ticks}</svg>`;
+});
+
+/* Route families */
+$("#famtable tbody").innerHTML = D.families.map((f) => {
+  const F = FAM[f.key];
+  const bar = CLASSES.map((c) => `<span style="width:${(f[c.key] * 100).toFixed(2)}%;background:${css(c.color)}" data-tip="<b>${esc(f.label)}</b><br>${c.label}: ${pct(f[c.key])}"></span>`).join("");
+  return `<tr><td><span class="swatch" style="background:${css(F.color)}"></span><b>${f.label}</b><div class="muted" style="margin-left:18px">${f.via}</div></td>` +
+    `<td class="r"><span class="num">${fmt(f.n)}</span><div class="muted num">${pct(f.n / D.overview.journeys)}</div></td>` +
+    `<td class="r"><span class="num">${hm(f.sched)}</span></td><td class="r"><span class="num">${f.median} min</span></td>` +
+    `<td class="r"><span class="num">${pct(f.soc)}</span></td><td><div class="minibar">${bar}</div></td></tr>`;
+}).join("");
+legend($("#famclasslegend"), CLASSES);
+legend($("#famlegend"), FAM_ORDER.map((k) => FAM[k]));
+$("#schednote").textContent = D.sched_over ? `Not shown: ${fmt(D.sched_over)} journeys scheduled for ${hm(D.sched_hist[D.sched_hist.length - 1].lo + 15)} or longer.` : "";
+register(function drawSched() {
+  const el = $("#sched"), W = el.clientWidth, H = 240, m = { l: 48, r: 10, t: 12, b: 34 };
+  const bins = D.sched_hist, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const totals = bins.map((b) => FAM_ORDER.reduce((s, k) => s + (b[k] || 0), 0));
+  const { max, step } = niceMax(Math.max(...totals));
+  const bw = iw / bins.length, w = Math.min(24, bw - 2), y = (v) => m.t + ih - (v / max) * ih;
+  let g = "";
+  for (let v = 0; v <= max; v += step) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+  const bars = bins.map((b, i) => {
+    if (!totals[i]) return "";
+    const x = m.l + i * bw + (bw - w) / 2, present = FAM_ORDER.filter((k) => b[k] > 0);
+    let acc = 0, out = "";
+    present.forEach((k, j) => {
+      const h = (b[k] / max) * ih, top = y(acc + b[k]); acc += b[k];
+      const hh = Math.max(0, h - (j > 0 ? 2 : 0));
+      out += `<path class="mark" d="${j === present.length - 1 ? colPath(x, top, w, hh) : `M${x},${top}h${w}v${hh}h${-w}Z`}" fill="${css(FAM[k].color)}"/>`;
+    });
+    const t = `<b>${hm(b.lo)} to ${hm(b.lo + 14)}</b><br>` + present.map((k) => `${esc(FAM[k].label)}: ${fmt(b[k])}`).join("<br>");
+    return `<g class="hov" data-tip="${t}"><rect class="hit" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${ih}"/>${out}</g>`;
+  }).join("");
+  const lo = bins[0].lo, hi = bins[bins.length - 1].lo + 15, every = (hi - lo) / 60 > 6 || W < 560 ? 120 : 60;
+  let ticks = "";
+  for (let t = Math.floor(lo / 60) * 60 + 60; t <= hi; t += every) ticks += `<text x="${m.l + ((t - lo) / 15) * bw}" y="${H - m.b + 16}" text-anchor="middle">${t / 60} h</text>`;
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}${bars}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>${ticks}</svg>`;
+});
+
+/* Monthly stacked columns */
+const MSTACK = [CLASSES[3], CLASSES[2], CLASSES[1]];
+legend($("#monthlegend"), [...MSTACK].reverse());
+register(function drawMonthly() {
+  const el = $("#monthly"), W = el.clientWidth, H = 280, m = { l: 44, r: 8, t: 12, b: 40 };
+  const rows = D.monthly, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const max = Math.max(0.3, Math.ceil(Math.max(...rows.map((r) => 1 - r.normal_minor)) * 10) / 10), y = (v) => m.t + ih - (v / max) * ih;
+  const bw = iw / rows.length, w = Math.min(24, bw - 3);
+  let g = "";
+  for (let v = 0; v <= max + 1e-9; v += 0.1) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${Math.round(v * 100)}%</text>`;
+  const cols = rows.map((r, i) => {
+    const x = m.l + i * bw + (bw - w) / 2; let acc = 0, out = "";
+    MSTACK.forEach((c, j) => {
+      const v = r[c.key] || 0, h = (v / max) * ih, top = y(acc + v); acc += v;
+      const hh = Math.max(0, h - (j > 0 ? 2 : 0));
+      out += `<path class="mark" d="${j === MSTACK.length - 1 ? colPath(x, top, w, hh) : `M${x},${top}h${w}v${hh}h${-w}Z`}" fill="${css(c.color)}"/>`;
+    });
+    const t = `<b>${mlabel(r.month)}</b> · ${fmt(r.n)} journeys<br>Moderate ${pct(r.moderate)}<br>Severe ${pct(r.severe)}<br>Canceled ${pct(r.canceled)}<br>Mean delay ${r.mean} min`;
+    return `<g class="hov" data-tip="${t}"><rect class="hit" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${ih}"/>${out}</g>`;
+  }).join("");
+  let ticks = "";
+  rows.forEach((r, i) => {
+    const mo = +r.month.slice(5), x = m.l + i * bw + bw / 2;
+    if (W < 560 ? mo === 1 || mo === 7 : mo % 3 === 1) ticks += `<text x="${x}" y="${H - m.b + 16}" text-anchor="middle">${MONTHS[mo - 1]}</text>`;
+    if (mo === 1 || i === 0) ticks += `<text class="lab" x="${x}" y="${H - m.b + 32}" text-anchor="middle">${r.month.slice(0, 4)}</text>`;
+  });
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}${cols}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>${ticks}</svg>`;
+});
+$("#monthtable").innerHTML = `<thead><tr><th>Month</th><th class="r">Journeys</th><th class="r">Mean delay</th><th class="r">Moderate</th><th class="r">Severe</th><th class="r">Canceled</th></tr></thead><tbody>` +
+  D.monthly.map((r) => `<tr><td>${mlabel(r.month)}</td><td class="r num">${fmt(r.n)}</td><td class="r num">${r.mean} min</td><td class="r num">${pct(r.moderate)}</td><td class="r num">${pct(r.severe)}</td><td class="r num">${pct(r.canceled)}</td></tr>`).join("") + "</tbody>";
+
+/* Hour of day and weekday */
+function columns(el, rows, { label, tipOf, tickEvery = 1 }) {
+  const W = el.clientWidth, H = 220, m = { l: 40, r: 6, t: 12, b: 30 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const shown = rows.filter((r) => r.n >= 300);
+  const max = Math.max(0.2, Math.ceil(Math.max(...shown.map((r) => r.soc)) * 20) / 20);
+  const y = (v) => m.t + ih - (Math.min(v, max) / max) * ih, bw = iw / rows.length, w = Math.min(24, bw - 3);
+  let g = "";
+  for (let v = 0; v <= max + 1e-9; v += 0.05) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${Math.round(v * 100)}%</text>`;
+  const cols = rows.map((r, i) => {
+    const x = m.l + i * bw + (bw - w) / 2, h = (Math.min(r.soc, max) / max) * ih;
+    const tick = i % tickEvery === 0 ? `<text x="${m.l + i * bw + bw / 2}" y="${H - m.b + 16}" text-anchor="middle">${label(r)}</text>` : "";
+    return `<g class="hov" data-tip="${tipOf(r)}"><rect class="hit" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${ih}"/><path class="mark" d="${colPath(x, y(r.soc), w, h)}" fill="var(--sev-severe)" fill-opacity="${r.n < 300 ? 0.4 : 1}"/></g>${tick}`;
+  }).join("");
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}${cols}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/></svg>`;
+}
+const HOURS = Array.from({ length: 24 }, (_, h) => D.hourly.find((r) => r.hour === h) || { hour: h, n: 0, soc: 0, mean: 0, sched: 0 });
+const hh = (h) => String(h).padStart(2, "0");
+register(() => columns($("#hourly"), HOURS, {
+  label: (r) => hh(r.hour), tickEvery: $("#hourly").clientWidth < 420 ? 4 : 2,
+  tipOf: (r) => r.n ? `<b>${hh(r.hour)}:00–${hh(r.hour)}:59</b><br>${fmt(r.n)} journeys<br>Severe or canceled ${pct(r.soc)}<br>Median scheduled time ${hm(r.sched)}` : `<b>${hh(r.hour)}:00–${hh(r.hour)}:59</b><br>No journeys`,
+}));
+register(() => columns($("#weekday"), D.weekday, {
+  label: (r) => WD[r.wd],
+  tipOf: (r) => `<b>${WD[r.wd]}</b><br>${fmt(r.n)} journeys<br>Severe or canceled ${pct(r.soc)}<br>Canceled ${pct(r.canc)}<br>Mean delay ${r.mean} min`,
+}));
+
+/* Delay build-up along the main family */
+const stationShort = (n, narrow) => narrow ? n.replace(" Hauptbahnhof", "").replace(/ \(Main\)| \(Saale\)| \(Westf\)/, "").replace(" Hbf", "").replace("Kassel-Wilhelmshöhe", "Kassel") : n.replace(" Hauptbahnhof", " Hbf");
+register(function drawBuildup() {
+  const el = $("#buildup"), W = el.clientWidth, rows = D.buildup, narrow = W < 520;
+  const labW = narrow ? 96 : Math.min(210, W * 0.38), m = { l: labW, r: 44, t: 6, b: 26 }, rowH = 30, bh = 16;
+  const H = m.t + rows.length * rowH + m.b, iw = W - m.l - m.r;
+  const max = Math.ceil(Math.max(...rows.map((r) => r.p6)) * 10 + 0.5) / 10, x = (v) => m.l + (v / max) * iw;
+  let g = "";
+  for (let v = 0; v <= max + 1e-9; v += 0.1) g += `<line class="gridline" x1="${x(v)}" x2="${x(v)}" y1="${m.t}" y2="${H - m.b}"/><text x="${x(v)}" y="${H - 8}" text-anchor="middle">${Math.round(v * 100)}%</text>`;
+  const bars = rows.map((r, i) => {
+    const yy = m.t + i * rowH + (rowH - bh) / 2, w20 = x(r.p20) - m.l, w6 = x(r.p6) - m.l;
+    const t = `<b>${esc(r.station)}</b><br>Scheduled ${hm(r.mins)} after ${esc(D.short)}<br>${pct(r.p6)} at least 6 min late<br>${pct(r.p20)} at least 20 min late<br>Mean delay ${r.mean} min · ${fmt(r.n)} trains`;
+    return `<g class="hov" data-tip="${t}"><rect class="hit" x="0" y="${m.t + i * rowH}" width="${W}" height="${rowH}"/>` +
+      `<text class="lab" x="0" y="${yy + bh - 3}">${stationShort(r.station, narrow)}</text>` + (narrow ? "" : `<text x="${labW - 10}" y="${yy + bh - 3}" text-anchor="end">+${hm(r.mins).replace(" h ", ":")}</text>`) +
+      `<path class="mark" d="M${m.l},${yy}h${Math.max(0, w20 - 1)}v${bh}h${-Math.max(0, w20 - 1)}Z" fill="var(--sev-severe)"/>` +
+      `<path class="mark" d="${barPath(m.l + w20 + 1, yy, Math.max(0, w6 - w20 - 1), bh)}" fill="var(--sev-moderate)"/>` +
+      `<text class="val" x="${x(r.p6) + 6}" y="${yy + bh - 3}">${pct(r.p6, 0)}</text></g>`;
+  }).join("");
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}<line class="baseline" x1="${m.l}" x2="${m.l}" y1="${m.t}" y2="${H - m.b}"/>${bars}</svg>`;
+});
+
+/* Delay at earlier stops vs outcome */
+$("#enroutegrid").innerHTML = D.enroute.map((e) => `<div class="chart"><div class="chart-title">Delay leaving ${stationShort(e.station, false)}</div><div class="chart-sub">${fmt(e.n)} trains · share that end severe or canceled</div><div class="table-wrap"><table>
+    <thead><tr><th>Delay</th><th class="r">Trains</th><th>Severe or canceled</th></tr></thead><tbody>` +
+  e.rows.map((r) => `<tr><td class="num">${r.b} min</td><td class="r num">${fmt(r.n)}</td><td>${r.soc == null ? "–" : `<div class="cellbar"><div class="bar" style="width:${Math.max(2, r.soc * 90)}px"></div><span class="num">${pct(r.soc, 0)}</span></div>`}</td></tr>`).join("") +
+  `</tbody></table></div></div>`).join("");
+
+/* Cancellations */
+register(function drawCancel() {
+  const el = $("#cancelbars"), W = el.clientWidth, c = D.cancel, o = stationShort(D.short, false);
+  const rows = [
+    { label: "Canceled at both ends", n: c.both, counted: true },
+    { label: `Left ${o}, never reached ${D.dest_label}`, n: c.dest_only, counted: true },
+    { label: `Canceled at ${o}, ran later on`, n: c.origin_only, counted: true },
+    { label: "Only intermediate stops canceled", n: c.intermediate_only, counted: false },
+  ];
+  const narrow = W < 560, labW = narrow ? 0 : Math.min(290, W * 0.5), m = { l: labW, r: 56 }, rowH = narrow ? 50 : 34, bh = 18, H = rows.length * rowH + 4;
+  const max = Math.max(...rows.map((r) => r.n)), x = (v) => (v / max) * (W - m.l - m.r);
+  el.innerHTML = `<svg width="${W}" height="${H}">` + rows.map((r, i) => {
+    const yy = narrow ? i * rowH + 22 : i * rowH + (rowH - bh) / 2, ly = narrow ? i * rowH + 14 : yy + bh - 4;
+    return `<g class="hov" data-tip="<b>${r.label}</b><br>${fmt(r.n)} journeys${r.counted ? "" : "<br>Not counted as canceled"}"><rect class="hit" x="0" y="${i * rowH}" width="${W}" height="${rowH}"/>` +
+      `<text class="lab" x="0" y="${ly}">${r.label}${r.counted ? "" : " *"}</text>` +
+      `<path class="mark" d="${barPath(m.l, yy, x(r.n), bh)}" fill="${r.counted ? "var(--sev-canceled)" : "var(--sev-normal)"}"/><text class="val" x="${m.l + x(r.n) + 6}" y="${yy + bh - 4}">${fmt(r.n)}</text></g>`;
+  }).join("") + `</svg><p class="muted" style="font-size:var(--step--1);margin-top:6px">* Not counted as canceled under our definition.</p>`;
+});
+
+/* Trains */
+function trainTable(el, rows) {
+  el.innerHTML = `<thead><tr><th>Train</th><th>Leaves ${esc(stationShort(D.short, true))}</th><th>Route</th><th class="r">Runs</th><th class="r">Severe or canceled</th></tr></thead><tbody>` +
+    rows.map((t) => `<tr><td class="num">${t.type} ${t.train}</td><td class="num">${t.dep}</td><td data-tip="${esc(FAM[t.fam].label)}"><span class="swatch" style="background:${css(FAM[t.fam].color)}"></span>${hm(t.sched)}</td><td class="r num">${fmt(t.n)}</td><td class="r num">${pct(t.soc)}</td></tr>`).join("") + "</tbody>";
+}
+trainTable($("#worst"), D.trains_worst);
+trainTable($("#best"), D.trains_best);
+</script>

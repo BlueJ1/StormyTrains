@@ -21,3 +21,8 @@ berlin_munich_weather/data/train_journeys.csv
 *.pdf
 AlexMasterThesis/
 alex-thesis-project-summary.html
+
+# Three-corridor analysis: generated parquet files and the station-coordinate download.
+# Rebuild them with the scripts listed in corridor_analysis/README.md.
+corridor_analysis/data/*.parquet
+corridor_analysis/cache/
