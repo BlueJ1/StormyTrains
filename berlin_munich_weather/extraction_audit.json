@@ -1,0 +1,318 @@
+{
+  "endpoint_duplicate_ids": 0,
+  "endpoint_conflicting_ids": 0,
+  "endpoint_rows": 378090,
+  "origin_rows": 204287,
+  "destination_rows": 173803,
+  "valid_endpoint_pairs": 27420,
+  "journeys_with_multiple_endpoint_pairs": 4,
+  "planned_destination_before_origin": 1,
+  "planned_endpoint_time_missing": 3,
+  "sequence_only_candidate_journeys": 27416,
+  "excluded_reverse_endpoint_candidates": 4,
+  "excluded_candidate_ids": [
+    "-690776802853422910-2509170549",
+    "7108274583246193747-2509152051",
+    "7958024030493783972-2503160822",
+    "9119715771601918587-2501061255"
+  ],
+  "duplicate_source_rows": 0,
+  "conflicting_source_ids": 0,
+  "panel_file": "data/stations_present_in_all_months.csv",
+  "stops_before_panel_filter": 232488,
+  "stops_removed_outside_panel": 15969,
+  "stations_removed_outside_panel": [
+    "Bitterfeld",
+    "Coburg",
+    "Dessau Hbf",
+    "Donauwörth",
+    "Eisenach Hbf",
+    "Erlangen",
+    "Esslingen (Neckar)",
+    "Flughafen Leipzig/Halle",
+    "Frankfurt am Main Flughafen Fernbahnhof",
+    "Günzburg",
+    "Jena Paradies",
+    "Jena-Göschwitz",
+    "Leipzig Messe",
+    "Lichtenfels",
+    "Lutherstadt Wittenberg Hbf",
+    "Naumburg (Saale) Hbf",
+    "Oebisfelde",
+    "Saalfeld (Saale)",
+    "Stendal Hbf",
+    "Treuchtlingen"
+  ],
+  "source_files": [
+    "data/monthly_processed_data/data-2024-07.parquet",
+    "data/monthly_processed_data/data-2024-08.parquet",
+    "data/monthly_processed_data/data-2024-09.parquet",
+    "data/monthly_processed_data/data-2024-10.parquet",
+    "data/monthly_processed_data/data-2024-11.parquet",
+    "data/monthly_processed_data/data-2024-12.parquet",
+    "data/monthly_processed_data/data-2025-01.parquet",
+    "data/monthly_processed_data/data-2025-02.parquet",
+    "data/monthly_processed_data/data-2025-03.parquet",
+    "data/monthly_processed_data/data-2025-04.parquet",
+    "data/monthly_processed_data/data-2025-05.parquet",
+    "data/monthly_processed_data/data-2025-06.parquet",
+    "data/monthly_processed_data/data-2025-07.parquet",
+    "data/monthly_processed_data/data-2025-08.parquet",
+    "data/monthly_processed_data/data-2025-09.parquet",
+    "data/monthly_processed_data/data-2025-10.parquet",
+    "data/monthly_processed_data/data-2025-11.parquet",
+    "data/monthly_processed_data/data-2025-12.parquet",
+    "data/monthly_processed_data/data-2026-01.parquet",
+    "data/monthly_processed_data/data-2026-02.parquet",
+    "data/monthly_processed_data/data-2026-03.parquet",
+    "data/monthly_processed_data/data-2026-04.parquet",
+    "data/monthly_processed_data/data-2026-05.parquet",
+    "data/monthly_processed_data/data-2026-06.parquet",
+    "data/monthly_processed_data/data-2026-07.parquet",
+    "data/monthly_processed_data/data-2026-08.parquet"
+  ],
+  "journeys": 27412,
+  "observed_stops": 216519,
+  "ICE_journeys": 27412,
+  "IC_journeys": 0,
+  "journeys_missing_sequence": 11132,
+  "missing_sequence_rows": 24797,
+  "journeys_missing_origin_row": 0,
+  "journeys_missing_destination_row": 0,
+  "intermediate_sequence_100_rows": 12,
+  "stops_outside_endpoint_planned_window": 0,
+  "journeys_without_exact_origin": 0,
+  "journeys_without_exact_destination": 0,
+  "min_selected_event_time": "2024-07-01 04:24:00",
+  "max_selected_event_time": "2026-08-31 23:46:00",
+  "reported_destination_before_origin": 0,
+  "stops_missing_selected_planned_time": 0,
+  "stops_missing_selected_reported_time": 0,
+  "stops_arrival_canceled": 11456,
+  "stops_departure_canceled": 10248,
+  "stations": [
+    {
+      "station_name": "Aschaffenburg Hbf",
+      "eva": "08000010"
+    },
+    {
+      "station_name": "Augsburg Hbf",
+      "eva": "08000013"
+    },
+    {
+      "station_name": "Bamberg",
+      "eva": "08000025"
+    },
+    {
+      "station_name": "Berlin Gesundbrunnen",
+      "eva": "08011102"
+    },
+    {
+      "station_name": "Berlin Hauptbahnhof",
+      "eva": "08011160"
+    },
+    {
+      "station_name": "Berlin Hauptbahnhof",
+      "eva": "08098160"
+    },
+    {
+      "station_name": "Berlin Ostbahnhof",
+      "eva": "08010255"
+    },
+    {
+      "station_name": "Berlin Südkreuz",
+      "eva": "08011113"
+    },
+    {
+      "station_name": "Berlin Zoologischer Garten",
+      "eva": "08010406"
+    },
+    {
+      "station_name": "Berlin-Spandau",
+      "eva": "08010404"
+    },
+    {
+      "station_name": "Berlin-Wannsee",
+      "eva": "08010405"
+    },
+    {
+      "station_name": "Bielefeld Hbf",
+      "eva": "08000036"
+    },
+    {
+      "station_name": "Bochum Hbf",
+      "eva": "08000041"
+    },
+    {
+      "station_name": "Bonn Hbf",
+      "eva": "08000044"
+    },
+    {
+      "station_name": "Braunschweig Hbf",
+      "eva": "08000049"
+    },
+    {
+      "station_name": "Bremen Hbf",
+      "eva": "08000050"
+    },
+    {
+      "station_name": "Darmstadt Hbf",
+      "eva": "08000068"
+    },
+    {
+      "station_name": "Dortmund Hbf",
+      "eva": "08000080"
+    },
+    {
+      "station_name": "Duisburg Hbf",
+      "eva": "08000086"
+    },
+    {
+      "station_name": "Düsseldorf Hbf",
+      "eva": "08000085"
+    },
+    {
+      "station_name": "Erfurt Hbf",
+      "eva": "08010101"
+    },
+    {
+      "station_name": "Essen Hbf",
+      "eva": "08000098"
+    },
+    {
+      "station_name": "Frankfurt (Main) Hbf",
+      "eva": "08000105"
+    },
+    {
+      "station_name": "Frankfurt (Main) Süd",
+      "eva": "08002041"
+    },
+    {
+      "station_name": "Fulda",
+      "eva": "08000115"
+    },
+    {
+      "station_name": "Fürth (Bay) Hbf",
+      "eva": "08000114"
+    },
+    {
+      "station_name": "Göttingen",
+      "eva": "08000128"
+    },
+    {
+      "station_name": "Halle (Saale) Hbf",
+      "eva": "08010159"
+    },
+    {
+      "station_name": "Hamm (Westf) Hbf",
+      "eva": "08000149"
+    },
+    {
+      "station_name": "Hanau Hbf",
+      "eva": "08000150"
+    },
+    {
+      "station_name": "Hannover Hbf",
+      "eva": "08000152"
+    },
+    {
+      "station_name": "Heidelberg Hbf",
+      "eva": "08000156"
+    },
+    {
+      "station_name": "Hildesheim Hbf",
+      "eva": "08000169"
+    },
+    {
+      "station_name": "Ingolstadt Hbf",
+      "eva": "08000183"
+    },
+    {
+      "station_name": "Kassel-Wilhelmshöhe",
+      "eva": "08003200"
+    },
+    {
+      "station_name": "Koblenz Hbf",
+      "eva": "08000206"
+    },
+    {
+      "station_name": "Köln Hbf",
+      "eva": "08000207"
+    },
+    {
+      "station_name": "Köln Messe/Deutz",
+      "eva": "08003368"
+    },
+    {
+      "station_name": "Köln Messe/Deutz",
+      "eva": "08073368"
+    },
+    {
+      "station_name": "Leipzig Hbf",
+      "eva": "08010205"
+    },
+    {
+      "station_name": "Magdeburg Hbf",
+      "eva": "08010224"
+    },
+    {
+      "station_name": "Mainz Hbf",
+      "eva": "08000240"
+    },
+    {
+      "station_name": "Mannheim Hbf",
+      "eva": "08000244"
+    },
+    {
+      "station_name": "München Hbf",
+      "eva": "08000261"
+    },
+    {
+      "station_name": "München-Pasing",
+      "eva": "08004158"
+    },
+    {
+      "station_name": "Münster (Westf) Hbf",
+      "eva": "08000263"
+    },
+    {
+      "station_name": "Nürnberg Hbf",
+      "eva": "08000284"
+    },
+    {
+      "station_name": "Osnabrück Hbf",
+      "eva": "08000294"
+    },
+    {
+      "station_name": "Plochingen",
+      "eva": "08000302"
+    },
+    {
+      "station_name": "Potsdam Hbf",
+      "eva": "08012666"
+    },
+    {
+      "station_name": "Solingen Hbf",
+      "eva": "08000087"
+    },
+    {
+      "station_name": "Stuttgart Hbf",
+      "eva": "08000096"
+    },
+    {
+      "station_name": "Ulm Hbf",
+      "eva": "08000170"
+    },
+    {
+      "station_name": "Wolfsburg Hbf",
+      "eva": "08006552"
+    },
+    {
+      "station_name": "Würzburg Hbf",
+      "eva": "08000260"
+    }
+  ],
+  "missing_sequence_detail": "data/train_missing_sequence_coverage.csv",
+  "stop_index_meaning": "Original stop sequence minus Berlin sequence; gaps remain visible",
+  "timestamp_basis": "Source naive German-local wall time; no conversion in extraction"
+}

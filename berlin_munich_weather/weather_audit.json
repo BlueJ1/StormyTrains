@@ -1,0 +1,38 @@
+{
+  "time_basis": "scheduled Berlin Hbf departure, same hour for every stop of a journey",
+  "journeys": 27412,
+  "stops": 216519,
+  "first_berlin_departure_local": "2024-07-01 04:24:00",
+  "last_berlin_departure_local": "2026-08-31 18:37:00",
+  "timezone_unresolved": 0,
+  "selected_event_canceled": 11883,
+  "complete_weather_stops": 216519,
+  "missing_by_variable": {
+    "temperature_c": 0,
+    "precipitation_mm": 0,
+    "wind_speed_ms": 0
+  },
+  "max_station_distance_km": {
+    "temperature": 28.524096063349177,
+    "precipitation": 19.594256669362487,
+    "wind": 48.06540371143998
+  },
+  "gap_policy": "nearest available alternative station at the same UTC hour; original nearest-only data retained",
+  "fallback_stops_by_variable": {
+    "temperature": 647,
+    "precipitation": 519,
+    "wind": 787
+  },
+  "max_station_rank": {
+    "temperature": 3,
+    "precipitation": 3,
+    "wind": 3
+  },
+  "max_distance_limit_km": 50.0,
+  "beyond_distance_limit_by_variable": {
+    "temperature": 0,
+    "precipitation": 0,
+    "wind": 0
+  },
+  "ambiguous_time_candidate_rows": 0
+}

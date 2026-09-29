@@ -1,0 +1,228 @@
+product,station_name,eva,dwd_station_id,dwd_station_name,distance_km,station_rank,stop_events
+temperature,Aschaffenburg Hbf,08000010,02480,Kahl/Main,14.234350524599295,1,86
+temperature,Aschaffenburg Hbf,08000010,04411,Schaafheim-Schlierbach,14.337538225305172,2,2
+temperature,Augsburg Hbf,08000013,00232,Augsburg,7.84072776147076,1,10188
+temperature,Augsburg Hbf,08000013,02905,Lechfeld,20.240453941753657,2,21
+temperature,Bamberg,08000025,00282,Bamberg,3.308090847523666,1,9709
+temperature,Bamberg,08000025,04813,"Staffelstein, Bad-Stublang",22.597560694233945,2,133
+temperature,Berlin Gesundbrunnen,08011102,00433,Berlin-Tempelhof,9.093094475794615,1,2
+temperature,Berlin Hauptbahnhof,08011160,00403,Berlin-Dahlem (FU),9.219855190385749,2,1
+temperature,Berlin Hauptbahnhof,08011160,00433,Berlin-Tempelhof,6.8124437653103405,1,344
+temperature,Berlin Hauptbahnhof,08098160,00403,Berlin-Dahlem (FU),9.219855190385749,2,67
+temperature,Berlin Hauptbahnhof,08098160,00433,Berlin-Tempelhof,6.8124437653103405,1,27001
+temperature,Berlin Ostbahnhof,08010255,00433,Berlin-Tempelhof,5.257290390139066,1,32
+temperature,Berlin Südkreuz,08011113,00403,Berlin-Dahlem (FU),4.9203602498697405,2,66
+temperature,Berlin Südkreuz,08011113,00433,Berlin-Tempelhof,2.6189599312974816,1,23773
+temperature,Berlin Zoologischer Garten,08010406,00403,Berlin-Dahlem (FU),6.300800718415848,1,118
+temperature,Berlin-Spandau,08010404,00403,Berlin-Dahlem (FU),11.461226556418314,1,769
+temperature,Berlin-Spandau,08010404,00433,Berlin-Tempelhof,15.758454415341848,2,16
+temperature,Berlin-Wannsee,08010405,00403,Berlin-Dahlem (FU),9.04608088094518,1,125
+temperature,Bielefeld Hbf,08000036,07106,Bielefeld-Deppendorf,7.008715297724305,1,103
+temperature,Bochum Hbf,08000041,00555,Bochum,2.6959582624998033,1,93
+temperature,Bonn Hbf,08000044,00603,Königswinter-Heiderhof,7.527410997122985,1,28
+temperature,Braunschweig Hbf,08000049,00662,Braunschweig,7.739245289764514,1,961
+temperature,Braunschweig Hbf,08000049,13777,Helmstedt-Emmerstedt,28.524096063349177,2,1
+temperature,Bremen Hbf,08000050,00691,Bremen,4.395364954822722,1,3
+temperature,Darmstadt Hbf,08000068,00917,Darmstadt,3.582321201500447,1,237
+temperature,Dortmund Hbf,08000080,13696,Waltrop-Abdinghof,9.527835788295908,1,110
+temperature,Duisburg Hbf,08000086,13670,Duisburg-Baerl,10.17555383751891,1,94
+temperature,Düsseldorf Hbf,08000085,01078,Düsseldorf,8.64239533394771,1,94
+temperature,Erfurt Hbf,08010101,01270,Erfurt-Weimar,5.521344919562589,1,24999
+temperature,Essen Hbf,08000098,01303,Essen-Bredeney,6.186279018117926,1,94
+temperature,Frankfurt (Main) Hbf,08000105,01424,Frankfurt/Main-Westend,2.2327929793077295,1,4991
+temperature,Frankfurt (Main) Süd,08002041,01424,Frankfurt/Main-Westend,3.2944919586655392,1,80
+temperature,Fulda,08000115,01526,Fulda-Horas,2.555335806240486,1,4504
+temperature,Fulda,08000115,04480,Schlüchtern-Herolz,25.119605654825186,3,1
+temperature,Fürth (Bay) Hbf,08000114,03668,Nürnberg,5.974213748199525,1,40
+temperature,Göttingen,08000128,01691,Göttingen,4.413640419467299,1,828
+temperature,Göttingen,08000128,03348,Moringen-Lutterbeck,21.410831618911082,2,47
+temperature,Halle (Saale) Hbf,08010159,02878,"Lauchstädt, Bad",12.21884620319169,1,13424
+temperature,Hamm (Westf) Hbf,08000149,05480,Werl,12.594997290197831,1,104
+temperature,Hamm (Westf) Hbf,08000149,06337,Lüdinghausen-Brochtrup,22.157102126772642,2,6
+temperature,Hanau Hbf,08000150,02480,Kahl/Main,7.780009814972864,1,49
+temperature,Hannover Hbf,08000152,02014,Hannover,10.643674181902488,1,133
+temperature,Heidelberg Hbf,08000156,05275,Waghäusel-Kirrlach,20.320861717443844,2,8
+temperature,Heidelberg Hbf,08000156,05906,Mannheim,14.214991416910735,1,884
+temperature,Hildesheim Hbf,08000169,00860,Algermissen-Groß Lobke,13.21816213628135,1,853
+temperature,Ingolstadt Hbf,08000183,02410,Ingolstadt-Manching,8.15578608020827,1,3133
+temperature,Ingolstadt Hbf,08000183,02700,Kösching,10.201353319770861,2,79
+temperature,Kassel-Wilhelmshöhe,08003200,01504,Fritzlar/Eder,24.519059639147653,2,3
+temperature,Kassel-Wilhelmshöhe,08003200,15207,Schauenburg-Elgershausen,6.941945941940881,1,857
+temperature,Koblenz Hbf,08000206,00161,Andernach,14.4079105105025,1,28
+temperature,Köln Hbf,08000207,02667,Köln/Bonn,16.447681170517793,1,110
+temperature,Köln Messe/Deutz,08003368,02667,Köln/Bonn,15.35898436837017,1,1
+temperature,Köln Messe/Deutz,08073368,02667,Köln/Bonn,15.35898436837017,1,1
+temperature,Leipzig Hbf,08010205,02928,Leipzig-Holzhausen,5.591186695306177,1,11811
+temperature,Leipzig Hbf,08010205,02932,Leipzig/Halle,14.00568286241748,2,4
+temperature,Magdeburg Hbf,08010224,03126,Magdeburg,4.291895138560748,1,141
+temperature,Mainz Hbf,08000240,03137,Mainz-Lerchenberg (ZDF),5.4981621920791675,1,28
+temperature,Mannheim Hbf,08000244,05692,Worms,15.835381913743408,2,43
+temperature,Mannheim Hbf,08000244,05906,Mannheim,7.123497698613211,1,4862
+temperature,München Hbf,08000261,03379,München-Stadt,2.7988710163787576,1,27293
+temperature,München Hbf,08000261,07431,Oberhaching-Laufzorn,14.154441938394266,2,119
+temperature,München-Pasing,08004158,03379,München-Stadt,6.191041650373847,1,8613
+temperature,München-Pasing,08004158,07431,Oberhaching-Laufzorn,16.6370350235814,2,30
+temperature,Münster (Westf) Hbf,08000263,01766,Münster/Osnabrück,20.212138057947488,1,6
+temperature,Nürnberg Hbf,08000284,03668,Nürnberg,6.695805411661616,1,21911
+temperature,Osnabrück Hbf,08000294,00342,Belm,8.812751838308293,1,1
+temperature,Plochingen,08000302,06275,Notzingen,6.076512581807751,1,156
+temperature,Potsdam Hbf,08012666,03987,Potsdam,1.1863486025187089,1,110
+temperature,Solingen Hbf,08000087,05717,Wuppertal-Buchenhofen,10.075835191044286,1,3
+temperature,Stuttgart Hbf,08000096,04928,Stuttgart (Schnarrenberg),5.075791749947672,1,5163
+temperature,Ulm Hbf,08000170,15444,Ulm-Mähringen,6.496611711600532,1,4975
+temperature,Wolfsburg Hbf,08006552,13777,Helmstedt-Emmerstedt,23.426175782299495,1,872
+temperature,Würzburg Hbf,08000260,05705,Würzburg,3.8264334997342346,1,944
+precipitation,Aschaffenburg Hbf,08000010,01851,Großostheim,7.4594757124778255,1,88
+precipitation,Augsburg Hbf,08000013,00232,Augsburg,7.84072776147076,1,10209
+precipitation,Bamberg,08000025,00282,Bamberg,3.308090847523666,1,9761
+precipitation,Bamberg,08000025,06195,Scheßlitz-Köttensdorf,10.525770777263311,2,81
+precipitation,Berlin Gesundbrunnen,08011102,17475,Berlin-Gesundbrunnen,0.5427840312466978,1,2
+precipitation,Berlin Hauptbahnhof,08011160,17483,Berlin-Mitte/Südpanke,1.1092952827772282,1,345
+precipitation,Berlin Hauptbahnhof,08098160,17452,Berlin-Wedding,2.8591193512943813,2,2
+precipitation,Berlin Hauptbahnhof,08098160,17483,Berlin-Mitte/Südpanke,1.1092952827772282,1,27066
+precipitation,Berlin Ostbahnhof,08010255,17473,Berlin-Friedrichshain/Spree,0.5226210704987941,1,32
+precipitation,Berlin Südkreuz,08011113,00433,Berlin-Tempelhof,2.6189599312974816,1,23698
+precipitation,Berlin Südkreuz,08011113,17449,Berlin-Wilmersdorf,3.2905173911395367,2,141
+precipitation,Berlin Zoologischer Garten,08010406,17449,Berlin-Wilmersdorf,1.5008630288233358,1,118
+precipitation,Berlin-Spandau,08010404,17453,Berlin-Haselhorst,2.2905723706422614,2,4
+precipitation,Berlin-Spandau,08010404,17486,Berlin-Wilhelmstadt,1.6649708086765145,1,781
+precipitation,Berlin-Wannsee,08010405,17447,Berlin-Colonie Alsen,0.9851562435684391,1,125
+precipitation,Bielefeld Hbf,08000036,07106,Bielefeld-Deppendorf,7.008715297724305,1,103
+precipitation,Bochum Hbf,08000041,00555,Bochum,2.6959582624998033,1,93
+precipitation,Bonn Hbf,08000044,00603,Königswinter-Heiderhof,7.527410997122985,1,28
+precipitation,Braunschweig Hbf,08000049,00662,Braunschweig,7.739245289764514,1,960
+precipitation,Braunschweig Hbf,08000049,15833,Harxbüttel (Pegel),10.024652916397004,2,2
+precipitation,Bremen Hbf,08000050,00691,Bremen,4.395364954822722,1,3
+precipitation,Darmstadt Hbf,08000068,00917,Darmstadt,3.582321201500447,1,237
+precipitation,Dortmund Hbf,08000080,13696,Waltrop-Abdinghof,9.527835788295908,1,110
+precipitation,Duisburg Hbf,08000086,13670,Duisburg-Baerl,10.17555383751891,1,94
+precipitation,Düsseldorf Hbf,08000085,01078,Düsseldorf,8.64239533394771,1,94
+precipitation,Erfurt Hbf,08010101,01270,Erfurt-Weimar,5.521344919562589,1,24999
+precipitation,Essen Hbf,08000098,01303,Essen-Bredeney,6.186279018117926,1,94
+precipitation,Frankfurt (Main) Hbf,08000105,01424,Frankfurt/Main-Westend,2.2327929793077295,1,4991
+precipitation,Frankfurt (Main) Süd,08002041,01424,Frankfurt/Main-Westend,3.2944919586655392,1,80
+precipitation,Fulda,08000115,01526,Fulda-Horas,2.555335806240486,1,4500
+precipitation,Fulda,08000115,03911,Petersberg-Marbach,7.557468827800845,2,5
+precipitation,Fürth (Bay) Hbf,08000114,03668,Nürnberg,5.974213748199525,1,40
+precipitation,Göttingen,08000128,01039,Dransfeld-Ossenfeld,8.949614082489228,2,43
+precipitation,Göttingen,08000128,01691,Göttingen,4.413640419467299,1,832
+precipitation,Halle (Saale) Hbf,08010159,02878,"Lauchstädt, Bad",12.21884620319169,1,13424
+precipitation,Hamm (Westf) Hbf,08000149,01046,Drensteinfurt,9.712637738247734,1,110
+precipitation,Hanau Hbf,08000150,03136,Mühlheim/Main,7.763320911763778,1,49
+precipitation,Hannover Hbf,08000152,02012,Hannover-Kirchrode,5.401757859908855,1,133
+precipitation,Heidelberg Hbf,08000156,03448,Neckargemünd-Kleingemünd,9.393455063789979,2,4
+precipitation,Heidelberg Hbf,08000156,15514,Heidelberg-Kurpfalzhof,5.137205711552283,1,888
+precipitation,Hildesheim Hbf,08000169,00860,Algermissen-Groß Lobke,13.21816213628135,3,6
+precipitation,Hildesheim Hbf,08000169,15834,Holle,12.917450722520016,2,8
+precipitation,Hildesheim Hbf,08000169,19126,Hildesheim Flugplatz,2.1876520180815517,1,839
+precipitation,Ingolstadt Hbf,08000183,02409,Ingolstadt (Flussmeisterstelle),2.7005272155095965,1,3212
+precipitation,Kassel-Wilhelmshöhe,08003200,15207,Schauenburg-Elgershausen,6.941945941940881,1,860
+precipitation,Koblenz Hbf,08000206,14043,"Mülheim-Kärlich, Kr. Mayen-Koblenz",5.382150079733083,1,28
+precipitation,Köln Hbf,08000207,02667,Köln/Bonn,16.447681170517793,1,110
+precipitation,Köln Messe/Deutz,08003368,02667,Köln/Bonn,15.35898436837017,1,1
+precipitation,Köln Messe/Deutz,08073368,02667,Köln/Bonn,15.35898436837017,1,1
+precipitation,Leipzig Hbf,08010205,02928,Leipzig-Holzhausen,5.591186695306177,1,11815
+precipitation,Magdeburg Hbf,08010224,03126,Magdeburg,4.291895138560748,1,141
+precipitation,Mainz Hbf,08000240,14007,Mainz-Marienborn,4.893993813943457,1,28
+precipitation,Mannheim Hbf,08000244,05906,Mannheim,7.123497698613211,1,4867
+precipitation,Mannheim Hbf,08000244,06317,Dannstadt-Schauernheim,12.18970298559029,2,38
+precipitation,München Hbf,08000261,03379,München-Stadt,2.7988710163787576,1,27309
+precipitation,München Hbf,08000261,03722,Oberschleißheim,11.579120881274,2,103
+precipitation,München-Pasing,08004158,03379,München-Stadt,6.191041650373847,1,8616
+precipitation,München-Pasing,08004158,03722,Oberschleißheim,12.478636293814816,2,27
+precipitation,Münster (Westf) Hbf,08000263,13669,Ostbevern-Schirlheide,15.899897982605795,1,6
+precipitation,Nürnberg Hbf,08000284,03668,Nürnberg,6.695805411661616,1,21903
+precipitation,Nürnberg Hbf,08000284,04599,Wendelstein-Kleinschwarzenlohe,11.604622076700235,2,8
+precipitation,Osnabrück Hbf,08000294,00342,Belm,8.812751838308293,1,1
+precipitation,Plochingen,08000302,00279,Baltmannsweiler-Hohengehren,5.757428469291687,1,156
+precipitation,Potsdam Hbf,08012666,03987,Potsdam,1.1863486025187089,1,110
+precipitation,Solingen Hbf,08000087,04741,Solingen-Hohenscheid,6.611091363493639,1,3
+precipitation,Stuttgart Hbf,08000096,04928,Stuttgart (Schnarrenberg),5.075791749947672,1,5162
+precipitation,Stuttgart Hbf,08000096,04931,Stuttgart-Echterdingen,11.084396370179583,2,1
+precipitation,Ulm Hbf,08000170,05444,Weißenhorn-Oberreichenbach,19.277597726655035,2,38
+precipitation,Ulm Hbf,08000170,15444,Ulm-Mähringen,6.496611711600532,1,4937
+precipitation,Wolfsburg Hbf,08006552,07285,Oebisfelde-Weferlingen-Bösdorf,19.594256669362487,2,8
+precipitation,Wolfsburg Hbf,08006552,15832,Glentorf (Pegel),10.735417137921537,1,864
+precipitation,Würzburg Hbf,08000260,05705,Würzburg,3.8264334997342346,1,944
+wind,Aschaffenburg Hbf,08000010,07412,Neuhütten/Spessart,20.258869101511685,1,88
+wind,Augsburg Hbf,08000013,00232,Augsburg,7.84072776147076,1,10188
+wind,Augsburg Hbf,08000013,01886,Günzburg,48.06540371143998,2,21
+wind,Bamberg,08000025,00282,Bamberg,3.308090847523666,1,9703
+wind,Bamberg,08000025,00867,Lautertal-Oberlauter,45.39051100679201,2,139
+wind,Berlin Gesundbrunnen,08011102,00433,Berlin-Tempelhof,9.093094475794615,1,2
+wind,Berlin Hauptbahnhof,08011160,00427,Berlin Brandenburg,19.47054749344036,2,1
+wind,Berlin Hauptbahnhof,08011160,00433,Berlin-Tempelhof,6.8124437653103405,1,344
+wind,Berlin Hauptbahnhof,08098160,00427,Berlin Brandenburg,19.47054749344036,2,76
+wind,Berlin Hauptbahnhof,08098160,00433,Berlin-Tempelhof,6.8124437653103405,1,26992
+wind,Berlin Ostbahnhof,08010255,00433,Berlin-Tempelhof,5.257290390139066,1,32
+wind,Berlin Südkreuz,08011113,00427,Berlin Brandenburg,15.356014332458393,2,76
+wind,Berlin Südkreuz,08011113,00433,Berlin-Tempelhof,2.6189599312974816,1,23763
+wind,Berlin Zoologischer Garten,08010406,00433,Berlin-Tempelhof,6.475727045603579,1,118
+wind,Berlin-Spandau,08010404,00433,Berlin-Tempelhof,15.758454415341848,1,785
+wind,Berlin-Wannsee,08010405,03987,Potsdam,9.1059552020983,1,125
+wind,Bielefeld Hbf,08000036,04371,"Salzuflen, Bad",17.15555056544205,1,97
+wind,Bielefeld Hbf,08000036,13693,Gütersloh/Ems,19.046462953580537,2,6
+wind,Bochum Hbf,08000041,01303,Essen-Bredeney,19.55556124037774,1,93
+wind,Bonn Hbf,08000044,00603,Königswinter-Heiderhof,7.527410997122985,1,28
+wind,Braunschweig Hbf,08000049,00662,Braunschweig,7.739245289764514,1,960
+wind,Braunschweig Hbf,08000049,15194,Börßum-Achim,21.188559867603438,2,2
+wind,Bremen Hbf,08000050,00691,Bremen,4.395364954822722,1,3
+wind,Darmstadt Hbf,08000068,01420,Frankfurt/Main,18.735691276409508,1,237
+wind,Dortmund Hbf,08000080,13901,Haltern (Wasserwerk),29.997982067488365,1,110
+wind,Duisburg Hbf,08000086,01303,Essen-Bredeney,13.603660919970666,1,94
+wind,Düsseldorf Hbf,08000085,01078,Düsseldorf,8.64239533394771,1,92
+wind,Düsseldorf Hbf,08000085,01303,Essen-Bredeney,23.758375763353712,2,2
+wind,Erfurt Hbf,08010101,01270,Erfurt-Weimar,5.521344919562589,1,24995
+wind,Erfurt Hbf,08010101,04501,Schmücke,40.09549920487084,2,4
+wind,Essen Hbf,08000098,01303,Essen-Bredeney,6.186279018117926,1,94
+wind,Frankfurt (Main) Hbf,08000105,01420,Frankfurt/Main,13.603248372404567,2,17
+wind,Frankfurt (Main) Hbf,08000105,07341,Offenbach-Wetterpark,8.937058102780359,1,4974
+wind,Frankfurt (Main) Süd,08002041,07341,Offenbach-Wetterpark,7.190862863053769,1,80
+wind,Fulda,08000115,02897,Lautertal-Hörgenau,28.27822881826084,2,92
+wind,Fulda,08000115,05371,Wasserkuppe,19.371632421362936,1,4413
+wind,Fürth (Bay) Hbf,08000114,03668,Nürnberg,5.974213748199525,1,40
+wind,Göttingen,08000128,01691,Göttingen,4.413640419467299,1,827
+wind,Göttingen,08000128,03651,Northeim-Stöckheim,23.974234024290084,2,48
+wind,Halle (Saale) Hbf,08010159,02878,"Lauchstädt, Bad",12.21884620319169,1,13421
+wind,Halle (Saale) Hbf,08010159,02932,Leipzig/Halle,18.13203771386775,2,3
+wind,Hamm (Westf) Hbf,08000149,05480,Werl,12.594997290197831,1,104
+wind,Hamm (Westf) Hbf,08000149,13952,Arnsberg-Müschede,33.01825115847502,2,6
+wind,Hanau Hbf,08000150,07341,Offenbach-Wetterpark,10.75006550152762,1,49
+wind,Hannover Hbf,08000152,02014,Hannover,10.643674181902488,1,133
+wind,Heidelberg Hbf,08000156,05906,Mannheim,14.214991416910735,1,884
+wind,Heidelberg Hbf,08000156,13674,Waibstadt,20.612112297473963,2,8
+wind,Hildesheim Hbf,08000169,00662,Braunschweig,36.59096162596781,2,47
+wind,Hildesheim Hbf,08000169,07367,Alfeld,24.012400945982098,1,806
+wind,Ingolstadt Hbf,08000183,01587,Gelbelsee,22.643177494088476,1,3199
+wind,Ingolstadt Hbf,08000183,05404,Weihenstephan-Dürnast,42.49267381750653,2,13
+wind,Kassel-Wilhelmshöhe,08003200,00197,"Arolsen-Volkhardinghausen, Bad",27.197809289484912,2,3
+wind,Kassel-Wilhelmshöhe,08003200,15207,Schauenburg-Elgershausen,6.941945941940881,1,857
+wind,Koblenz Hbf,08000206,00161,Andernach,14.4079105105025,1,28
+wind,Köln Hbf,08000207,02667,Köln/Bonn,16.447681170517793,1,110
+wind,Köln Messe/Deutz,08003368,02667,Köln/Bonn,15.35898436837017,1,1
+wind,Köln Messe/Deutz,08073368,02667,Köln/Bonn,15.35898436837017,1,1
+wind,Leipzig Hbf,08010205,02928,Leipzig-Holzhausen,5.591186695306177,1,11814
+wind,Leipzig Hbf,08010205,02932,Leipzig/Halle,14.00568286241748,2,1
+wind,Magdeburg Hbf,08010224,03126,Magdeburg,4.291895138560748,1,141
+wind,Mainz Hbf,08000240,01420,Frankfurt/Main,18.9638689463402,2,6
+wind,Mainz Hbf,08000240,15976,Ober-Olm/Bellem,6.366868377029187,1,22
+wind,Mannheim Hbf,08000244,05426,Weinbiet,27.65874750006197,2,35
+wind,Mannheim Hbf,08000244,05906,Mannheim,7.123497698613211,1,4858
+wind,Mannheim Hbf,08000244,07391,Oberzent-Beerfelden-Vogelherd,36.94768455527199,3,12
+wind,München Hbf,08000261,01262,München-Flughafen,29.81527306585851,2,118
+wind,München Hbf,08000261,03379,München-Stadt,2.7988710163787576,1,27294
+wind,München-Pasing,08004158,03379,München-Stadt,6.191041650373847,1,8614
+wind,München-Pasing,08004158,05404,Weihenstephan-Dürnast,32.942889109803794,2,29
+wind,Münster (Westf) Hbf,08000263,01766,Münster/Osnabrück,20.212138057947488,1,6
+wind,Nürnberg Hbf,08000284,03668,Nürnberg,6.695805411661616,1,21896
+wind,Nürnberg Hbf,08000284,04280,Roth,25.55319343622169,2,15
+wind,Osnabrück Hbf,08000294,00342,Belm,8.812751838308293,1,1
+wind,Plochingen,08000302,10510,Winterbach/Remstal,12.401264997827196,1,156
+wind,Potsdam Hbf,08012666,03987,Potsdam,1.1863486025187089,1,110
+wind,Solingen Hbf,08000087,15200,Wuppertal,17.95920479929303,1,3
+wind,Stuttgart Hbf,08000096,04928,Stuttgart (Schnarrenberg),5.075791749947672,1,5159
+wind,Stuttgart Hbf,08000096,04931,Stuttgart-Echterdingen,11.084396370179583,2,4
+wind,Ulm Hbf,08000170,01886,Günzburg,22.77640722052767,2,3
+wind,Ulm Hbf,08000170,15444,Ulm-Mähringen,6.496611711600532,1,4972
+wind,Wolfsburg Hbf,08006552,04947,Süpplingen,23.7583814777467,1,872
+wind,Würzburg Hbf,08000260,05705,Würzburg,3.8264334997342346,1,944

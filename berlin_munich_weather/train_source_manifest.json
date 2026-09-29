@@ -1,0 +1,184 @@
+[
+  {
+    "path": "data/monthly_processed_data/data-2024-07.parquet",
+    "bytes": 108406869,
+    "mtime_ns": 1789828340138898199,
+    "rows": 2029509,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2024-08.parquet",
+    "bytes": 101950423,
+    "mtime_ns": 1789829459517258001,
+    "rows": 1909899,
+    "row_groups": 16
+  },
+  {
+    "path": "data/monthly_processed_data/data-2024-09.parquet",
+    "bytes": 102538585,
+    "mtime_ns": 1789829346282927387,
+    "rows": 1926181,
+    "row_groups": 16
+  },
+  {
+    "path": "data/monthly_processed_data/data-2024-10.parquet",
+    "bytes": 106837152,
+    "mtime_ns": 1789829348784936084,
+    "rows": 2007940,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2024-11.parquet",
+    "bytes": 102132697,
+    "mtime_ns": 1789829349508426303,
+    "rows": 1929435,
+    "row_groups": 16
+  },
+  {
+    "path": "data/monthly_processed_data/data-2024-12.parquet",
+    "bytes": 105920076,
+    "mtime_ns": 1789829351837768171,
+    "rows": 2020288,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-01.parquet",
+    "bytes": 107210172,
+    "mtime_ns": 1789827685210317139,
+    "rows": 2035582,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-02.parquet",
+    "bytes": 97985678,
+    "mtime_ns": 1789829504052943713,
+    "rows": 1864068,
+    "row_groups": 16
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-03.parquet",
+    "bytes": 105675583,
+    "mtime_ns": 1789829506735250037,
+    "rows": 2004921,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-04.parquet",
+    "bytes": 101895284,
+    "mtime_ns": 1789829353322720762,
+    "rows": 1932361,
+    "row_groups": 16
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-05.parquet",
+    "bytes": 105876285,
+    "mtime_ns": 1789829518725215736,
+    "rows": 2011335,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-06.parquet",
+    "bytes": 102961423,
+    "mtime_ns": 1789829520821619389,
+    "rows": 1951121,
+    "row_groups": 16
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-07.parquet",
+    "bytes": 108255046,
+    "mtime_ns": 1789829355086455890,
+    "rows": 2051978,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-08.parquet",
+    "bytes": 105528178,
+    "mtime_ns": 1789829524276995111,
+    "rows": 2004682,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-09.parquet",
+    "bytes": 104336696,
+    "mtime_ns": 1789829355411125957,
+    "rows": 1975457,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-10.parquet",
+    "bytes": 106851323,
+    "mtime_ns": 1789829366618198245,
+    "rows": 2018378,
+    "row_groups": 17
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-11.parquet",
+    "bytes": 598625173,
+    "mtime_ns": 1789829424544155369,
+    "rows": 14206637,
+    "row_groups": 116
+  },
+  {
+    "path": "data/monthly_processed_data/data-2025-12.parquet",
+    "bytes": 654141332,
+    "mtime_ns": 1789829431319763103,
+    "rows": 15625384,
+    "row_groups": 128
+  },
+  {
+    "path": "data/monthly_processed_data/data-2026-01.parquet",
+    "bytes": 663688747,
+    "mtime_ns": 1789650744335925618,
+    "rows": 15799915,
+    "row_groups": 129
+  },
+  {
+    "path": "data/monthly_processed_data/data-2026-02.parquet",
+    "bytes": 583954450,
+    "mtime_ns": 1789829529946631342,
+    "rows": 13936132,
+    "row_groups": 114
+  },
+  {
+    "path": "data/monthly_processed_data/data-2026-03.parquet",
+    "bytes": 637286813,
+    "mtime_ns": 1789829535735641906,
+    "rows": 15240797,
+    "row_groups": 125
+  },
+  {
+    "path": "data/monthly_processed_data/data-2026-04.parquet",
+    "bytes": 608977922,
+    "mtime_ns": 1789829581928758416,
+    "rows": 14555946,
+    "row_groups": 119
+  },
+  {
+    "path": "data/monthly_processed_data/data-2026-05.parquet",
+    "bytes": 623191935,
+    "mtime_ns": 1789829434525534120,
+    "rows": 14906549,
+    "row_groups": 122
+  },
+  {
+    "path": "data/monthly_processed_data/data-2026-06.parquet",
+    "bytes": 634873929,
+    "mtime_ns": 1789829536891784995,
+    "rows": 15082144,
+    "row_groups": 123
+  },
+  {
+    "path": "data/monthly_processed_data/data-2026-07.parquet",
+    "bytes": 619126911,
+    "mtime_ns": 1789829435857650486,
+    "rows": 14768104,
+    "row_groups": 121
+  },
+  {
+    "path": "data/monthly_processed_data/data-2026-08.parquet",
+    "bytes": 607483669,
+    "mtime_ns": 1789829436062728682,
+    "rows": 14516986,
+    "row_groups": 119
+  }
+]

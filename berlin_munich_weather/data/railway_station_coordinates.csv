@@ -1,0 +1,56 @@
+station_name,eva,latitude,longitude,coordinate_source_id,coordinate_source_name,coordinate_match
+Berlin Hauptbahnhof,08098160,52.525592,13.369545,8011160,Berlin Hauptbahnhof,exact_station_name_alternate_eva
+Berlin Südkreuz,08011113,52.475047,13.365319,8011113,Berlin Südkreuz,exact_eva
+Leipzig Hbf,08010205,51.3454712,12.3820639,8010205,Leipzig Hbf,exact_eva
+Erfurt Hbf,08010101,50.972551,11.038499,8010101,Erfurt Hbf,exact_eva
+Fulda,08000115,50.554723,9.683977,8000115,Fulda,exact_eva
+Frankfurt (Main) Hbf,08000105,50.107145,8.663789,8000105,Frankfurt (Main) Hbf,exact_eva
+Mannheim Hbf,08000244,49.479354,8.468921,8000244,Mannheim Hbf,exact_eva
+Stuttgart Hbf,08000096,48.784084,9.181635,8000096,Stuttgart Hbf,exact_eva
+Ulm Hbf,08000170,48.399437,9.982227,8000170,Ulm Hbf,exact_eva
+Augsburg Hbf,08000013,48.365441,10.88557,8000013,Augsburg Hbf,exact_eva
+München-Pasing,08004158,48.149852,11.461872,8004158,München-Pasing,exact_eva
+München Hbf,08000261,48.140232,11.558335,8000261,München Hbf,exact_eva
+Bamberg,08000025,49.900759,10.899489,8000025,Bamberg,exact_eva
+Nürnberg Hbf,08000284,49.445616,11.082989,8000284,Nürnberg Hbf,exact_eva
+Halle (Saale) Hbf,08010159,51.477509,11.987085,8010159,Halle (Saale) Hbf,exact_eva
+Berlin-Spandau,08010404,52.5346481,13.1968975,8010404,Berlin-Spandau,exact_eva
+Wolfsburg Hbf,08006552,52.429498,10.787784,8006552,Wolfsburg Hbf,exact_eva
+Braunschweig Hbf,08000049,52.252218,10.540295,8000049,Braunschweig Hbf,exact_eva
+Hildesheim Hbf,08000169,52.160626,9.953497,8000169,Hildesheim Hbf,exact_eva
+Göttingen,08000128,51.536815,9.926072,8000128,Göttingen,exact_eva
+Kassel-Wilhelmshöhe,08003200,51.313114,9.446898,8003200,Kassel-Wilhelmshöhe,exact_eva
+Aschaffenburg Hbf,08000010,49.980557,9.143697,8000010,Aschaffenburg Hbf,exact_eva
+Ingolstadt Hbf,08000183,48.744541,11.437337,8000183,Ingolstadt Hbf,exact_eva
+Würzburg Hbf,08000260,49.801796,9.93578,8000260,Würzburg Hbf,exact_eva
+Heidelberg Hbf,08000156,49.403567,8.675442,8000156,Heidelberg Hbf,exact_eva
+Berlin Hauptbahnhof,08011160,52.525592,13.369545,8011160,Berlin Hauptbahnhof,exact_eva
+Frankfurt (Main) Süd,08002041,50.099365,8.686457,8002041,Frankfurt (Main) Süd,exact_eva
+Hanau Hbf,08000150,50.120953,8.929,8000150,Hanau Hbf,exact_eva
+Hannover Hbf,08000152,52.376761,9.741021,8000152,Hannover Hbf,exact_eva
+Magdeburg Hbf,08010224,52.130349,11.626891,8010224,Magdeburg Hbf,exact_eva
+Berlin-Wannsee,08010405,52.4209723,13.1795275,8010405,Berlin-Wannsee,exact_eva
+Darmstadt Hbf,08000068,49.872503,8.629636,8000068,Darmstadt Hbf,exact_eva
+Plochingen,08000302,48.71308,9.41081,8000302,Plochingen,exact_eva
+Berlin Ostbahnhof,08010255,52.5104881,13.4346807,8010255,Berlin Ostbahnhof,exact_eva
+Fürth (Bay) Hbf,08000114,49.469707,10.989988,8000114,Fürth (Bay) Hbf,exact_eva
+Berlin Zoologischer Garten,08010406,52.507277,13.331992,8010406,Berlin Zoologischer Garten,exact_eva
+Berlin Gesundbrunnen,08011102,52.548963,13.388513,8011102,Berlin Gesundbrunnen,exact_eva
+Potsdam Hbf,08012666,52.391509,13.0667031,8012666,Potsdam Hbf,exact_eva
+Bielefeld Hbf,08000036,52.029261,8.532722,8000036,Bielefeld Hbf,exact_eva
+Hamm (Westf) Hbf,08000149,51.678078,7.807821,8000149,Hamm (Westf) Hbf,exact_eva
+Dortmund Hbf,08000080,51.517896,7.45929,8000080,Dortmund Hbf,exact_eva
+Bochum Hbf,08000041,51.478609,7.223275,8000041,Bochum Hbf,exact_eva
+Essen Hbf,08000098,51.451355,7.014793,8000098,Essen Hbf,exact_eva
+Duisburg Hbf,08000086,51.429785,6.775903,8000086,Duisburg Hbf,exact_eva
+Düsseldorf Hbf,08000085,51.219962,6.794319,8000085,Düsseldorf Hbf,exact_eva
+Köln Hbf,08000207,50.94303,6.958729,8000207,Köln Hbf,exact_eva
+Bonn Hbf,08000044,50.732008,7.097136,8000044,Bonn Hbf,exact_eva
+Koblenz Hbf,08000206,50.350929,7.588345,8000206,Koblenz Hbf,exact_eva
+Mainz Hbf,08000240,50.001117,8.25872,8000240,Mainz Hbf,exact_eva
+Köln Messe/Deutz,08073368,50.940874,6.975001,8003368,Köln Messe/Deutz,exact_station_name_alternate_eva
+Osnabrück Hbf,08000294,52.272851,8.061781,8000294,Osnabrück Hbf,exact_eva
+Bremen Hbf,08000050,53.083481,8.813834,8000050,Bremen Hbf,exact_eva
+Münster (Westf) Hbf,08000263,51.956566,7.635715,8000263,Münster (Westf) Hbf,exact_eva
+Köln Messe/Deutz,08003368,50.940874,6.975001,8003368,Köln Messe/Deutz,exact_eva
+Solingen Hbf,08000087,51.160766,7.004187,8000087,Solingen Hbf,exact_eva

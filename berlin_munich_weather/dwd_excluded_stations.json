@@ -1,0 +1,8 @@
+{
+  "wind": {
+    "02410": "Ingolstadt-Manching: F parameter metadata says Stundenwerte in MEZ through 20260831; excluded to avoid unverified UTC interpretation.",
+    "02886": "Laupheim: F parameter metadata says Stundenwerte in MEZ through 20260831; excluded to avoid unverified UTC interpretation.",
+    "02905": "Lechfeld: F parameter metadata says Stundenwerte in MEZ through 20260831; excluded to avoid unverified UTC interpretation.",
+    "03484": "Neuburg an der Donau: F parameter metadata says Stundenwerte in MEZ through 20260831; excluded to avoid unverified UTC interpretation."
+  }
+}

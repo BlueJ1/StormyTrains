@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "journeys": 27412,
+  "stops": 216519,
+  "complete_weather_stops": 216519,
+  "complete_weather_percent": 100.0,
+  "journeys_with_weather_for_every_observed_stop": 27412,
+  "raw_archive_spot_checks": [
+    {
+      "product": "temperature",
+      "period": "historical",
+      "stop_id": "-9041826274447067038-2410051204-1",
+      "source_file": "stundenwerte_TU_00433_19510101_20251231_hist.zip"
+    },
+    {
+      "product": "temperature",
+      "period": "recent",
+      "stop_id": "-83995720850612411-2607201634-2",
+      "source_file": "stundenwerte_TU_00433_akt.zip"
+    },
+    {
+      "product": "precipitation",
+      "period": "historical",
+      "stop_id": "-9041826274447067038-2410051204-1",
+      "source_file": "stundenwerte_RR_17483_20240101_20251231_hist.zip"
+    },
+    {
+      "product": "precipitation",
+      "period": "recent",
+      "stop_id": "-83995720850612411-2607201634-2",
+      "source_file": "stundenwerte_RR_17483_akt.zip"
+    },
+    {
+      "product": "wind",
+      "period": "historical",
+      "stop_id": "-9041826274447067038-2410051204-1",
+      "source_file": "stundenwerte_FF_00433_19740101_20251231_hist.zip"
+    },
+    {
+      "product": "wind",
+      "period": "recent",
+      "stop_id": "-83995720850612411-2607201634-2",
+      "source_file": "stundenwerte_FF_00433_akt.zip"
+    }
+  ],
+  "archives_with_verified_UTC_metadata": 265,
+  "severity_class_counts": {
+    "normal_minor": 18395,
+    "moderate": 5520,
+    "canceled": 1792,
+    "severe": 1705
+  },
+  "journeys_canceled": 1792,
+  "example_journey_id": "-2638916872742442629-2506110652"
+}

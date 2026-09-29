@@ -1,0 +1,1857 @@
+[
+  {
+    "source_file": "stundenwerte_TU_00433_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02928_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01270_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01526_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01424_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05906_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_04928_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_15444_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00232_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03379_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00433_19510101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02928_19510101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01270_19510101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00282_19610101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03668_19510101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03379_19970701_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02878_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00282_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03668_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00403_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_13777_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00662_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00860_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01691_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_15207_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02480_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00232_19550101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02878_20170801_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02410_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05705_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05705_19480101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05692_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01526_20041101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01424_20080801_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05906_19480101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_04928_19770701_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_15444_20140901_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02905_20020101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02932_19720501_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00403_20020101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_13777_20080601_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00662_19510101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00860_20231001_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01691_19480101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_15207_20131101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05692_20040901_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01504_20020101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_07431_20071101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_04480_20040901_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03348_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_04813_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02480_20040901_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02014_19490101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_04813_20200801_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02410_19610102_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03126_19550101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00917_20040901_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_06275_20040701_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02700_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00917_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02700_20041201_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05275_20040601_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_04411_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05275_akt.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03987_18930101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_07106_20060901_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05480_20030910_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_13696_20071201_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00555_20080101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01303_19510101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_13670_20070601_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01078_19760301_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_02667_19600101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00603_20010403_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00161_20110901_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03137_20080501_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_06337_20040801_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00342_20101201_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_00691_19490101_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_01766_19891001_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_05717_20060901_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_TU_03348_20040601_20251231_hist.zip",
+    "product": "temperature",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17483_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00433_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_02928_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01270_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01526_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01424_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_05906_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_04928_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15444_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00232_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03379_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17483_20240101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_02928_19970407_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01270_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00282_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03668_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03379_19970707_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_02878_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00282_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03668_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17486_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15832_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00662_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_19126_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01691_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15207_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01851_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00232_19961107_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00433_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_02878_20170801_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17449_20240101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_02409_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_05705_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_05705_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15514_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_06317_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01526_20041101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01424_20080801_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_05906_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_04928_19980601_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15444_20140901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17486_20240101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15832_20190107_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00662_19971022_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_19126_20190911_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01691_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15207_20131101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03911_20040701_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_05444_20040701_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_06317_20081001_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15833_20190911_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03722_20050101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15834_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03136_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01039_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_15514_20171101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03136_20021101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_02012_20100601_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_07285_20050801_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_02409_20090101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_06195_20041001_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03126_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17449_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00860_20231001_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17447_20240101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00917_20040901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00279_20061101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17473_20240101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01851_20030429_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_04599_20050101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03911_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17452_20240101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00917_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03448_20100610_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17475_20240101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_17453_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_03987_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_07106_20060901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01046_20041001_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_13696_20071201_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00555_20080101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01303_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_13670_20070601_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_01078_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_02667_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00603_19990303_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_14043_20211101_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_14007_20120213_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00342_20101201_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_00691_19950901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_13669_20070901_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_04741_20041201_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_04931_19951004_20251231_hist.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_RR_06195_akt.zip",
+    "product": "precipitation",
+    "time_reference": [
+      "in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00427_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02928_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01270_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05371_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_07341_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05906_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04928_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_15444_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00232_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_03379_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00433_19740101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02928_19580101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01270_19730101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00282_19710801_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_03668_19490101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_03379_19850101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00433_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02878_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00282_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_03668_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04947_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00662_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_07367_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01691_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_15207_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_07412_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00232_19610101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02878_20170801_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04501_19780701_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01587_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05705_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04280_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05705_19660101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05426_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05371_19590101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_07341_20050801_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05906_19690101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04928_19760901_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_15444_20140901_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01886_20091126_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04947_19880817_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00662_19660101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_07367_20071201_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01691_19690101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_15207_20131101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05426_19731201_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_07391_20120201_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_15194_20240401_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00197_19900801_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02897_19900830_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05404_19720101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01262_19920519_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01420_19670101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02897_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_03651_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00867_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02014_19500101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00867_19720101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01587_20031210_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_03126_19570801_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_03987_18930101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_10510_20090101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_07412_20061001_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05404_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01420_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02932_19720501_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00427_19730101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02932_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_13674_20070801_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_13674_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04280_19710101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04931_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01886_akt.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04371_19690101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_05480_19750101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_13901_19790201_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01303_19630101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01078_19520101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_02667_19570701_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00603_19860801_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00161_19801201_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_15976_20200402_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_13952_20090201_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_13693_20080611_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00342_20101201_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_00691_19260101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_01766_19820101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_15200_20130601_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  },
+  {
+    "source_file": "stundenwerte_FF_04931_19530101_20251231_hist.zip",
+    "product": "wind",
+    "time_reference": [
+      "Stundenwerte in UTC"
+    ]
+  }
+]

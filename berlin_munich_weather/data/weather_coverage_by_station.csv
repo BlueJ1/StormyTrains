@@ -1,0 +1,56 @@
+station_name,eva,stops,journeys,complete_weather_stops,temperature_c_missing,precipitation_mm_missing,wind_speed_ms_missing
+Aschaffenburg Hbf,08000010,88,88,88,0,0,0
+Augsburg Hbf,08000013,10209,10209,10209,0,0,0
+Bamberg,08000025,9842,9842,9842,0,0,0
+Berlin Gesundbrunnen,08011102,2,2,2,0,0,0
+Berlin Hauptbahnhof,08011160,345,345,345,0,0,0
+Berlin Hauptbahnhof,08098160,27068,27067,27068,0,0,0
+Berlin Ostbahnhof,08010255,32,32,32,0,0,0
+Berlin Südkreuz,08011113,23839,23839,23839,0,0,0
+Berlin Zoologischer Garten,08010406,118,118,118,0,0,0
+Berlin-Spandau,08010404,785,785,785,0,0,0
+Berlin-Wannsee,08010405,125,125,125,0,0,0
+Bielefeld Hbf,08000036,103,103,103,0,0,0
+Bochum Hbf,08000041,93,93,93,0,0,0
+Bonn Hbf,08000044,28,28,28,0,0,0
+Braunschweig Hbf,08000049,962,962,962,0,0,0
+Bremen Hbf,08000050,3,3,3,0,0,0
+Darmstadt Hbf,08000068,237,237,237,0,0,0
+Dortmund Hbf,08000080,110,110,110,0,0,0
+Duisburg Hbf,08000086,94,94,94,0,0,0
+Düsseldorf Hbf,08000085,94,94,94,0,0,0
+Erfurt Hbf,08010101,24999,24999,24999,0,0,0
+Essen Hbf,08000098,94,94,94,0,0,0
+Frankfurt (Main) Hbf,08000105,4991,4991,4991,0,0,0
+Frankfurt (Main) Süd,08002041,80,80,80,0,0,0
+Fulda,08000115,4505,4505,4505,0,0,0
+Fürth (Bay) Hbf,08000114,40,40,40,0,0,0
+Göttingen,08000128,875,875,875,0,0,0
+Halle (Saale) Hbf,08010159,13424,13424,13424,0,0,0
+Hamm (Westf) Hbf,08000149,110,110,110,0,0,0
+Hanau Hbf,08000150,49,49,49,0,0,0
+Hannover Hbf,08000152,133,133,133,0,0,0
+Heidelberg Hbf,08000156,892,892,892,0,0,0
+Hildesheim Hbf,08000169,853,853,853,0,0,0
+Ingolstadt Hbf,08000183,3212,3212,3212,0,0,0
+Kassel-Wilhelmshöhe,08003200,860,860,860,0,0,0
+Koblenz Hbf,08000206,28,28,28,0,0,0
+Köln Hbf,08000207,110,110,110,0,0,0
+Köln Messe/Deutz,08003368,1,1,1,0,0,0
+Köln Messe/Deutz,08073368,1,1,1,0,0,0
+Leipzig Hbf,08010205,11815,11815,11815,0,0,0
+Magdeburg Hbf,08010224,141,141,141,0,0,0
+Mainz Hbf,08000240,28,28,28,0,0,0
+Mannheim Hbf,08000244,4905,4905,4905,0,0,0
+München Hbf,08000261,27412,27412,27412,0,0,0
+München-Pasing,08004158,8643,8643,8643,0,0,0
+Münster (Westf) Hbf,08000263,6,6,6,0,0,0
+Nürnberg Hbf,08000284,21911,21911,21911,0,0,0
+Osnabrück Hbf,08000294,1,1,1,0,0,0
+Plochingen,08000302,156,156,156,0,0,0
+Potsdam Hbf,08012666,110,110,110,0,0,0
+Solingen Hbf,08000087,3,3,3,0,0,0
+Stuttgart Hbf,08000096,5163,5163,5163,0,0,0
+Ulm Hbf,08000170,4975,4975,4975,0,0,0
+Wolfsburg Hbf,08006552,872,872,872,0,0,0
+Würzburg Hbf,08000260,944,944,944,0,0,0

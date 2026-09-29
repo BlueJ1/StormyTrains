@@ -1,0 +1,23 @@
+# Python and editor files
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.idea/
+.DS_Store
+
+# Raw monthly railway data (about 7 GB), obtained separately
+data/monthly_processed_data/
+
+# Berlin–München pipeline: raw downloads and large generated outputs.
+# Rebuild them with the scripts listed in berlin_munich_weather/README.md.
+berlin_munich_weather/cache/
+berlin_munich_weather/data/*.parquet
+berlin_munich_weather/data/*.csv.gz
+berlin_munich_weather/data/journeys.csv
+berlin_munich_weather/data/train_journeys.csv
+
+# Third-party papers and theses: copyrighted, not ours to publish
+*.pdf
+AlexMasterThesis/
+alex-thesis-project-summary.html
