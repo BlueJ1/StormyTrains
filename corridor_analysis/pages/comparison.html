@@ -1,0 +1,562 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Three Corridors into München</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: a single report column (prose at ~66ch) with full-width chart bands; the hero pairs the thesis with a map of the corridor drawn from the journeys themselves. */
+:root {
+  --paper: #f5f7f9;
+  --surface: #fcfcfd;
+  --ink: #111820;
+  --ink-2: #47505c;
+  --muted: #7a838f;
+  --grid: #e1e5ea;
+  --axis: #c2c9d1;
+  --accent: #0e6b70;
+  --track: #2b3440;
+
+  --sev-normal: #c9d0d8;
+  --sev-moderate: #86b6ef;
+  --sev-severe: #1c5cab;
+  --sev-canceled: #e34948;
+
+  --fam-1: #2a78d6;
+  --fam-2: #eb6834;
+  --fam-3: #1baf7a;
+  --fam-4: #eda100;
+  --fam-other: #a9b1ba;
+
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: 2.125rem;
+  --step-4: clamp(2.5rem, 6vw, 4.25rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0f1318;
+    --surface: #161b21;
+    --ink: #f1f4f7;
+    --ink-2: #bcc4cd;
+    --muted: #87909b;
+    --grid: #262d35;
+    --axis: #3a434d;
+    --accent: #52c1bf;
+    --track: #d5dce3;
+    --sev-normal: #3f4852;
+    --sev-moderate: #256abf;
+    --sev-severe: #86b6ef;
+    --sev-canceled: #e66767;
+    --fam-1: #3987e5;
+    --fam-2: #d95926;
+    --fam-3: #199e70;
+    --fam-4: #c98500;
+    --fam-other: #5d6671;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0f1318;
+  --surface: #161b21;
+  --ink: #f1f4f7;
+  --ink-2: #bcc4cd;
+  --muted: #87909b;
+  --grid: #262d35;
+  --axis: #3a434d;
+  --accent: #52c1bf;
+  --track: #d5dce3;
+  --sev-normal: #3f4852;
+  --sev-moderate: #256abf;
+  --sev-severe: #86b6ef;
+  --sev-canceled: #e66767;
+  --fam-1: #3987e5;
+  --fam-2: #d95926;
+  --fam-3: #199e70;
+  --fam-4: #c98500;
+  --fam-other: #5d6671;
+}
+
+* { box-sizing: border-box; }
+section > *, .chart > *, .hero > *, .hero-text > *, .two > *, .three > *, .qa > * { min-width: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  padding-inline: clamp(16px, 4vw, 40px);
+  padding-block: 0 64px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; }
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-stretch: 88%;
+  text-wrap: balance;
+  line-height: 1.1;
+  margin: 0;
+}
+h1 { font-size: var(--step-4); font-weight: 800; letter-spacing: -0.02em; }
+h1 .arrow { color: var(--accent); font-stretch: 100%; }
+h2 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: var(--step-1); font-weight: 700; font-stretch: 95%; }
+p { margin: 0; max-width: 66ch; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.eyebrow {
+  font-family: var(--font-display);
+  font-stretch: 110%;
+  font-weight: 700;
+  font-size: var(--step--1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.mono, .num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+
+/* Hero */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+  padding-block: clamp(32px, 6vw, 72px) 24px;
+}
+.hero-text { display: grid; gap: 20px; }
+.lede { font-size: var(--step-1); color: var(--ink-2); line-height: 1.5; }
+.figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 28px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--grid);
+}
+.figure { display: grid; gap: 6px; align-content: start; }
+.figure b {
+  font-family: var(--font-display);
+  font-stretch: 80%;
+  font-weight: 700;
+  font-size: var(--step-3);
+  line-height: 1;
+}
+.figure span { font-size: var(--step--1); color: var(--ink-2); line-height: 1.4; }
+.map-box { display: grid; gap: 8px; }
+.map-box figcaption { font-size: var(--step--1); color: var(--muted); }
+#map { width: 100%; }
+
+/* Sections */
+section { display: grid; gap: 20px; padding-block: 48px 8px; border-top: 1px solid var(--grid); margin-top: 40px; }
+.section-head { display: grid; gap: 10px; }
+.chart {
+  background: var(--surface);
+  border: 1px solid var(--grid);
+  border-radius: 8px;
+  padding: 18px 18px 12px;
+  display: grid;
+  gap: 12px;
+}
+.chart-title { font-family: var(--font-body); font-weight: 600; font-size: var(--step-0); }
+.chart-sub { font-size: var(--step--1); color: var(--muted); margin-top: -8px; }
+.plot { width: 100%; min-height: 60px; position: relative; }
+.plot svg { display: block; overflow: visible; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--step--1); color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.callout {
+  font-size: var(--step-1);
+  line-height: 1.45;
+  max-width: 60ch;
+  padding-left: 16px;
+  border-left: 3px solid var(--accent);
+  color: var(--ink);
+}
+
+/* SVG text */
+svg text { fill: var(--muted); font-family: var(--font-data); font-size: 11px; }
+svg text.lab { fill: var(--ink-2); font-family: var(--font-body); font-size: 12px; }
+svg text.lab-strong { fill: var(--ink); font-family: var(--font-body); font-size: 12px; font-weight: 600; }
+svg text.val { fill: var(--ink); font-size: 11px; }
+svg .gridline { stroke: var(--grid); stroke-width: 1; }
+svg .baseline { stroke: var(--axis); stroke-width: 1; }
+svg .hit { fill: transparent; cursor: default; }
+svg .mark { transition: opacity 120ms; }
+svg g.hov:hover .mark { opacity: 0.8; }
+@media (prefers-reduced-motion: reduce) { svg .mark { transition: none; } }
+
+/* Tables */
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--grid); vertical-align: middle; }
+th { font-weight: 600; color: var(--ink-2); font-size: 0.75rem; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+td.r, th.r { text-align: right; }
+td .num { white-space: nowrap; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px; }
+.minibar { display: flex; gap: 2px; height: 12px; min-width: 140px; }
+.minibar span { display: block; height: 100%; }
+.minibar span:first-child { border-radius: 3px 0 0 3px; }
+.minibar span:last-child { border-radius: 0 3px 3px 0; }
+.cellbar { display: flex; align-items: center; gap: 8px; }
+.cellbar .bar { height: 10px; border-radius: 0 3px 3px 0; background: var(--sev-severe); min-width: 2px; }
+details { font-size: var(--step--1); }
+details summary { cursor: pointer; color: var(--accent); width: fit-content; }
+details .table-wrap { margin-top: 8px; max-height: 320px; overflow: auto; }
+
+ul.notes { margin: 0; padding-left: 20px; display: grid; gap: 12px; max-width: 70ch; }
+ul.notes li::marker { color: var(--accent); }
+.qa { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.qa > div { display: grid; gap: 6px; padding: 16px; border: 1px solid var(--grid); border-radius: 8px; background: var(--surface); }
+.qa h3 { font-size: var(--step-0); font-stretch: 100%; }
+.qa p { font-size: 0.9375rem; color: var(--ink-2); }
+footer { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--grid); font-size: var(--step--1); color: var(--muted); display: grid; gap: 6px; }
+
+/* Tooltip */
+#tip {
+  position: fixed; z-index: 10; pointer-events: none;
+  background: var(--ink); color: var(--paper);
+  font-size: 12px; line-height: 1.45; padding: 7px 10px; border-radius: 6px;
+  max-width: 260px; box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+#tip b { font-weight: 600; }
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; }
+  .map-box { max-width: 460px; }
+  .two, .three, .qa { grid-template-columns: 1fr; }
+}
+</style>
+
+<style>
+.hero.single { grid-template-columns: 1fr; }
+.keytable td b { font-family: var(--font-display); font-stretch: 85%; font-size: var(--step-1); }
+.keytable td, .keytable th { padding: 10px 12px; }
+.rowlabel { font-size: var(--step--1); color: var(--ink-2); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.stackrows { display: grid; gap: 14px; }
+</style>
+
+<div id="tip" hidden></div>
+<div class="wrap">
+
+<header class="hero single">
+  <div class="hero-text">
+    <div class="eyebrow">Project in Data Science · corridor comparison</div>
+    <h1>Three corridors <span class="arrow">→</span> München</h1>
+    <p class="lede">Berlin Hbf, Hamburg Hbf and Frankfurt (Main) Hbf to München Hbf: every ICE and IC run that stopped at the origin and later at München, 1 July 2024 to 31 August 2026. The same rules and severity classes on all three, railway data only, no weather.</p>
+    <div class="chart">
+      <div class="table-wrap">
+        <table class="keytable" id="keytable"></table>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="outcomes">
+  <div class="section-head">
+    <div class="eyebrow">Outcomes</div>
+    <h2>Similar shares of bad journeys, different kinds of lateness</h2>
+    <p>The severe-or-canceled share is close on all three corridors: 12.8% from Berlin, 14.9% from Hamburg and 13.8% from Frankfurt. Frankfurt, the shortest trip, has the fewest punctual arrivals (38.9%) and a median delay of 10 min: more trains are moderately late, but no more are severely late than elsewhere. Hamburg has the most cancellations (8.0%).</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Journeys by severity class</div>
+    <div class="stackrows" id="classrows"></div>
+    <div class="legend" id="classlegend"></div>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Share of completed journeys arriving at München within a given delay</div>
+    <div class="chart-sub">Read across: the higher the line, the more trains are within that delay. Hover for values.</div>
+    <div class="plot" id="cdf"></div>
+    <div class="legend corrlegend"></div>
+  </div>
+</section>
+
+<section id="routes">
+  <div class="section-head">
+    <div class="eyebrow">Routes and length</div>
+    <h2>Frankfurt is short and simple; Hamburg is long and varied</h2>
+    <p>From Frankfurt, 72 stop patterns fall into two main routes of similar length. From Hamburg there are 508 patterns, and the slowest 10% of runs take 9 h 06 or more. Berlin sits in between, with one dominant high-speed route and a long tail of detours.</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="routetable"></table></div>
+  </div>
+</section>
+
+<section id="time">
+  <div class="section-head">
+    <div class="eyebrow">Over time</div>
+    <h2>Bad months are largely shared</h2>
+    <p>The monthly severe-or-canceled shares move together: the correlation is 0.84 between Berlin and Hamburg, 0.72 between Hamburg and Frankfurt, and 0.66 between Berlin and Frankfurt. July 2025 and January 2026 are bad on all three. Part of this is shared trains, part is whatever affects the whole network at once.</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Severe or canceled, by month of departure</div>
+    <div class="plot" id="monthly"></div>
+    <div class="legend corrlegend"></div>
+  </div>
+  <div class="two">
+    <div class="chart">
+      <div class="chart-title">Severe or canceled, by scheduled departure hour</div>
+      <div class="chart-sub">Hours with fewer than 300 journeys on a corridor are left out.</div>
+      <div class="plot" id="hourly"></div>
+      <div class="legend corrlegend"></div>
+    </div>
+    <div class="chart">
+      <div class="chart-title">Severe or canceled, by weekday</div>
+      <div class="table-wrap"><table id="weekdaytable"></table></div>
+    </div>
+  </div>
+</section>
+
+<section id="enroute">
+  <div class="section-head">
+    <div class="eyebrow">During the journey</div>
+    <h2>Frankfurt trains bring their delay with them</h2>
+    <p>50% of trains leave Frankfurt at least 6 minutes late, against 26% at Berlin and 24% at Hamburg, because most Frankfurt runs started further back. So the delay at departure already says a lot about the outcome there (correlation 0.65), and little at Hamburg (0.26). On all three corridors the correlation climbs to about 0.9 once three quarters of the schedule is done.</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">How well the delay at a stop matches the final arrival delay</div>
+    <div class="chart-sub">Correlation between the departure delay at a stop and the arrival delay at München, grouped by how much of the scheduled journey is already behind the train. Completed journeys only.</div>
+    <div class="plot" id="progress"></div>
+    <div class="legend corrlegend"></div>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="origintable"></table></div>
+  </div>
+</section>
+
+<section id="cancel">
+  <div class="section-head">
+    <div class="eyebrow">Cancellations</div>
+    <h2>Hamburg loses the most journeys</h2>
+    <p>Most canceled journeys are canceled at both ends. Hamburg has a larger share canceled only at the origin, where the train then ran later in the journey, and the most journeys that lost only intermediate stops.</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="canceltable"></table></div>
+  </div>
+</section>
+
+<section id="overlap">
+  <div class="section-head">
+    <div class="eyebrow">Shared trains</div>
+    <h2>The same run can count on more than one corridor</h2>
+    <p>A train from Hamburg via Berlin to München is a Hamburg journey and a Berlin journey. 8,706 runs are in both of those corridors, a third of Hamburg's. 4,991 Berlin runs go via Frankfurt and are Frankfurt journeys too. One ICE 699 run is even in all three. Their outcomes at München are identical, so any split into training and test data has to keep a run on one side.</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="overlaptable"></table></div>
+  </div>
+</section>
+
+<section id="quality">
+  <div class="section-head">
+    <div class="eyebrow">Data quality</div>
+    <h2>Frankfurt's stop data is the most complete</h2>
+    <p>Before the source widened its station coverage on 3 November 2025, most Berlin and Hamburg journeys have gaps in their stop numbering; far fewer Frankfurt journeys do. After the change, gaps are rare everywhere.</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="qualitytable"></table></div>
+  </div>
+</section>
+
+<section id="next">
+  <div class="section-head">
+    <div class="eyebrow">For the project</div>
+    <h2>Choosing the study pairs</h2>
+    <p>The project instructions ask us to compare two or three candidate origin–destination pairs and pick one or two. These are the trade-offs visible in the railway data. The choice is ours to make together.</p>
+  </div>
+  <div class="qa">
+    <div><h3>One corridor or two?</h3><p>Berlin and Hamburg share a third of Hamburg's runs and most of their bad months, so as a pair they add less independent data. Frankfurt shares fewer runs and behaves differently at departure.</p></div>
+    <div><h3>Does trip length matter for the question?</h3><p>Frankfurt (3 h 22) gives a short, simple corridor; Hamburg (6 h 37) a long one with many routes. Weather along a 6-hour trip is harder to summarise than along a 3-hour one.</p></div>
+    <div><h3>What is known at prediction time?</h3><p>For Frankfurt, the delay the train brings in is the strongest single signal. Whether it counts as known before departure depends on the prediction cutoff we choose.</p></div>
+    <div><h3>How much data is enough?</h3><p>All three have 22,544 or more journeys and about 3,100 or more positives, so any of them supports the core models.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div>Source: <span class="mono">corridor_analysis/stats/comparison.json</span>, computed by <span class="mono">corridor_analysis/analyse.py</span> from the journeys built by <span class="mono">extract.py</span> out of the Deutsche Bahn timetable data collected by piebro/deutsche-bahn-data (CC BY 4.0). ICE and IC runs, 1 July 2024 to 31 August 2026. Stops are limited to stations present in all monthly files.</div>
+  <div>Delay classes: normal/minor under 20 min, moderate 20–59 min, severe 60 min or more, canceled if the origin departure or München arrival is canceled.</div>
+</footer>
+</div>
+
+<script>
+const C = {"corridors": [{"key": "berlin", "label": "Berlin", "origin": "Berlin Hauptbahnhof", "short": "Berlin Hbf", "overview": {"journeys": 27412, "days": 792, "first": "2024-07-01", "last": "2026-08-31", "per_day": 34.6, "train_numbers": 186, "routes": 255, "ice": 27412, "ic": 0, "sched_median": 281.0, "sched_min": 229.0, "sched_p10": 243.0, "sched_p90": 470.0, "delay_mean": 16.6, "delay_median": 7.0, "p90": 47.0, "p99": 126.0, "dmax": 398.0, "punctual_6": 0.4601, "under20": 0.718, "classes": {"normal_minor": 18395, "moderate": 5520, "canceled": 1792, "severe": 1705}, "severe_or_canceled": 0.1276, "canceled": 0.0654, "early_5": 542, "early_min": -57.0}, "cdf": [{"x": -5, "p": 0.0148}, {"x": -4, "p": 0.0212}, {"x": -3, "p": 0.0345}, {"x": -2, "p": 0.0557}, {"x": -1, "p": 0.0929}, {"x": 0, "p": 0.1558}, {"x": 1, "p": 0.2436}, {"x": 2, "p": 0.297}, {"x": 3, "p": 0.346}, {"x": 4, "p": 0.3891}, {"x": 5, "p": 0.4289}, {"x": 6, "p": 0.4601}, {"x": 7, "p": 0.4931}, {"x": 8, "p": 0.5231}, {"x": 9, "p": 0.5498}, {"x": 10, "p": 0.5719}, {"x": 11, "p": 0.5938}, {"x": 12, "p": 0.6131}, {"x": 13, "p": 0.6294}, {"x": 14, "p": 0.6463}, {"x": 15, "p": 0.6596}, {"x": 16, "p": 0.6724}, {"x": 17, "p": 0.6844}, {"x": 18, "p": 0.6954}, {"x": 19, "p": 0.7071}, {"x": 20, "p": 0.718}, {"x": 21, "p": 0.7291}, {"x": 22, "p": 0.7391}, {"x": 23, "p": 0.7495}, {"x": 24, "p": 0.7597}, {"x": 25, "p": 0.7703}, {"x": 26, "p": 0.7801}, {"x": 27, "p": 0.7873}, {"x": 28, "p": 0.7961}, {"x": 29, "p": 0.804}, {"x": 30, "p": 0.8122}, {"x": 31, "p": 0.8196}, {"x": 32, "p": 0.8263}, {"x": 33, "p": 0.8327}, {"x": 34, "p": 0.8388}, {"x": 35, "p": 0.8442}, {"x": 36, "p": 0.85}, {"x": 37, "p": 0.8557}, {"x": 38, "p": 0.8613}, {"x": 39, "p": 0.8657}, {"x": 40, "p": 0.8703}, {"x": 41, "p": 0.8742}, {"x": 42, "p": 0.8786}, {"x": 43, "p": 0.8828}, {"x": 44, "p": 0.8867}, {"x": 45, "p": 0.8906}, {"x": 46, "p": 0.894}, {"x": 47, "p": 0.8975}, {"x": 48, "p": 0.9014}, {"x": 49, "p": 0.9045}, {"x": 50, "p": 0.9075}, {"x": 51, "p": 0.9112}, {"x": 52, "p": 0.9141}, {"x": 53, "p": 0.9167}, {"x": 54, "p": 0.9197}, {"x": 55, "p": 0.9224}, {"x": 56, "p": 0.9249}, {"x": 57, "p": 0.9269}, {"x": 58, "p": 0.9296}, {"x": 59, "p": 0.9317}, {"x": 60, "p": 0.9335}, {"x": 61, "p": 0.9352}, {"x": 62, "p": 0.9375}, {"x": 63, "p": 0.9387}, {"x": 64, "p": 0.9405}, {"x": 65, "p": 0.9425}, {"x": 66, "p": 0.9439}, {"x": 67, "p": 0.9456}, {"x": 68, "p": 0.9473}, {"x": 69, "p": 0.9488}, {"x": 70, "p": 0.9506}, {"x": 71, "p": 0.9523}, {"x": 72, "p": 0.9534}, {"x": 73, "p": 0.955}, {"x": 74, "p": 0.9562}, {"x": 75, "p": 0.9573}, {"x": 76, "p": 0.9579}, {"x": 77, "p": 0.9589}, {"x": 78, "p": 0.9603}, {"x": 79, "p": 0.9613}, {"x": 80, "p": 0.962}, {"x": 81, "p": 0.9631}, {"x": 82, "p": 0.9644}, {"x": 83, "p": 0.9655}, {"x": 84, "p": 0.9662}, {"x": 85, "p": 0.9673}, {"x": 86, "p": 0.9681}, {"x": 87, "p": 0.9692}, {"x": 88, "p": 0.9701}, {"x": 89, "p": 0.9707}, {"x": 90, "p": 0.9715}, {"x": 91, "p": 0.9724}, {"x": 92, "p": 0.973}, {"x": 93, "p": 0.9738}, {"x": 94, "p": 0.9745}, {"x": 95, "p": 0.9749}, {"x": 96, "p": 0.9755}, {"x": 97, "p": 0.9761}, {"x": 98, "p": 0.9767}, {"x": 99, "p": 0.9772}, {"x": 100, "p": 0.9779}, {"x": 101, "p": 0.9786}, {"x": 102, "p": 0.9793}, {"x": 103, "p": 0.9797}, {"x": 104, "p": 0.9801}, {"x": 105, "p": 0.9805}, {"x": 106, "p": 0.9811}, {"x": 107, "p": 0.9815}, {"x": 108, "p": 0.982}, {"x": 109, "p": 0.9828}, {"x": 110, "p": 0.9832}, {"x": 111, "p": 0.9839}, {"x": 112, "p": 0.9845}, {"x": 113, "p": 0.9849}, {"x": 114, "p": 0.9851}, {"x": 115, "p": 0.9854}, {"x": 116, "p": 0.9859}, {"x": 117, "p": 0.9863}, {"x": 118, "p": 0.9867}, {"x": 119, "p": 0.9869}, {"x": 120, "p": 0.9872}], "monthly": [{"month": "2024-07", "n": 1123, "mean": 12.1, "soc": 0.1051, "normal_minor": 0.7186, "moderate": 0.1763, "severe": 0.0374, "canceled": 0.0677}, {"month": "2024-08", "n": 1029, "mean": 20.2, "soc": 0.208, "normal_minor": 0.5695, "moderate": 0.2225, "severe": 0.07, "canceled": 0.138}, {"month": "2024-09", "n": 929, "mean": 12.9, "soc": 0.1464, "normal_minor": 0.7147, "moderate": 0.1389, "severe": 0.0431, "canceled": 0.1033}, {"month": "2024-10", "n": 934, "mean": 14.2, "soc": 0.1285, "normal_minor": 0.6991, "moderate": 0.1724, "severe": 0.0236, "canceled": 0.1049}, {"month": "2024-11", "n": 900, "mean": 12.6, "soc": 0.1467, "normal_minor": 0.71, "moderate": 0.1433, "severe": 0.0344, "canceled": 0.1122}, {"month": "2024-12", "n": 1123, "mean": 8.9, "soc": 0.1033, "normal_minor": 0.7667, "moderate": 0.13, "severe": 0.0258, "canceled": 0.0775}, {"month": "2025-01", "n": 1158, "mean": 8.7, "soc": 0.0691, "normal_minor": 0.8195, "moderate": 0.1114, "severe": 0.025, "canceled": 0.044}, {"month": "2025-02", "n": 1037, "mean": 9.3, "soc": 0.08, "normal_minor": 0.784, "moderate": 0.136, "severe": 0.0212, "canceled": 0.0588}, {"month": "2025-03", "n": 968, "mean": 15.1, "soc": 0.094, "normal_minor": 0.6983, "moderate": 0.2076, "severe": 0.0362, "canceled": 0.0579}, {"month": "2025-04", "n": 936, "mean": 18.3, "soc": 0.1421, "normal_minor": 0.641, "moderate": 0.2169, "severe": 0.0652, "canceled": 0.0769}, {"month": "2025-05", "n": 1155, "mean": 10.4, "soc": 0.0753, "normal_minor": 0.7879, "moderate": 0.1368, "severe": 0.0346, "canceled": 0.0407}, {"month": "2025-06", "n": 1052, "mean": 16.2, "soc": 0.134, "normal_minor": 0.6759, "moderate": 0.1901, "severe": 0.0599, "canceled": 0.0741}, {"month": "2025-07", "n": 1016, "mean": 32.4, "soc": 0.2815, "normal_minor": 0.5148, "moderate": 0.2037, "severe": 0.1831, "canceled": 0.0984}, {"month": "2025-08", "n": 1035, "mean": 17.2, "soc": 0.1159, "normal_minor": 0.6841, "moderate": 0.2, "severe": 0.0638, "canceled": 0.0522}, {"month": "2025-09", "n": 941, "mean": 15.9, "soc": 0.0893, "normal_minor": 0.7024, "moderate": 0.2083, "severe": 0.0584, "canceled": 0.0308}, {"month": "2025-10", "n": 821, "mean": 20.3, "soc": 0.1267, "normal_minor": 0.6273, "moderate": 0.246, "severe": 0.0816, "canceled": 0.0451}, {"month": "2025-11", "n": 889, "mean": 18.8, "soc": 0.1136, "normal_minor": 0.6322, "moderate": 0.2542, "severe": 0.054, "canceled": 0.0596}, {"month": "2025-12", "n": 1042, "mean": 13.2, "soc": 0.0643, "normal_minor": 0.7294, "moderate": 0.2063, "severe": 0.0317, "canceled": 0.0326}, {"month": "2026-01", "n": 1264, "mean": 23.5, "soc": 0.1915, "normal_minor": 0.5522, "moderate": 0.2563, "severe": 0.0997, "canceled": 0.0918}, {"month": "2026-02", "n": 1142, "mean": 11.4, "soc": 0.0832, "normal_minor": 0.7496, "moderate": 0.1673, "severe": 0.0385, "canceled": 0.0447}, {"month": "2026-03", "n": 1185, "mean": 14.5, "soc": 0.103, "normal_minor": 0.6937, "moderate": 0.2034, "severe": 0.0506, "canceled": 0.0523}, {"month": "2026-04", "n": 909, "mean": 13.9, "soc": 0.1023, "normal_minor": 0.7349, "moderate": 0.1628, "severe": 0.0539, "canceled": 0.0484}, {"month": "2026-05", "n": 1250, "mean": 15.9, "soc": 0.1096, "normal_minor": 0.6848, "moderate": 0.2056, "severe": 0.068, "canceled": 0.0416}, {"month": "2026-06", "n": 1229, "mean": 27.5, "soc": 0.1945, "normal_minor": 0.5183, "moderate": 0.2872, "severe": 0.1326, "canceled": 0.0618}, {"month": "2026-07", "n": 1216, "mean": 24.9, "soc": 0.1505, "normal_minor": 0.5074, "moderate": 0.3421, "severe": 0.0946, "canceled": 0.0559}, {"month": "2026-08", "n": 1129, "mean": 23.3, "soc": 0.1532, "normal_minor": 0.5695, "moderate": 0.2772, "severe": 0.1081, "canceled": 0.0452}], "hourly": [{"hour": 0, "n": 111, "soc": 0.1261, "mean": 12.1, "sched": 708.0}, {"hour": 3, "n": 66, "soc": 0.0606, "mean": 12.1, "sched": 335.0}, {"hour": 4, "n": 486, "soc": 0.1091, "mean": 13.8, "sched": 298.0}, {"hour": 5, "n": 1841, "soc": 0.0972, "mean": 12.4, "sched": 308.0}, {"hour": 6, "n": 1296, "soc": 0.0856, "mean": 11.1, "sched": 275.0}, {"hour": 7, "n": 2127, "soc": 0.102, "mean": 14.8, "sched": 308.0}, {"hour": 8, "n": 1626, "soc": 0.139, "mean": 13.4, "sched": 273.0}, {"hour": 9, "n": 1848, "soc": 0.125, "mean": 15.9, "sched": 268.0}, {"hour": 10, "n": 1210, "soc": 0.1446, "mean": 16.3, "sched": 276.0}, {"hour": 11, "n": 2154, "soc": 0.1509, "mean": 18.9, "sched": 308.0}, {"hour": 12, "n": 1565, "soc": 0.1099, "mean": 14.7, "sched": 273.0}, {"hour": 13, "n": 2167, "soc": 0.1389, "mean": 20.2, "sched": 322.0}, {"hour": 14, "n": 1767, "soc": 0.1522, "mean": 19.8, "sched": 279.0}, {"hour": 15, "n": 2121, "soc": 0.1433, "mean": 21.3, "sched": 308.0}, {"hour": 16, "n": 1600, "soc": 0.1306, "mean": 18.5, "sched": 274.0}, {"hour": 17, "n": 1672, "soc": 0.1394, "mean": 17.8, "sched": 292.0}, {"hour": 18, "n": 1316, "soc": 0.1444, "mean": 19.5, "sched": 274.0}, {"hour": 19, "n": 714, "soc": 0.1387, "mean": 18.2, "sched": 247.0}, {"hour": 20, "n": 750, "soc": 0.144, "mean": 21.7, "sched": 260.5}, {"hour": 21, "n": 702, "soc": 0.084, "mean": 7.0, "sched": 601.0}, {"hour": 22, "n": 23, "soc": 0.0, "mean": 2.4, "sched": 504.0}, {"hour": 23, "n": 250, "soc": 0.072, "mean": 3.3, "sched": 467.0}], "weekday": [{"wd": 0, "n": 3965, "soc": 0.1238, "mean": 15.4, "canc": 0.0691}, {"wd": 1, "n": 3965, "soc": 0.1422, "mean": 17.4, "canc": 0.0757}, {"wd": 2, "n": 3942, "soc": 0.1246, "mean": 17.2, "canc": 0.0657}, {"wd": 3, "n": 4004, "soc": 0.1286, "mean": 18.1, "canc": 0.0659}, {"wd": 4, "n": 4051, "soc": 0.134, "mean": 18.4, "canc": 0.058}, {"wd": 5, "n": 3740, "soc": 0.1225, "mean": 14.9, "canc": 0.0655}, {"wd": 6, "n": 3745, "soc": 0.1162, "mean": 14.8, "canc": 0.0574}], "families": [{"key": "direct", "label": "High-speed via Erfurt and Nürnberg", "via": "Halle or Leipzig, Erfurt, Nürnberg, sometimes Bamberg or Ingolstadt", "n": 17172, "sched": 268.0, "mean": 15.2, "median": 6.0, "soc": 0.121, "canc": 0.0661, "normal_minor": 0.7027, "moderate": 0.1763, "severe": 0.0549, "canceled": 0.0661}, {"key": "augsburg", "label": "Via Nürnberg and Augsburg", "via": "As above to Nürnberg, then Augsburg and München-Pasing", "n": 4738, "sched": 309.0, "mean": 14.7, "median": 6.0, "soc": 0.1182, "canc": 0.0703, "normal_minor": 0.6919, "moderate": 0.19, "severe": 0.0479, "canceled": 0.0703}, {"key": "frankfurt", "label": "Via Frankfurt and Stuttgart", "via": "Leipzig, Erfurt, Fulda, Frankfurt, Mannheim, Stuttgart, Ulm, Augsburg", "n": 4136, "sched": 470.0, "mean": 21.1, "median": 10.0, "soc": 0.1436, "canc": 0.0549, "normal_minor": 0.5795, "moderate": 0.2768, "severe": 0.0887, "canceled": 0.0549}, {"key": "west", "label": "Via Kassel and Frankfurt", "via": "Spandau, Wolfsburg, Braunschweig, Göttingen, Kassel, Fulda, Frankfurt, Stuttgart", "n": 855, "sched": 470.0, "mean": 33.8, "median": 27.0, "soc": 0.2058, "canc": 0.048, "normal_minor": 0.3801, "moderate": 0.414, "severe": 0.1579, "canceled": 0.048}, {"key": "other", "label": "Diversions and rare patterns", "via": "For example via Würzburg skipping Nürnberg, or via the Ruhr and Köln", "n": 511, "sched": 422.0, "mean": 16.4, "median": 7.0, "soc": 0.1742, "canc": 0.1096, "normal_minor": 0.6419, "moderate": 0.184, "severe": 0.0646, "canceled": 0.1096}], "cancel": {"both": 1173, "dest_only": 495, "origin_only": 124, "intermediate_only": 845}, "quality": {"no_update_journeys": 832, "zero_delay_arrivals": 2249, "gaps": 11132, "gap_before": 0.6763, "gap_after": 0.0147}, "enroute": [{"station": "Berlin Hauptbahnhof", "n": 26115, "corr": 0.4, "rows": [{"b": "<6", "n": 19264, "soc": 0.0582, "final": 5.0}, {"b": "6–19", "n": 4322, "soc": 0.0863, "final": 10.0}, {"b": "20–39", "n": 1753, "soc": 0.1666, "final": 30.0}, {"b": "40–59", "n": 484, "soc": 0.3802, "final": 49.0}, {"b": "≥60", "n": 292, "soc": 0.7842, "final": 81.0}]}, {"station": "Erfurt Hbf", "n": 23779, "corr": 0.612, "rows": [{"b": "<6", "n": 15139, "soc": 0.0375, "final": 3.0}, {"b": "6–19", "n": 4818, "soc": 0.0587, "final": 9.0}, {"b": "20–39", "n": 2331, "soc": 0.1103, "final": 28.5}, {"b": "40–59", "n": 817, "soc": 0.295, "final": 48.0}, {"b": "≥60", "n": 674, "soc": 0.8472, "final": 82.0}]}, {"station": "Nürnberg Hbf", "n": 20537, "corr": 0.894, "rows": [{"b": "<6", "n": 11719, "soc": 0.0066, "final": 2.0}, {"b": "6–19", "n": 4712, "soc": 0.0178, "final": 10.0}, {"b": "20–39", "n": 2411, "soc": 0.0456, "final": 28.0}, {"b": "40–59", "n": 773, "soc": 0.2005, "final": 48.0}, {"b": "≥60", "n": 922, "soc": 0.91, "final": 92.0}]}], "progress": [{"lo": 0.0, "n": 48964, "corr": 0.408, "p60_soc": 0.7476}, {"lo": 0.1, "n": 6093, "corr": 0.33, "p60_soc": 0.5763}, {"lo": 0.2, "n": 17772, "corr": 0.524, "p60_soc": 0.7975}, {"lo": 0.3, "n": 15466, "corr": 0.604, "p60_soc": 0.8297}, {"lo": 0.4, "n": 15989, "corr": 0.65, "p60_soc": 0.8397}, {"lo": 0.5, "n": 11643, "corr": 0.683, "p60_soc": 0.7854}, {"lo": 0.6, "n": 16793, "corr": 0.809, "p60_soc": 0.826}, {"lo": 0.7, "n": 17859, "corr": 0.887, "p60_soc": 0.9216}, {"lo": 0.8, "n": 10869, "corr": 0.947, "p60_soc": 0.9283}, {"lo": 0.9, "n": 14561, "corr": 0.99, "p60_soc": 0.9489}], "trains_count": 34, "origin_start": {"starts_here": 0.2931, "late_if_starts_here": 0.2177, "late_if_through": 0.2812}}, {"key": "hamburg", "label": "Hamburg", "origin": "Hamburg Hbf", "short": "Hamburg Hbf", "overview": {"journeys": 26526, "days": 792, "first": "2024-07-01", "last": "2026-08-31", "per_day": 33.5, "train_numbers": 191, "routes": 508, "ice": 26496, "ic": 30, "sched_median": 397.0, "sched_min": 325.0, "sched_p10": 341.0, "sched_p90": 546.0, "delay_mean": 17.5, "delay_median": 7.0, "p90": 50.0, "p99": 126.0, "dmax": 315.0, "punctual_6": 0.4584, "under20": 0.7034, "classes": {"normal_minor": 17162, "moderate": 5408, "canceled": 2128, "severe": 1828}, "severe_or_canceled": 0.1491, "canceled": 0.0802, "early_5": 554, "early_min": -57.0}, "cdf": [{"x": -5, "p": 0.0152}, {"x": -4, "p": 0.0227}, {"x": -3, "p": 0.0366}, {"x": -2, "p": 0.0602}, {"x": -1, "p": 0.1005}, {"x": 0, "p": 0.1605}, {"x": 1, "p": 0.2449}, {"x": 2, "p": 0.2958}, {"x": 3, "p": 0.348}, {"x": 4, "p": 0.3914}, {"x": 5, "p": 0.4286}, {"x": 6, "p": 0.4584}, {"x": 7, "p": 0.4854}, {"x": 8, "p": 0.5103}, {"x": 9, "p": 0.535}, {"x": 10, "p": 0.5569}, {"x": 11, "p": 0.5777}, {"x": 12, "p": 0.598}, {"x": 13, "p": 0.6144}, {"x": 14, "p": 0.6309}, {"x": 15, "p": 0.6437}, {"x": 16, "p": 0.6585}, {"x": 17, "p": 0.6707}, {"x": 18, "p": 0.6826}, {"x": 19, "p": 0.6928}, {"x": 20, "p": 0.7034}, {"x": 21, "p": 0.714}, {"x": 22, "p": 0.7252}, {"x": 23, "p": 0.7362}, {"x": 24, "p": 0.7453}, {"x": 25, "p": 0.7566}, {"x": 26, "p": 0.7651}, {"x": 27, "p": 0.7731}, {"x": 28, "p": 0.7804}, {"x": 29, "p": 0.7885}, {"x": 30, "p": 0.7961}, {"x": 31, "p": 0.8035}, {"x": 32, "p": 0.8107}, {"x": 33, "p": 0.8166}, {"x": 34, "p": 0.822}, {"x": 35, "p": 0.8281}, {"x": 36, "p": 0.8336}, {"x": 37, "p": 0.8387}, {"x": 38, "p": 0.8444}, {"x": 39, "p": 0.849}, {"x": 40, "p": 0.854}, {"x": 41, "p": 0.8587}, {"x": 42, "p": 0.8635}, {"x": 43, "p": 0.8677}, {"x": 44, "p": 0.8722}, {"x": 45, "p": 0.8766}, {"x": 46, "p": 0.8806}, {"x": 47, "p": 0.8851}, {"x": 48, "p": 0.8893}, {"x": 49, "p": 0.8929}, {"x": 50, "p": 0.8958}, {"x": 51, "p": 0.9002}, {"x": 52, "p": 0.9032}, {"x": 53, "p": 0.9061}, {"x": 54, "p": 0.909}, {"x": 55, "p": 0.9122}, {"x": 56, "p": 0.9147}, {"x": 57, "p": 0.9173}, {"x": 58, "p": 0.9201}, {"x": 59, "p": 0.9227}, {"x": 60, "p": 0.9251}, {"x": 61, "p": 0.9276}, {"x": 62, "p": 0.9299}, {"x": 63, "p": 0.9318}, {"x": 64, "p": 0.9337}, {"x": 65, "p": 0.9356}, {"x": 66, "p": 0.9378}, {"x": 67, "p": 0.9399}, {"x": 68, "p": 0.9418}, {"x": 69, "p": 0.9436}, {"x": 70, "p": 0.9453}, {"x": 71, "p": 0.9468}, {"x": 72, "p": 0.9481}, {"x": 73, "p": 0.9494}, {"x": 74, "p": 0.9508}, {"x": 75, "p": 0.9519}, {"x": 76, "p": 0.9528}, {"x": 77, "p": 0.9545}, {"x": 78, "p": 0.9561}, {"x": 79, "p": 0.9574}, {"x": 80, "p": 0.9585}, {"x": 81, "p": 0.9598}, {"x": 82, "p": 0.9611}, {"x": 83, "p": 0.9623}, {"x": 84, "p": 0.963}, {"x": 85, "p": 0.9643}, {"x": 86, "p": 0.9653}, {"x": 87, "p": 0.9662}, {"x": 88, "p": 0.9675}, {"x": 89, "p": 0.9682}, {"x": 90, "p": 0.9689}, {"x": 91, "p": 0.9699}, {"x": 92, "p": 0.9707}, {"x": 93, "p": 0.9714}, {"x": 94, "p": 0.9722}, {"x": 95, "p": 0.9732}, {"x": 96, "p": 0.974}, {"x": 97, "p": 0.9746}, {"x": 98, "p": 0.9754}, {"x": 99, "p": 0.9761}, {"x": 100, "p": 0.977}, {"x": 101, "p": 0.9779}, {"x": 102, "p": 0.9785}, {"x": 103, "p": 0.9792}, {"x": 104, "p": 0.9798}, {"x": 105, "p": 0.9803}, {"x": 106, "p": 0.981}, {"x": 107, "p": 0.9814}, {"x": 108, "p": 0.9823}, {"x": 109, "p": 0.9829}, {"x": 110, "p": 0.9835}, {"x": 111, "p": 0.984}, {"x": 112, "p": 0.9845}, {"x": 113, "p": 0.9849}, {"x": 114, "p": 0.9852}, {"x": 115, "p": 0.9854}, {"x": 116, "p": 0.9857}, {"x": 117, "p": 0.9862}, {"x": 118, "p": 0.9869}, {"x": 119, "p": 0.9873}, {"x": 120, "p": 0.9875}], "monthly": [{"month": "2024-07", "n": 1228, "mean": 17.3, "soc": 0.1384, "normal_minor": 0.6303, "moderate": 0.2313, "severe": 0.0651, "canceled": 0.0733}, {"month": "2024-08", "n": 1166, "mean": 26.0, "soc": 0.2213, "normal_minor": 0.4854, "moderate": 0.2933, "severe": 0.0986, "canceled": 0.1226}, {"month": "2024-09", "n": 1138, "mean": 17.7, "soc": 0.1494, "normal_minor": 0.6353, "moderate": 0.2153, "severe": 0.0562, "canceled": 0.0931}, {"month": "2024-10", "n": 1236, "mean": 15.6, "soc": 0.1303, "normal_minor": 0.6885, "moderate": 0.1812, "severe": 0.0437, "canceled": 0.0866}, {"month": "2024-11", "n": 1227, "mean": 16.9, "soc": 0.1703, "normal_minor": 0.6577, "moderate": 0.172, "severe": 0.066, "canceled": 0.1043}, {"month": "2024-12", "n": 1264, "mean": 9.1, "soc": 0.0744, "normal_minor": 0.7927, "moderate": 0.1329, "severe": 0.0309, "canceled": 0.0435}, {"month": "2025-01", "n": 1265, "mean": 10.9, "soc": 0.1012, "normal_minor": 0.7589, "moderate": 0.1399, "severe": 0.0372, "canceled": 0.064}, {"month": "2025-02", "n": 1131, "mean": 11.4, "soc": 0.107, "normal_minor": 0.7312, "moderate": 0.1618, "severe": 0.0371, "canceled": 0.0698}, {"month": "2025-03", "n": 964, "mean": 14.5, "soc": 0.1037, "normal_minor": 0.6961, "moderate": 0.2002, "severe": 0.0384, "canceled": 0.0654}, {"month": "2025-04", "n": 1042, "mean": 17.6, "soc": 0.1468, "normal_minor": 0.6113, "moderate": 0.2418, "severe": 0.0518, "canceled": 0.095}, {"month": "2025-05", "n": 1192, "mean": 13.5, "soc": 0.0948, "normal_minor": 0.7299, "moderate": 0.1753, "severe": 0.0537, "canceled": 0.0411}, {"month": "2025-06", "n": 1179, "mean": 16.6, "soc": 0.1349, "normal_minor": 0.665, "moderate": 0.2002, "severe": 0.0645, "canceled": 0.0704}, {"month": "2025-07", "n": 1104, "mean": 27.5, "soc": 0.2337, "normal_minor": 0.5643, "moderate": 0.202, "severe": 0.1467, "canceled": 0.087}, {"month": "2025-08", "n": 1014, "mean": 19.4, "soc": 0.1272, "normal_minor": 0.6489, "moderate": 0.2239, "severe": 0.074, "canceled": 0.0533}, {"month": "2025-09", "n": 984, "mean": 17.8, "soc": 0.1453, "normal_minor": 0.6494, "moderate": 0.2053, "severe": 0.0671, "canceled": 0.0783}, {"month": "2025-10", "n": 726, "mean": 26.7, "soc": 0.1832, "normal_minor": 0.489, "moderate": 0.3278, "severe": 0.1171, "canceled": 0.0661}, {"month": "2025-11", "n": 626, "mean": 21.2, "soc": 0.1502, "normal_minor": 0.5799, "moderate": 0.27, "severe": 0.0799, "canceled": 0.0703}, {"month": "2025-12", "n": 898, "mean": 9.4, "soc": 0.0891, "normal_minor": 0.7851, "moderate": 0.1258, "severe": 0.0256, "canceled": 0.0635}, {"month": "2026-01", "n": 1129, "mean": 22.6, "soc": 0.264, "normal_minor": 0.5252, "moderate": 0.2108, "severe": 0.0921, "canceled": 0.1718}, {"month": "2026-02", "n": 975, "mean": 11.3, "soc": 0.1128, "normal_minor": 0.7415, "moderate": 0.1456, "severe": 0.0431, "canceled": 0.0697}, {"month": "2026-03", "n": 634, "mean": 12.3, "soc": 0.1498, "normal_minor": 0.6719, "moderate": 0.1782, "severe": 0.0426, "canceled": 0.1073}, {"month": "2026-04", "n": 881, "mean": 12.1, "soc": 0.1146, "normal_minor": 0.7662, "moderate": 0.1192, "severe": 0.0613, "canceled": 0.0533}, {"month": "2026-05", "n": 949, "mean": 15.2, "soc": 0.1454, "normal_minor": 0.6786, "moderate": 0.176, "severe": 0.0653, "canceled": 0.0801}, {"month": "2026-06", "n": 1039, "mean": 22.7, "soc": 0.1983, "normal_minor": 0.5698, "moderate": 0.232, "severe": 0.1107, "canceled": 0.0876}, {"month": "2026-07", "n": 849, "mean": 26.9, "soc": 0.212, "normal_minor": 0.4782, "moderate": 0.3098, "severe": 0.1131, "canceled": 0.0989}, {"month": "2026-08", "n": 686, "mean": 33.9, "soc": 0.2259, "normal_minor": 0.4198, "moderate": 0.3542, "severe": 0.1662, "canceled": 0.0598}], "hourly": [{"hour": 1, "n": 16, "soc": 0.125, "mean": 11.0, "sched": 566.0}, {"hour": 2, "n": 20, "soc": 0.05, "mean": 16.7, "sched": 552.0}, {"hour": 3, "n": 368, "soc": 0.0598, "mean": 15.7, "sched": 473.0}, {"hour": 4, "n": 646, "soc": 0.0759, "mean": 8.7, "sched": 351.0}, {"hour": 5, "n": 2045, "soc": 0.1144, "mean": 13.3, "sched": 435.0}, {"hour": 6, "n": 944, "soc": 0.1483, "mean": 13.0, "sched": 394.0}, {"hour": 7, "n": 2161, "soc": 0.1476, "mean": 17.4, "sched": 439.0}, {"hour": 8, "n": 1054, "soc": 0.1641, "mean": 15.0, "sched": 394.0}, {"hour": 9, "n": 2329, "soc": 0.1554, "mean": 19.4, "sched": 440.0}, {"hour": 10, "n": 1603, "soc": 0.1223, "mean": 13.6, "sched": 366.0}, {"hour": 11, "n": 2586, "soc": 0.1562, "mean": 19.6, "sched": 401.0}, {"hour": 12, "n": 1501, "soc": 0.1399, "mean": 16.3, "sched": 391.0}, {"hour": 13, "n": 2683, "soc": 0.1804, "mean": 21.3, "sched": 426.0}, {"hour": 14, "n": 1536, "soc": 0.1497, "mean": 16.1, "sched": 359.0}, {"hour": 15, "n": 2321, "soc": 0.1982, "mean": 23.2, "sched": 430.0}, {"hour": 16, "n": 1005, "soc": 0.1254, "mean": 15.2, "sched": 355.0}, {"hour": 17, "n": 865, "soc": 0.1965, "mean": 24.2, "sched": 348.0}, {"hour": 18, "n": 914, "soc": 0.1433, "mean": 16.9, "sched": 359.0}, {"hour": 19, "n": 1178, "soc": 0.1333, "mean": 15.1, "sched": 618.0}, {"hour": 20, "n": 4, "soc": 0.0, "mean": 11.2, "sched": 545.0}, {"hour": 21, "n": 104, "soc": 0.1154, "mean": 14.6, "sched": 498.0}, {"hour": 22, "n": 643, "soc": 0.1151, "mean": 16.4, "sched": 457.0}], "weekday": [{"wd": 0, "n": 3894, "soc": 0.1405, "mean": 16.8, "canc": 0.0791}, {"wd": 1, "n": 3880, "soc": 0.1637, "mean": 18.7, "canc": 0.0894}, {"wd": 2, "n": 3815, "soc": 0.1544, "mean": 18.4, "canc": 0.086}, {"wd": 3, "n": 3837, "soc": 0.1566, "mean": 19.1, "canc": 0.0813}, {"wd": 4, "n": 3981, "soc": 0.1598, "mean": 19.1, "canc": 0.0826}, {"wd": 5, "n": 3553, "soc": 0.1354, "mean": 14.3, "canc": 0.078}, {"wd": 6, "n": 3566, "soc": 0.131, "mean": 15.7, "canc": 0.0637}], "families": [{"key": "hannover", "label": "Via Hannover and Würzburg", "via": "Harburg, Hannover, Göttingen, Kassel, Fulda, Würzburg, then Nürnberg or Augsburg", "n": 11586, "sched": 349.0, "mean": 15.6, "median": 5.0, "soc": 0.1467, "canc": 0.0853, "normal_minor": 0.6705, "moderate": 0.1828, "severe": 0.0615, "canceled": 0.0853}, {"key": "berlin", "label": "Via Berlin and Erfurt", "via": "Berlin-Spandau, Berlin Hbf, Südkreuz, Leipzig or Halle, Erfurt, Nürnberg", "n": 7777, "sched": 430.0, "mean": 17.1, "median": 6.0, "soc": 0.1556, "canc": 0.0901, "normal_minor": 0.6566, "moderate": 0.1879, "severe": 0.0654, "canceled": 0.0901}, {"key": "ruhr", "label": "Via Bremen, the Ruhr and Köln", "via": "Bremen, Osnabrück, Münster, Dortmund, Köln, Mannheim, Stuttgart, Ulm, Augsburg", "n": 4852, "sched": 526.0, "mean": 21.1, "median": 11.0, "soc": 0.1443, "canc": 0.0602, "normal_minor": 0.6018, "moderate": 0.2539, "severe": 0.0841, "canceled": 0.0602}, {"key": "frankfurt", "label": "Via Kassel and Frankfurt", "via": "Hannover, Göttingen, Kassel, Frankfurt, Mannheim, Stuttgart, Ulm, Augsburg", "n": 1258, "sched": 472.0, "mean": 21.6, "median": 13.0, "soc": 0.1264, "canc": 0.0485, "normal_minor": 0.5811, "moderate": 0.2925, "severe": 0.0779, "canceled": 0.0485}, {"key": "other", "label": "Diversions and rare patterns", "via": "For example via Berlin and Frankfurt, or skipping Hannover", "n": 1053, "sched": 598.0, "mean": 19.5, "median": 6.0, "soc": 0.1776, "canc": 0.0817, "normal_minor": 0.6049, "moderate": 0.2175, "severe": 0.0959, "canceled": 0.0817}], "cancel": {"both": 867, "dest_only": 699, "origin_only": 562, "intermediate_only": 1647}, "quality": {"no_update_journeys": 590, "zero_delay_arrivals": 2058, "gaps": 11363, "gap_before": 0.6274, "gap_after": 0.0148}, "enroute": [{"station": "Hamburg Hbf", "n": 25097, "corr": 0.259, "rows": [{"b": "<6", "n": 19066, "soc": 0.0818, "final": 6.0}, {"b": "6–19", "n": 4610, "soc": 0.1167, "final": 10.0}, {"b": "20–39", "n": 1068, "soc": 0.22, "final": 26.0}, {"b": "40–59", "n": 264, "soc": 0.4659, "final": 51.0}, {"b": "≥60", "n": 89, "soc": 0.7978, "final": 92.0}]}, {"station": "Kassel-Wilhelmshöhe", "n": 11556, "corr": 0.69, "rows": [{"b": "<6", "n": 5431, "soc": 0.0462, "final": 2.0}, {"b": "6–19", "n": 3495, "soc": 0.0607, "final": 6.0}, {"b": "20–39", "n": 1627, "soc": 0.1309, "final": 23.0}, {"b": "40–59", "n": 572, "soc": 0.3444, "final": 48.0}, {"b": "≥60", "n": 431, "soc": 0.8445, "final": 80.0}]}, {"station": "Nürnberg Hbf", "n": 16350, "corr": 0.91, "rows": [{"b": "<6", "n": 8993, "soc": 0.0212, "final": 1.0}, {"b": "6–19", "n": 3446, "soc": 0.0354, "final": 10.0}, {"b": "20–39", "n": 2150, "soc": 0.0781, "final": 28.0}, {"b": "40–59", "n": 833, "soc": 0.2617, "final": 50.0}, {"b": "≥60", "n": 928, "soc": 0.9149, "final": 87.0}]}], "progress": [{"lo": 0.0, "n": 48673, "corr": 0.266, "p60_soc": 0.6734}, {"lo": 0.1, "n": 9569, "corr": 0.286, "p60_soc": 0.5207}, {"lo": 0.2, "n": 29373, "corr": 0.451, "p60_soc": 0.7219}, {"lo": 0.3, "n": 39239, "corr": 0.531, "p60_soc": 0.6957}, {"lo": 0.4, "n": 24330, "corr": 0.63, "p60_soc": 0.7309}, {"lo": 0.5, "n": 19966, "corr": 0.703, "p60_soc": 0.7836}, {"lo": 0.6, "n": 21355, "corr": 0.736, "p60_soc": 0.7294}, {"lo": 0.7, "n": 20699, "corr": 0.864, "p60_soc": 0.8301}, {"lo": 0.8, "n": 19710, "corr": 0.936, "p60_soc": 0.9285}, {"lo": 0.9, "n": 18890, "corr": 0.986, "p60_soc": 0.9484}], "trains_count": 37, "origin_start": {"starts_here": 0.1269, "late_if_starts_here": 0.3306, "late_if_through": 0.227}}, {"key": "frankfurt", "label": "Frankfurt", "origin": "Frankfurt (Main) Hbf", "short": "Frankfurt (Main) Hbf", "overview": {"journeys": 22544, "days": 792, "first": "2024-07-01", "last": "2026-08-31", "per_day": 28.5, "train_numbers": 163, "routes": 72, "ice": 22313, "ic": 231, "sched_median": 202.5, "sched_min": 185.0, "sched_p10": 192.0, "sched_p90": 260.0, "delay_mean": 18.8, "delay_median": 10.0, "p90": 50.0, "p99": 118.0, "dmax": 260.0, "punctual_6": 0.3892, "under20": 0.6591, "classes": {"normal_minor": 13761, "moderate": 5669, "canceled": 1664, "severe": 1450}, "severe_or_canceled": 0.1381, "canceled": 0.0738, "early_5": 297, "early_min": -57.0}, "cdf": [{"x": -5, "p": 0.0091}, {"x": -4, "p": 0.0142}, {"x": -3, "p": 0.025}, {"x": -2, "p": 0.0444}, {"x": -1, "p": 0.0791}, {"x": 0, "p": 0.1301}, {"x": 1, "p": 0.2052}, {"x": 2, "p": 0.2511}, {"x": 3, "p": 0.2919}, {"x": 4, "p": 0.3272}, {"x": 5, "p": 0.3597}, {"x": 6, "p": 0.3892}, {"x": 7, "p": 0.4183}, {"x": 8, "p": 0.4454}, {"x": 9, "p": 0.4723}, {"x": 10, "p": 0.4944}, {"x": 11, "p": 0.5151}, {"x": 12, "p": 0.5351}, {"x": 13, "p": 0.5552}, {"x": 14, "p": 0.5723}, {"x": 15, "p": 0.5878}, {"x": 16, "p": 0.6032}, {"x": 17, "p": 0.6174}, {"x": 18, "p": 0.6317}, {"x": 19, "p": 0.6443}, {"x": 20, "p": 0.6591}, {"x": 21, "p": 0.6716}, {"x": 22, "p": 0.6836}, {"x": 23, "p": 0.6959}, {"x": 24, "p": 0.7079}, {"x": 25, "p": 0.7201}, {"x": 26, "p": 0.7318}, {"x": 27, "p": 0.7404}, {"x": 28, "p": 0.7512}, {"x": 29, "p": 0.7608}, {"x": 30, "p": 0.7719}, {"x": 31, "p": 0.7821}, {"x": 32, "p": 0.7904}, {"x": 33, "p": 0.7981}, {"x": 34, "p": 0.806}, {"x": 35, "p": 0.8143}, {"x": 36, "p": 0.8217}, {"x": 37, "p": 0.8281}, {"x": 38, "p": 0.8347}, {"x": 39, "p": 0.841}, {"x": 40, "p": 0.8475}, {"x": 41, "p": 0.853}, {"x": 42, "p": 0.859}, {"x": 43, "p": 0.8648}, {"x": 44, "p": 0.8712}, {"x": 45, "p": 0.8764}, {"x": 46, "p": 0.8811}, {"x": 47, "p": 0.8854}, {"x": 48, "p": 0.89}, {"x": 49, "p": 0.8942}, {"x": 50, "p": 0.8978}, {"x": 51, "p": 0.9016}, {"x": 52, "p": 0.905}, {"x": 53, "p": 0.9082}, {"x": 54, "p": 0.9128}, {"x": 55, "p": 0.9162}, {"x": 56, "p": 0.9188}, {"x": 57, "p": 0.9218}, {"x": 58, "p": 0.9246}, {"x": 59, "p": 0.9276}, {"x": 60, "p": 0.9306}, {"x": 61, "p": 0.9326}, {"x": 62, "p": 0.9348}, {"x": 63, "p": 0.937}, {"x": 64, "p": 0.9391}, {"x": 65, "p": 0.9418}, {"x": 66, "p": 0.9445}, {"x": 67, "p": 0.9457}, {"x": 68, "p": 0.9481}, {"x": 69, "p": 0.9501}, {"x": 70, "p": 0.9521}, {"x": 71, "p": 0.9534}, {"x": 72, "p": 0.9545}, {"x": 73, "p": 0.9559}, {"x": 74, "p": 0.957}, {"x": 75, "p": 0.9581}, {"x": 76, "p": 0.9601}, {"x": 77, "p": 0.9615}, {"x": 78, "p": 0.9627}, {"x": 79, "p": 0.9637}, {"x": 80, "p": 0.9649}, {"x": 81, "p": 0.9664}, {"x": 82, "p": 0.9678}, {"x": 83, "p": 0.969}, {"x": 84, "p": 0.9703}, {"x": 85, "p": 0.9714}, {"x": 86, "p": 0.9725}, {"x": 87, "p": 0.9736}, {"x": 88, "p": 0.9739}, {"x": 89, "p": 0.975}, {"x": 90, "p": 0.9757}, {"x": 91, "p": 0.9768}, {"x": 92, "p": 0.9774}, {"x": 93, "p": 0.9783}, {"x": 94, "p": 0.9787}, {"x": 95, "p": 0.9792}, {"x": 96, "p": 0.9799}, {"x": 97, "p": 0.9805}, {"x": 98, "p": 0.9811}, {"x": 99, "p": 0.9816}, {"x": 100, "p": 0.9821}, {"x": 101, "p": 0.9826}, {"x": 102, "p": 0.9829}, {"x": 103, "p": 0.9833}, {"x": 104, "p": 0.9835}, {"x": 105, "p": 0.9841}, {"x": 106, "p": 0.9844}, {"x": 107, "p": 0.9847}, {"x": 108, "p": 0.9852}, {"x": 109, "p": 0.9858}, {"x": 110, "p": 0.9863}, {"x": 111, "p": 0.9867}, {"x": 112, "p": 0.9875}, {"x": 113, "p": 0.9878}, {"x": 114, "p": 0.9883}, {"x": 115, "p": 0.9886}, {"x": 116, "p": 0.989}, {"x": 117, "p": 0.9893}, {"x": 118, "p": 0.9898}, {"x": 119, "p": 0.99}, {"x": 120, "p": 0.9901}], "monthly": [{"month": "2024-07", "n": 1053, "mean": 18.3, "soc": 0.1273, "normal_minor": 0.604, "moderate": 0.2688, "severe": 0.0551, "canceled": 0.0722}, {"month": "2024-08", "n": 820, "mean": 20.2, "soc": 0.1341, "normal_minor": 0.5988, "moderate": 0.2671, "severe": 0.0732, "canceled": 0.061}, {"month": "2024-09", "n": 793, "mean": 17.2, "soc": 0.1097, "normal_minor": 0.6469, "moderate": 0.2434, "severe": 0.0467, "canceled": 0.0631}, {"month": "2024-10", "n": 828, "mean": 16.8, "soc": 0.1039, "normal_minor": 0.6751, "moderate": 0.221, "severe": 0.0495, "canceled": 0.0543}, {"month": "2024-11", "n": 827, "mean": 22.2, "soc": 0.1608, "normal_minor": 0.5852, "moderate": 0.2539, "severe": 0.0822, "canceled": 0.0786}, {"month": "2024-12", "n": 925, "mean": 12.5, "soc": 0.0843, "normal_minor": 0.6951, "moderate": 0.2205, "severe": 0.0205, "canceled": 0.0638}, {"month": "2025-01", "n": 987, "mean": 13.4, "soc": 0.1114, "normal_minor": 0.696, "moderate": 0.1925, "severe": 0.0405, "canceled": 0.0709}, {"month": "2025-02", "n": 558, "mean": 16.3, "soc": 0.1254, "normal_minor": 0.6434, "moderate": 0.2312, "severe": 0.052, "canceled": 0.0735}, {"month": "2025-03", "n": 620, "mean": 16.6, "soc": 0.1194, "normal_minor": 0.6629, "moderate": 0.2177, "severe": 0.0565, "canceled": 0.0629}, {"month": "2025-04", "n": 713, "mean": 16.4, "soc": 0.1332, "normal_minor": 0.6508, "moderate": 0.216, "severe": 0.0533, "canceled": 0.0799}, {"month": "2025-05", "n": 723, "mean": 15.4, "soc": 0.0954, "normal_minor": 0.6888, "moderate": 0.2158, "severe": 0.047, "canceled": 0.0484}, {"month": "2025-06", "n": 899, "mean": 16.4, "soc": 0.1313, "normal_minor": 0.6396, "moderate": 0.2291, "severe": 0.0534, "canceled": 0.0779}, {"month": "2025-07", "n": 923, "mean": 22.5, "soc": 0.1939, "normal_minor": 0.52, "moderate": 0.286, "severe": 0.078, "canceled": 0.1159}, {"month": "2025-08", "n": 805, "mean": 18.5, "soc": 0.1391, "normal_minor": 0.6311, "moderate": 0.2298, "severe": 0.0683, "canceled": 0.0708}, {"month": "2025-09", "n": 901, "mean": 24.0, "soc": 0.1487, "normal_minor": 0.5172, "moderate": 0.3341, "severe": 0.0888, "canceled": 0.0599}, {"month": "2025-10", "n": 882, "mean": 29.4, "soc": 0.1769, "normal_minor": 0.4546, "moderate": 0.3685, "severe": 0.1236, "canceled": 0.0533}, {"month": "2025-11", "n": 759, "mean": 19.6, "soc": 0.1159, "normal_minor": 0.6285, "moderate": 0.2556, "severe": 0.058, "canceled": 0.058}, {"month": "2025-12", "n": 920, "mean": 14.5, "soc": 0.0848, "normal_minor": 0.713, "moderate": 0.2022, "severe": 0.0478, "canceled": 0.037}, {"month": "2026-01", "n": 997, "mean": 22.2, "soc": 0.1715, "normal_minor": 0.5597, "moderate": 0.2688, "severe": 0.0843, "canceled": 0.0873}, {"month": "2026-02", "n": 848, "mean": 17.0, "soc": 0.1226, "normal_minor": 0.6144, "moderate": 0.263, "severe": 0.0483, "canceled": 0.0743}, {"month": "2026-03", "n": 936, "mean": 16.7, "soc": 0.1496, "normal_minor": 0.6122, "moderate": 0.2382, "severe": 0.0502, "canceled": 0.0994}, {"month": "2026-04", "n": 912, "mean": 16.0, "soc": 0.125, "normal_minor": 0.6721, "moderate": 0.2029, "severe": 0.0559, "canceled": 0.0691}, {"month": "2026-05", "n": 913, "mean": 15.8, "soc": 0.1249, "normal_minor": 0.6648, "moderate": 0.2103, "severe": 0.0581, "canceled": 0.0668}, {"month": "2026-06", "n": 930, "mean": 27.4, "soc": 0.2538, "normal_minor": 0.4473, "moderate": 0.2989, "severe": 0.1065, "canceled": 0.1473}, {"month": "2026-07", "n": 972, "mean": 23.6, "soc": 0.1626, "normal_minor": 0.5041, "moderate": 0.3333, "severe": 0.0885, "canceled": 0.0741}, {"month": "2026-08", "n": 1100, "mean": 18.5, "soc": 0.1509, "normal_minor": 0.6136, "moderate": 0.2355, "severe": 0.0709, "canceled": 0.08}], "hourly": [{"hour": 0, "n": 16, "soc": 0.0, "mean": -2.7, "sched": 293.0}, {"hour": 1, "n": 541, "soc": 0.1109, "mean": 12.1, "sched": 284.0}, {"hour": 2, "n": 836, "soc": 0.0861, "mean": 7.7, "sched": 303.0}, {"hour": 3, "n": 104, "soc": 0.2019, "mean": 23.5, "sched": 268.0}, {"hour": 4, "n": 607, "soc": 0.0824, "mean": 11.8, "sched": 193.0}, {"hour": 5, "n": 838, "soc": 0.1074, "mean": 12.5, "sched": 193.0}, {"hour": 6, "n": 1052, "soc": 0.0913, "mean": 11.2, "sched": 195.0}, {"hour": 7, "n": 1545, "soc": 0.0757, "mean": 13.4, "sched": 204.0}, {"hour": 8, "n": 906, "soc": 0.1015, "mean": 13.4, "sched": 196.0}, {"hour": 9, "n": 1557, "soc": 0.1137, "mean": 16.6, "sched": 203.0}, {"hour": 10, "n": 1270, "soc": 0.1866, "mean": 20.8, "sched": 195.0}, {"hour": 11, "n": 1588, "soc": 0.2003, "mean": 20.4, "sched": 204.0}, {"hour": 12, "n": 809, "soc": 0.1273, "mean": 15.7, "sched": 193.0}, {"hour": 13, "n": 1596, "soc": 0.1429, "mean": 20.5, "sched": 206.0}, {"hour": 14, "n": 1149, "soc": 0.1166, "mean": 16.8, "sched": 195.0}, {"hour": 15, "n": 1567, "soc": 0.171, "mean": 26.7, "sched": 202.0}, {"hour": 16, "n": 1192, "soc": 0.1695, "mean": 20.0, "sched": 196.0}, {"hour": 17, "n": 1668, "soc": 0.1757, "mean": 26.9, "sched": 203.0}, {"hour": 18, "n": 1161, "soc": 0.1447, "mean": 19.5, "sched": 199.0}, {"hour": 19, "n": 1573, "soc": 0.1577, "mean": 26.3, "sched": 205.0}, {"hour": 20, "n": 732, "soc": 0.1489, "mean": 23.1, "sched": 207.0}, {"hour": 21, "n": 232, "soc": 0.1293, "mean": 23.2, "sched": 246.5}, {"hour": 22, "n": 5, "soc": 0.2, "mean": 30.0, "sched": 220.0}], "weekday": [{"wd": 0, "n": 3312, "soc": 0.1347, "mean": 17.8, "canc": 0.0734}, {"wd": 1, "n": 3241, "soc": 0.1589, "mean": 20.7, "canc": 0.0849}, {"wd": 2, "n": 3242, "soc": 0.1366, "mean": 20.7, "canc": 0.0703}, {"wd": 3, "n": 3229, "soc": 0.157, "mean": 21.7, "canc": 0.0818}, {"wd": 4, "n": 3314, "soc": 0.1506, "mean": 20.1, "canc": 0.0772}, {"wd": 5, "n": 3094, "soc": 0.1147, "mean": 14.7, "canc": 0.0701}, {"wd": 6, "n": 3112, "soc": 0.1121, "mean": 15.7, "canc": 0.0582}], "families": [{"key": "wuerzburg", "label": "Via Würzburg and Nürnberg", "via": "Hanau or Aschaffenburg, Würzburg, Nürnberg, sometimes Ingolstadt", "n": 12397, "sched": 195.0, "mean": 18.5, "median": 10.0, "soc": 0.1376, "canc": 0.0804, "normal_minor": 0.6111, "moderate": 0.2513, "severe": 0.0572, "canceled": 0.0804}, {"key": "stuttgart", "label": "Via Stuttgart and Augsburg", "via": "Mannheim, Mainz or Darmstadt and Heidelberg, Stuttgart, Ulm, Augsburg", "n": 9723, "sched": 230.0, "mean": 18.9, "median": 9.0, "soc": 0.137, "canc": 0.0636, "normal_minor": 0.6161, "moderate": 0.2469, "severe": 0.0734, "canceled": 0.0636}, {"key": "other", "label": "Diversions and rare patterns", "via": "For example via Würzburg skipping Nürnberg, or a loop through the Ruhr and Kassel", "n": 424, "sched": 239.0, "mean": 25.2, "median": 19.0, "soc": 0.1792, "canc": 0.1156, "normal_minor": 0.4599, "moderate": 0.3608, "severe": 0.0637, "canceled": 0.1156}], "cancel": {"both": 721, "dest_only": 573, "origin_only": 370, "intermediate_only": 603}, "quality": {"no_update_journeys": 323, "zero_delay_arrivals": 1567, "gaps": 2406, "gap_before": 0.179, "gap_after": 0.0024}, "enroute": [{"station": "Frankfurt (Main) Hbf", "n": 21453, "corr": 0.648, "rows": [{"b": "<6", "n": 10634, "soc": 0.0381, "final": 4.0}, {"b": "6–19", "n": 6432, "soc": 0.0524, "final": 12.0}, {"b": "20–39", "n": 2684, "soc": 0.1297, "final": 31.0}, {"b": "40–59", "n": 947, "soc": 0.3622, "final": 50.5}, {"b": "≥60", "n": 756, "soc": 0.7804, "final": 81.0}]}, {"station": "Würzburg Hbf", "n": 12301, "corr": 0.808, "rows": [{"b": "<6", "n": 4404, "soc": 0.0254, "final": 2.0}, {"b": "6–19", "n": 4179, "soc": 0.0395, "final": 9.0}, {"b": "20–39", "n": 2298, "soc": 0.1036, "final": 28.0}, {"b": "40–59", "n": 794, "soc": 0.2809, "final": 47.0}, {"b": "≥60", "n": 626, "soc": 0.8866, "final": 81.0}]}, {"station": "Ulm Hbf", "n": 8978, "corr": 0.919, "rows": [{"b": "<6", "n": 3633, "soc": 0.014, "final": 0.0}, {"b": "6–19", "n": 2612, "soc": 0.0241, "final": 9.0}, {"b": "20–39", "n": 1563, "soc": 0.0409, "final": 28.0}, {"b": "40–59", "n": 605, "soc": 0.2132, "final": 49.0}, {"b": "≥60", "n": 565, "soc": 0.9274, "final": 80.0}]}], "progress": [{"lo": 0.0, "n": 24201, "corr": 0.641, "p60_soc": 0.7504}, {"lo": 0.1, "n": 15715, "corr": 0.709, "p60_soc": 0.7359}, {"lo": 0.2, "n": 6073, "corr": 0.693, "p60_soc": 0.6889}, {"lo": 0.3, "n": 12761, "corr": 0.783, "p60_soc": 0.8608}, {"lo": 0.4, "n": 6982, "corr": 0.827, "p60_soc": 0.9159}, {"lo": 0.5, "n": 2585, "corr": 0.832, "p60_soc": 0.7805}, {"lo": 0.6, "n": 17119, "corr": 0.908, "p60_soc": 0.9227}, {"lo": 0.7, "n": 3933, "corr": 0.91, "p60_soc": 0.8714}, {"lo": 0.8, "n": 11528, "corr": 0.972, "p60_soc": 0.923}, {"lo": 0.9, "n": 7572, "corr": 0.995, "p60_soc": 0.9773}], "trains_count": 30, "origin_start": {"starts_here": 0.1253, "late_if_starts_here": 0.1861, "late_if_through": 0.5487}}], "overlap": {"berlin-hamburg": 8706, "berlin-frankfurt": 4991, "hamburg-frankfurt": 2554}, "monthly_corr": {"berlin-hamburg": 0.836, "berlin-frankfurt": 0.663, "hamburg-frankfurt": 0.724}, "destination": "München Hbf"};
+/* Shared helpers for the corridor pages: formatting, tooltip, mark paths, resizing. */
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => n.toLocaleString("en-US");
+const pct = (x, d = 1) => (x * 100).toFixed(d) + "%";
+const css = (v) => `var(--${v})`;
+const hm = (m) => `${Math.floor(m / 60)} h ${String(Math.round(m % 60)).padStart(2, "0")}`;
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+const CLASSES = [
+  { key: "normal_minor", label: "Normal or minor (<20 min)", color: "sev-normal" },
+  { key: "moderate", label: "Moderate (20–59 min)", color: "sev-moderate" },
+  { key: "severe", label: "Severe (60+ min)", color: "sev-severe" },
+  { key: "canceled", label: "Canceled", color: "sev-canceled" },
+];
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const mlabel = (s) => `${MONTHS[+s.slice(5) - 1]} ${s.slice(0, 4)}`;
+const WD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/* Tooltip: any element with data-tip (HTML, built from our own data) shows it. */
+const tip = $("#tip");
+function showTip(html, x, y) {
+  tip.innerHTML = html; tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  let left = x + 14, top = y + 14;
+  if (left + r.width > innerWidth - 8) left = x - r.width - 14;
+  if (top + r.height > innerHeight - 8) top = y - r.height - 14;
+  tip.style.left = Math.max(8, left) + "px"; tip.style.top = Math.max(8, top) + "px";
+}
+document.addEventListener("pointermove", (e) => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (t) showTip(t.getAttribute("data-tip"), e.clientX, e.clientY);
+  else if (!e.target.closest || !e.target.closest("[data-cross]")) tip.hidden = true;
+});
+document.addEventListener("focusin", (e) => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (t) { const r = t.getBoundingClientRect(); showTip(t.getAttribute("data-tip"), r.right, r.top); }
+});
+document.addEventListener("focusout", () => { tip.hidden = true; });
+
+function niceMax(v, steps = 4) {
+  const raw = v / steps, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const n = [1, 2, 2.5, 5, 10].find((k) => k * mag >= raw) * mag;
+  return { max: n * steps, step: n };
+}
+// Column with 4px rounded data end, square at the baseline.
+function colPath(x, y, w, h, r = 4) {
+  if (h <= 0) return "";
+  r = Math.min(r, w / 2, h);
+  return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+}
+// Horizontal bar with 4px rounded data end.
+function barPath(x, y, w, h, r = 4) {
+  if (w <= 0) return "";
+  r = Math.min(r, h / 2, w);
+  return `M${x},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h - r}Q${x + w},${y + h} ${x + w - r},${y + h}H${x}Z`;
+}
+function legend(el, items) {
+  el.innerHTML = items.map((i) => `<span><i style="background:${css(i.color)}"></i>${i.label}</span>`).join("");
+}
+const charts = [];
+function register(fn) { charts.push(fn); fn(); }
+let resizeTimer;
+addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => charts.forEach((f) => f()), 120); });
+
+/* 100% bar of severity classes. */
+function classBar(el, counts, total, H = 54, labels = true) {
+  const W = el.clientWidth;
+  let x = 0, out = "";
+  CLASSES.forEach((c, i) => {
+    const n = counts[c.key] || 0, w = (n / total) * W, gap = i < CLASSES.length - 1 ? 2 : 0;
+    const d = i === 0 ? `M${x + 4},0H${x + w - gap}V28H${x + 4}Q${x},28 ${x},24V4Q${x},0 ${x + 4},0Z`
+      : i === CLASSES.length - 1 ? barPath(x, 0, w, 28) : `M${x},0H${x + w - gap}V28H${x}Z`;
+    out += `<g class="hov" data-tip="<b>${c.label}</b><br>${fmt(n)} journeys · ${pct(n / total)}"><path class="mark" d="${d}" fill="${css(c.color)}"/></g>`;
+    if (labels && w > 54) out += `<text class="val" x="${x + 2}" y="46">${pct(n / total)}</text>`;
+    x += w;
+  });
+  el.innerHTML = `<svg width="${W}" height="${H}">${out}</svg>`;
+}
+
+/* Line chart with a shared crosshair: series = [{label, color, points:[{x,y}]}]. */
+function lineChart(el, series, o) {
+  const W = el.clientWidth, H = o.height || 260, m = { l: 48, r: 12, t: 12, b: 34 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const xs = series[0].points.map((p) => p.x);
+  const x0 = o.xMin ?? Math.min(...xs), x1 = o.xMax ?? Math.max(...xs);
+  const X = (v) => m.l + ((v - x0) / (x1 - x0)) * iw, Y = (v) => m.t + ih - ((v - o.yMin) / (o.yMax - o.yMin)) * ih;
+  let g = "";
+  for (let v = o.yMin; v <= o.yMax + 1e-9; v += o.yStep) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${o.yFmt(v)}</text>`;
+  // Ticks at the plot edges are anchored inward so they stay clear of the y labels and the frame.
+  (o.xTicks(W) || []).forEach((t) => { const x = X(t.v), a = x < m.l + 24 ? "start" : x > W - m.r - 24 ? "end" : "middle"; g += `<text x="${x}" y="${H - m.b + 16}" text-anchor="${a}">${t.label}</text>`; });
+  (o.refs || []).forEach((r) => { g += `<line x1="${X(r.x)}" x2="${X(r.x)}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--axis)" stroke-dasharray="3 3"/><text x="${X(r.x) + 4}" y="${m.t + 10}">${r.label}</text>`; });
+  const lines = series.map((s) => {
+    // A missing value breaks the line rather than bridging the gap.
+    const d = s.points.map((p, i) => p.y == null ? "" : `${i && s.points[i - 1].y != null ? "L" : "M"}${X(p.x).toFixed(1)},${Y(p.y).toFixed(1)}`).join("");
+    return `<path d="${d}" fill="none" stroke="${css(s.color)}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }).join("");
+  const id = el.id;
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>${lines}<g id="${id}-cross" pointer-events="none"></g><rect data-cross="1" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/></svg>`;
+  const rect = el.querySelector("rect[data-cross]"), cross = el.querySelector(`#${id}-cross`);
+  const move = (clientX, clientY) => {
+    const b = rect.getBoundingClientRect();
+    const v = x0 + ((clientX - b.left) / b.width) * (x1 - x0);
+    let best = xs[0]; xs.forEach((x) => { if (Math.abs(x - v) < Math.abs(best - v)) best = x; });
+    const cx = X(best);
+    cross.innerHTML = `<line x1="${cx}" x2="${cx}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--ink-2)" stroke-width="1"/>` +
+      series.map((s) => { const p = s.points.find((q) => q.x === best); return p && p.y != null ? `<circle cx="${cx}" cy="${Y(p.y)}" r="4.5" fill="${css(s.color)}" stroke="var(--surface)" stroke-width="2"/>` : ""; }).join("");
+    showTip(`<b>${o.xFmt(best)}</b><br>` + series.map((s) => { const p = s.points.find((q) => q.x === best); return `${s.label}: ${p && p.y != null ? o.tipFmt(p) : "–"}`; }).join("<br>"), clientX, clientY);
+  };
+  rect.addEventListener("pointermove", (e) => move(e.clientX, e.clientY));
+  rect.addEventListener("pointerleave", () => { cross.innerHTML = ""; tip.hidden = true; });
+}
+
+const COLORS = ["fam-1", "fam-2", "fam-3"];
+const K = C.corridors.map((c, i) => ({ ...c, color: COLORS[i] }));
+document.querySelectorAll(".corrlegend").forEach((el) => legend(el, K.map((c) => ({ label: `${c.label} → München`, color: c.color }))));
+const sw = (c) => `<span class="swatch" style="background:${css(c.color)}"></span>`;
+const late6 = (e) => e.rows.slice(1).reduce((s, r) => s + r.n, 0) / e.n;
+
+/* Key figures */
+$("#keytable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Journeys</th><th class="r">Per day</th><th class="r">Scheduled (median)</th><th class="r">Median delay</th><th class="r">Punctual (&lt;6 min)</th><th class="r">Canceled</th><th class="r">Severe or canceled</th></tr></thead><tbody>` +
+  K.map((c) => { const o = c.overview; return `<tr><td>${sw(c)}<b>${c.label}</b><div class="muted" style="margin-left:18px">from ${esc(c.short)}</div></td><td class="r num">${fmt(o.journeys)}</td><td class="r num">${o.per_day}</td><td class="r num">${hm(o.sched_median)}</td><td class="r num">${o.delay_median} min</td><td class="r num">${pct(o.punctual_6)}</td><td class="r num">${pct(o.canceled)}</td><td class="r"><b>${pct(o.severe_or_canceled)}</b></td></tr>`; }).join("") + "</tbody>";
+
+/* Outcomes */
+legend($("#classlegend"), CLASSES);
+$("#classrows").innerHTML = K.map((c) => `<div><div class="rowlabel">${sw(c)}${c.label}</div><div class="plot" id="cls-${c.key}"></div></div>`).join("");
+K.forEach((c) => register(() => classBar($(`#cls-${c.key}`), c.overview.classes, c.overview.journeys)));
+register(() => lineChart($("#cdf"), K.map((c) => ({ label: c.label, color: c.color, points: c.cdf.filter((p) => p.x >= 0).map((p) => ({ x: p.x, y: p.p })) })), {
+  yMin: 0, yMax: 1, yStep: 0.25, yFmt: (v) => Math.round(v * 100) + "%", height: 280,
+  xTicks: (W) => [0, 20, 40, 60, 80, 100, 120].filter((v, i) => W > 560 || i % 2 === 0).map((v) => ({ v, label: v + " min" })),
+  refs: [{ x: 6, label: "6" }, { x: 20, label: "20" }, { x: 60, label: "60" }],
+  xFmt: (x) => `Less than ${x} min late`, tipFmt: (p) => pct(p.y),
+}));
+
+/* Routes */
+$("#routetable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Stop patterns</th><th class="r">Train numbers</th><th class="r">Scheduled: fastest 10%</th><th class="r">median</th><th class="r">slowest 10%</th><th>Route families (share of journeys)</th></tr></thead><tbody>` +
+  K.map((c) => { const o = c.overview; return `<tr><td>${sw(c)}<b>${c.label}</b></td><td class="r num">${fmt(o.routes)}</td><td class="r num">${fmt(o.train_numbers)}</td><td class="r num">${hm(o.sched_p10)}</td><td class="r num">${hm(o.sched_median)}</td><td class="r num">${hm(o.sched_p90)}</td><td>${c.families.map((f) => `${esc(f.label)} <span class="num muted">${pct(f.n / o.journeys, 0)}</span>`).join("<br>")}</td></tr>`; }).join("") + "</tbody>";
+
+/* Over time */
+const months = K[0].monthly.map((m) => m.month);
+register(() => lineChart($("#monthly"), K.map((c) => ({ label: c.label, color: c.color, points: c.monthly.map((m, i) => ({ x: i, y: m.soc, n: m.n })) })), {
+  yMin: 0, yMax: 0.3, yStep: 0.1, yFmt: (v) => Math.round(v * 100) + "%", height: 280,
+  xTicks: (W) => months.map((m, i) => ({ i, m })).filter(({ m }) => W < 560 ? m.endsWith("-01") : ["01", "07"].includes(m.slice(5))).map(({ i, m }) => ({ v: i, label: mlabel(m) })),
+  xFmt: (i) => mlabel(months[i]), tipFmt: (p) => `${pct(p.y)} of ${fmt(p.n)}`,
+}));
+register(() => lineChart($("#hourly"), K.map((c) => ({ label: c.label, color: c.color, points: Array.from({ length: 24 }, (_, h) => { const r = c.hourly.find((q) => q.hour === h); return { x: h, y: r && r.n >= 300 ? r.soc : null, n: r ? r.n : 0 }; }) })), {
+  yMin: 0, yMax: 0.25, yStep: 0.05, yFmt: (v) => Math.round(v * 100) + "%", height: 240, xMin: 0, xMax: 23,
+  xTicks: (W) => [0, 4, 8, 12, 16, 20].map((v) => ({ v, label: String(v).padStart(2, "0") })),
+  xFmt: (h) => `${String(h).padStart(2, "0")}:00–${String(h).padStart(2, "0")}:59`, tipFmt: (p) => `${pct(p.y)} of ${fmt(p.n)}`,
+}));
+$("#weekdaytable").innerHTML = `<thead><tr><th>Day</th>${K.map((c) => `<th class="r">${sw(c)}${c.label}</th>`).join("")}</tr></thead><tbody>` +
+  WD.map((d, i) => `<tr><td>${d}</td>${K.map((c) => `<td class="r num">${pct(c.weekday[i].soc)}</td>`).join("")}</tr>`).join("") + "</tbody>";
+
+/* During the journey */
+register(() => lineChart($("#progress"), K.map((c) => ({ label: c.label, color: c.color, points: c.progress.map((p) => ({ x: p.lo, y: p.corr, n: p.n })) })), {
+  yMin: 0, yMax: 1, yStep: 0.25, yFmt: (v) => v.toFixed(2), height: 260, xMin: 0, xMax: 0.9,
+  xTicks: () => [0, 0.2, 0.4, 0.6, 0.8].map((v) => ({ v, label: Math.round(v * 100) + "%" })),
+  xFmt: (x) => `${Math.round(x * 100)}–${Math.round(x * 100) + 10}% of the schedule covered`, tipFmt: (p) => `${p.y.toFixed(2)} (${fmt(p.n)} stops)`,
+}));
+$("#origintable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Leave origin 6+ min late</th><th class="r">Correlation at origin</th><th>Stations compared (correlation)</th><th class="r">Severe or canceled after leaving origin 60+ min late</th></tr></thead><tbody>` +
+  K.map((c) => `<tr><td>${sw(c)}<b>${c.label}</b></td><td class="r num">${pct(late6(c.enroute[0]))}</td><td class="r num">${c.enroute[0].corr.toFixed(2)}</td><td>${c.enroute.slice(1).map((e) => `${esc(e.station.replace(" Hbf", "").replace("Kassel-Wilhelmshöhe", "Kassel"))} <span class="num">${e.corr.toFixed(2)}</span>`).join(", ")}</td><td class="r num">${pct(c.enroute[0].rows[4].soc, 0)}</td></tr>`).join("") + "</tbody>";
+
+/* Cancellations */
+$("#canceltable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Canceled journeys</th><th class="r">Both ends</th><th class="r">München only</th><th class="r">Origin only</th><th class="r">Intermediate stops only*</th></tr></thead><tbody>` +
+  K.map((c) => { const x = c.cancel, n = c.overview.journeys, tot = x.both + x.dest_only + x.origin_only; return `<tr><td>${sw(c)}<b>${c.label}</b></td><td class="r num">${fmt(tot)} · ${pct(tot / n)}</td><td class="r num">${pct(x.both / tot, 0)}</td><td class="r num">${pct(x.dest_only / tot, 0)}</td><td class="r num">${pct(x.origin_only / tot, 0)}</td><td class="r num">${fmt(x.intermediate_only)} · ${pct(x.intermediate_only / n)}</td></tr>`; }).join("") +
+  `</tbody><caption style="caption-side:bottom;text-align:left;padding-top:8px" class="muted">* Not counted as canceled. Shares in the three middle columns are of the corridor's canceled journeys.</caption>`;
+
+/* Overlap */
+const byKey = Object.fromEntries(K.map((c) => [c.key, c]));
+$("#overlaptable").innerHTML = `<thead><tr><th>Pair</th><th class="r">Runs in both</th><th class="r">Share of first</th><th class="r">Share of second</th><th class="r">Monthly correlation of severe-or-canceled share</th></tr></thead><tbody>` +
+  Object.entries(C.overlap).map(([k, n]) => { const [a, b] = k.split("-"); return `<tr><td>${sw(byKey[a])}${byKey[a].label} &amp; ${sw(byKey[b])}${byKey[b].label}</td><td class="r num">${fmt(n)}</td><td class="r num">${pct(n / byKey[a].overview.journeys)}</td><td class="r num">${pct(n / byKey[b].overview.journeys)}</td><td class="r num">${C.monthly_corr[k].toFixed(2)}</td></tr>`; }).join("") + "</tbody>";
+
+/* Data quality */
+$("#qualitytable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Gaps in stop numbering, before 3 Nov 2025</th><th class="r">after</th><th class="r">No live update at any stop</th><th class="r">Arrive exactly on time</th><th class="r">Arrive 5+ min early</th></tr></thead><tbody>` +
+  K.map((c) => { const q = c.quality, n = c.overview.journeys; return `<tr><td>${sw(c)}<b>${c.label}</b></td><td class="r num">${pct(q.gap_before)}</td><td class="r num">${pct(q.gap_after)}</td><td class="r num">${fmt(q.no_update_journeys)} · ${pct(q.no_update_journeys / n)}</td><td class="r num">${fmt(q.zero_delay_arrivals)}</td><td class="r num">${fmt(c.overview.early_5)}</td></tr>`; }).join("") + "</tbody>";
+</script>

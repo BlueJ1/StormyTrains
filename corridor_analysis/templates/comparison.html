@@ -1,0 +1,219 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Three Corridors into München</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+{{STYLE}}
+<style>
+.hero.single { grid-template-columns: 1fr; }
+.keytable td b { font-family: var(--font-display); font-stretch: 85%; font-size: var(--step-1); }
+.keytable td, .keytable th { padding: 10px 12px; }
+.rowlabel { font-size: var(--step--1); color: var(--ink-2); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.stackrows { display: grid; gap: 14px; }
+</style>
+
+<div id="tip" hidden></div>
+<div class="wrap">
+
+<header class="hero single">
+  <div class="hero-text">
+    <div class="eyebrow">Project in Data Science · corridor comparison</div>
+    <h1>Three corridors <span class="arrow">→</span> München</h1>
+    <p class="lede">{{lede}}</p>
+    <div class="chart">
+      <div class="table-wrap">
+        <table class="keytable" id="keytable"></table>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="outcomes">
+  <div class="section-head">
+    <div class="eyebrow">Outcomes</div>
+    <h2>{{h_outcomes}}</h2>
+    <p>{{p_outcomes}}</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Journeys by severity class</div>
+    <div class="stackrows" id="classrows"></div>
+    <div class="legend" id="classlegend"></div>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Share of completed journeys arriving at München within a given delay</div>
+    <div class="chart-sub">Read across: the higher the line, the more trains are within that delay. Hover for values.</div>
+    <div class="plot" id="cdf"></div>
+    <div class="legend corrlegend"></div>
+  </div>
+</section>
+
+<section id="routes">
+  <div class="section-head">
+    <div class="eyebrow">Routes and length</div>
+    <h2>{{h_routes}}</h2>
+    <p>{{p_routes}}</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="routetable"></table></div>
+  </div>
+</section>
+
+<section id="time">
+  <div class="section-head">
+    <div class="eyebrow">Over time</div>
+    <h2>{{h_time}}</h2>
+    <p>{{p_time}}</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Severe or canceled, by month of departure</div>
+    <div class="plot" id="monthly"></div>
+    <div class="legend corrlegend"></div>
+  </div>
+  <div class="two">
+    <div class="chart">
+      <div class="chart-title">Severe or canceled, by scheduled departure hour</div>
+      <div class="chart-sub">Hours with fewer than 300 journeys on a corridor are left out.</div>
+      <div class="plot" id="hourly"></div>
+      <div class="legend corrlegend"></div>
+    </div>
+    <div class="chart">
+      <div class="chart-title">Severe or canceled, by weekday</div>
+      <div class="table-wrap"><table id="weekdaytable"></table></div>
+    </div>
+  </div>
+</section>
+
+<section id="enroute">
+  <div class="section-head">
+    <div class="eyebrow">During the journey</div>
+    <h2>{{h_enroute}}</h2>
+    <p>{{p_enroute}}</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">How well the delay at a stop matches the final arrival delay</div>
+    <div class="chart-sub">Correlation between the departure delay at a stop and the arrival delay at München, grouped by how much of the scheduled journey is already behind the train. Completed journeys only.</div>
+    <div class="plot" id="progress"></div>
+    <div class="legend corrlegend"></div>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="origintable"></table></div>
+  </div>
+</section>
+
+<section id="cancel">
+  <div class="section-head">
+    <div class="eyebrow">Cancellations</div>
+    <h2>{{h_cancel}}</h2>
+    <p>{{p_cancel}}</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="canceltable"></table></div>
+  </div>
+</section>
+
+<section id="overlap">
+  <div class="section-head">
+    <div class="eyebrow">Shared trains</div>
+    <h2>{{h_overlap}}</h2>
+    <p>{{p_overlap}}</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="overlaptable"></table></div>
+  </div>
+</section>
+
+<section id="quality">
+  <div class="section-head">
+    <div class="eyebrow">Data quality</div>
+    <h2>{{h_quality}}</h2>
+    <p>{{p_quality}}</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap"><table id="qualitytable"></table></div>
+  </div>
+</section>
+
+<section id="next">
+  <div class="section-head">
+    <div class="eyebrow">For the project</div>
+    <h2>Choosing the study pairs</h2>
+    <p>The project instructions ask us to compare two or three candidate origin–destination pairs and pick one or two. These are the trade-offs visible in the railway data. The choice is ours to make together.</p>
+  </div>
+  <div class="qa">
+    {{questions}}
+  </div>
+</section>
+
+<footer>
+  <div>Source: <span class="mono">corridor_analysis/stats/comparison.json</span>, computed by <span class="mono">corridor_analysis/analyse.py</span> from the journeys built by <span class="mono">extract.py</span> out of the Deutsche Bahn timetable data collected by piebro/deutsche-bahn-data (CC BY 4.0). ICE and IC runs, 1 July 2024 to 31 August 2026. Stops are limited to stations present in all monthly files.</div>
+  <div>Delay classes: normal/minor under 20 min, moderate 20–59 min, severe 60 min or more, canceled if the origin departure or München arrival is canceled.</div>
+</footer>
+</div>
+
+<script>
+const C = {{DATA}};
+{{COMMON}}
+const COLORS = ["fam-1", "fam-2", "fam-3"];
+const K = C.corridors.map((c, i) => ({ ...c, color: COLORS[i] }));
+document.querySelectorAll(".corrlegend").forEach((el) => legend(el, K.map((c) => ({ label: `${c.label} → München`, color: c.color }))));
+const sw = (c) => `<span class="swatch" style="background:${css(c.color)}"></span>`;
+const late6 = (e) => e.rows.slice(1).reduce((s, r) => s + r.n, 0) / e.n;
+
+/* Key figures */
+$("#keytable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Journeys</th><th class="r">Per day</th><th class="r">Scheduled (median)</th><th class="r">Median delay</th><th class="r">Punctual (&lt;6 min)</th><th class="r">Canceled</th><th class="r">Severe or canceled</th></tr></thead><tbody>` +
+  K.map((c) => { const o = c.overview; return `<tr><td>${sw(c)}<b>${c.label}</b><div class="muted" style="margin-left:18px">from ${esc(c.short)}</div></td><td class="r num">${fmt(o.journeys)}</td><td class="r num">${o.per_day}</td><td class="r num">${hm(o.sched_median)}</td><td class="r num">${o.delay_median} min</td><td class="r num">${pct(o.punctual_6)}</td><td class="r num">${pct(o.canceled)}</td><td class="r"><b>${pct(o.severe_or_canceled)}</b></td></tr>`; }).join("") + "</tbody>";
+
+/* Outcomes */
+legend($("#classlegend"), CLASSES);
+$("#classrows").innerHTML = K.map((c) => `<div><div class="rowlabel">${sw(c)}${c.label}</div><div class="plot" id="cls-${c.key}"></div></div>`).join("");
+K.forEach((c) => register(() => classBar($(`#cls-${c.key}`), c.overview.classes, c.overview.journeys)));
+register(() => lineChart($("#cdf"), K.map((c) => ({ label: c.label, color: c.color, points: c.cdf.filter((p) => p.x >= 0).map((p) => ({ x: p.x, y: p.p })) })), {
+  yMin: 0, yMax: 1, yStep: 0.25, yFmt: (v) => Math.round(v * 100) + "%", height: 280,
+  xTicks: (W) => [0, 20, 40, 60, 80, 100, 120].filter((v, i) => W > 560 || i % 2 === 0).map((v) => ({ v, label: v + " min" })),
+  refs: [{ x: 6, label: "6" }, { x: 20, label: "20" }, { x: 60, label: "60" }],
+  xFmt: (x) => `Less than ${x} min late`, tipFmt: (p) => pct(p.y),
+}));
+
+/* Routes */
+$("#routetable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Stop patterns</th><th class="r">Train numbers</th><th class="r">Scheduled: fastest 10%</th><th class="r">median</th><th class="r">slowest 10%</th><th>Route families (share of journeys)</th></tr></thead><tbody>` +
+  K.map((c) => { const o = c.overview; return `<tr><td>${sw(c)}<b>${c.label}</b></td><td class="r num">${fmt(o.routes)}</td><td class="r num">${fmt(o.train_numbers)}</td><td class="r num">${hm(o.sched_p10)}</td><td class="r num">${hm(o.sched_median)}</td><td class="r num">${hm(o.sched_p90)}</td><td>${c.families.map((f) => `${esc(f.label)} <span class="num muted">${pct(f.n / o.journeys, 0)}</span>`).join("<br>")}</td></tr>`; }).join("") + "</tbody>";
+
+/* Over time */
+const months = K[0].monthly.map((m) => m.month);
+register(() => lineChart($("#monthly"), K.map((c) => ({ label: c.label, color: c.color, points: c.monthly.map((m, i) => ({ x: i, y: m.soc, n: m.n })) })), {
+  yMin: 0, yMax: 0.3, yStep: 0.1, yFmt: (v) => Math.round(v * 100) + "%", height: 280,
+  xTicks: (W) => months.map((m, i) => ({ i, m })).filter(({ m }) => W < 560 ? m.endsWith("-01") : ["01", "07"].includes(m.slice(5))).map(({ i, m }) => ({ v: i, label: mlabel(m) })),
+  xFmt: (i) => mlabel(months[i]), tipFmt: (p) => `${pct(p.y)} of ${fmt(p.n)}`,
+}));
+register(() => lineChart($("#hourly"), K.map((c) => ({ label: c.label, color: c.color, points: Array.from({ length: 24 }, (_, h) => { const r = c.hourly.find((q) => q.hour === h); return { x: h, y: r && r.n >= 300 ? r.soc : null, n: r ? r.n : 0 }; }) })), {
+  yMin: 0, yMax: 0.25, yStep: 0.05, yFmt: (v) => Math.round(v * 100) + "%", height: 240, xMin: 0, xMax: 23,
+  xTicks: (W) => [0, 4, 8, 12, 16, 20].map((v) => ({ v, label: String(v).padStart(2, "0") })),
+  xFmt: (h) => `${String(h).padStart(2, "0")}:00–${String(h).padStart(2, "0")}:59`, tipFmt: (p) => `${pct(p.y)} of ${fmt(p.n)}`,
+}));
+$("#weekdaytable").innerHTML = `<thead><tr><th>Day</th>${K.map((c) => `<th class="r">${sw(c)}${c.label}</th>`).join("")}</tr></thead><tbody>` +
+  WD.map((d, i) => `<tr><td>${d}</td>${K.map((c) => `<td class="r num">${pct(c.weekday[i].soc)}</td>`).join("")}</tr>`).join("") + "</tbody>";
+
+/* During the journey */
+register(() => lineChart($("#progress"), K.map((c) => ({ label: c.label, color: c.color, points: c.progress.map((p) => ({ x: p.lo, y: p.corr, n: p.n })) })), {
+  yMin: 0, yMax: 1, yStep: 0.25, yFmt: (v) => v.toFixed(2), height: 260, xMin: 0, xMax: 0.9,
+  xTicks: () => [0, 0.2, 0.4, 0.6, 0.8].map((v) => ({ v, label: Math.round(v * 100) + "%" })),
+  xFmt: (x) => `${Math.round(x * 100)}–${Math.round(x * 100) + 10}% of the schedule covered`, tipFmt: (p) => `${p.y.toFixed(2)} (${fmt(p.n)} stops)`,
+}));
+$("#origintable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Leave origin 6+ min late</th><th class="r">Correlation at origin</th><th>Stations compared (correlation)</th><th class="r">Severe or canceled after leaving origin 60+ min late</th></tr></thead><tbody>` +
+  K.map((c) => `<tr><td>${sw(c)}<b>${c.label}</b></td><td class="r num">${pct(late6(c.enroute[0]))}</td><td class="r num">${c.enroute[0].corr.toFixed(2)}</td><td>${c.enroute.slice(1).map((e) => `${esc(e.station.replace(" Hbf", "").replace("Kassel-Wilhelmshöhe", "Kassel"))} <span class="num">${e.corr.toFixed(2)}</span>`).join(", ")}</td><td class="r num">${pct(c.enroute[0].rows[4].soc, 0)}</td></tr>`).join("") + "</tbody>";
+
+/* Cancellations */
+$("#canceltable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Canceled journeys</th><th class="r">Both ends</th><th class="r">München only</th><th class="r">Origin only</th><th class="r">Intermediate stops only*</th></tr></thead><tbody>` +
+  K.map((c) => { const x = c.cancel, n = c.overview.journeys, tot = x.both + x.dest_only + x.origin_only; return `<tr><td>${sw(c)}<b>${c.label}</b></td><td class="r num">${fmt(tot)} · ${pct(tot / n)}</td><td class="r num">${pct(x.both / tot, 0)}</td><td class="r num">${pct(x.dest_only / tot, 0)}</td><td class="r num">${pct(x.origin_only / tot, 0)}</td><td class="r num">${fmt(x.intermediate_only)} · ${pct(x.intermediate_only / n)}</td></tr>`; }).join("") +
+  `</tbody><caption style="caption-side:bottom;text-align:left;padding-top:8px" class="muted">* Not counted as canceled. Shares in the three middle columns are of the corridor's canceled journeys.</caption>`;
+
+/* Overlap */
+const byKey = Object.fromEntries(K.map((c) => [c.key, c]));
+$("#overlaptable").innerHTML = `<thead><tr><th>Pair</th><th class="r">Runs in both</th><th class="r">Share of first</th><th class="r">Share of second</th><th class="r">Monthly correlation of severe-or-canceled share</th></tr></thead><tbody>` +
+  Object.entries(C.overlap).map(([k, n]) => { const [a, b] = k.split("-"); return `<tr><td>${sw(byKey[a])}${byKey[a].label} &amp; ${sw(byKey[b])}${byKey[b].label}</td><td class="r num">${fmt(n)}</td><td class="r num">${pct(n / byKey[a].overview.journeys)}</td><td class="r num">${pct(n / byKey[b].overview.journeys)}</td><td class="r num">${C.monthly_corr[k].toFixed(2)}</td></tr>`; }).join("") + "</tbody>";
+
+/* Data quality */
+$("#qualitytable").innerHTML = `<thead><tr><th>Corridor</th><th class="r">Gaps in stop numbering, before 3 Nov 2025</th><th class="r">after</th><th class="r">No live update at any stop</th><th class="r">Arrive exactly on time</th><th class="r">Arrive 5+ min early</th></tr></thead><tbody>` +
+  K.map((c) => { const q = c.quality, n = c.overview.journeys; return `<tr><td>${sw(c)}<b>${c.label}</b></td><td class="r num">${pct(q.gap_before)}</td><td class="r num">${pct(q.gap_after)}</td><td class="r num">${fmt(q.no_update_journeys)} · ${pct(q.no_update_journeys / n)}</td><td class="r num">${fmt(q.zero_delay_arrivals)}</td><td class="r num">${fmt(c.overview.early_5)}</td></tr>`; }).join("") + "</tbody>";
+</script>

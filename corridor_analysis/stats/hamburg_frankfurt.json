@@ -1,0 +1,2277 @@
+{
+ "key": "hamburg_frankfurt",
+ "label": "Hamburg",
+ "origin": "Hamburg Hbf",
+ "short": "Hamburg Hbf",
+ "destination": "Frankfurt (Main) Hbf",
+ "dest_label": "Frankfurt",
+ "overview": {
+  "journeys": 21557,
+  "days": 792,
+  "first": "2024-07-01",
+  "last": "2026-08-31",
+  "per_day": 27.2,
+  "train_numbers": 227,
+  "routes": 388,
+  "ice": 20822,
+  "ic": 735,
+  "sched_median": 234.0,
+  "sched_min": 202.0,
+  "sched_p10": 216.0,
+  "sched_p90": 371.0,
+  "delay_mean": 17.4,
+  "delay_median": 8.0,
+  "p90": 48.0,
+  "p99": 124.0,
+  "dmax": 380.0,
+  "punctual_6": 0.4282,
+  "under20": 0.7058,
+  "classes": {
+   "normal_minor": 14008,
+   "moderate": 4494,
+   "canceled": 1709,
+   "severe": 1346
+  },
+  "severe_or_canceled": 0.1417,
+  "canceled": 0.0793,
+  "early_5": 459,
+  "early_min": -70.0
+ },
+ "hist": [
+  {
+   "lo": -10,
+   "n": 320
+  },
+  {
+   "lo": -5,
+   "n": 2126
+  },
+  {
+   "lo": 0,
+   "n": 5362
+  },
+  {
+   "lo": 5,
+   "n": 2999
+  },
+  {
+   "lo": 10,
+   "n": 1845
+  },
+  {
+   "lo": 15,
+   "n": 1356
+  },
+  {
+   "lo": 20,
+   "n": 1073
+  },
+  {
+   "lo": 25,
+   "n": 868
+  },
+  {
+   "lo": 30,
+   "n": 647
+  },
+  {
+   "lo": 35,
+   "n": 514
+  },
+  {
+   "lo": 40,
+   "n": 479
+  },
+  {
+   "lo": 45,
+   "n": 352
+  },
+  {
+   "lo": 50,
+   "n": 304
+  },
+  {
+   "lo": 55,
+   "n": 257
+  },
+  {
+   "lo": 60,
+   "n": 219
+  },
+  {
+   "lo": 65,
+   "n": 170
+  },
+  {
+   "lo": 70,
+   "n": 134
+  },
+  {
+   "lo": 75,
+   "n": 118
+  },
+  {
+   "lo": 80,
+   "n": 94
+  },
+  {
+   "lo": 85,
+   "n": 98
+  },
+  {
+   "lo": 90,
+   "n": 72
+  },
+  {
+   "lo": 95,
+   "n": 48
+  },
+  {
+   "lo": 100,
+   "n": 47
+  },
+  {
+   "lo": 105,
+   "n": 41
+  },
+  {
+   "lo": 110,
+   "n": 50
+  },
+  {
+   "lo": 115,
+   "n": 30
+  },
+  {
+   "lo": 120,
+   "n": 30
+  },
+  {
+   "lo": 125,
+   "n": 19
+  },
+  {
+   "lo": 130,
+   "n": 17
+  },
+  {
+   "lo": 135,
+   "n": 21
+  },
+  {
+   "lo": 140,
+   "n": 12
+  },
+  {
+   "lo": 145,
+   "n": 18
+  },
+  {
+   "lo": 150,
+   "n": 14
+  },
+  {
+   "lo": 155,
+   "n": 15
+  },
+  {
+   "lo": 160,
+   "n": 7
+  },
+  {
+   "lo": 165,
+   "n": 5
+  },
+  {
+   "lo": 170,
+   "n": 4
+  },
+  {
+   "lo": 175,
+   "n": 4
+  }
+ ],
+ "hist_over180": 59,
+ "hist_under_minus10": 148,
+ "cdf": [
+  {
+   "x": -5,
+   "p": 0.0161
+  },
+  {
+   "x": -4,
+   "p": 0.0231
+  },
+  {
+   "x": -3,
+   "p": 0.0342
+  },
+  {
+   "x": -2,
+   "p": 0.0523
+  },
+  {
+   "x": -1,
+   "p": 0.0809
+  },
+  {
+   "x": 0,
+   "p": 0.1232
+  },
+  {
+   "x": 1,
+   "p": 0.199
+  },
+  {
+   "x": 2,
+   "p": 0.2535
+  },
+  {
+   "x": 3,
+   "p": 0.3035
+  },
+  {
+   "x": 4,
+   "p": 0.3511
+  },
+  {
+   "x": 5,
+   "p": 0.3934
+  },
+  {
+   "x": 6,
+   "p": 0.4282
+  },
+  {
+   "x": 7,
+   "p": 0.4628
+  },
+  {
+   "x": 8,
+   "p": 0.4936
+  },
+  {
+   "x": 9,
+   "p": 0.5202
+  },
+  {
+   "x": 10,
+   "p": 0.5445
+  },
+  {
+   "x": 11,
+   "p": 0.5674
+  },
+  {
+   "x": 12,
+   "p": 0.5874
+  },
+  {
+   "x": 13,
+   "p": 0.6048
+  },
+  {
+   "x": 14,
+   "p": 0.6217
+  },
+  {
+   "x": 15,
+   "p": 0.6374
+  },
+  {
+   "x": 16,
+   "p": 0.6538
+  },
+  {
+   "x": 17,
+   "p": 0.6688
+  },
+  {
+   "x": 18,
+   "p": 0.6815
+  },
+  {
+   "x": 19,
+   "p": 0.6941
+  },
+  {
+   "x": 20,
+   "p": 0.7058
+  },
+  {
+   "x": 21,
+   "p": 0.7174
+  },
+  {
+   "x": 22,
+   "p": 0.7287
+  },
+  {
+   "x": 23,
+   "p": 0.739
+  },
+  {
+   "x": 24,
+   "p": 0.7498
+  },
+  {
+   "x": 25,
+   "p": 0.7598
+  },
+  {
+   "x": 26,
+   "p": 0.77
+  },
+  {
+   "x": 27,
+   "p": 0.7801
+  },
+  {
+   "x": 28,
+   "p": 0.7879
+  },
+  {
+   "x": 29,
+   "p": 0.7957
+  },
+  {
+   "x": 30,
+   "p": 0.8036
+  },
+  {
+   "x": 31,
+   "p": 0.8111
+  },
+  {
+   "x": 32,
+   "p": 0.818
+  },
+  {
+   "x": 33,
+   "p": 0.8227
+  },
+  {
+   "x": 34,
+   "p": 0.8296
+  },
+  {
+   "x": 35,
+   "p": 0.8362
+  },
+  {
+   "x": 36,
+   "p": 0.8418
+  },
+  {
+   "x": 37,
+   "p": 0.847
+  },
+  {
+   "x": 38,
+   "p": 0.8528
+  },
+  {
+   "x": 39,
+   "p": 0.8582
+  },
+  {
+   "x": 40,
+   "p": 0.8621
+  },
+  {
+   "x": 41,
+   "p": 0.8669
+  },
+  {
+   "x": 42,
+   "p": 0.8722
+  },
+  {
+   "x": 43,
+   "p": 0.8765
+  },
+  {
+   "x": 44,
+   "p": 0.8821
+  },
+  {
+   "x": 45,
+   "p": 0.8862
+  },
+  {
+   "x": 46,
+   "p": 0.8903
+  },
+  {
+   "x": 47,
+   "p": 0.8944
+  },
+  {
+   "x": 48,
+   "p": 0.898
+  },
+  {
+   "x": 49,
+   "p": 0.9006
+  },
+  {
+   "x": 50,
+   "p": 0.9039
+  },
+  {
+   "x": 51,
+   "p": 0.9069
+  },
+  {
+   "x": 52,
+   "p": 0.9104
+  },
+  {
+   "x": 53,
+   "p": 0.9135
+  },
+  {
+   "x": 54,
+   "p": 0.9167
+  },
+  {
+   "x": 55,
+   "p": 0.9192
+  },
+  {
+   "x": 56,
+   "p": 0.9225
+  },
+  {
+   "x": 57,
+   "p": 0.9252
+  },
+  {
+   "x": 58,
+   "p": 0.9278
+  },
+  {
+   "x": 59,
+   "p": 0.9297
+  },
+  {
+   "x": 60,
+   "p": 0.9322
+  },
+  {
+   "x": 61,
+   "p": 0.9343
+  },
+  {
+   "x": 62,
+   "p": 0.9359
+  },
+  {
+   "x": 63,
+   "p": 0.9386
+  },
+  {
+   "x": 64,
+   "p": 0.941
+  },
+  {
+   "x": 65,
+   "p": 0.9432
+  },
+  {
+   "x": 66,
+   "p": 0.9452
+  },
+  {
+   "x": 67,
+   "p": 0.9468
+  },
+  {
+   "x": 68,
+   "p": 0.9487
+  },
+  {
+   "x": 69,
+   "p": 0.9501
+  },
+  {
+   "x": 70,
+   "p": 0.9518
+  },
+  {
+   "x": 71,
+   "p": 0.953
+  },
+  {
+   "x": 72,
+   "p": 0.9542
+  },
+  {
+   "x": 73,
+   "p": 0.9555
+  },
+  {
+   "x": 74,
+   "p": 0.9572
+  },
+  {
+   "x": 75,
+   "p": 0.9585
+  },
+  {
+   "x": 76,
+   "p": 0.9597
+  },
+  {
+   "x": 77,
+   "p": 0.9612
+  },
+  {
+   "x": 78,
+   "p": 0.9624
+  },
+  {
+   "x": 79,
+   "p": 0.9635
+  },
+  {
+   "x": 80,
+   "p": 0.9645
+  },
+  {
+   "x": 81,
+   "p": 0.9654
+  },
+  {
+   "x": 82,
+   "p": 0.9664
+  },
+  {
+   "x": 83,
+   "p": 0.9674
+  },
+  {
+   "x": 84,
+   "p": 0.9682
+  },
+  {
+   "x": 85,
+   "p": 0.9692
+  },
+  {
+   "x": 86,
+   "p": 0.9704
+  },
+  {
+   "x": 87,
+   "p": 0.9714
+  },
+  {
+   "x": 88,
+   "p": 0.9723
+  },
+  {
+   "x": 89,
+   "p": 0.9732
+  },
+  {
+   "x": 90,
+   "p": 0.9742
+  },
+  {
+   "x": 91,
+   "p": 0.9749
+  },
+  {
+   "x": 92,
+   "p": 0.9755
+  },
+  {
+   "x": 93,
+   "p": 0.9765
+  },
+  {
+   "x": 94,
+   "p": 0.9772
+  },
+  {
+   "x": 95,
+   "p": 0.9778
+  },
+  {
+   "x": 96,
+   "p": 0.9782
+  },
+  {
+   "x": 97,
+   "p": 0.9788
+  },
+  {
+   "x": 98,
+   "p": 0.9792
+  },
+  {
+   "x": 99,
+   "p": 0.9798
+  },
+  {
+   "x": 100,
+   "p": 0.9802
+  },
+  {
+   "x": 101,
+   "p": 0.9809
+  },
+  {
+   "x": 102,
+   "p": 0.9813
+  },
+  {
+   "x": 103,
+   "p": 0.9818
+  },
+  {
+   "x": 104,
+   "p": 0.9822
+  },
+  {
+   "x": 105,
+   "p": 0.9826
+  },
+  {
+   "x": 106,
+   "p": 0.9831
+  },
+  {
+   "x": 107,
+   "p": 0.9834
+  },
+  {
+   "x": 108,
+   "p": 0.9839
+  },
+  {
+   "x": 109,
+   "p": 0.9844
+  },
+  {
+   "x": 110,
+   "p": 0.9846
+  },
+  {
+   "x": 111,
+   "p": 0.9849
+  },
+  {
+   "x": 112,
+   "p": 0.9855
+  },
+  {
+   "x": 113,
+   "p": 0.9859
+  },
+  {
+   "x": 114,
+   "p": 0.9867
+  },
+  {
+   "x": 115,
+   "p": 0.9872
+  },
+  {
+   "x": 116,
+   "p": 0.9875
+  },
+  {
+   "x": 117,
+   "p": 0.9878
+  },
+  {
+   "x": 118,
+   "p": 0.988
+  },
+  {
+   "x": 119,
+   "p": 0.9882
+  },
+  {
+   "x": 120,
+   "p": 0.9887
+  }
+ ],
+ "monthly": [
+  {
+   "month": "2024-07",
+   "n": 908,
+   "mean": 16.9,
+   "soc": 0.1421,
+   "normal_minor": 0.6619,
+   "moderate": 0.196,
+   "severe": 0.0683,
+   "canceled": 0.0738
+  },
+  {
+   "month": "2024-08",
+   "n": 1008,
+   "mean": 19.0,
+   "soc": 0.13,
+   "normal_minor": 0.5873,
+   "moderate": 0.2827,
+   "severe": 0.0546,
+   "canceled": 0.0754
+  },
+  {
+   "month": "2024-09",
+   "n": 1142,
+   "mean": 18.5,
+   "soc": 0.134,
+   "normal_minor": 0.6252,
+   "moderate": 0.2408,
+   "severe": 0.0595,
+   "canceled": 0.0744
+  },
+  {
+   "month": "2024-10",
+   "n": 1157,
+   "mean": 16.5,
+   "soc": 0.1426,
+   "normal_minor": 0.6283,
+   "moderate": 0.229,
+   "severe": 0.0501,
+   "canceled": 0.0925
+  },
+  {
+   "month": "2024-11",
+   "n": 1112,
+   "mean": 23.4,
+   "soc": 0.2041,
+   "normal_minor": 0.5234,
+   "moderate": 0.2725,
+   "severe": 0.0899,
+   "canceled": 0.1142
+  },
+  {
+   "month": "2024-12",
+   "n": 1073,
+   "mean": 12.9,
+   "soc": 0.0792,
+   "normal_minor": 0.7139,
+   "moderate": 0.2069,
+   "severe": 0.027,
+   "canceled": 0.0522
+  },
+  {
+   "month": "2025-01",
+   "n": 783,
+   "mean": 13.6,
+   "soc": 0.1188,
+   "normal_minor": 0.705,
+   "moderate": 0.1762,
+   "severe": 0.0536,
+   "canceled": 0.0651
+  },
+  {
+   "month": "2025-02",
+   "n": 826,
+   "mean": 12.8,
+   "soc": 0.1065,
+   "normal_minor": 0.7022,
+   "moderate": 0.1913,
+   "severe": 0.0303,
+   "canceled": 0.0763
+  },
+  {
+   "month": "2025-03",
+   "n": 763,
+   "mean": 14.7,
+   "soc": 0.1337,
+   "normal_minor": 0.7143,
+   "moderate": 0.152,
+   "severe": 0.0511,
+   "canceled": 0.0826
+  },
+  {
+   "month": "2025-04",
+   "n": 601,
+   "mean": 18.4,
+   "soc": 0.1814,
+   "normal_minor": 0.619,
+   "moderate": 0.1997,
+   "severe": 0.0582,
+   "canceled": 0.1231
+  },
+  {
+   "month": "2025-05",
+   "n": 771,
+   "mean": 15.4,
+   "soc": 0.1128,
+   "normal_minor": 0.6861,
+   "moderate": 0.201,
+   "severe": 0.048,
+   "canceled": 0.0649
+  },
+  {
+   "month": "2025-06",
+   "n": 982,
+   "mean": 16.7,
+   "soc": 0.164,
+   "normal_minor": 0.6263,
+   "moderate": 0.2098,
+   "severe": 0.055,
+   "canceled": 0.109
+  },
+  {
+   "month": "2025-07",
+   "n": 956,
+   "mean": 20.7,
+   "soc": 0.2123,
+   "normal_minor": 0.5868,
+   "moderate": 0.2008,
+   "severe": 0.0795,
+   "canceled": 0.1328
+  },
+  {
+   "month": "2025-08",
+   "n": 908,
+   "mean": 17.5,
+   "soc": 0.1289,
+   "normal_minor": 0.6894,
+   "moderate": 0.1817,
+   "severe": 0.0727,
+   "canceled": 0.0562
+  },
+  {
+   "month": "2025-09",
+   "n": 891,
+   "mean": 17.0,
+   "soc": 0.1212,
+   "normal_minor": 0.6902,
+   "moderate": 0.1886,
+   "severe": 0.0696,
+   "canceled": 0.0516
+  },
+  {
+   "month": "2025-10",
+   "n": 966,
+   "mean": 18.0,
+   "soc": 0.1294,
+   "normal_minor": 0.6211,
+   "moderate": 0.2495,
+   "severe": 0.0652,
+   "canceled": 0.0642
+  },
+  {
+   "month": "2025-11",
+   "n": 768,
+   "mean": 16.4,
+   "soc": 0.1081,
+   "normal_minor": 0.7135,
+   "moderate": 0.1784,
+   "severe": 0.0638,
+   "canceled": 0.0443
+  },
+  {
+   "month": "2025-12",
+   "n": 824,
+   "mean": 11.6,
+   "soc": 0.0765,
+   "normal_minor": 0.79,
+   "moderate": 0.1335,
+   "severe": 0.0413,
+   "canceled": 0.0352
+  },
+  {
+   "month": "2026-01",
+   "n": 685,
+   "mean": 26.8,
+   "soc": 0.2599,
+   "normal_minor": 0.5182,
+   "moderate": 0.2219,
+   "severe": 0.1168,
+   "canceled": 0.1431
+  },
+  {
+   "month": "2026-02",
+   "n": 622,
+   "mean": 16.2,
+   "soc": 0.1254,
+   "normal_minor": 0.6768,
+   "moderate": 0.1977,
+   "severe": 0.0579,
+   "canceled": 0.0675
+  },
+  {
+   "month": "2026-03",
+   "n": 625,
+   "mean": 16.5,
+   "soc": 0.1632,
+   "normal_minor": 0.664,
+   "moderate": 0.1728,
+   "severe": 0.056,
+   "canceled": 0.1072
+  },
+  {
+   "month": "2026-04",
+   "n": 609,
+   "mean": 10.3,
+   "soc": 0.0591,
+   "normal_minor": 0.8161,
+   "moderate": 0.1248,
+   "severe": 0.023,
+   "canceled": 0.0361
+  },
+  {
+   "month": "2026-05",
+   "n": 446,
+   "mean": 12.2,
+   "soc": 0.0987,
+   "normal_minor": 0.7825,
+   "moderate": 0.1188,
+   "severe": 0.0493,
+   "canceled": 0.0493
+  },
+  {
+   "month": "2026-06",
+   "n": 502,
+   "mean": 20.3,
+   "soc": 0.1335,
+   "normal_minor": 0.6375,
+   "moderate": 0.2291,
+   "severe": 0.0757,
+   "canceled": 0.0578
+  },
+  {
+   "month": "2026-07",
+   "n": 643,
+   "mean": 24.4,
+   "soc": 0.2177,
+   "normal_minor": 0.5614,
+   "moderate": 0.2208,
+   "severe": 0.126,
+   "canceled": 0.0918
+  },
+  {
+   "month": "2026-08",
+   "n": 986,
+   "mean": 23.7,
+   "soc": 0.1836,
+   "normal_minor": 0.5213,
+   "moderate": 0.2951,
+   "severe": 0.0872,
+   "canceled": 0.0963
+  }
+ ],
+ "hourly": [
+  {
+   "hour": 0,
+   "n": 14,
+   "soc": 0.0714,
+   "mean": 16.5,
+   "sched": 292.0
+  },
+  {
+   "hour": 1,
+   "n": 1,
+   "soc": 0.0,
+   "mean": 22.0,
+   "sched": 336.0
+  },
+  {
+   "hour": 2,
+   "n": 27,
+   "soc": 0.1481,
+   "mean": 16.5,
+   "sched": 300.0
+  },
+  {
+   "hour": 3,
+   "n": 319,
+   "soc": 0.0313,
+   "mean": 7.3,
+   "sched": 264.0
+  },
+  {
+   "hour": 4,
+   "n": 387,
+   "soc": 0.0982,
+   "mean": 11.4,
+   "sched": 227.0
+  },
+  {
+   "hour": 5,
+   "n": 926,
+   "soc": 0.0896,
+   "mean": 10.0,
+   "sched": 226.0
+  },
+  {
+   "hour": 6,
+   "n": 1708,
+   "soc": 0.1294,
+   "mean": 8.5,
+   "sched": 222.0
+  },
+  {
+   "hour": 7,
+   "n": 880,
+   "soc": 0.1193,
+   "mean": 17.4,
+   "sched": 217.0
+  },
+  {
+   "hour": 8,
+   "n": 1061,
+   "soc": 0.1338,
+   "mean": 12.4,
+   "sched": 270.0
+  },
+  {
+   "hour": 9,
+   "n": 1013,
+   "soc": 0.1115,
+   "mean": 17.2,
+   "sched": 225.0
+  },
+  {
+   "hour": 10,
+   "n": 1402,
+   "soc": 0.1405,
+   "mean": 11.9,
+   "sched": 225.0
+  },
+  {
+   "hour": 11,
+   "n": 1924,
+   "soc": 0.1954,
+   "mean": 22.8,
+   "sched": 255.0
+  },
+  {
+   "hour": 12,
+   "n": 1317,
+   "soc": 0.1549,
+   "mean": 16.8,
+   "sched": 252.0
+  },
+  {
+   "hour": 13,
+   "n": 1040,
+   "soc": 0.1144,
+   "mean": 20.5,
+   "sched": 225.0
+  },
+  {
+   "hour": 14,
+   "n": 1840,
+   "soc": 0.1402,
+   "mean": 17.5,
+   "sched": 278.0
+  },
+  {
+   "hour": 15,
+   "n": 981,
+   "soc": 0.1427,
+   "mean": 21.8,
+   "sched": 222.0
+  },
+  {
+   "hour": 16,
+   "n": 1550,
+   "soc": 0.1974,
+   "mean": 23.8,
+   "sched": 280.0
+  },
+  {
+   "hour": 17,
+   "n": 1028,
+   "soc": 0.143,
+   "mean": 23.4,
+   "sched": 225.0
+  },
+  {
+   "hour": 18,
+   "n": 1346,
+   "soc": 0.1582,
+   "mean": 18.9,
+   "sched": 225.0
+  },
+  {
+   "hour": 19,
+   "n": 1560,
+   "soc": 0.159,
+   "mean": 23.2,
+   "sched": 322.0
+  },
+  {
+   "hour": 20,
+   "n": 558,
+   "soc": 0.1183,
+   "mean": 18.1,
+   "sched": 234.0
+  },
+  {
+   "hour": 21,
+   "n": 3,
+   "soc": 0.0,
+   "mean": 6.3,
+   "sched": 576.0
+  },
+  {
+   "hour": 22,
+   "n": 655,
+   "soc": 0.0962,
+   "mean": 9.7,
+   "sched": 496.0
+  },
+  {
+   "hour": 23,
+   "n": 17,
+   "soc": 0.0588,
+   "mean": 6.8,
+   "sched": 310.0
+  }
+ ],
+ "weekday": [
+  {
+   "wd": 0,
+   "n": 3133,
+   "soc": 0.1532,
+   "mean": 17.9,
+   "canc": 0.0827
+  },
+  {
+   "wd": 1,
+   "n": 3086,
+   "soc": 0.1504,
+   "mean": 19.3,
+   "canc": 0.0778
+  },
+  {
+   "wd": 2,
+   "n": 3150,
+   "soc": 0.1565,
+   "mean": 18.8,
+   "canc": 0.0879
+  },
+  {
+   "wd": 3,
+   "n": 3172,
+   "soc": 0.151,
+   "mean": 18.8,
+   "canc": 0.0892
+  },
+  {
+   "wd": 4,
+   "n": 3114,
+   "soc": 0.1468,
+   "mean": 18.2,
+   "canc": 0.0851
+  },
+  {
+   "wd": 5,
+   "n": 2929,
+   "soc": 0.1171,
+   "mean": 13.9,
+   "canc": 0.0686
+  },
+  {
+   "wd": 6,
+   "n": 2973,
+   "soc": 0.114,
+   "mean": 14.5,
+   "canc": 0.0619
+  }
+ ],
+ "families": [
+  {
+   "key": "hannover",
+   "label": "High-speed via Hannover and Kassel",
+   "via": "Harburg or Lüneburg and Uelzen, Hannover, Göttingen, Kassel, sometimes Fulda or Hanau",
+   "n": 14246,
+   "sched": 222.0,
+   "mean": 15.6,
+   "median": 7.0,
+   "soc": 0.1152,
+   "canc": 0.0611,
+   "normal_minor": 0.706,
+   "moderate": 0.1789,
+   "severe": 0.0541,
+   "canceled": 0.0611
+  },
+  {
+   "key": "giessen",
+   "label": "Via Kassel and Gießen",
+   "via": "As above to Kassel, then the older line through Marburg and Gießen",
+   "n": 2890,
+   "sched": 280.0,
+   "mean": 9.5,
+   "median": 2.0,
+   "soc": 0.209,
+   "canc": 0.1882,
+   "normal_minor": 0.6623,
+   "moderate": 0.1287,
+   "severe": 0.0208,
+   "canceled": 0.1882
+  },
+  {
+   "key": "koeln",
+   "label": "Via Bremen, the Ruhr and Köln",
+   "via": "Bremen, Osnabrück, Münster, the Ruhr, Köln, then the high-speed line or the Rhine valley via Koblenz and Mainz",
+   "n": 3329,
+   "sched": 363.0,
+   "mean": 29.5,
+   "median": 23.0,
+   "soc": 0.1895,
+   "canc": 0.0682,
+   "normal_minor": 0.4269,
+   "moderate": 0.3836,
+   "severe": 0.1214,
+   "canceled": 0.0682
+  },
+  {
+   "key": "berlin",
+   "label": "Via Berlin and Erfurt",
+   "via": "Berlin-Spandau, Berlin Hbf, Südkreuz, Leipzig or Halle, Erfurt, Fulda",
+   "n": 1067,
+   "sched": 391.0,
+   "mean": 21.9,
+   "median": 12.0,
+   "soc": 0.1649,
+   "canc": 0.0609,
+   "normal_minor": 0.5604,
+   "moderate": 0.2746,
+   "severe": 0.104,
+   "canceled": 0.0609
+  },
+  {
+   "key": "other",
+   "label": "Diversions and rare patterns",
+   "via": "Mostly via Bremen and Hannover; a few runs recorded with almost no stops",
+   "n": 25,
+   "sched": 306.0,
+   "mean": 10.1,
+   "median": 4.0,
+   "soc": 0.12,
+   "canc": 0.08,
+   "normal_minor": 0.72,
+   "moderate": 0.16,
+   "severe": 0.04,
+   "canceled": 0.08
+  }
+ ],
+ "sched_over": 24,
+ "sched_hist": [
+  {
+   "lo": 195,
+   "berlin": 0,
+   "giessen": 0,
+   "hannover": 329,
+   "koeln": 0,
+   "other": 0
+  },
+  {
+   "lo": 210,
+   "berlin": 0,
+   "giessen": 0,
+   "hannover": 7343,
+   "koeln": 0,
+   "other": 1
+  },
+  {
+   "lo": 225,
+   "berlin": 0,
+   "giessen": 0,
+   "hannover": 3310,
+   "koeln": 0,
+   "other": 4
+  },
+  {
+   "lo": 240,
+   "berlin": 0,
+   "giessen": 0,
+   "hannover": 508,
+   "koeln": 1,
+   "other": 0
+  },
+  {
+   "lo": 255,
+   "berlin": 0,
+   "giessen": 0,
+   "hannover": 1005,
+   "koeln": 0,
+   "other": 2
+  },
+  {
+   "lo": 270,
+   "berlin": 0,
+   "giessen": 2684,
+   "hannover": 1240,
+   "koeln": 2,
+   "other": 1
+  },
+  {
+   "lo": 285,
+   "berlin": 0,
+   "giessen": 196,
+   "hannover": 348,
+   "koeln": 0,
+   "other": 0
+  },
+  {
+   "lo": 300,
+   "berlin": 0,
+   "giessen": 7,
+   "hannover": 82,
+   "koeln": 0,
+   "other": 13
+  },
+  {
+   "lo": 315,
+   "berlin": 0,
+   "giessen": 3,
+   "hannover": 51,
+   "koeln": 1290,
+   "other": 0
+  },
+  {
+   "lo": 330,
+   "berlin": 0,
+   "giessen": 0,
+   "hannover": 24,
+   "koeln": 169,
+   "other": 0
+  },
+  {
+   "lo": 345,
+   "berlin": 0,
+   "giessen": 0,
+   "hannover": 2,
+   "koeln": 49,
+   "other": 0
+  },
+  {
+   "lo": 360,
+   "berlin": 351,
+   "giessen": 0,
+   "hannover": 4,
+   "koeln": 450,
+   "other": 0
+  },
+  {
+   "lo": 375,
+   "berlin": 95,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 510,
+   "other": 0
+  },
+  {
+   "lo": 390,
+   "berlin": 287,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 115,
+   "other": 2
+  },
+  {
+   "lo": 405,
+   "berlin": 21,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 42,
+   "other": 0
+  },
+  {
+   "lo": 420,
+   "berlin": 37,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 39,
+   "other": 0
+  },
+  {
+   "lo": 435,
+   "berlin": 169,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 12,
+   "other": 1
+  },
+  {
+   "lo": 450,
+   "berlin": 32,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 4,
+   "other": 0
+  },
+  {
+   "lo": 465,
+   "berlin": 31,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 0,
+   "other": 0
+  },
+  {
+   "lo": 480,
+   "berlin": 6,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 20,
+   "other": 0
+  },
+  {
+   "lo": 495,
+   "berlin": 26,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 506,
+   "other": 1
+  },
+  {
+   "lo": 510,
+   "berlin": 2,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 82,
+   "other": 0
+  },
+  {
+   "lo": 525,
+   "berlin": 2,
+   "giessen": 0,
+   "hannover": 0,
+   "koeln": 22,
+   "other": 0
+  }
+ ],
+ "buildup": [
+  {
+   "station": "Hamburg Hbf",
+   "n": 13665,
+   "mean": 5.1,
+   "p20": 0.0698,
+   "p6": 0.2326,
+   "mins": 0.0
+  },
+  {
+   "station": "Hamburg-Harburg",
+   "n": 3048,
+   "mean": 5.0,
+   "p20": 0.0614,
+   "p6": 0.2215,
+   "mins": 12.0
+  },
+  {
+   "station": "Lüneburg",
+   "n": 2739,
+   "mean": 6.5,
+   "p20": 0.0814,
+   "p6": 0.3176,
+   "mins": 30.0
+  },
+  {
+   "station": "Uelzen",
+   "n": 2499,
+   "mean": 9.1,
+   "p20": 0.1349,
+   "p6": 0.4198,
+   "mins": 43.0
+  },
+  {
+   "station": "Hannover Hbf",
+   "n": 13711,
+   "mean": 10.4,
+   "p20": 0.1614,
+   "p6": 0.4194,
+   "mins": 78.0
+  },
+  {
+   "station": "Göttingen",
+   "n": 12847,
+   "mean": 12.0,
+   "p20": 0.1878,
+   "p6": 0.4631,
+   "mins": 118.0
+  },
+  {
+   "station": "Kassel-Wilhelmshöhe",
+   "n": 12806,
+   "mean": 12.9,
+   "p20": 0.2022,
+   "p6": 0.4852,
+   "mins": 139.0
+  },
+  {
+   "station": "Frankfurt (Main) Hbf",
+   "n": 13512,
+   "mean": 15.8,
+   "p20": 0.2511,
+   "p6": 0.5574,
+   "mins": 221.0
+  }
+ ],
+ "main_family": "hannover",
+ "main_n": 14246,
+ "enroute": [
+  {
+   "station": "Hamburg Hbf",
+   "n": 20353,
+   "corr": 0.359,
+   "rows": [
+    {
+     "b": "<6",
+     "n": 15391,
+     "soc": 0.0661,
+     "final": 6.0
+    },
+    {
+     "b": "6–19",
+     "n": 3496,
+     "soc": 0.1061,
+     "final": 14.0
+    },
+    {
+     "b": "20–39",
+     "n": 1056,
+     "soc": 0.2045,
+     "final": 31.0
+    },
+    {
+     "b": "40–59",
+     "n": 270,
+     "soc": 0.4926,
+     "final": 56.0
+    },
+    {
+     "b": "≥60",
+     "n": 140,
+     "soc": 0.8071,
+     "final": 89.0
+    }
+   ]
+  },
+  {
+   "station": "Hannover Hbf",
+   "n": 16220,
+   "corr": 0.687,
+   "rows": [
+    {
+     "b": "<6",
+     "n": 9445,
+     "soc": 0.0341,
+     "final": 3.0
+    },
+    {
+     "b": "6–19",
+     "n": 4148,
+     "soc": 0.0586,
+     "final": 9.0
+    },
+    {
+     "b": "20–39",
+     "n": 1668,
+     "soc": 0.1265,
+     "final": 26.0
+    },
+    {
+     "b": "40–59",
+     "n": 544,
+     "soc": 0.3235,
+     "final": 49.0
+    },
+    {
+     "b": "≥60",
+     "n": 415,
+     "soc": 0.8964,
+     "final": 87.0
+    }
+   ]
+  },
+  {
+   "station": "Kassel-Wilhelmshöhe",
+   "n": 15310,
+   "corr": 0.786,
+   "rows": [
+    {
+     "b": "<6",
+     "n": 8007,
+     "soc": 0.0279,
+     "final": 2.0
+    },
+    {
+     "b": "6–19",
+     "n": 4231,
+     "soc": 0.0402,
+     "final": 9.0
+    },
+    {
+     "b": "20–39",
+     "n": 1808,
+     "soc": 0.0951,
+     "final": 27.0
+    },
+    {
+     "b": "40–59",
+     "n": 710,
+     "soc": 0.2437,
+     "final": 47.0
+    },
+    {
+     "b": "≥60",
+     "n": 554,
+     "soc": 0.8827,
+     "final": 83.0
+    }
+   ]
+  }
+ ],
+ "origin_start": {
+  "starts_here": 0.1914,
+  "late_if_starts_here": 0.2551,
+  "late_if_through": 0.2412
+ },
+ "cancel": {
+  "both": 882,
+  "dest_only": 505,
+  "origin_only": 322,
+  "intermediate_only": 707
+ },
+ "quality": {
+  "no_update_journeys": 737,
+  "zero_delay_arrivals": 1504,
+  "gaps": 6876,
+  "gap_before": 0.4527,
+  "gap_after": 0.0192
+ },
+ "trains_count": 30,
+ "trains_worst": [
+  {
+   "train": "1575",
+   "n": 323,
+   "soc": 0.3251,
+   "median": 0.0,
+   "dep": "06:24",
+   "sched": 284.0,
+   "fam": "giessen",
+   "type": "ICE"
+  },
+  {
+   "train": "1021",
+   "n": 451,
+   "soc": 0.2683,
+   "median": 37.0,
+   "dep": "16:10",
+   "sched": 363.0,
+   "fam": "koeln",
+   "type": "ICE"
+  },
+  {
+   "train": "1579",
+   "n": 314,
+   "soc": 0.2643,
+   "median": 0.0,
+   "dep": "10:28",
+   "sched": 280.0,
+   "fam": "giessen",
+   "type": "ICE"
+  },
+  {
+   "train": "927",
+   "n": 523,
+   "soc": 0.2581,
+   "median": 34.0,
+   "dep": "11:53",
+   "sched": 380.0,
+   "fam": "koeln",
+   "type": "ICE"
+  },
+  {
+   "train": "1675",
+   "n": 394,
+   "soc": 0.2513,
+   "median": 0.0,
+   "dep": "16:28",
+   "sched": 280.0,
+   "fam": "giessen",
+   "type": "ICE"
+  },
+  {
+   "train": "1683",
+   "n": 391,
+   "soc": 0.2455,
+   "median": 5.0,
+   "dep": "11:28",
+   "sched": 255.0,
+   "fam": "hannover",
+   "type": "ICE"
+  }
+ ],
+ "trains_best": [
+  {
+   "train": "591",
+   "n": 324,
+   "soc": 0.0278,
+   "median": 4.0,
+   "dep": "03:20",
+   "sched": 264.0,
+   "fam": "hannover",
+   "type": "ICE"
+  },
+  {
+   "train": "571",
+   "n": 352,
+   "soc": 0.0455,
+   "median": 1.0,
+   "dep": "05:14",
+   "sched": 226.0,
+   "fam": "hannover",
+   "type": "ICE"
+  },
+  {
+   "train": "71",
+   "n": 587,
+   "soc": 0.0562,
+   "median": 4.0,
+   "dep": "06:18",
+   "sched": 222.0,
+   "fam": "hannover",
+   "type": "ICE"
+  },
+  {
+   "train": "1097",
+   "n": 332,
+   "soc": 0.0873,
+   "median": 4.0,
+   "dep": "06:06",
+   "sched": 206.0,
+   "fam": "hannover",
+   "type": "ICE"
+  },
+  {
+   "train": "573",
+   "n": 553,
+   "soc": 0.0886,
+   "median": 4.0,
+   "dep": "07:24",
+   "sched": 216.0,
+   "fam": "hannover",
+   "type": "ICE"
+  },
+  {
+   "train": "75",
+   "n": 587,
+   "soc": 0.0903,
+   "median": 6.0,
+   "dep": "10:24",
+   "sched": 216.0,
+   "fam": "hannover",
+   "type": "ICE"
+  }
+ ],
+ "map": {
+  "segments": [
+   {
+    "a": "Hannover Hbf",
+    "b": "Göttingen",
+    "n": 16201
+   },
+   {
+    "a": "Göttingen",
+    "b": "Kassel-Wilhelmshöhe",
+    "n": 16164
+   },
+   {
+    "a": "Kassel-Wilhelmshöhe",
+    "b": "Frankfurt (Main) Hbf",
+    "n": 11679
+   },
+   {
+    "a": "Hamburg Hbf",
+    "b": "Hannover Hbf",
+    "n": 8871
+   },
+   {
+    "a": "Hamburg Hbf",
+    "b": "Hamburg-Harburg",
+    "n": 8550
+   },
+   {
+    "a": "Uelzen",
+    "b": "Hannover Hbf",
+    "n": 5578
+   },
+   {
+    "a": "Hamburg-Harburg",
+    "b": "Lüneburg",
+    "n": 4975
+   },
+   {
+    "a": "Lüneburg",
+    "b": "Uelzen",
+    "n": 4433
+   },
+   {
+    "a": "Kassel-Wilhelmshöhe",
+    "b": "Gießen",
+    "n": 2890
+   },
+   {
+    "a": "Gießen",
+    "b": "Frankfurt (Main) Hbf",
+    "n": 2885
+   },
+   {
+    "a": "Duisburg Hbf",
+    "b": "Düsseldorf Hbf",
+    "n": 2368
+   },
+   {
+    "a": "Essen Hbf",
+    "b": "Duisburg Hbf",
+    "n": 2338
+   },
+   {
+    "a": "Hamburg-Harburg",
+    "b": "Bremen Hbf",
+    "n": 2335
+   },
+   {
+    "a": "Bremen Hbf",
+    "b": "Osnabrück Hbf",
+    "n": 2231
+   },
+   {
+    "a": "Osnabrück Hbf",
+    "b": "Münster (Westf) Hbf",
+    "n": 2165
+   },
+   {
+    "a": "Düsseldorf Hbf",
+    "b": "Köln Hbf",
+    "n": 1788
+   },
+   {
+    "a": "Kassel-Wilhelmshöhe",
+    "b": "Fulda",
+    "n": 1565
+   },
+   {
+    "a": "Münster (Westf) Hbf",
+    "b": "Dortmund Hbf",
+    "n": 1517
+   },
+   {
+    "a": "Lüneburg",
+    "b": "Hannover Hbf",
+    "n": 1478
+   },
+   {
+    "a": "Köln Hbf",
+    "b": "Frankfurt (Main) Hbf",
+    "n": 1455
+   },
+   {
+    "a": "Mainz Hbf",
+    "b": "Frankfurt (Main) Hbf",
+    "n": 1421
+   },
+   {
+    "a": "Koblenz Hbf",
+    "b": "Mainz Hbf",
+    "n": 1391
+   },
+   {
+    "a": "Hanau Hbf",
+    "b": "Frankfurt (Main) Hbf",
+    "n": 1340
+   },
+   {
+    "a": "Fulda",
+    "b": "Hanau Hbf",
+    "n": 1329
+   },
+   {
+    "a": "Hamburg-Harburg",
+    "b": "Hannover Hbf",
+    "n": 1214
+   },
+   {
+    "a": "Hamburg Hbf",
+    "b": "Uelzen",
+    "n": 1163
+   },
+   {
+    "a": "Dortmund Hbf",
+    "b": "Bochum Hbf",
+    "n": 1114
+   },
+   {
+    "a": "Bochum Hbf",
+    "b": "Essen Hbf",
+    "n": 1112
+   },
+   {
+    "a": "Hamburg Hbf",
+    "b": "Lüneburg",
+    "n": 1085
+   },
+   {
+    "a": "Bonn Hbf",
+    "b": "Koblenz Hbf",
+    "n": 1054
+   },
+   {
+    "a": "Berlin Hauptbahnhof",
+    "b": "Berlin Südkreuz",
+    "n": 1035
+   },
+   {
+    "a": "Köln Hbf",
+    "b": "Bonn Hbf",
+    "n": 1014
+   },
+   {
+    "a": "Hannover Hbf",
+    "b": "Frankfurt (Main) Hbf",
+    "n": 917
+   },
+   {
+    "a": "Leipzig Hbf",
+    "b": "Erfurt Hbf",
+    "n": 793
+   },
+   {
+    "a": "Berlin Südkreuz",
+    "b": "Leipzig Hbf",
+    "n": 780
+   },
+   {
+    "a": "Berlin-Spandau",
+    "b": "Berlin Hauptbahnhof",
+    "n": 626
+   },
+   {
+    "a": "Münster (Westf) Hbf",
+    "b": "Essen Hbf",
+    "n": 594
+   },
+   {
+    "a": "Erfurt Hbf",
+    "b": "Frankfurt (Main) Hbf",
+    "n": 591
+   },
+   {
+    "a": "Hamm (Westf) Hbf",
+    "b": "Dortmund Hbf",
+    "n": 586
+   },
+   {
+    "a": "Fulda",
+    "b": "Frankfurt (Main) Hbf",
+    "n": 582
+   },
+   {
+    "a": "Düsseldorf Hbf",
+    "b": "Köln Messe/Deutz",
+    "n": 569
+   },
+   {
+    "a": "Wuppertal Hbf",
+    "b": "Solingen Hbf",
+    "n": 556
+   },
+   {
+    "a": "Dortmund Hbf",
+    "b": "Hagen Hbf",
+    "n": 551
+   },
+   {
+    "a": "Hagen Hbf",
+    "b": "Wuppertal Hbf",
+    "n": 549
+   },
+   {
+    "a": "Solingen Hbf",
+    "b": "Köln Hbf",
+    "n": 544
+   },
+   {
+    "a": "Münster (Westf) Hbf",
+    "b": "Hamm (Westf) Hbf",
+    "n": 532
+   },
+   {
+    "a": "Bremen Hbf",
+    "b": "Münster (Westf) Hbf",
+    "n": 517
+   },
+   {
+    "a": "Hamburg Hbf",
+    "b": "Essen Hbf",
+    "n": 509
+   },
+   {
+    "a": "Hamburg Hbf",
+    "b": "Bremen Hbf",
+    "n": 473
+   },
+   {
+    "a": "Hamburg Hbf",
+    "b": "Berlin-Spandau",
+    "n": 461
+   },
+   {
+    "a": "Köln Messe/Deutz",
+    "b": "Koblenz Hbf",
+    "n": 443
+   },
+   {
+    "a": "Hamburg Hbf",
+    "b": "Berlin Hauptbahnhof",
+    "n": 435
+   },
+   {
+    "a": "Erfurt Hbf",
+    "b": "Fulda",
+    "n": 423
+   }
+  ],
+  "stations": [
+   {
+    "name": "Berlin Hauptbahnhof",
+    "lat": 52.525592,
+    "lon": 13.369545,
+    "n": 1062
+   },
+   {
+    "name": "Berlin Südkreuz",
+    "lat": 52.475047,
+    "lon": 13.365319,
+    "n": 1035
+   },
+   {
+    "name": "Berlin-Spandau",
+    "lat": 52.5346481,
+    "lon": 13.1968975,
+    "n": 631
+   },
+   {
+    "name": "Bochum Hbf",
+    "lat": 51.478609,
+    "lon": 7.223275,
+    "n": 1115
+   },
+   {
+    "name": "Bonn Hbf",
+    "lat": 50.732008,
+    "lon": 7.097136,
+    "n": 1063
+   },
+   {
+    "name": "Bremen Hbf",
+    "lat": 53.083481,
+    "lon": 8.813834,
+    "n": 2808
+   },
+   {
+    "name": "Dortmund Hbf",
+    "lat": 51.517896,
+    "lon": 7.45929,
+    "n": 2133
+   },
+   {
+    "name": "Duisburg Hbf",
+    "lat": 51.429785,
+    "lon": 6.775903,
+    "n": 2484
+   },
+   {
+    "name": "Düsseldorf Hbf",
+    "lat": 51.219962,
+    "lon": 6.794319,
+    "n": 2443
+   },
+   {
+    "name": "Erfurt Hbf",
+    "lat": 50.972551,
+    "lon": 11.038499,
+    "n": 1038
+   },
+   {
+    "name": "Essen Hbf",
+    "lat": 51.451355,
+    "lon": 7.014793,
+    "n": 2346
+   },
+   {
+    "name": "Frankfurt (Main) Hbf",
+    "lat": 50.107145,
+    "lon": 8.663789,
+    "n": 21557
+   },
+   {
+    "name": "Fulda",
+    "lat": 50.554723,
+    "lon": 9.683977,
+    "n": 2026
+   },
+   {
+    "name": "Gießen",
+    "lat": 50.579059,
+    "lon": 8.661462,
+    "n": 2890
+   },
+   {
+    "name": "Göttingen",
+    "lat": 51.536815,
+    "lon": 9.926072,
+    "n": 16209
+   },
+   {
+    "name": "Hagen Hbf",
+    "lat": 51.362747,
+    "lon": 7.460249,
+    "n": 553
+   },
+   {
+    "name": "Hamburg Hbf",
+    "lat": 53.552736,
+    "lon": 10.006909,
+    "n": 21557
+   },
+   {
+    "name": "Hamburg-Harburg",
+    "lat": 53.455908,
+    "lon": 9.991701,
+    "n": 8551
+   },
+   {
+    "name": "Hamm (Westf) Hbf",
+    "lat": 51.678078,
+    "lon": 7.807821,
+    "n": 608
+   },
+   {
+    "name": "Hanau Hbf",
+    "lat": 50.120953,
+    "lon": 8.929,
+    "n": 1344
+   },
+   {
+    "name": "Hannover Hbf",
+    "lat": 52.376761,
+    "lon": 9.741021,
+    "n": 17157
+   },
+   {
+    "name": "Kassel-Wilhelmshöhe",
+    "lat": 51.313114,
+    "lon": 9.446898,
+    "n": 16201
+   },
+   {
+    "name": "Koblenz Hbf",
+    "lat": 50.350929,
+    "lon": 7.588345,
+    "n": 1633
+   },
+   {
+    "name": "Köln Hbf",
+    "lat": 50.94303,
+    "lon": 6.958729,
+    "n": 2600
+   },
+   {
+    "name": "Köln Messe/Deutz",
+    "lat": 50.940874,
+    "lon": 6.975001,
+    "n": 608
+   },
+   {
+    "name": "Leipzig Hbf",
+    "lat": 51.3454712,
+    "lon": 12.3820639,
+    "n": 803
+   },
+   {
+    "name": "Lüneburg",
+    "lat": 53.249656,
+    "lon": 10.41989,
+    "n": 6060
+   },
+   {
+    "name": "Mainz Hbf",
+    "lat": 50.001117,
+    "lon": 8.25872,
+    "n": 1426
+   },
+   {
+    "name": "Münster (Westf) Hbf",
+    "lat": 51.956566,
+    "lon": 7.635715,
+    "n": 2694
+   },
+   {
+    "name": "Osnabrück Hbf",
+    "lat": 52.272851,
+    "lon": 8.061781,
+    "n": 2242
+   },
+   {
+    "name": "Solingen Hbf",
+    "lat": 51.160766,
+    "lon": 7.004187,
+    "n": 585
+   },
+   {
+    "name": "Uelzen",
+    "lat": 52.969781,
+    "lon": 10.553053,
+    "n": 5604
+   },
+   {
+    "name": "Wuppertal Hbf",
+    "lat": 51.254363,
+    "lon": 7.149543,
+    "n": 557
+   }
+  ]
+ },
+ "panel": {
+  "stops_before_panel_filter": 159543,
+  "stops_removed_outside_panel": 7099,
+  "stations_removed_outside_panel": [
+   "Andernach",
+   "Bad Bevensen",
+   "Bingen (Rhein) Hbf",
+   "Büchen",
+   "Celle Pbf",
+   "Düsseldorf Flughafen",
+   "Eisenach Hbf",
+   "Frankfurt (Main) Flughafen Regionalbahnhof",
+   "Frankfurt (Main) West",
+   "Frankfurt am Main Flughafen Fernbahnhof",
+   "Friedberg (Hess)",
+   "Günzburg",
+   "Hannover-Messe / Laatzen",
+   "Köln Süd",
+   "Ludwigslust",
+   "Lutherstadt Wittenberg Hbf",
+   "Marburg (Lahn)",
+   "Offenbach (Main) Hbf",
+   "Recklinghausen Hbf",
+   "Remagen",
+   "Siegburg/Bonn",
+   "Treysa",
+   "Wabern (Bz Kassel)",
+   "Wittenberge"
+  ]
+ },
+ "shared_runs": {
+  "berlin": 695,
+  "hamburg": 2559,
+  "frankfurt": 2554
+ }
+}

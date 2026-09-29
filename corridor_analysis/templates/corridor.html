@@ -1,0 +1,389 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{label}} → {{dest_label}} Corridor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+{{STYLE}}
+
+<div id="tip" hidden></div>
+<div class="wrap">
+
+<header class="hero">
+  <div class="hero-text">
+    <div class="eyebrow">Project in Data Science · corridor analysis</div>
+    <h1>{{label}} <span class="arrow">→</span> {{dest_label}}</h1>
+    <p class="lede">Every ICE and IC run in our data that stopped at {{origin}} and later at {{dest_full}}, from 1 July 2024 to 31 August 2026. How late the trains arrive, which routes they take, when things go wrong, and what that means for the prediction task. This page uses railway data only, with no weather.</p>
+    <div class="figures">
+      <div class="figure"><b>{{fig_journeys}}</b><span>{{fig_journeys_text}}</span></div>
+      <div class="figure"><b>{{fig_punctual}}</b><span>of completed journeys reach {{dest_label}} less than 6 minutes late, DB's own definition of punctual</span></div>
+      <div class="figure"><b>{{fig_median}}</b><span>{{fig_median_text}}</span></div>
+      <div class="figure"><b>{{fig_soc}}</b><span>severe (60+ min late) or canceled: the positive class of the binary target</span></div>
+    </div>
+  </div>
+  <figure class="map-box" style="margin:0">
+    <div class="plot" id="map" role="img" aria-label="Map of the routes taken from {{label}} to {{dest_label}}, with line width by number of journeys"></div>
+    <figcaption>Recorded stop-to-stop segments used by at least 300 journeys, drawn straight between station coordinates. Line width shows the number of journeys. Hover a station or segment for counts.</figcaption>
+  </figure>
+</header>
+
+<section id="outcomes">
+  <div class="section-head">
+    <div class="eyebrow">Outcomes</div>
+    <h2>{{h_outcomes}}</h2>
+    <p>The severity classes follow the working definition in the project instructions. Delay is measured at {{dest_full}} as reported arrival minus scheduled arrival. A journey counts as canceled when its {{short}} departure or its {{dest_label}} arrival is canceled.</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Journeys by severity class</div>
+    <div class="plot" id="classbar"></div>
+    <div class="legend" id="classlegend"></div>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Arrival delay at {{dest_full}}, completed journeys</div>
+    <div class="chart-sub">5-minute bins, colored by severity class. <span id="histnote"></span></div>
+    <div class="plot" id="hist"></div>
+  </div>
+</section>
+
+<section id="routes">
+  <div class="section-head">
+    <div class="eyebrow">Routes</div>
+    <h2>{{h_routes}}</h2>
+    <p>{{p_routes}}</p>
+  </div>
+  <div class="chart">
+    <div class="table-wrap">
+      <table id="famtable">
+        <thead><tr><th>Route family</th><th class="r">Journeys</th><th class="r">Scheduled</th><th class="r">Median delay</th><th class="r">Severe or canceled</th><th>Class mix</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="legend" id="famclasslegend"></div>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Scheduled {{label}} → {{dest_label}} travel time</div>
+    <div class="chart-sub">Journeys per 15-minute band, by route family. <span id="schednote"></span></div>
+    <div class="plot" id="sched"></div>
+    <div class="legend" id="famlegend"></div>
+  </div>
+  <p class="callout">{{callout_routes}}</p>
+</section>
+
+<section id="time">
+  <div class="section-head">
+    <div class="eyebrow">Over time</div>
+    <h2>{{h_time}}</h2>
+    <p>{{p_time}}</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Share of journeys that were moderate, severe or canceled, by month of departure</div>
+    <div class="chart-sub">The rest of each month, up to 100%, is normal or minor.</div>
+    <div class="plot" id="monthly"></div>
+    <div class="legend" id="monthlegend"></div>
+    <details><summary>Show the monthly table</summary><div class="table-wrap"><table id="monthtable"></table></div></details>
+  </div>
+  <div class="two">
+    <div class="chart">
+      <div class="chart-title">Severe or canceled, by scheduled {{short}} departure hour</div>
+      <div class="chart-sub">{{sub_hourly}} Paler columns have fewer than 300 journeys.</div>
+      <div class="plot" id="hourly"></div>
+    </div>
+    <div class="chart">
+      <div class="chart-title">Severe or canceled, by weekday</div>
+      <div class="chart-sub">{{sub_weekday}}</div>
+      <div class="plot" id="weekday"></div>
+    </div>
+  </div>
+</section>
+
+<section id="enroute">
+  <div class="section-head">
+    <div class="eyebrow">Along the way</div>
+    <h2>{{h_enroute}}</h2>
+    <p>{{p_enroute}}</p>
+  </div>
+  <div class="chart">
+    <div class="chart-title">Trains late at each stop, {{main_label}}</div>
+    <div class="chart-sub">Departure delay, or arrival delay at {{dest_label}}. Canceled stops are left out. Stations served by at least 12% of this family's {{main_n}} journeys; not every run stops at every station.</div>
+    <div class="plot" id="buildup"></div>
+    <div class="legend"><span><i style="background:var(--sev-severe)"></i>20 min or more late</span><span><i style="background:var(--sev-moderate)"></i>6 to 19 min late</span></div>
+  </div>
+  <div class="section-head">
+    <p>{{p_corr}}</p>
+  </div>
+  <div class="three" id="enroutegrid"></div>
+</section>
+
+<section id="cancel">
+  <div class="section-head">
+    <div class="eyebrow">Cancellations</div>
+    <h2>{{h_cancel}}</h2>
+    <p>{{p_cancel}}</p>
+  </div>
+  <div class="chart">
+    <div class="plot" id="cancelbars"></div>
+  </div>
+</section>
+
+<section id="trains">
+  <div class="section-head">
+    <div class="eyebrow">Individual trains</div>
+    <h2>{{h_trains}}</h2>
+    <p>{{p_trains}}</p>
+  </div>
+  <div class="two">
+    <div class="chart"><div class="chart-title">Least reliable</div><div class="table-wrap"><table id="worst"></table></div></div>
+    <div class="chart"><div class="chart-title">Most reliable</div><div class="table-wrap"><table id="best"></table></div></div>
+  </div>
+</section>
+
+<section id="quality">
+  <div class="section-head">
+    <div class="eyebrow">Data quality</div>
+    <h2>What to watch for in the data</h2>
+  </div>
+  <ul class="notes">
+    {{quality_items}}
+  </ul>
+</section>
+
+<section id="next">
+  <div class="section-head">
+    <div class="eyebrow">For the project</div>
+    <h2>Questions this raises</h2>
+  </div>
+  <div class="qa">
+    {{questions}}
+  </div>
+</section>
+
+<footer>
+  <div>Source: <span class="mono">corridor_analysis/data/journeys.parquet</span> and <span class="mono">stops.parquet</span>, built by <span class="mono">corridor_analysis/extract.py</span> from the Deutsche Bahn timetable data collected by piebro/deutsche-bahn-data (CC BY 4.0). Stops are limited to stations present in all monthly files. Station coordinates from db-stations 5.0.2.</div>
+  <div>Delay classes: normal/minor under 20 min, moderate 20–59 min, severe 60 min or more, canceled if the {{short}} departure or {{dest_label}} arrival is canceled. Route families are our own grouping of the recorded stop patterns.</div>
+</footer>
+</div>
+
+<script>
+const D = {{DATA}};
+{{COMMON}}
+const SLOTS = ["fam-1", "fam-2", "fam-3", "fam-4"];
+const FAM = {};
+D.families.forEach((f, i) => { FAM[f.key] = { ...f, color: f.key === "other" ? "fam-other" : SLOTS[i] }; });
+const FAM_ORDER = D.families.map((f) => f.key);
+
+/* Map with greedy label placement: larger stations first, first free side wins. */
+register(function drawMap() {
+  const el = $("#map"), W = el.clientWidth;
+  const st = D.map.stations, byName = Object.fromEntries(st.map((s) => [s.name, s]));
+  const kx = Math.cos(50.3 * Math.PI / 180);
+  const xs = st.map((s) => s.lon * kx), ys = st.map((s) => s.lat);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const padL = 64, padR = 72, padT = 18, padB = 24;
+  const scale = (W - padL - padR) / (maxX - minX);
+  const H = Math.round((maxY - minY) * scale + padT + padB);
+  const px = (s) => padL + (s.lon * kx - minX) * scale, py = (s) => padT + (maxY - s.lat) * scale;
+  const maxN = Math.max(...D.map.segments.map((s) => s.n));
+  const sw = (n) => 1.2 + 10 * Math.sqrt(n / maxN);
+  const segs = [...D.map.segments].sort((a, b) => a.n - b.n).map((s) => {
+    const a = byName[s.a], b = byName[s.b];
+    return `<line x1="${px(a)}" y1="${py(a)}" x2="${px(b)}" y2="${py(b)}" stroke="var(--track)" stroke-opacity="0.78" stroke-width="${sw(s.n)}" stroke-linecap="round"/>` +
+      `<line class="hit" x1="${px(a)}" y1="${py(a)}" x2="${px(b)}" y2="${py(b)}" stroke="transparent" stroke-width="${Math.max(12, sw(s.n) + 6)}" data-tip="<b>${esc(s.a)} → ${esc(s.b)}</b><br>${fmt(s.n)} journeys"/>`;
+  }).join("");
+  const rad = (s) => (s.n > 0.5 * D.overview.journeys ? 5.5 : s.n > 0.2 * D.overview.journeys ? 4.5 : 3.5);
+  const dots = st.map((s) => `<circle cx="${px(s)}" cy="${py(s)}" r="${rad(s)}" fill="var(--surface)" stroke="var(--track)" stroke-width="2" data-tip="<b>${esc(s.name)}</b><br>${fmt(s.n)} journeys stop here" tabindex="0"/>`).join("");
+  el.innerHTML = `<svg width="${W}" height="${H}">${segs}${dots}<g class="labels"></g></svg>`;
+  const svg = el.querySelector("svg"), g = svg.querySelector(".labels");
+  const short = (n) => n.replace(" Hauptbahnhof", " Hbf").replace(/ \(Main\)| \(Saale\)| \(Westf\)/, "").replace(/ Hbf$/, "").replace("Kassel-Wilhelmshöhe", "Kassel");
+  const ends = [D.origin, D.destination];
+  const placed = st.map((s) => { const r = rad(s) + 1; return { l: px(s) - r, r: px(s) + r, t: py(s) - r, b: py(s) + r }; });
+  const order = [...st].sort((a, b) => (ends.includes(b.name) - ends.includes(a.name)) || b.n - a.n);
+  const hit = (a, b) => a.l < b.r && b.l < a.r && a.t < b.b && b.t < a.b;
+  order.forEach((s) => {
+    const r = rad(s), x = px(s), y = py(s), major = ends.includes(s.name);
+    const name = major ? (s.name === D.origin ? D.short.replace(" Hauptbahnhof", " Hbf") : D.destination.replace(" Hauptbahnhof", " Hbf").replace(" (Main)", "")) : short(s.name);
+    const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    t.setAttribute("class", major ? "lab-strong" : "lab"); t.textContent = name; g.appendChild(t);
+    const cands = [[x + r + 5, y + 4, "start"], [x - r - 5, y + 4, "end"], [x, y - r - 5, "middle"], [x, y + r + 14, "middle"]];
+    for (const [cx, cy, anchor] of cands) {
+      t.setAttribute("x", cx); t.setAttribute("y", cy); t.setAttribute("text-anchor", anchor);
+      const b = t.getBBox(), box = { l: b.x - 2, r: b.x + b.width + 2, t: b.y, b: b.y + b.height };
+      if (box.l >= 0 && box.r <= W && box.t >= 0 && box.b <= H && !placed.some((p) => hit(p, box))) { placed.push(box); return; }
+    }
+    t.remove();
+  });
+});
+
+/* Outcomes */
+legend($("#classlegend"), CLASSES);
+register(() => classBar($("#classbar"), D.overview.classes, D.overview.journeys));
+$("#histnote").textContent = `Not shown: ${fmt(D.hist_under_minus10)} journeys more than 10 min early and ${fmt(D.hist_over180)} 180 min or more late.`;
+register(function drawHist() {
+  const el = $("#hist"), W = el.clientWidth, H = 260, m = { l: 48, r: 10, t: 14, b: 34 };
+  const bins = D.hist, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const { max, step } = niceMax(Math.max(...bins.map((b) => b.n)));
+  const bw = iw / bins.length, w = Math.min(24, bw - 2), y = (v) => m.t + ih - (v / max) * ih;
+  let g = "";
+  for (let v = 0; v <= max; v += step) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+  const xOf = (min) => m.l + ((min + 10) / 5) * bw;
+  const bars = bins.map((b, i) => {
+    const color = b.lo < 20 ? "sev-normal" : b.lo < 60 ? "sev-moderate" : "sev-severe";
+    const x = m.l + i * bw + (bw - w) / 2;
+    return `<g class="hov" data-tip="<b>${b.lo} to ${b.lo + 4} min</b><br>${fmt(b.n)} journeys"><rect class="hit" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${ih}"/><path class="mark" d="${colPath(x, y(b.n), w, (b.n / max) * ih)}" fill="${css(color)}"/></g>`;
+  }).join("");
+  let ticks = "";
+  for (let t = 0; t <= 180; t += W < 560 ? 30 : 20) ticks += `<text x="${xOf(t)}" y="${H - m.b + 16}" text-anchor="middle">${t}</text>`;
+  ticks += `<text x="${W - m.r}" y="${H - 4}" text-anchor="end">minutes late</text>`;
+  const x6 = xOf(6);
+  const ref = `<line x1="${x6}" x2="${x6}" y1="${m.t}" y2="${m.t + ih}" stroke="var(--ink-2)" stroke-width="1"/><text class="lab" x="${x6 + 6}" y="${m.t + 10}">6 min: DB's limit for punctual</text>`;
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}${bars}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>${ref}${ticks}</svg>`;
+});
+
+/* Route families */
+$("#famtable tbody").innerHTML = D.families.map((f) => {
+  const F = FAM[f.key];
+  const bar = CLASSES.map((c) => `<span style="width:${(f[c.key] * 100).toFixed(2)}%;background:${css(c.color)}" data-tip="<b>${esc(f.label)}</b><br>${c.label}: ${pct(f[c.key])}"></span>`).join("");
+  return `<tr><td><span class="swatch" style="background:${css(F.color)}"></span><b>${f.label}</b><div class="muted" style="margin-left:18px">${f.via}</div></td>` +
+    `<td class="r"><span class="num">${fmt(f.n)}</span><div class="muted num">${pct(f.n / D.overview.journeys)}</div></td>` +
+    `<td class="r"><span class="num">${hm(f.sched)}</span></td><td class="r"><span class="num">${f.median} min</span></td>` +
+    `<td class="r"><span class="num">${pct(f.soc)}</span></td><td><div class="minibar">${bar}</div></td></tr>`;
+}).join("");
+legend($("#famclasslegend"), CLASSES);
+legend($("#famlegend"), FAM_ORDER.map((k) => FAM[k]));
+$("#schednote").textContent = D.sched_over ? `Not shown: ${fmt(D.sched_over)} journeys scheduled for ${hm(D.sched_hist[D.sched_hist.length - 1].lo + 15)} or longer.` : "";
+register(function drawSched() {
+  const el = $("#sched"), W = el.clientWidth, H = 240, m = { l: 48, r: 10, t: 12, b: 34 };
+  const bins = D.sched_hist, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const totals = bins.map((b) => FAM_ORDER.reduce((s, k) => s + (b[k] || 0), 0));
+  const { max, step } = niceMax(Math.max(...totals));
+  const bw = iw / bins.length, w = Math.min(24, bw - 2), y = (v) => m.t + ih - (v / max) * ih;
+  let g = "";
+  for (let v = 0; v <= max; v += step) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+  const bars = bins.map((b, i) => {
+    if (!totals[i]) return "";
+    const x = m.l + i * bw + (bw - w) / 2, present = FAM_ORDER.filter((k) => b[k] > 0);
+    let acc = 0, out = "";
+    present.forEach((k, j) => {
+      const h = (b[k] / max) * ih, top = y(acc + b[k]); acc += b[k];
+      const hh = Math.max(0, h - (j > 0 ? 2 : 0));
+      out += `<path class="mark" d="${j === present.length - 1 ? colPath(x, top, w, hh) : `M${x},${top}h${w}v${hh}h${-w}Z`}" fill="${css(FAM[k].color)}"/>`;
+    });
+    const t = `<b>${hm(b.lo)} to ${hm(b.lo + 14)}</b><br>` + present.map((k) => `${esc(FAM[k].label)}: ${fmt(b[k])}`).join("<br>");
+    return `<g class="hov" data-tip="${t}"><rect class="hit" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${ih}"/>${out}</g>`;
+  }).join("");
+  const lo = bins[0].lo, hi = bins[bins.length - 1].lo + 15, every = (hi - lo) / 60 > 6 || W < 560 ? 120 : 60;
+  let ticks = "";
+  for (let t = Math.floor(lo / 60) * 60 + 60; t <= hi; t += every) ticks += `<text x="${m.l + ((t - lo) / 15) * bw}" y="${H - m.b + 16}" text-anchor="middle">${t / 60} h</text>`;
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}${bars}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>${ticks}</svg>`;
+});
+
+/* Monthly stacked columns */
+const MSTACK = [CLASSES[3], CLASSES[2], CLASSES[1]];
+legend($("#monthlegend"), [...MSTACK].reverse());
+register(function drawMonthly() {
+  const el = $("#monthly"), W = el.clientWidth, H = 280, m = { l: 44, r: 8, t: 12, b: 40 };
+  const rows = D.monthly, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const max = Math.max(0.3, Math.ceil(Math.max(...rows.map((r) => 1 - r.normal_minor)) * 10) / 10), y = (v) => m.t + ih - (v / max) * ih;
+  const bw = iw / rows.length, w = Math.min(24, bw - 3);
+  let g = "";
+  for (let v = 0; v <= max + 1e-9; v += 0.1) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${Math.round(v * 100)}%</text>`;
+  const cols = rows.map((r, i) => {
+    const x = m.l + i * bw + (bw - w) / 2; let acc = 0, out = "";
+    MSTACK.forEach((c, j) => {
+      const v = r[c.key] || 0, h = (v / max) * ih, top = y(acc + v); acc += v;
+      const hh = Math.max(0, h - (j > 0 ? 2 : 0));
+      out += `<path class="mark" d="${j === MSTACK.length - 1 ? colPath(x, top, w, hh) : `M${x},${top}h${w}v${hh}h${-w}Z`}" fill="${css(c.color)}"/>`;
+    });
+    const t = `<b>${mlabel(r.month)}</b> · ${fmt(r.n)} journeys<br>Moderate ${pct(r.moderate)}<br>Severe ${pct(r.severe)}<br>Canceled ${pct(r.canceled)}<br>Mean delay ${r.mean} min`;
+    return `<g class="hov" data-tip="${t}"><rect class="hit" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${ih}"/>${out}</g>`;
+  }).join("");
+  let ticks = "";
+  rows.forEach((r, i) => {
+    const mo = +r.month.slice(5), x = m.l + i * bw + bw / 2;
+    if (W < 560 ? mo === 1 || mo === 7 : mo % 3 === 1) ticks += `<text x="${x}" y="${H - m.b + 16}" text-anchor="middle">${MONTHS[mo - 1]}</text>`;
+    if (mo === 1 || i === 0) ticks += `<text class="lab" x="${x}" y="${H - m.b + 32}" text-anchor="middle">${r.month.slice(0, 4)}</text>`;
+  });
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}${cols}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/>${ticks}</svg>`;
+});
+$("#monthtable").innerHTML = `<thead><tr><th>Month</th><th class="r">Journeys</th><th class="r">Mean delay</th><th class="r">Moderate</th><th class="r">Severe</th><th class="r">Canceled</th></tr></thead><tbody>` +
+  D.monthly.map((r) => `<tr><td>${mlabel(r.month)}</td><td class="r num">${fmt(r.n)}</td><td class="r num">${r.mean} min</td><td class="r num">${pct(r.moderate)}</td><td class="r num">${pct(r.severe)}</td><td class="r num">${pct(r.canceled)}</td></tr>`).join("") + "</tbody>";
+
+/* Hour of day and weekday */
+function columns(el, rows, { label, tipOf, tickEvery = 1 }) {
+  const W = el.clientWidth, H = 220, m = { l: 40, r: 6, t: 12, b: 30 }, iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const shown = rows.filter((r) => r.n >= 300);
+  const max = Math.max(0.2, Math.ceil(Math.max(...shown.map((r) => r.soc)) * 20) / 20);
+  const y = (v) => m.t + ih - (Math.min(v, max) / max) * ih, bw = iw / rows.length, w = Math.min(24, bw - 3);
+  let g = "";
+  for (let v = 0; v <= max + 1e-9; v += 0.05) g += `<line class="gridline" x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}"/><text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${Math.round(v * 100)}%</text>`;
+  const cols = rows.map((r, i) => {
+    const x = m.l + i * bw + (bw - w) / 2, h = (Math.min(r.soc, max) / max) * ih;
+    const tick = i % tickEvery === 0 ? `<text x="${m.l + i * bw + bw / 2}" y="${H - m.b + 16}" text-anchor="middle">${label(r)}</text>` : "";
+    return `<g class="hov" data-tip="${tipOf(r)}"><rect class="hit" x="${m.l + i * bw}" y="${m.t}" width="${bw}" height="${ih}"/><path class="mark" d="${colPath(x, y(r.soc), w, h)}" fill="var(--sev-severe)" fill-opacity="${r.n < 300 ? 0.4 : 1}"/></g>${tick}`;
+  }).join("");
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}${cols}<line class="baseline" x1="${m.l}" x2="${W - m.r}" y1="${m.t + ih}" y2="${m.t + ih}"/></svg>`;
+}
+const HOURS = Array.from({ length: 24 }, (_, h) => D.hourly.find((r) => r.hour === h) || { hour: h, n: 0, soc: 0, mean: 0, sched: 0 });
+const hh = (h) => String(h).padStart(2, "0");
+register(() => columns($("#hourly"), HOURS, {
+  label: (r) => hh(r.hour), tickEvery: $("#hourly").clientWidth < 420 ? 4 : 2,
+  tipOf: (r) => r.n ? `<b>${hh(r.hour)}:00–${hh(r.hour)}:59</b><br>${fmt(r.n)} journeys<br>Severe or canceled ${pct(r.soc)}<br>Median scheduled time ${hm(r.sched)}` : `<b>${hh(r.hour)}:00–${hh(r.hour)}:59</b><br>No journeys`,
+}));
+register(() => columns($("#weekday"), D.weekday, {
+  label: (r) => WD[r.wd],
+  tipOf: (r) => `<b>${WD[r.wd]}</b><br>${fmt(r.n)} journeys<br>Severe or canceled ${pct(r.soc)}<br>Canceled ${pct(r.canc)}<br>Mean delay ${r.mean} min`,
+}));
+
+/* Delay build-up along the main family */
+const stationShort = (n, narrow) => narrow ? n.replace(" Hauptbahnhof", "").replace(/ \(Main\)| \(Saale\)| \(Westf\)/, "").replace(" Hbf", "").replace("Kassel-Wilhelmshöhe", "Kassel") : n.replace(" Hauptbahnhof", " Hbf");
+register(function drawBuildup() {
+  const el = $("#buildup"), W = el.clientWidth, rows = D.buildup, narrow = W < 520;
+  const labW = narrow ? 96 : Math.min(210, W * 0.38), m = { l: labW, r: 44, t: 6, b: 26 }, rowH = 30, bh = 16;
+  const H = m.t + rows.length * rowH + m.b, iw = W - m.l - m.r;
+  const max = Math.ceil(Math.max(...rows.map((r) => r.p6)) * 10 + 0.5) / 10, x = (v) => m.l + (v / max) * iw;
+  let g = "";
+  for (let v = 0; v <= max + 1e-9; v += 0.1) g += `<line class="gridline" x1="${x(v)}" x2="${x(v)}" y1="${m.t}" y2="${H - m.b}"/><text x="${x(v)}" y="${H - 8}" text-anchor="middle">${Math.round(v * 100)}%</text>`;
+  const bars = rows.map((r, i) => {
+    const yy = m.t + i * rowH + (rowH - bh) / 2, w20 = x(r.p20) - m.l, w6 = x(r.p6) - m.l;
+    const t = `<b>${esc(r.station)}</b><br>Scheduled ${hm(r.mins)} after ${esc(D.short)}<br>${pct(r.p6)} at least 6 min late<br>${pct(r.p20)} at least 20 min late<br>Mean delay ${r.mean} min · ${fmt(r.n)} trains`;
+    return `<g class="hov" data-tip="${t}"><rect class="hit" x="0" y="${m.t + i * rowH}" width="${W}" height="${rowH}"/>` +
+      `<text class="lab" x="0" y="${yy + bh - 3}">${stationShort(r.station, narrow)}</text>` + (narrow ? "" : `<text x="${labW - 10}" y="${yy + bh - 3}" text-anchor="end">+${hm(r.mins).replace(" h ", ":")}</text>`) +
+      `<path class="mark" d="M${m.l},${yy}h${Math.max(0, w20 - 1)}v${bh}h${-Math.max(0, w20 - 1)}Z" fill="var(--sev-severe)"/>` +
+      `<path class="mark" d="${barPath(m.l + w20 + 1, yy, Math.max(0, w6 - w20 - 1), bh)}" fill="var(--sev-moderate)"/>` +
+      `<text class="val" x="${x(r.p6) + 6}" y="${yy + bh - 3}">${pct(r.p6, 0)}</text></g>`;
+  }).join("");
+  el.innerHTML = `<svg width="${W}" height="${H}">${g}<line class="baseline" x1="${m.l}" x2="${m.l}" y1="${m.t}" y2="${H - m.b}"/>${bars}</svg>`;
+});
+
+/* Delay at earlier stops vs outcome */
+$("#enroutegrid").innerHTML = D.enroute.map((e) => `<div class="chart"><div class="chart-title">Delay leaving ${stationShort(e.station, false)}</div><div class="chart-sub">${fmt(e.n)} trains · share that end severe or canceled</div><div class="table-wrap"><table>
+    <thead><tr><th>Delay</th><th class="r">Trains</th><th>Severe or canceled</th></tr></thead><tbody>` +
+  e.rows.map((r) => `<tr><td class="num">${r.b} min</td><td class="r num">${fmt(r.n)}</td><td>${r.soc == null ? "–" : `<div class="cellbar"><div class="bar" style="width:${Math.max(2, r.soc * 90)}px"></div><span class="num">${pct(r.soc, 0)}</span></div>`}</td></tr>`).join("") +
+  `</tbody></table></div></div>`).join("");
+
+/* Cancellations */
+register(function drawCancel() {
+  const el = $("#cancelbars"), W = el.clientWidth, c = D.cancel, o = stationShort(D.short, false);
+  const rows = [
+    { label: "Canceled at both ends", n: c.both, counted: true },
+    { label: `Left ${o}, never reached ${D.dest_label}`, n: c.dest_only, counted: true },
+    { label: `Canceled at ${o}, ran later on`, n: c.origin_only, counted: true },
+    { label: "Only intermediate stops canceled", n: c.intermediate_only, counted: false },
+  ];
+  const narrow = W < 560, labW = narrow ? 0 : Math.min(290, W * 0.5), m = { l: labW, r: 56 }, rowH = narrow ? 50 : 34, bh = 18, H = rows.length * rowH + 4;
+  const max = Math.max(...rows.map((r) => r.n)), x = (v) => (v / max) * (W - m.l - m.r);
+  el.innerHTML = `<svg width="${W}" height="${H}">` + rows.map((r, i) => {
+    const yy = narrow ? i * rowH + 22 : i * rowH + (rowH - bh) / 2, ly = narrow ? i * rowH + 14 : yy + bh - 4;
+    return `<g class="hov" data-tip="<b>${r.label}</b><br>${fmt(r.n)} journeys${r.counted ? "" : "<br>Not counted as canceled"}"><rect class="hit" x="0" y="${i * rowH}" width="${W}" height="${rowH}"/>` +
+      `<text class="lab" x="0" y="${ly}">${r.label}${r.counted ? "" : " *"}</text>` +
+      `<path class="mark" d="${barPath(m.l, yy, x(r.n), bh)}" fill="${r.counted ? "var(--sev-canceled)" : "var(--sev-normal)"}"/><text class="val" x="${m.l + x(r.n) + 6}" y="${yy + bh - 4}">${fmt(r.n)}</text></g>`;
+  }).join("") + `</svg><p class="muted" style="font-size:var(--step--1);margin-top:6px">* Not counted as canceled under our definition.</p>`;
+});
+
+/* Trains */
+function trainTable(el, rows) {
+  el.innerHTML = `<thead><tr><th>Train</th><th>Leaves ${esc(stationShort(D.short, true))}</th><th>Route</th><th class="r">Runs</th><th class="r">Severe or canceled</th></tr></thead><tbody>` +
+    rows.map((t) => `<tr><td class="num">${t.type} ${t.train}</td><td class="num">${t.dep}</td><td data-tip="${esc(FAM[t.fam].label)}"><span class="swatch" style="background:${css(FAM[t.fam].color)}"></span>${hm(t.sched)}</td><td class="r num">${fmt(t.n)}</td><td class="r num">${pct(t.soc)}</td></tr>`).join("") + "</tbody>";
+}
+trainTable($("#worst"), D.trains_worst);
+trainTable($("#best"), D.trains_best);
+</script>
