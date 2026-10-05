@@ -26,3 +26,6 @@ alex-thesis-project-summary.html
 # Rebuild them with the scripts listed in corridor_analysis/README.md.
 corridor_analysis/data/*.parquet
 corridor_analysis/cache/
+
+# Arrival-delay datasets: generated parquet files. Rebuild with arrival_delays/extract.py.
+arrival_delays/data/*.parquet
