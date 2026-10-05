@@ -1,0 +1,26 @@
+{
+  "source_files": 26,
+  "source_rows": 5547636,
+  "duplicate_ids_dropped": 0,
+  "runs": 641240,
+  "stop_rows": 5547636,
+  "stop_dropped_no_planned_arrival": 541971,
+  "stop_dropped_no_actual_arrival": 0,
+  "stop_dropped_canceled": 343548,
+  "stop_dropped_outside_panel": 601002,
+  "stop_kept": 4061115,
+  "stop_kept_by_type": {
+    "ICE": 3407523,
+    "IC": 653592
+  },
+  "terminus_rows": 641240,
+  "terminus_dropped_no_planned_arrival": 9469,
+  "terminus_dropped_no_actual_arrival": 0,
+  "terminus_dropped_canceled": 48438,
+  "terminus_dropped_outside_panel": 24909,
+  "terminus_kept": 558424,
+  "terminus_kept_by_type": {
+    "ICE": 430324,
+    "IC": 128100
+  }
+}
