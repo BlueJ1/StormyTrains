@@ -1,0 +1,85 @@
+{
+  "source_files": [
+    "data-2024-07.parquet",
+    "data-2024-08.parquet",
+    "data-2024-09.parquet",
+    "data-2024-10.parquet",
+    "data-2024-11.parquet",
+    "data-2024-12.parquet",
+    "data-2025-01.parquet",
+    "data-2025-02.parquet",
+    "data-2025-03.parquet",
+    "data-2025-04.parquet",
+    "data-2025-05.parquet",
+    "data-2025-06.parquet",
+    "data-2025-07.parquet",
+    "data-2025-08.parquet",
+    "data-2025-09.parquet",
+    "data-2025-10.parquet",
+    "data-2025-11.parquet",
+    "data-2025-12.parquet",
+    "data-2026-01.parquet",
+    "data-2026-02.parquet",
+    "data-2026-03.parquet",
+    "data-2026-04.parquet",
+    "data-2026-05.parquet",
+    "data-2026-06.parquet",
+    "data-2026-07.parquet",
+    "data-2026-08.parquet",
+    "data-2026-09.parquet"
+  ],
+  "extraction": {
+    "journeys_with_multiple_endpoint_pairs": 4,
+    "sequence_only_candidate_journeys": 23459,
+    "excluded_reverse_endpoint_candidates": 11,
+    "journeys": 23448,
+    "stops_removed_outside_panel": 4824
+  },
+  "shared_departures": {
+    "journeys_in_shared_departures": 2765,
+    "groups": 1341,
+    "groups_all_completed": 942,
+    "groups_all_canceled": 101,
+    "groups_canceled_and_completed": 298,
+    "kept_replacement_trains_from_canceled_and_completed": 265,
+    "journeys_removed": 1424
+  },
+  "journeys": 22024,
+  "cv_journeys": 12084,
+  "holdout_journeys": 9940,
+  "cv_first": "2024-07-01 00:17:00",
+  "cv_last": "2025-09-30 20:54:00",
+  "holdout_first": "2025-10-01 02:25:00",
+  "holdout_last": "2026-09-30 19:57:00",
+  "run_stops_read": 131955,
+  "run_stops_off_panel": 15173,
+  "cancellations": {
+    "last_snapshot_utc": "2026-10-01 00:36:34.186277",
+    "canceled": 1219,
+    "canceled_without_announcement_time": 0,
+    "withdrawn": 78
+  },
+  "left_out_known_cancellation": {
+    "cv": {
+      "24h": 16,
+      "6h": 57,
+      "1h": 206,
+      "20min": 276,
+      "0min": 303
+    },
+    "holdout": {
+      "24h": 35,
+      "6h": 99,
+      "1h": 273,
+      "20min": 356,
+      "0min": 393
+    }
+  },
+  "current_delay_known": {
+    "current_delay_24h": 0,
+    "current_delay_6h": 1155,
+    "current_delay_1h": 18758,
+    "current_delay_20min": 18858,
+    "current_delay_0min": 19776
+  }
+}

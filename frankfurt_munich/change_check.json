@@ -1,0 +1,417 @@
+{
+  "snapshots_last_day": "2026-10-01",
+  "journeys_covered": 21993,
+  "by_split": {
+    "cv": 12084,
+    "holdout": 9909
+  },
+  "arrival_source": {
+    "after arrival": 20635,
+    "cancelled": 1219,
+    "before arrival": 132,
+    "around arrival": 6,
+    "no snapshot": 1
+  },
+  "arrival_source_by_month": {
+    "2024-07": {
+      "after arrival": 978,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 36,
+      "no snapshot": 0
+    },
+    "2024-08": {
+      "after arrival": 771,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 29,
+      "no snapshot": 0
+    },
+    "2024-09": {
+      "after arrival": 744,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 30,
+      "no snapshot": 0
+    },
+    "2024-10": {
+      "after arrival": 786,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 26,
+      "no snapshot": 0
+    },
+    "2024-11": {
+      "after arrival": 764,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 43,
+      "no snapshot": 0
+    },
+    "2024-12": {
+      "after arrival": 866,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 38,
+      "no snapshot": 0
+    },
+    "2025-01": {
+      "after arrival": 920,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 56,
+      "no snapshot": 0
+    },
+    "2025-02": {
+      "after arrival": 518,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 26,
+      "no snapshot": 0
+    },
+    "2025-03": {
+      "after arrival": 584,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 29,
+      "no snapshot": 0
+    },
+    "2025-04": {
+      "after arrival": 660,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 35,
+      "no snapshot": 0
+    },
+    "2025-05": {
+      "after arrival": 691,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 22,
+      "no snapshot": 0
+    },
+    "2025-06": {
+      "after arrival": 819,
+      "around arrival": 4,
+      "before arrival": 6,
+      "cancelled": 62,
+      "no snapshot": 0
+    },
+    "2025-07": {
+      "after arrival": 819,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 61,
+      "no snapshot": 0
+    },
+    "2025-08": {
+      "after arrival": 749,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 38,
+      "no snapshot": 0
+    },
+    "2025-09": {
+      "after arrival": 833,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 41,
+      "no snapshot": 0
+    },
+    "2025-10": {
+      "after arrival": 814,
+      "around arrival": 0,
+      "before arrival": 0,
+      "cancelled": 38,
+      "no snapshot": 0
+    },
+    "2025-11": {
+      "after arrival": 690,
+      "around arrival": 2,
+      "before arrival": 5,
+      "cancelled": 36,
+      "no snapshot": 0
+    },
+    "2025-12": {
+      "after arrival": 848,
+      "around arrival": 0,
+      "before arrival": 5,
+      "cancelled": 30,
+      "no snapshot": 0
+    },
+    "2026-01": {
+      "after arrival": 815,
+      "around arrival": 0,
+      "before arrival": 6,
+      "cancelled": 57,
+      "no snapshot": 1
+    },
+    "2026-02": {
+      "after arrival": 702,
+      "around arrival": 0,
+      "before arrival": 3,
+      "cancelled": 49,
+      "no snapshot": 0
+    },
+    "2026-03": {
+      "after arrival": 778,
+      "around arrival": 0,
+      "before arrival": 3,
+      "cancelled": 79,
+      "no snapshot": 0
+    },
+    "2026-04": {
+      "after arrival": 791,
+      "around arrival": 0,
+      "before arrival": 2,
+      "cancelled": 41,
+      "no snapshot": 0
+    },
+    "2026-05": {
+      "after arrival": 762,
+      "around arrival": 0,
+      "before arrival": 17,
+      "cancelled": 50,
+      "no snapshot": 0
+    },
+    "2026-06": {
+      "after arrival": 707,
+      "around arrival": 0,
+      "before arrival": 7,
+      "cancelled": 112,
+      "no snapshot": 0
+    },
+    "2026-07": {
+      "after arrival": 773,
+      "around arrival": 0,
+      "before arrival": 39,
+      "cancelled": 56,
+      "no snapshot": 0
+    },
+    "2026-08": {
+      "after arrival": 776,
+      "around arrival": 0,
+      "before arrival": 25,
+      "cancelled": 55,
+      "no snapshot": 0
+    },
+    "2026-09": {
+      "after arrival": 677,
+      "around arrival": 0,
+      "before arrival": 14,
+      "cancelled": 44,
+      "no snapshot": 0
+    }
+  },
+  "arrival_source_of_0_min": {
+    "after arrival": 1555,
+    "before arrival": 15,
+    "no snapshot": 1
+  },
+  "arrival_source_of_0_min_by_month": {
+    "2024-07": {
+      "after arrival": 50,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2024-08": {
+      "after arrival": 39,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2024-09": {
+      "after arrival": 37,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2024-10": {
+      "after arrival": 29,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2024-11": {
+      "after arrival": 34,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2024-12": {
+      "after arrival": 71,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-01": {
+      "after arrival": 78,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-02": {
+      "after arrival": 30,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-03": {
+      "after arrival": 30,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-04": {
+      "after arrival": 43,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-05": {
+      "after arrival": 50,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-06": {
+      "after arrival": 58,
+      "before arrival": 1,
+      "no snapshot": 0
+    },
+    "2025-07": {
+      "after arrival": 43,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-08": {
+      "after arrival": 41,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-09": {
+      "after arrival": 31,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-10": {
+      "after arrival": 24,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2025-11": {
+      "after arrival": 59,
+      "before arrival": 1,
+      "no snapshot": 0
+    },
+    "2025-12": {
+      "after arrival": 121,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2026-01": {
+      "after arrival": 44,
+      "before arrival": 0,
+      "no snapshot": 1
+    },
+    "2026-02": {
+      "after arrival": 63,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2026-03": {
+      "after arrival": 111,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2026-04": {
+      "after arrival": 85,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2026-05": {
+      "after arrival": 108,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2026-06": {
+      "after arrival": 65,
+      "before arrival": 0,
+      "no snapshot": 0
+    },
+    "2026-07": {
+      "after arrival": 65,
+      "before arrival": 6,
+      "no snapshot": 0
+    },
+    "2026-08": {
+      "after arrival": 90,
+      "before arrival": 5,
+      "no snapshot": 0
+    },
+    "2026-09": {
+      "after arrival": 56,
+      "before arrival": 2,
+      "no snapshot": 0
+    }
+  },
+  "arrival_reproduced_share": 1.0,
+  "request_after_arrival_min": {
+    "count": 20635.0,
+    "mean": 258.2,
+    "std": 135.1,
+    "min": 0.8,
+    "25%": 160.0,
+    "50%": 252.2,
+    "75%": 346.0,
+    "max": 1656.0
+  },
+  "request_before_arrival_min": {
+    "count": 132.0,
+    "mean": -74.8,
+    "std": 74.0,
+    "min": -341.6,
+    "25%": -132.0,
+    "50%": -46.9,
+    "75%": -13.2,
+    "max": -0.3
+  },
+  "0_min_arrivals_with_an_earlier_different_time": {
+    "2024-07": 19,
+    "2024-08": 13,
+    "2024-09": 7,
+    "2024-10": 15,
+    "2024-11": 14,
+    "2024-12": 13,
+    "2025-01": 25,
+    "2025-02": 14,
+    "2025-03": 10,
+    "2025-04": 15,
+    "2025-05": 19,
+    "2025-06": 16,
+    "2025-07": 22,
+    "2025-08": 11,
+    "2025-09": 13,
+    "2025-10": 10,
+    "2025-11": 30,
+    "2025-12": 63,
+    "2026-01": 20,
+    "2026-02": 40,
+    "2026-03": 55,
+    "2026-04": 24,
+    "2026-05": 18,
+    "2026-06": 21,
+    "2026-07": 22,
+    "2026-08": 19,
+    "2026-09": 22
+  },
+  "cancelled_in_cv": {
+    "journeys": 572,
+    "with_cancellation_time": 572,
+    "issued_before_planned_departure_by": {
+      "24h_or_more": 16,
+      "6h_or_more": 57,
+      "1h_or_more": 206,
+      "20min_or_more": 276,
+      "0min_or_more": 303
+    },
+    "issued_after_planned_departure": 269
+  },
+  "cancellation_withdrawn": {
+    "journeys_by_split": {
+      "holdout": 44,
+      "cv": 34
+    },
+    "cancelled_cv_journeys_withdrawn_at_both_ends": 0
+  }
+}
