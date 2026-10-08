@@ -9,3 +9,18 @@ Updated 29 September 2026.
 - This is observed weather, suitable for a prediction made at departure time, not a forecast dataset. Existing railway inputs and `eda.ipynb` were left unchanged.
 - `corridor_analysis/` applies the same railway-only journey definition to Hamburg Hbf → München (26,526 journeys), Frankfurt (Main) Hbf → München (22,544) and Hamburg Hbf → Frankfurt (Main) Hbf (21,557), and compares the three München corridors. See its README.
 - `arrival_delays/` holds two delay-only ICE/IC datasets for density estimation: every stop arrival (4.06 M) and each run's last recorded stop (558 k). Canceled and off-panel arrivals are excluded. See its README.
+
+# Decisions, 5–8 October 2026
+
+- Origin–destination pair: Frankfurt (Main) Hbf → München Hbf.
+- Prediction times: 24 h, 6 h, 1 h, 20 min and 0 min before the scheduled Frankfurt departure.
+- Cancelled means origin departure or destination arrival cancelled. A cancellation only at an intermediate stop does not count (this is what `extract.py` already does).
+- Four classes: under 20 min, 20–59 min, 60+ min, cancelled. Exactly 20 min is in the 20–59 class.
+- Hold-out set: one full year, October 2025 to September 2026, in its own file. July 2024 to September 2025 is for cross-validation: 5 folds, training on the first 6/12 to 10/12 and validating on the next 2/12, so validation windows overlap (`frankfurt_munich/folds.py`). Don't look at the hold-out year yet, except to check data quality.
+- Shared departures (same planned Frankfurt departure and München arrival under two train numbers): keep one, from the passenger's view. If any of them completed, the departure counts as completed (often a replacement train).
+- IC trains are kept. Negative `current_delay` values are kept; revisit later.
+- Model choice and tuning on the CV folds use multi-class log loss. Macro-F1 is reported at the end as well (also in the Google Doc). Probably one model per prediction time.
+- No prediction is made for a journey whose cancellation (Frankfurt departure or München arrival) is already announced at the prediction time. Journeys whose cancellation was announced and later withdrawn (the train ran) stay in at every prediction time, flagged as `cancellation_withdrawn` (34 in CV). Applied in `frankfurt_munich/data/prediction_rows_*.parquet`; it needs the live-update snapshots, since the monthly files have no `cancellation_time`.
+- Railway feature `current_delay`: the latest delay known at the prediction time. A train that has arrived at a stop but not yet left uses the delay accumulated at that moment. Not used at 24 h (always missing) and probably not at 6 h (93% missing). From 1 h on, missing values are not set to plain 0: use 0 plus a missing indicator for linear models, and leave them missing for tree models. The files keep the missing values.
+- `frankfurt_munich/` holds the modelling dataset: `journeys_cv.parquet` (Jul 2024–Sep 2025), `journeys_holdout.parquet` (Oct 2025–Sep 2026), and `prediction_rows_*.parquet` with one row per journey and prediction time. Its README lists the data-quality audit and the open issues.
+- Local data: the monthly files and live-update snapshots (`data/monthly_processed_data`, `data/monthly_processed_data_change`), July 2024 to September 2026, as rebuilt by the source on 6–8 October 2026; downloaded 8 October 2026 and checked against the SHA-256 sums. The files from before the rebuild are in `data/_old_pre_rebuild/` and can be deleted. Forecast arrival labels (10 in CV) are kept without a flag.

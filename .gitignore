@@ -8,6 +8,8 @@ __pycache__/
 
 # Raw monthly railway data (about 7 GB), obtained separately
 data/monthly_processed_data/
+data/monthly_processed_data_change/
+data/_old_pre_rebuild/
 
 # Berlin–München pipeline: raw downloads and large generated outputs.
 # Rebuild them with the scripts listed in berlin_munich_weather/README.md.
@@ -29,3 +31,6 @@ corridor_analysis/cache/
 
 # Arrival-delay datasets: generated parquet files. Rebuild with arrival_delays/extract.py.
 arrival_delays/data/*.parquet
+
+# Frankfurt–München dataset: generated parquet files. Rebuild with frankfurt_munich/build_dataset.py.
+frankfurt_munich/data/*.parquet
