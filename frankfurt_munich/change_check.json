@@ -1,13 +1,13 @@
 {
   "snapshots_last_day": "2026-10-01",
-  "journeys_covered": 21993,
+  "journeys_covered": 21800,
   "by_split": {
-    "cv": 12084,
-    "holdout": 9909
+    "cv": 11936,
+    "holdout": 9864
   },
   "arrival_source": {
-    "after arrival": 20635,
-    "cancelled": 1219,
+    "after arrival": 20471,
+    "cancelled": 1190,
     "before arrival": 132,
     "around arrival": 6,
     "no snapshot": 1
@@ -21,10 +21,10 @@
       "no snapshot": 0
     },
     "2024-08": {
-      "after arrival": 771,
+      "after arrival": 762,
       "around arrival": 0,
       "before arrival": 0,
-      "cancelled": 29,
+      "cancelled": 28,
       "no snapshot": 0
     },
     "2024-09": {
@@ -49,17 +49,17 @@
       "no snapshot": 0
     },
     "2024-12": {
-      "after arrival": 866,
+      "after arrival": 859,
       "around arrival": 0,
       "before arrival": 0,
-      "cancelled": 38,
+      "cancelled": 37,
       "no snapshot": 0
     },
     "2025-01": {
-      "after arrival": 920,
+      "after arrival": 900,
       "around arrival": 0,
       "before arrival": 0,
-      "cancelled": 56,
+      "cancelled": 52,
       "no snapshot": 0
     },
     "2025-02": {
@@ -70,73 +70,73 @@
       "no snapshot": 0
     },
     "2025-03": {
-      "after arrival": 584,
+      "after arrival": 582,
       "around arrival": 0,
       "before arrival": 0,
       "cancelled": 29,
       "no snapshot": 0
     },
     "2025-04": {
-      "after arrival": 660,
+      "after arrival": 653,
       "around arrival": 0,
       "before arrival": 0,
-      "cancelled": 35,
+      "cancelled": 32,
       "no snapshot": 0
     },
     "2025-05": {
-      "after arrival": 691,
+      "after arrival": 676,
       "around arrival": 0,
       "before arrival": 0,
       "cancelled": 22,
       "no snapshot": 0
     },
     "2025-06": {
-      "after arrival": 819,
+      "after arrival": 802,
       "around arrival": 4,
       "before arrival": 6,
-      "cancelled": 62,
+      "cancelled": 59,
       "no snapshot": 0
     },
     "2025-07": {
-      "after arrival": 819,
+      "after arrival": 802,
       "around arrival": 0,
       "before arrival": 0,
-      "cancelled": 61,
+      "cancelled": 55,
       "no snapshot": 0
     },
     "2025-08": {
-      "after arrival": 749,
+      "after arrival": 739,
       "around arrival": 0,
       "before arrival": 0,
-      "cancelled": 38,
+      "cancelled": 34,
       "no snapshot": 0
     },
     "2025-09": {
-      "after arrival": 833,
+      "after arrival": 813,
       "around arrival": 0,
       "before arrival": 0,
-      "cancelled": 41,
+      "cancelled": 39,
       "no snapshot": 0
     },
     "2025-10": {
-      "after arrival": 814,
+      "after arrival": 797,
       "around arrival": 0,
       "before arrival": 0,
-      "cancelled": 38,
+      "cancelled": 35,
       "no snapshot": 0
     },
     "2025-11": {
-      "after arrival": 690,
+      "after arrival": 680,
       "around arrival": 2,
       "before arrival": 5,
-      "cancelled": 36,
+      "cancelled": 35,
       "no snapshot": 0
     },
     "2025-12": {
-      "after arrival": 848,
+      "after arrival": 838,
       "around arrival": 0,
       "before arrival": 5,
-      "cancelled": 30,
+      "cancelled": 29,
       "no snapshot": 0
     },
     "2026-01": {
@@ -147,7 +147,7 @@
       "no snapshot": 1
     },
     "2026-02": {
-      "after arrival": 702,
+      "after arrival": 701,
       "around arrival": 0,
       "before arrival": 3,
       "cancelled": 49,
@@ -182,7 +182,7 @@
       "no snapshot": 0
     },
     "2026-07": {
-      "after arrival": 773,
+      "after arrival": 771,
       "around arrival": 0,
       "before arrival": 39,
       "cancelled": 56,
@@ -204,7 +204,7 @@
     }
   },
   "arrival_source_of_0_min": {
-    "after arrival": 1555,
+    "after arrival": 1547,
     "before arrival": 15,
     "no snapshot": 1
   },
@@ -215,7 +215,7 @@
       "no snapshot": 0
     },
     "2024-08": {
-      "after arrival": 39,
+      "after arrival": 38,
       "before arrival": 0,
       "no snapshot": 0
     },
@@ -235,12 +235,12 @@
       "no snapshot": 0
     },
     "2024-12": {
-      "after arrival": 71,
+      "after arrival": 70,
       "before arrival": 0,
       "no snapshot": 0
     },
     "2025-01": {
-      "after arrival": 78,
+      "after arrival": 76,
       "before arrival": 0,
       "no snapshot": 0
     },
@@ -270,7 +270,7 @@
       "no snapshot": 0
     },
     "2025-07": {
-      "after arrival": 43,
+      "after arrival": 42,
       "before arrival": 0,
       "no snapshot": 0
     },
@@ -280,17 +280,17 @@
       "no snapshot": 0
     },
     "2025-09": {
-      "after arrival": 31,
+      "after arrival": 30,
       "before arrival": 0,
       "no snapshot": 0
     },
     "2025-10": {
-      "after arrival": 24,
+      "after arrival": 23,
       "before arrival": 0,
       "no snapshot": 0
     },
     "2025-11": {
-      "after arrival": 59,
+      "after arrival": 58,
       "before arrival": 1,
       "no snapshot": 0
     },
@@ -347,12 +347,12 @@
   },
   "arrival_reproduced_share": 1.0,
   "request_after_arrival_min": {
-    "count": 20635.0,
-    "mean": 258.2,
-    "std": 135.1,
+    "count": 20471.0,
+    "mean": 258.1,
+    "std": 135.5,
     "min": 0.8,
     "25%": 160.0,
-    "50%": 252.2,
+    "50%": 252.0,
     "75%": 346.0,
     "max": 1656.0
   },
@@ -373,16 +373,16 @@
     "2024-10": 15,
     "2024-11": 14,
     "2024-12": 13,
-    "2025-01": 25,
+    "2025-01": 24,
     "2025-02": 14,
     "2025-03": 10,
     "2025-04": 15,
     "2025-05": 19,
     "2025-06": 16,
-    "2025-07": 22,
+    "2025-07": 21,
     "2025-08": 11,
-    "2025-09": 13,
-    "2025-10": 10,
+    "2025-09": 12,
+    "2025-10": 9,
     "2025-11": 30,
     "2025-12": 63,
     "2026-01": 20,
@@ -396,21 +396,21 @@
     "2026-09": 22
   },
   "cancelled_in_cv": {
-    "journeys": 572,
-    "with_cancellation_time": 572,
+    "journeys": 548,
+    "with_cancellation_time": 548,
     "issued_before_planned_departure_by": {
-      "24h_or_more": 16,
-      "6h_or_more": 57,
-      "1h_or_more": 206,
-      "20min_or_more": 276,
-      "0min_or_more": 303
+      "24h_or_more": 15,
+      "6h_or_more": 54,
+      "1h_or_more": 201,
+      "20min_or_more": 271,
+      "0min_or_more": 297
     },
-    "issued_after_planned_departure": 269
+    "issued_after_planned_departure": 251
   },
   "cancellation_withdrawn": {
     "journeys_by_split": {
       "holdout": 44,
-      "cv": 34
+      "cv": 32
     },
     "cancelled_cv_journeys_withdrawn_at_both_ends": 0
   }

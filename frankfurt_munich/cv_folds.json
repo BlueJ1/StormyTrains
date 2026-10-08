@@ -5,8 +5,8 @@
     "train_end": "2025-02-14 00:00:00",
     "validation_start": "2025-02-14 00:00:00",
     "validation_end": "2025-05-01 00:00:00",
-    "train_journeys": 6345,
-    "validation_journeys": 1594
+    "train_journeys": 6303,
+    "validation_journeys": 1582
   },
   {
     "fold": 2,
@@ -14,8 +14,8 @@
     "train_end": "2025-03-24 00:00:00",
     "validation_start": "2025-03-24 00:00:00",
     "validation_end": "2025-06-08 00:00:00",
-    "train_journeys": 7068,
-    "validation_journeys": 1766
+    "train_journeys": 7025,
+    "validation_journeys": 1735
   },
   {
     "fold": 3,
@@ -23,8 +23,8 @@
     "train_end": "2025-05-01 00:00:00",
     "validation_start": "2025-05-01 00:00:00",
     "validation_end": "2025-07-16 00:00:00",
-    "train_journeys": 7939,
-    "validation_journeys": 2044
+    "train_journeys": 7885,
+    "validation_journeys": 1998
   },
   {
     "fold": 4,
@@ -32,8 +32,8 @@
     "train_end": "2025-06-08 00:00:00",
     "validation_start": "2025-06-08 00:00:00",
     "validation_end": "2025-08-23 00:00:00",
-    "train_journeys": 8834,
-    "validation_journeys": 2135
+    "train_journeys": 8760,
+    "validation_journeys": 2086
   },
   {
     "fold": 5,
@@ -41,7 +41,7 @@
     "train_end": "2025-07-16 00:00:00",
     "validation_start": "2025-07-16 00:00:00",
     "validation_end": "2025-10-01 00:00:00",
-    "train_journeys": 9983,
-    "validation_journeys": 2101
+    "train_journeys": 9883,
+    "validation_journeys": 2053
   }
 ]
