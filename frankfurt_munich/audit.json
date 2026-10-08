@@ -27,12 +27,12 @@
         "with_sequence_gaps": 0.214
       },
       "2024-08": {
-        "journeys": 800.0,
-        "canceled": 0.0362,
-        "severe_or_canceled": 0.1113,
-        "arrival_exactly_0": 0.0506,
+        "journeys": 790.0,
+        "canceled": 0.0354,
+        "severe_or_canceled": 0.1089,
+        "arrival_exactly_0": 0.0499,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.1037
+        "with_sequence_gaps": 0.0924
       },
       "2024-09": {
         "journeys": 774.0,
@@ -59,20 +59,20 @@
         "with_sequence_gaps": 0.088
       },
       "2024-12": {
-        "journeys": 904.0,
-        "canceled": 0.042,
-        "severe_or_canceled": 0.0631,
-        "arrival_exactly_0": 0.082,
+        "journeys": 896.0,
+        "canceled": 0.0413,
+        "severe_or_canceled": 0.0625,
+        "arrival_exactly_0": 0.0815,
         "completed_without_live_updates": 1.0,
-        "with_sequence_gaps": 0.146
+        "with_sequence_gaps": 0.1384
       },
       "2025-01": {
-        "journeys": 976.0,
-        "canceled": 0.0574,
-        "severe_or_canceled": 0.0984,
-        "arrival_exactly_0": 0.0848,
+        "journeys": 952.0,
+        "canceled": 0.0546,
+        "severe_or_canceled": 0.0956,
+        "arrival_exactly_0": 0.0844,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.1947
+        "with_sequence_gaps": 0.1744
       },
       "2025-02": {
         "journeys": 544.0,
@@ -83,84 +83,84 @@
         "with_sequence_gaps": 0.3051
       },
       "2025-03": {
-        "journeys": 613.0,
-        "canceled": 0.0473,
-        "severe_or_canceled": 0.1044,
-        "arrival_exactly_0": 0.0514,
+        "journeys": 611.0,
+        "canceled": 0.0475,
+        "severe_or_canceled": 0.1047,
+        "arrival_exactly_0": 0.0515,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.279
+        "with_sequence_gaps": 0.2766
       },
       "2025-04": {
-        "journeys": 695.0,
-        "canceled": 0.0504,
-        "severe_or_canceled": 0.1065,
-        "arrival_exactly_0": 0.0652,
+        "journeys": 685.0,
+        "canceled": 0.0467,
+        "severe_or_canceled": 0.1022,
+        "arrival_exactly_0": 0.0658,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.2662
+        "with_sequence_gaps": 0.2569
       },
       "2025-05": {
-        "journeys": 713.0,
-        "canceled": 0.0309,
-        "severe_or_canceled": 0.0785,
-        "arrival_exactly_0": 0.0724,
+        "journeys": 698.0,
+        "canceled": 0.0315,
+        "severe_or_canceled": 0.0788,
+        "arrival_exactly_0": 0.074,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.3478
+        "with_sequence_gaps": 0.3338
       },
       "2025-06": {
-        "journeys": 891.0,
-        "canceled": 0.0696,
-        "severe_or_canceled": 0.1235,
-        "arrival_exactly_0": 0.0712,
+        "journeys": 871.0,
+        "canceled": 0.0677,
+        "severe_or_canceled": 0.1206,
+        "arrival_exactly_0": 0.0727,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.2166
+        "with_sequence_gaps": 0.1986
       },
       "2025-07": {
-        "journeys": 880.0,
-        "canceled": 0.0693,
-        "severe_or_canceled": 0.1534,
-        "arrival_exactly_0": 0.0525,
+        "journeys": 857.0,
+        "canceled": 0.0642,
+        "severe_or_canceled": 0.1505,
+        "arrival_exactly_0": 0.0524,
         "completed_without_live_updates": 2.0,
-        "with_sequence_gaps": 0.1318
+        "with_sequence_gaps": 0.1085
       },
       "2025-08": {
-        "journeys": 787.0,
-        "canceled": 0.0483,
-        "severe_or_canceled": 0.1169,
-        "arrival_exactly_0": 0.0547,
+        "journeys": 773.0,
+        "canceled": 0.044,
+        "severe_or_canceled": 0.1113,
+        "arrival_exactly_0": 0.0555,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.2008
+        "with_sequence_gaps": 0.1863
       },
       "2025-09": {
-        "journeys": 874.0,
-        "canceled": 0.0469,
-        "severe_or_canceled": 0.135,
-        "arrival_exactly_0": 0.0372,
+        "journeys": 852.0,
+        "canceled": 0.0458,
+        "severe_or_canceled": 0.1362,
+        "arrival_exactly_0": 0.0369,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.1465
+        "with_sequence_gaps": 0.1244
       },
       "2025-10": {
-        "journeys": 852.0,
+        "journeys": 832.0,
         "canceled": NaN,
         "severe_or_canceled": NaN,
-        "arrival_exactly_0": 0.0295,
+        "arrival_exactly_0": 0.0289,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.1514
+        "with_sequence_gaps": 0.131
       },
       "2025-11": {
-        "journeys": 733.0,
+        "journeys": 722.0,
         "canceled": NaN,
         "severe_or_canceled": NaN,
-        "arrival_exactly_0": 0.0861,
+        "arrival_exactly_0": 0.0859,
         "completed_without_live_updates": 2.0,
-        "with_sequence_gaps": 0.0164
+        "with_sequence_gaps": 0.0166
       },
       "2025-12": {
-        "journeys": 883.0,
+        "journeys": 872.0,
         "canceled": NaN,
         "severe_or_canceled": NaN,
-        "arrival_exactly_0": 0.1419,
+        "arrival_exactly_0": 0.1435,
         "completed_without_live_updates": 1.0,
-        "with_sequence_gaps": 0.0011
+        "with_sequence_gaps": 0.0
       },
       "2026-01": {
         "journeys": 879.0,
@@ -171,12 +171,12 @@
         "with_sequence_gaps": 0.0
       },
       "2026-02": {
-        "journeys": 754.0,
+        "journeys": 753.0,
         "canceled": NaN,
         "severe_or_canceled": NaN,
-        "arrival_exactly_0": 0.0894,
+        "arrival_exactly_0": 0.0895,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.0013
+        "with_sequence_gaps": 0.0
       },
       "2026-03": {
         "journeys": 860.0,
@@ -211,12 +211,12 @@
         "with_sequence_gaps": 0.0012
       },
       "2026-07": {
-        "journeys": 868.0,
+        "journeys": 866.0,
         "canceled": NaN,
         "severe_or_canceled": NaN,
-        "arrival_exactly_0": 0.0874,
+        "arrival_exactly_0": 0.0877,
         "completed_without_live_updates": 0.0,
-        "with_sequence_gaps": 0.0104
+        "with_sequence_gaps": 0.0081
       },
       "2026-08": {
         "journeys": 856.0,
@@ -238,48 +238,48 @@
   },
   "splits": {
     "journeys": {
-      "cv": 12084,
-      "holdout": 9940
+      "cv": 11936,
+      "holdout": 9895
     },
     "cv_class_shares": {
-      "normal_minor": 0.644,
-      "moderate": 0.2497,
+      "normal_minor": 0.647,
+      "moderate": 0.2482,
       "severe": 0.059,
-      "canceled": 0.0473
+      "canceled": 0.0459
     },
     "cv_class_shares_by_quarter": {
       "2024Q3": {
-        "normal_minor": 0.6341,
-        "moderate": 0.2693,
-        "severe": 0.0599,
-        "canceled": 0.0367
+        "normal_minor": 0.6358,
+        "moderate": 0.2684,
+        "severe": 0.0593,
+        "canceled": 0.0365
       },
       "2024Q4": {
-        "normal_minor": 0.6702,
+        "normal_minor": 0.6704,
         "moderate": 0.2366,
-        "severe": 0.0507,
-        "canceled": 0.0424
+        "severe": 0.0509,
+        "canceled": 0.0421
       },
       "2025Q1": {
-        "normal_minor": 0.6845,
-        "moderate": 0.2147,
-        "canceled": 0.052,
-        "severe": 0.0488
+        "normal_minor": 0.6849,
+        "moderate": 0.2155,
+        "canceled": 0.0508,
+        "severe": 0.0489
       },
       "2025Q2": {
-        "normal_minor": 0.6699,
-        "moderate": 0.2258,
-        "severe": 0.0526,
-        "canceled": 0.0518
+        "normal_minor": 0.6748,
+        "moderate": 0.2232,
+        "severe": 0.0519,
+        "canceled": 0.0501
       },
       "2025Q3": {
-        "normal_minor": 0.5706,
-        "moderate": 0.2936,
-        "severe": 0.0807,
-        "canceled": 0.0551
+        "normal_minor": 0.5774,
+        "moderate": 0.2893,
+        "severe": 0.0818,
+        "canceled": 0.0516
       }
     },
-    "holdout_journeys_with_train_number_unseen_in_cv": 721,
+    "holdout_journeys_with_train_number_unseen_in_cv": 719,
     "ic_journeys_by_quarter": {
       "2024Q3": 15,
       "2024Q4": 18,
@@ -295,109 +295,109 @@
   "folds": {
     "1": {
       "train": {
-        "normal_minor": 0.6621,
-        "moderate": 0.2419,
-        "severe": 0.0528,
-        "canceled": 0.0432
+        "normal_minor": 0.663,
+        "moderate": 0.2418,
+        "severe": 0.0527,
+        "canceled": 0.0425
       },
       "validation": {
-        "normal_minor": 0.6631,
-        "moderate": 0.2334,
-        "severe": 0.0571,
-        "canceled": 0.0464
+        "normal_minor": 0.6643,
+        "moderate": 0.2339,
+        "severe": 0.0569,
+        "canceled": 0.0449
       }
     },
     "2": {
       "train": {
-        "normal_minor": 0.6617,
-        "moderate": 0.2424,
-        "severe": 0.0528,
-        "canceled": 0.0432
+        "normal_minor": 0.6625,
+        "moderate": 0.2423,
+        "severe": 0.0527,
+        "canceled": 0.0426
       },
       "validation": {
-        "normal_minor": 0.6835,
-        "moderate": 0.2237,
-        "severe": 0.0527,
-        "canceled": 0.0402
+        "normal_minor": 0.687,
+        "moderate": 0.2213,
+        "severe": 0.0524,
+        "canceled": 0.0392
       }
     },
     "3": {
       "train": {
-        "normal_minor": 0.6623,
+        "normal_minor": 0.6633,
         "moderate": 0.2402,
-        "severe": 0.0537,
-        "canceled": 0.0438
+        "severe": 0.0535,
+        "canceled": 0.043
       },
       "validation": {
-        "normal_minor": 0.6228,
-        "moderate": 0.252,
-        "severe": 0.067,
-        "canceled": 0.0582
+        "normal_minor": 0.6291,
+        "moderate": 0.2472,
+        "severe": 0.0671,
+        "canceled": 0.0566
       }
     },
     "4": {
       "train": {
-        "normal_minor": 0.6661,
-        "moderate": 0.2386,
-        "severe": 0.0528,
-        "canceled": 0.0426
+        "normal_minor": 0.6674,
+        "moderate": 0.2381,
+        "severe": 0.0526,
+        "canceled": 0.0419
       },
       "validation": {
-        "normal_minor": 0.6066,
-        "moderate": 0.2553,
-        "severe": 0.0693,
-        "canceled": 0.0689
+        "normal_minor": 0.6141,
+        "moderate": 0.2522,
+        "severe": 0.0695,
+        "canceled": 0.0642
       }
     },
     "5": {
       "train": {
-        "normal_minor": 0.6542,
-        "moderate": 0.2426,
-        "severe": 0.0564,
-        "canceled": 0.0468
+        "normal_minor": 0.6564,
+        "moderate": 0.2416,
+        "severe": 0.0563,
+        "canceled": 0.0457
       },
       "validation": {
-        "normal_minor": 0.5954,
-        "moderate": 0.2832,
-        "severe": 0.0714,
-        "canceled": 0.05
+        "normal_minor": 0.6016,
+        "moderate": 0.2796,
+        "severe": 0.0721,
+        "canceled": 0.0468
       }
     }
   },
   "route_family_by_quarter": {
     "2024Q3": {
-      "wuerzburg": 1641,
-      "stuttgart": 943,
+      "wuerzburg": 1636,
+      "stuttgart": 938,
       "other": 4
     },
     "2024Q4": {
-      "wuerzburg": 1637,
+      "wuerzburg": 1629,
       "stuttgart": 886
     },
     "2025Q1": {
       "stuttgart": 1112,
-      "wuerzburg": 971,
+      "wuerzburg": 945,
       "other": 50
     },
     "2025Q2": {
-      "wuerzburg": 1334,
-      "stuttgart": 951,
+      "wuerzburg": 1291,
+      "stuttgart": 949,
       "other": 14
     },
     "2025Q3": {
-      "wuerzburg": 1535,
+      "wuerzburg": 1476,
       "stuttgart": 897,
       "other": 109
     },
     "2025Q4": {
-      "wuerzburg": 1391,
+      "wuerzburg": 1349,
       "stuttgart": 1000,
       "other": 77
     },
     "2026Q1": {
       "wuerzburg": 1451,
       "stuttgart": 1039,
-      "other": 3
+      "other": 2
     },
     "2026Q2": {
       "wuerzburg": 1433,
@@ -406,30 +406,30 @@
     },
     "2026Q3": {
       "wuerzburg": 1376,
-      "stuttgart": 896,
-      "other": 218
+      "stuttgart": 895,
+      "other": 217
     }
   },
   "shared_departures_kept": {
-    "journeys": 1341,
-    "replacement_trains": 265,
+    "journeys": 1337,
+    "replacement_trains": 262,
     "by_split": {
       "holdout": 1066,
-      "cv": 275
+      "cv": 271
     }
   },
   "arrival_delay": {
-    "completed": 11512,
+    "completed": 11388,
     "non_integer": 0,
     "early_more_than_5": 75,
     "early_more_than_10": 25,
     "minimum": -57.0,
     "over_180": 21,
     "maximum": 260.0,
-    "exactly_0": 665,
-    "exactly_minus_1": 664,
-    "exactly_1": 576,
-    "exactly_20": 155,
+    "exactly_0": 659,
+    "exactly_minus_1": 660,
+    "exactly_1": 574,
+    "exactly_20": 151,
     "exactly_60": 24,
     "early_more_than_10_by_train": {
       "821": 7,
@@ -442,55 +442,55 @@
   },
   "zero_delay_check": {
     "-1": {
-      "journeys": 664,
+      "journeys": 660,
       "median_delay_at_previous_stop": 0.0,
       "share_previous_stop_10_plus": 0.0045
     },
     "0": {
-      "journeys": 665,
+      "journeys": 659,
       "median_delay_at_previous_stop": 1.0,
-      "share_previous_stop_10_plus": 0.006
+      "share_previous_stop_10_plus": 0.0061
     },
     "1": {
-      "journeys": 576,
+      "journeys": 574,
       "median_delay_at_previous_stop": 2.0,
       "share_previous_stop_10_plus": 0.0052
     }
   },
   "no_live_updates": {
-    "journeys": 56,
-    "canceled": 53,
+    "journeys": 55,
+    "canceled": 52,
     "completed": 3
   },
   "cancellations": {
-    "canceled": 572,
-    "origin_and_destination": 164,
-    "origin_only": 137,
-    "destination_only": 271,
-    "every_stop_canceled": 158,
-    "intermediate_only_not_counted": 369,
+    "canceled": 548,
+    "origin_and_destination": 162,
+    "origin_only": 134,
+    "destination_only": 252,
+    "every_stop_canceled": 157,
+    "intermediate_only_not_counted": 361,
     "origin_only_median_arrival_delay_at_muenchen": 30.0,
     "destination_only_last_served_station": {
-      "Würzburg Hbf": 127,
+      "Würzburg Hbf": 111,
       "Aschaffenburg Hbf": 82,
       "Mannheim Hbf": 16,
       "Frankfurt (Main) Hbf": 11,
       "Ulm Hbf": 8,
       "Heidelberg Hbf": 6
     },
-    "cv_share": 0.0473,
-    "replacement_train_journeys": 232
+    "cv_share": 0.0459,
+    "replacement_train_journeys": 228
   },
   "time_consistency": {
     "planned_travel_min": {
       "min": 185.0,
       "median": 203.0,
-      "max": 556.0,
-      "over_300": 571
+      "max": 369.0,
+      "over_300": 437
     },
     "actual_travel_below_70pct_of_planned": 0,
-    "journeys_planned_times_go_backwards": 5,
-    "journeys_reported_times_go_backwards_over_1_min": 52,
+    "journeys_planned_times_go_backwards": 0,
+    "journeys_reported_times_go_backwards_over_1_min": 45,
     "night_journeys_on_dst_change_dates": 2
   },
   "current_delay": {
@@ -499,95 +499,95 @@
         "cv": 0.0,
         "holdout": 0.0
       },
-      "missing_in_cv": 12084,
+      "missing_in_cv": 11936,
       "cv_median": null,
       "cv_below_minus_10": 0
     },
     "6h": {
       "known_share_by_split": {
-        "cv": 0.0691,
-        "holdout": 0.0322
+        "cv": 0.0699,
+        "holdout": 0.0323
       },
-      "missing_in_cv": 11249,
+      "missing_in_cv": 11102,
       "cv_median": 2.0,
       "cv_below_minus_10": 0
     },
     "1h": {
       "known_share_by_split": {
-        "cv": 0.8574,
-        "holdout": 0.8448
+        "cv": 0.867,
+        "holdout": 0.8484
       },
-      "missing_in_cv": 1723,
+      "missing_in_cv": 1588,
       "cv_median": 3.0,
       "cv_below_minus_10": 1
     },
     "20min": {
       "known_share_by_split": {
-        "cv": 0.8614,
-        "holdout": 0.85
+        "cv": 0.871,
+        "holdout": 0.8537
       },
-      "missing_in_cv": 1675,
+      "missing_in_cv": 1540,
       "cv_median": 3.0,
       "cv_below_minus_10": 48
     },
     "0min": {
       "known_share_by_split": {
-        "cv": 0.8993,
-        "holdout": 0.8963
+        "cv": 0.9021,
+        "holdout": 0.8973
       },
-      "missing_in_cv": 1217,
+      "missing_in_cv": 1169,
       "cv_median": 2.0,
       "cv_below_minus_10": 0
     },
-    "starts_at_origin_share": 0.1255
+    "starts_at_origin_share": 0.1184
   },
   "prediction_rows": {
     "cv": {
-      "24h": 12068,
-      "6h": 12027,
-      "1h": 11878,
-      "20min": 11808,
-      "0min": 11781
+      "24h": 11921,
+      "6h": 11882,
+      "1h": 11735,
+      "20min": 11665,
+      "0min": 11639
     },
     "holdout": {
-      "24h": 9905,
-      "6h": 9841,
-      "1h": 9667,
-      "20min": 9584,
-      "0min": 9547
+      "24h": 9860,
+      "6h": 9796,
+      "1h": 9622,
+      "20min": 9539,
+      "0min": 9502
     },
     "cv_class_shares": {
       "24h": {
-        "normal_minor": 0.6448,
-        "moderate": 0.25,
+        "normal_minor": 0.6478,
+        "moderate": 0.2485,
         "severe": 0.0591,
-        "canceled": 0.0461
+        "canceled": 0.0447
       },
       "6h": {
-        "normal_minor": 0.647,
-        "moderate": 0.2509,
-        "severe": 0.0593,
-        "canceled": 0.0428
+        "normal_minor": 0.6499,
+        "moderate": 0.2493,
+        "severe": 0.0592,
+        "canceled": 0.0416
       },
       "1h": {
-        "normal_minor": 0.6552,
-        "moderate": 0.254,
+        "normal_minor": 0.658,
+        "moderate": 0.2524,
         "severe": 0.06,
-        "canceled": 0.0308
+        "canceled": 0.0296
       },
       "20min": {
-        "normal_minor": 0.659,
-        "moderate": 0.2555,
+        "normal_minor": 0.662,
+        "moderate": 0.2539,
         "severe": 0.0604,
-        "canceled": 0.0251
+        "canceled": 0.0237
       },
       "0min": {
-        "normal_minor": 0.6606,
-        "moderate": 0.2561,
+        "normal_minor": 0.6635,
+        "moderate": 0.2545,
         "severe": 0.0605,
-        "canceled": 0.0228
+        "canceled": 0.0216
       }
     },
-    "cv_withdrawn_cancellations": 34
+    "cv_withdrawn_cancellations": 32
   }
 }

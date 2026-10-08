@@ -5,13 +5,14 @@ whose functions are reused here for the single pair. On top of that, this
 script
 
 1. keeps one journey per departure (SHARED DEPARTURES below);
-2. adds `current_delay` at each prediction time (CURRENT DELAY below);
-3. adds when a cancellation was announced (KNOWN CANCELLATIONS below);
-4. splits the journeys by planned Frankfurt departure (see folds.py) into
+2. drops unusual journeys (UNUSUAL JOURNEYS below);
+3. adds `current_delay` at each prediction time (CURRENT DELAY below);
+4. adds when a cancellation was announced (KNOWN CANCELLATIONS below);
+5. splits the journeys by planned Frankfurt departure (see folds.py) into
    data/journeys_cv.parquet (July 2024 to September 2025) and
    data/journeys_holdout.parquet (October 2025 to September 2026), and writes
    the cross-validation fold boundaries to cv_folds.json;
-5. writes the prediction rows, one per journey and prediction time, to
+6. writes the prediction rows, one per journey and prediction time, to
    data/prediction_rows_cv.parquet and data/prediction_rows_holdout.parquet.
 
 It also writes data/stops.parquet (the stops from Frankfurt to München),
@@ -30,6 +31,16 @@ One journey is kept per departure, from the passenger's point of view: a
 journey that completed if there is one, then one not flagged as a replacement
 train, then the lowest train number. `shared_departure` is the number of
 journeys that were listed for the departure.
+
+UNUSUAL JOURNEYS. After one journey is kept per departure, two kinds are
+dropped, so that the whole departure leaves the dataset:
+
+- a planned travel time from Frankfurt to München of more than 7 hours (ICE
+  1223 and 2923, which run Frankfurt - Köln - Ruhr - Kassel - München in about
+  9 hours; every other journey takes under 7);
+- Frankfurt or München is an additional stop (`is_additional_stop`), not in
+  the train's original timetable, for example a train extended to München or
+  diverted through München Hbf.
 
 CURRENT DELAY. current_delay at prediction time t is the latest delay known at
 t, from the train's own run up to and including its arrival at Frankfurt:
@@ -82,6 +93,7 @@ ORIGIN, DESTINATION = "Frankfurt (Main) Hbf", "München Hbf"
 HORIZONS = {"24h": pd.Timedelta(hours=24), "6h": pd.Timedelta(hours=6),
             "1h": pd.Timedelta(hours=1), "20min": pd.Timedelta(minutes=20),
             "0min": pd.Timedelta(0)}
+MAX_PLANNED_TRAVEL = pd.Timedelta(hours=7)
 RUN_COLUMNS = [
     "id", "station_name", "train_type", "train_line_ride_id", "train_line_station_num",
     "arrival_planned_time", "arrival_change_time", "departure_planned_time",
@@ -131,6 +143,18 @@ def drop_shared_departures(journeys: pd.DataFrame, stops: pd.DataFrame) -> tuple
              "journeys_removed": int(len(j) - len(keep))}
     out = kept.drop(columns="number").sort_values("origin_departure_planned_local")
     return out.reset_index(drop=True), audit
+
+
+def drop_unusual_journeys(journeys: pd.DataFrame, stops: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    """Drop journeys over 7 h and those with an additional end stop (see UNUSUAL JOURNEYS)."""
+    planned = journeys.destination_arrival_planned_local - journeys.origin_departure_planned_local
+    too_long = planned.gt(MAX_PLANNED_TRAVEL)
+    ends = stops[stops.stop_index.eq(0) | stops.final_destination]
+    additional = journeys.journey_id.map(ends.groupby("journey_id").is_additional_stop.any()).fillna(False)
+    drop = too_long | additional
+    audit = {"over_7h": int(too_long.sum()), "over_7h_trains": journeys.train_number[too_long].value_counts().to_dict(),
+             "additional_end_stop": int(additional.sum()), "journeys_removed": int(drop.sum())}
+    return journeys[~drop].reset_index(drop=True), audit
 
 
 def read_runs(origin_num: pd.Series) -> pd.DataFrame:
@@ -223,6 +247,7 @@ def main() -> None:
     # Journeys, one per departure
     journeys, stops, extraction_audit = extract_journeys(paths, panel)
     journeys, shared_audit = drop_shared_departures(journeys, stops)
+    journeys, unusual_audit = drop_unusual_journeys(journeys, stops)
     stops = stops[stops.journey_id.isin(journeys.journey_id)]
     j = journeys.set_index("journey_id")
 
@@ -263,7 +288,7 @@ def main() -> None:
     (HERE / "cv_folds.json").write_text(json.dumps(folds, indent=2))
 
     audit = {"source_files": [p.name for p in paths], "extraction": extraction_audit,
-             "shared_departures": shared_audit, "journeys": int(len(j)),
+             "shared_departures": shared_audit, "unusual_journeys": unusual_audit, "journeys": int(len(j)),
              **{f"{split}_journeys": int(len(frame)) for split, frame in splits.items()},
              **{f"{split}_{name}": str(getattr(frame.origin_departure_planned_local, end)())
                 for split, frame in splits.items() for name, end in (("first", "min"), ("last", "max"))},
