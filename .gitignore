@@ -31,6 +31,3 @@ corridor_analysis/cache/
 
 # Arrival-delay datasets: generated parquet files. Rebuild with arrival_delays/extract.py.
 arrival_delays/data/*.parquet
-
-# Frankfurt–München dataset: generated parquet files. Rebuild with frankfurt_munich/build_dataset.py.
-frankfurt_munich/data/*.parquet
