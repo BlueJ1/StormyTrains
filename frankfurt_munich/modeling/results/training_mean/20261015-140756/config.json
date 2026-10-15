@@ -1,8 +1,8 @@
 {
-  "name": "class_shares",
-  "task": "severity",
-  "target": "severity_class",
-  "model": "DummyClassifier()",
+  "name": "training_mean",
+  "task": "delay",
+  "target": "arrival_delay_min",
+  "model": "DummyRegressor()",
   "features": {
     "24h": {
       "numeric": [
@@ -83,6 +83,6 @@
       ]
     }
   },
-  "git_commit": "45e847a24aa78c4b46bac8a2000ad4e6d5b66ec8 (uncommitted changes)",
-  "created": "2026-10-12T04:30:20"
+  "git_commit": "b80d7444206c4671883ec07a952cd2094bd60126",
+  "created": "2026-10-15T14:07:56"
 }

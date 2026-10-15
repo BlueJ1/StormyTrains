@@ -1,7 +1,6 @@
-"""Checks of the cross-validation method itself, not of any model."""
+"""Checks of the split and the cross-validation method, not of any model."""
 from __future__ import annotations
 
-import json
 from functools import cache
 
 import numpy as np
@@ -9,10 +8,10 @@ import pandas as pd
 import pytest
 from sklearn.metrics import log_loss
 
-from cv import PROBA_COLUMNS, class_probabilities, cross_validate, fold_splits
-from data import DATA, HERE, LEAD, PREDICTION_TIMES, TIME_COLUMN, load_rows
+from cv import PROBA_COLUMNS, class_probabilities, cross_validate
+from data import DATA, PREDICTION_TIMES, TIME_COLUMN, load_rows
 from features import feature_columns
-from folds import cv_folds, fold_bounds
+from folds import N_FOLDS, cv_folds, read_assignment, week_of
 from metrics import CLASSES, class_log_loss
 from models import make_class_shares, make_linear_regression, make_logistic_regression
 
@@ -22,36 +21,53 @@ def rows_for(prediction_time):
     return load_rows(prediction_time)
 
 
-def test_folds_match_cv_folds_json():
-    saved = json.loads((HERE.parent / "cv_folds.json").read_text())
-    journeys = pd.read_parquet(DATA / "journeys_cv.parquet")
-    for bounds, entry, (fold, train, validation) in zip(fold_bounds(), saved, cv_folds(journeys)):
-        assert fold == entry["fold"]
-        for key in ("train_start", "train_end", "validation_start", "validation_end"):
-            assert bounds[key] == pd.Timestamp(entry[key])
-        assert train.sum() == entry["train_journeys"]
-        assert validation.sum() == entry["validation_journeys"]
+@cache
+def journeys(split):
+    return pd.read_parquet(DATA / f"journeys_{split}.parquet")
+
+
+def test_data_files_follow_the_committed_week_assignment():
+    """Fails if the data were built with another split than split_weeks.csv."""
+    weeks = read_assignment().set_index("week_start")
+    for split in ("cv", "holdout"):
+        week = week_of(journeys(split)[TIME_COLUMN])
+        assert week.isin(weeks.index).all()
+        assert week.map(weeks["split"]).eq(split).all()
+    cv = journeys("cv")
+    assert cv["fold"].astype(int).equals(week_of(cv[TIME_COLUMN]).map(weeks["fold"]).astype(int))
+
+
+def test_holdout_and_folds_share_no_week():
+    cv, holdout = journeys("cv"), journeys("holdout")
+    assert not set(week_of(cv[TIME_COLUMN])) & set(week_of(holdout[TIME_COLUMN]))
+    assert not set(cv["journey_id"]) & set(holdout["journey_id"])
+    assert set(cv["fold"]) == set(range(1, N_FOLDS + 1))
+    assert week_of(cv[TIME_COLUMN]).groupby(cv["fold"]).nunique().sum() == week_of(cv[TIME_COLUMN]).nunique()
+
+
+def test_holdout_is_about_a_fifth_of_the_weeks():
+    weeks = read_assignment()
+    assert 0.15 < weeks["split"].eq("holdout").mean() < 0.25
+
+
+def test_folds_have_similar_class_shares():
+    cv = journeys("cv")
+    shares = pd.crosstab(cv["fold"], cv["severity_class"], normalize="index")
+    overall = cv["severity_class"].value_counts(normalize=True)
+    assert (shares - overall).abs().max().max() < 0.02  # whole weeks: about 1 percentage point
 
 
 @pytest.mark.parametrize("prediction_time", PREDICTION_TIMES)
-def test_training_rows_precede_validation_and_respect_gap(prediction_time):
+def test_row_folds_match_the_journey_file(prediction_time):
     rows = rows_for(prediction_time)
-    for bounds, (fold, train, validation) in zip(fold_bounds(), fold_splits(rows, prediction_time)):
-        assert train.any() and validation.any()
-        assert not (train & validation).any()
-        assert rows.loc[train, TIME_COLUMN].max() < rows.loc[validation, TIME_COLUMN].min()
-        cutoff = bounds["validation_start"] - LEAD[prediction_time]
-        assert rows.loc[train, "outcome_known_at"].max() < cutoff
-        # The gap only removes journeys close to the cut, never older ones.
-        dropped = rows.loc[rows[TIME_COLUMN] < bounds["train_end"]].index.difference(rows.index[train])
-        assert (rows.loc[dropped, TIME_COLUMN] >= cutoff - pd.Timedelta(hours=12)).all()
+    assert rows["fold"].equals(rows["journey_id"].map(journeys("cv").set_index("journey_id")["fold"]))
+    assert rows["fold"].notna().all()
 
 
 def test_rows_are_one_per_journey_and_complete():
     for prediction_time in PREDICTION_TIMES:
         rows = rows_for(prediction_time)
         assert rows["journey_id"].is_unique
-        assert rows["outcome_known_at"].notna().all()
         assert rows["train_type"].notna().all()
 
 
@@ -78,7 +94,7 @@ def test_class_log_loss_matches_sklearn():
 def test_class_shares_score_is_the_hand_computed_cross_entropy():
     rows = rows_for("1h")
     metrics, _ = cross_validate(rows, "1h", "severity", make_class_shares, [], ["train_type"])
-    for (fold, train, validation), score in zip(fold_splits(rows, "1h"), metrics["log_loss"]):
+    for (fold, train, validation), score in zip(cv_folds(rows), metrics["log_loss"]):
         shares = rows.loc[train, "severity_class"].value_counts(normalize=True)
         expected = -np.log(shares[rows.loc[validation, "severity_class"]]).mean()
         assert score == pytest.approx(expected)

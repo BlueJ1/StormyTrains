@@ -1,20 +1,16 @@
-"""Chronological cross-validation shared by every model.
+"""Cross-validation shared by every model.
 
 For each prediction time and each fold of frankfurt_munich/folds.py:
 
-1. the training and validation rows come from `cv_folds` (planned Frankfurt
-   departure);
-2. GAP: a training row is kept only if its journey's outcome was known
-   before the first validation prediction, i.e. `outcome_known_at` is before
-   the validation start minus the prediction time;
-3. a fresh model is fitted on the training rows and predicts the validation
+1. the validation rows are the CV rows with that `fold`, the training rows
+   all other CV rows (folds are groups of whole weeks, see folds.py);
+2. a fresh model is fitted on the training rows and predicts the validation
    rows;
-4. the fold is scored: log loss and macro-F1 for `severity`, RMSE for
+3. the fold is scored: log loss and macro-F1 for `severity`, RMSE for
    `delay`. The `delay` task uses completed journeys only.
 
-Fold scores are averaged (mean and standard deviation over the 5 folds).
-Validation predictions are not pooled, because the validation windows
-overlap.
+Only the mean and standard deviation of the fold scores are reported; the
+validation predictions are saved but not pooled into one score.
 
 run_cv writes results/<name>/<timestamp>/:
 - config.json: task, model, features, git commit;
@@ -32,22 +28,14 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from data import HERE, LEAD, PREDICTION_TIMES, TIME_COLUMN, load_rows
+from data import HERE, PREDICTION_TIMES, TIME_COLUMN, load_rows
 from features import feature_columns
-from folds import cv_folds, fold_bounds
+from folds import cv_folds
 from metrics import CLASSES, class_log_loss, macro_f1, rmse
 
 RESULTS = HERE / "results"
 TARGETS = {"severity": "severity_class", "delay": "arrival_delay_min"}
 PROBA_COLUMNS = [f"p_{c}" for c in CLASSES]
-
-
-def fold_splits(rows: pd.DataFrame, prediction_time: str):
-    """Yield (fold, training mask, validation mask), with the gap applied."""
-    lead = LEAD[prediction_time]
-    for bounds, (fold, train, validation) in zip(fold_bounds(), cv_folds(rows)):
-        known = rows["outcome_known_at"] < bounds["validation_start"] - lead
-        yield fold, train & known, validation
 
 
 def class_probabilities(model, X) -> np.ndarray:
@@ -70,7 +58,7 @@ def cross_validate(rows: pd.DataFrame, prediction_time: str, task: str,
     features = numeric + categorical
 
     metrics, predictions = [], []
-    for fold, train, validation in fold_splits(rows, prediction_time):
+    for fold, train, validation in cv_folds(rows):
         model = make_model(numeric, categorical)
         model.fit(rows.loc[train, features], rows.loc[train, target])
         X, y = rows.loc[validation, features], rows.loc[validation, target]
@@ -102,7 +90,9 @@ def git_commit() -> str:
         return subprocess.run(["git", *args], cwd=HERE, capture_output=True,
                               text=True).stdout.strip()
     commit = git("rev-parse", "HEAD")
-    return commit + (" (uncommitted changes)" if git("status", "--porcelain") else "")
+    # Results written earlier in the same run don't count as changes.
+    changed = git("status", "--porcelain", "--", ":/", ":(exclude)results")
+    return commit + (" (uncommitted changes)" if changed else "")
 
 
 def run_cv(name: str, task: str, make_model, prediction_times=PREDICTION_TIMES,

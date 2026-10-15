@@ -8,13 +8,10 @@ how to treat them.
 Derived columns:
 - `planned_travel_min`: planned München arrival minus planned Frankfurt
   departure, in minutes;
-- `hour`, `weekday` (0 = Monday), `month`: of the planned Frankfurt departure;
-- `outcome_known_at`: when the journey's outcome was known, the latest of the
-  reported München arrival, the planned München arrival and
-  `cancellation_announced`. Used for the gap between training and validation.
+- `hour`, `weekday` (0 = Monday), `month`: of the planned Frankfurt departure.
 
-The hold-out year is not to be looked at yet, so loading it needs
-allow_holdout=True.
+CV rows keep their `fold` (see frankfurt_munich/folds.py). The hold-out set is
+not to be looked at yet, so loading it needs allow_holdout=True.
 """
 from __future__ import annotations
 
@@ -29,24 +26,19 @@ sys.path.insert(0, str(HERE.parent))
 from folds import TIME_COLUMN  # noqa: E402  frankfurt_munich/folds.py
 
 PREDICTION_TIMES = ["24h", "6h", "1h", "20min", "0min"]
-LEAD = {"24h": pd.Timedelta(hours=24), "6h": pd.Timedelta(hours=6),
-        "1h": pd.Timedelta(hours=1), "20min": pd.Timedelta(minutes=20),
-        "0min": pd.Timedelta(0)}
 JOURNEY_COLUMNS = ["journey_id", "train_type", "starts_at_origin",
-                   "destination_arrival_planned_local",
-                   "destination_arrival_reported_local", "observed_stops",
-                   "recorded_route", "unobserved_sequence_positions",
-                   "cancellation_announced"]
+                   "destination_arrival_planned_local", "observed_stops",
+                   "recorded_route", "unobserved_sequence_positions"]
 
 
 def load_rows(prediction_time: str, split: str = "cv",
               allow_holdout: bool = False) -> pd.DataFrame:
-    if prediction_time not in LEAD:
+    if prediction_time not in PREDICTION_TIMES:
         raise ValueError(f"unknown prediction time {prediction_time!r}")
     if split not in ("cv", "holdout"):
         raise ValueError(f"unknown split {split!r}")
     if split == "holdout" and not allow_holdout:
-        raise PermissionError("The hold-out year is not to be looked at yet; "
+        raise PermissionError("The hold-out set is not to be looked at yet; "
                               "pass allow_holdout=True for the final evaluation.")
 
     rows = pd.read_parquet(DATA / f"prediction_rows_{split}.parquet")
@@ -61,7 +53,4 @@ def load_rows(prediction_time: str, split: str = "cv",
     rows["hour"] = departure.dt.hour
     rows["weekday"] = departure.dt.dayofweek
     rows["month"] = departure.dt.month
-    rows["outcome_known_at"] = rows[["destination_arrival_reported_local",
-                                     "destination_arrival_planned_local",
-                                     "cancellation_announced"]].max(axis=1)
     return rows.reset_index(drop=True)

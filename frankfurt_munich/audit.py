@@ -3,9 +3,11 @@
 Reads the files written by build_dataset.py and writes audit.json. Every number
 quoted in README.md comes from that file or from build_audit.json.
 
-The hold-out year is not to be looked at yet, so outcome statistics (classes,
-delays, cancellations) are computed on the CV period only. For the hold-out year
-the audit reports counts, coverage and missing values.
+The hold-out set is not to be looked at yet, so outcome statistics (classes,
+delays, cancellations) are computed on the CV set only. For the hold-out set
+the audit reports counts, coverage and missing values. Changes over time compare
+July 2024 to September 2025 with October 2025 to September 2026
+(period_of in folds.py).
 
 Run from the project root: .venv/bin/python frankfurt_munich/audit.py
 """
@@ -17,7 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from folds import CV_START, HOLDOUT_END, cv_folds
+from folds import CALENDAR_END, CALENDAR_START, EARLIER_PERIOD, LATER_PERIOD, cv_folds, period_of
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data"
@@ -38,13 +40,14 @@ def main() -> None:
     month = planned.dt.to_period("M")
     quarter = planned.dt.to_period("Q")
     is_cv = j.split.eq("cv")
+    period = period_of(planned)
     delay = j.arrival_delay_min
     canceled = j.journey_canceled
     A: dict = {}
 
     # Coverage over time
     per_day = j.groupby(planned.dt.date).size().reindex(
-        pd.date_range(CV_START, HOLDOUT_END - pd.Timedelta(days=1)).date, fill_value=0)
+        pd.date_range(CALENDAR_START, CALENDAR_END - pd.Timedelta(days=1)).date, fill_value=0)
     stops["delay"] = (stops.event_reported_time - stops.event_planned_time).dt.total_seconds() / 60
     same_as_plan = stops.event_reported_time.eq(stops.event_planned_time).groupby(stops.journey_id).all()
     no_update = j.journey_id.map(same_as_plan)
@@ -52,7 +55,7 @@ def main() -> None:
         "journeys": j.groupby(month).size(),
         "canceled": canceled[is_cv].groupby(month).mean(),
         "severe_or_canceled": j.severe_or_canceled[is_cv].groupby(month).mean(),
-        "arrival_exactly_0": delay.eq(0).groupby(month).sum() / delay.notna().groupby(month).sum(),
+        "arrival_exactly_0": delay[is_cv].eq(0).groupby(month).sum() / delay[is_cv].notna().groupby(month).sum(),
         "completed_without_live_updates": (no_update & ~canceled).groupby(month).sum(),
         "with_sequence_gaps": j.unobserved_sequence_positions.gt(0).groupby(month).mean(),
     })
@@ -69,12 +72,19 @@ def main() -> None:
         "cv_class_shares": shares(cv.severity_class.value_counts(normalize=True)),
         "cv_class_shares_by_quarter": {str(q): shares(g.severity_class.value_counts(normalize=True))
                                        for q, g in j[is_cv].groupby(quarter[is_cv])},
+        "holdout_days_by_month": {str(k): int(v) for k, v in holdout.origin_departure_planned_local.dt.normalize()
+                                  .drop_duplicates().dt.to_period("M").value_counts().sort_index().items()},
         "holdout_journeys_with_train_number_unseen_in_cv":
             int((~holdout.train_number.isin(set(cv.train_number))).sum()),
         "ic_journeys_by_quarter": {str(q): int(g.train_type.eq("IC").sum()) for q, g in j.groupby(quarter)},
+        "ic_journeys_by_period": j.train_type.eq("IC").groupby(period).sum().to_dict(),
     }
-    A["folds"] = {fold: {"train": shares(cv[train].severity_class.value_counts(normalize=True)),
-                         "validation": shares(cv[val].severity_class.value_counts(normalize=True))}
+    cv_shares = cv.severity_class.value_counts(normalize=True)
+    A["folds"] = {fold: {"validation_journeys": int(val.sum()),
+                         "train": shares(cv[train].severity_class.value_counts(normalize=True)),
+                         "validation": shares(cv[val].severity_class.value_counts(normalize=True)),
+                         "max_class_share_difference_from_cv": round(float(
+                             (cv[val].severity_class.value_counts(normalize=True) - cv_shares).abs().max()), 4)}
                   for fold, train, val in cv_folds(cv)}
     family = np.select([j.recorded_route.str.contains("Würzburg"), j.recorded_route.str.contains("Stuttgart")],
                        ["wuerzburg", "stuttgart"], "other")
@@ -86,10 +96,12 @@ def main() -> None:
     A["shared_departures_kept"] = {
         "journeys": int(len(shared)), "replacement_trains": int(shared.is_replacement_train.sum()),
         "by_split": shared.split.value_counts().to_dict(),
+        "by_period": period[shared.index].value_counts().to_dict(),
     }
 
     # Delay values (CV only)
     full, j, delay, canceled, no_update = j, j[is_cv], delay[is_cv], canceled[is_cv], no_update[is_cv]
+    period = period[is_cv]
     stops = stops[stops.journey_id.isin(cv.journey_id)]
     planned = j.origin_departure_planned_local
     A["arrival_delay"] = {
@@ -106,10 +118,11 @@ def main() -> None:
     before = stops[~stops.final_destination].groupby("journey_id").tail(1).set_index("journey_id").delay
     prev = j.journey_id.map(before)
     A["zero_delay_check"] = {
-        str(v): {"journeys": int(delay.eq(v).sum()),
-                 "median_delay_at_previous_stop": float(prev[delay.eq(v)].median()),
-                 "share_previous_stop_10_plus": round(float(prev[delay.eq(v)].ge(10).mean()), 4)}
-        for v in (-1, 0, 1)}
+        p: {str(v): {"journeys": int((delay.eq(v) & in_p).sum()),
+                     "median_delay_at_previous_stop": float(prev[delay.eq(v) & in_p].median()),
+                     "share_previous_stop_10_plus": round(float(prev[delay.eq(v) & in_p].ge(10).mean()), 4)}
+            for v in (-1, 0, 1)}
+        for p, in_p in ((p, period.eq(p)) for p in (EARLIER_PERIOD, LATER_PERIOD))}
     A["no_live_updates"] = {"journeys": int(no_update.sum()),
                             "canceled": int((no_update & canceled).sum()),
                             "completed": int((no_update & ~canceled).sum())}
@@ -149,12 +162,32 @@ def main() -> None:
         "night_journeys_on_dst_change_dates": int(len(dst)),
     }
 
-    # current_delay: how often it is known in each split; values in CV only
+    # current_delay: how often it is known in each split; values in CV only.
+    # Why it is missing: the train starts at Frankfurt; its run has no usable
+    # report at all; or nothing of the run has happened yet.
+    runs = pd.read_parquet(DATA / "upstream_runs.parquet")
+    usable = pd.concat([
+        runs.journey_id[runs[f"{kind}_planned_time"].notna() & runs[f"{kind}_change_time"].notna()
+                        & ~runs[f"{kind}_is_canceled"].fillna(False).astype(bool)]
+        for kind in ("arrival", "departure")])
+    no_report = ~j.journey_id.isin(set(usable)) & ~j.starts_at_origin
+    A["current_delay_missing_in_cv"] = {}
+    for h in HORIZONS:
+        missing = j[f"current_delay_{h}"].isna()
+        A["current_delay_missing_in_cv"][h] = {
+            "missing": int(missing.sum()), "share": round(float(missing.mean()), 4),
+            "starts_at_origin": int((missing & j.starts_at_origin).sum()),
+            "no_usable_report": int((missing & no_report).sum()),
+            "run_not_started": int((missing & ~j.starts_at_origin & ~no_report).sum()),
+            "canceled_share_missing": None if not missing.any() else round(float(canceled[missing].mean()), 4),
+            "canceled_share_known": None if missing.all() else round(float(canceled[~missing].mean()), 4)}
     A["current_delay"] = {
         h: {"known_share_by_split": shares(full[f"current_delay_{h}"].notna().groupby(full.split).mean()),
             "missing_in_cv": int(j[f"current_delay_{h}"].isna().sum()),
             "cv_median": None if j[f"current_delay_{h}"].isna().all() else float(j[f"current_delay_{h}"].median()),
-            "cv_below_minus_10": int(j[f"current_delay_{h}"].lt(-10).sum())}
+            "cv_below_minus_10": int(j[f"current_delay_{h}"].lt(-10).sum()),
+            "cv_below_minus_10_by_train": j.train_number[j[f"current_delay_{h}"].lt(-10)]
+                                          .value_counts().head(3).to_dict()}
         for h in HORIZONS}
     A["current_delay"]["starts_at_origin_share"] = round(float(full.starts_at_origin.mean()), 4)
 

@@ -28,6 +28,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from folds import period_of
 from snapshots import event_summary, read_snapshots
 
 HERE = Path(__file__).resolve().parent
@@ -80,6 +81,7 @@ def main() -> None:
 
     c = out[covered]
     month = c.origin_departure_planned_local.dt.to_period("M").astype(str)
+    period = period_of(c.origin_departure_planned_local)
     zero = c.arrival_delay_min.eq(0)
     canceled = c[c.journey_canceled & c.split.eq("cv")]  # outcome statistics for CV only
     lead = canceled.cancellation_lead_min
@@ -93,6 +95,8 @@ def main() -> None:
         "snapshots_last_day": str(last_day.date()),
         "journeys_covered": int(len(c)), "by_split": c.split.value_counts().to_dict(),
         "arrival_source": c.arrival_source.value_counts().to_dict(),
+        "arrival_source_by_split": pd.crosstab(c.arrival_source, c.split).to_dict(),
+        "arrival_source_by_period": pd.crosstab(c.arrival_source, period).to_dict(),
         "arrival_source_by_month": pd.crosstab(month, c.arrival_source).to_dict(orient="index"),
         "arrival_source_of_0_min": c[zero].arrival_source.value_counts().to_dict(),
         "arrival_source_of_0_min_by_month": pd.crosstab(month[zero], c[zero].arrival_source).to_dict(orient="index"),
@@ -114,6 +118,7 @@ def main() -> None:
         },
         "cancellation_withdrawn": {
             "journeys_by_split": c[c.cancellation_withdrawn].split.value_counts().to_dict(),
+            "journeys_by_period": period[c.cancellation_withdrawn].value_counts().to_dict(),
             "cancelled_cv_journeys_withdrawn_at_both_ends": int(len(reinstated)),
         },
     }
