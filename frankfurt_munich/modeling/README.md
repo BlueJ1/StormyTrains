@@ -1,8 +1,8 @@
-# Modelling: shared chronological cross-validation
+# Modelling: shared cross-validation
 
 Every model for Frankfurt (Main) Hbf → München Hbf is trained and scored by the same procedure, so that models differ only in their features and estimator. A model is a function that returns a fresh, unfitted scikit-learn estimator; `cv.py` does the rest.
 
-Only the CV period is used (`../data/prediction_rows_cv.parquet`). Loading the hold-out year needs `allow_holdout=True`.
+Only the CV set is used (`../data/prediction_rows_cv.parquet`). Loading the hold-out set needs `allow_holdout=True`.
 
 ## Run
 
@@ -29,8 +29,7 @@ To add a model: write a factory `make_x(numeric, categorical)` in `models.py` an
 ## Method
 
 - **One model per prediction time** (24 h, 6 h, 1 h, 20 min, 0 min), fitted on the rows of that prediction time only.
-- **Folds:** the 5 expanding-window folds of `../folds.py`, by planned Frankfurt departure (see `../README.md`).
-- **Gap:** a training row is kept only if its journey's outcome was known before the first prediction of the validation window, which is the validation start minus the prediction time. The outcome counts as known at the latest of the reported München arrival, the planned München arrival and `cancellation_announced`. For cancelled journeys, the reported arrival is often later than planned, because a delay was reported before the cancellation. This removes 2–6 training rows per fold from 1 h on, 10–12 at 6 h and 21–32 at 24 h.
+- **Folds:** the 5 folds of `../folds.py`, stored in the `fold` column: random groups of whole days, stratified by `severity_class` (see `../README.md`). Fold *k* validates on the rows with `fold == k` and trains on all other CV rows, including days after the validation days. There is no gap between training and validation: keeping each day on one side already separates journeys that share weather and disruptions.
 - **Fresh model per fold.** All preprocessing is inside the model's pipeline, so it is fitted on the training rows only.
 - **Targets:**
   - `severity`: `severity_class`, with probabilities for the classes in the order `normal_minor, moderate, severe, canceled`.
@@ -38,7 +37,7 @@ To add a model: write a factory `make_x(numeric, categorical)` in `models.py` an
 - **Metrics per fold:**
   - `severity`: multi-class log loss (for choosing models) and macro-F1, which uses the most probable class.
   - `delay`: RMSE in minutes.
-- **Aggregation:** the mean and standard deviation over the 5 folds. Validation predictions are not pooled, because the windows overlap.
+- **Aggregation:** only the mean and standard deviation over the 5 folds. The validation predictions are saved but not pooled into one score.
 - **Compare models only at the same prediction time.** The rows differ between prediction times: journeys whose cancellation is already announced are left out, so the reference scores also change with the prediction time.
 - **Results:** each run writes `results/<name>/<timestamp>/` with:
   - `config.json`: task, model, features and git commit;
@@ -80,10 +79,10 @@ To add a model: write a factory `make_x(numeric, categorical)` in `models.py` an
 
 `tests/test_pipeline.py` checks the method, not the models:
 
-- the folds equal `../cv_folds.json`;
-- in every fold, training rows are planned before validation rows, and no training outcome is known later than the gap allows;
+- the rows' folds equal those in `../data/journeys_cv.parquet`;
+- at every prediction time, the 5 folds split the rows into training and validation with no day on both sides, and every row is validated exactly once;
 - `current_delay` is used only from 1 h on;
-- loading the hold-out year raises an error;
+- loading the hold-out set raises an error;
 - log loss agrees with scikit-learn's, and the class-share reference scores exactly the cross-entropy computed by hand;
 - the probability columns are in the fixed class order;
 - with the answer given as a feature, the logistic model reaches log loss < 0.05 and macro-F1 = 1, and the linear model reaches RMSE ≈ 0, so predictions line up with their rows;

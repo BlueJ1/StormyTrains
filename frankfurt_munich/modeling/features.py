@@ -3,7 +3,7 @@
 Only information known at the prediction time is used: the timetable,
 calendar features of the planned departure, the recorded route, and
 `current_delay`. `current_delay` is used from 1 h on; at 24 h it is always
-missing and at 6 h 93% missing.
+missing and at 6 h 95% missing (CV set).
 
 Left out because they describe the outcome: reported times, the cancellation
 columns, `cancellation_announced`, `cancellation_withdrawn`,
