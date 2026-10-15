@@ -8,12 +8,12 @@ script
 2. drops unusual journeys (UNUSUAL JOURNEYS below);
 3. adds `current_delay` at each prediction time (CURRENT DELAY below);
 4. adds when a cancellation was announced (KNOWN CANCELLATIONS below);
-5. splits the journeys by planned Frankfurt departure (see folds.py) into
-   data/journeys_cv.parquet (July 2024 to September 2025) and
-   data/journeys_holdout.parquet (October 2025 to September 2026), and writes
-   the cross-validation fold boundaries to cv_folds.json;
+5. splits the journeys at random by day (see folds.py) into
+   data/journeys_cv.parquet (80% of the days, with a `fold` column 1 to 5) and
+   data/journeys_holdout.parquet (the other 20%);
 6. writes the prediction rows, one per journey and prediction time, to
-   data/prediction_rows_cv.parquet and data/prediction_rows_holdout.parquet.
+   data/prediction_rows_cv.parquet (with `fold`) and
+   data/prediction_rows_holdout.parquet.
 
 It also writes data/stops.parquet (the stops from Frankfurt to München),
 data/upstream_runs.parquet (each run's stops up to Frankfurt) and
@@ -83,7 +83,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "corridor_analysis"))
 import extract  # noqa: E402  corridor_analysis/extract.py
 
-from folds import CV_START, HOLDOUT_END, HOLDOUT_START, cv_folds, fold_bounds  # noqa: E402
+from folds import LATER_PERIOD_START, assign_splits  # noqa: E402
 from snapshots import event_summary, read_snapshots  # noqa: E402
 
 INPUT_DIR = ROOT / "data" / "monthly_processed_data"
@@ -153,7 +153,9 @@ def drop_unusual_journeys(journeys: pd.DataFrame, stops: pd.DataFrame) -> tuple[
     additional = journeys.journey_id.map(ends.groupby("journey_id").is_additional_stop.any()).fillna(False)
     drop = too_long | additional
     audit = {"over_7h": int(too_long.sum()), "over_7h_trains": journeys.train_number[too_long].value_counts().to_dict(),
-             "additional_end_stop": int(additional.sum()), "journeys_removed": int(drop.sum())}
+             "additional_end_stop": int(additional.sum()), "journeys_removed": int(drop.sum()),
+             "removed_from_2025_10": int((drop & journeys.origin_departure_planned_local.ge(LATER_PERIOD_START)).sum()),
+             "over_7h_canceled_share": round(float(journeys.journey_canceled[too_long].mean()), 4)}
     return journeys[~drop].reset_index(drop=True), audit
 
 
@@ -225,11 +227,12 @@ def cancellation_times(journeys: pd.DataFrame, stops: pd.DataFrame) -> tuple[pd.
 def prediction_rows(journeys: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """One row per journey and prediction time, without known cancellations."""
     rows, left_out = [], {}
+    columns = PREDICTION_ROW_COLUMNS + (["fold"] if "fold" in journeys else [])
     for name, ahead in HORIZONS.items():
         at = journeys.origin_departure_planned_local - ahead
         known = journeys.cancellation_announced.le(at)
         left_out[name] = int(known.sum())
-        rows.append(journeys.loc[~known, PREDICTION_ROW_COLUMNS].assign(
+        rows.append(journeys.loc[~known, columns].assign(
             prediction_time=name, predicted_at=at[~known], current_delay=journeys[f"current_delay_{name}"][~known]))
     out = pd.concat(rows, ignore_index=True)
     out["prediction_time"] = pd.Categorical(out.prediction_time, categories=list(HORIZONS), ordered=True)
@@ -267,11 +270,9 @@ def main() -> None:
     cancellations, cancel_audit = cancellation_times(j, stops)
     j = j.join(cancellations).reset_index()
 
-    # Split, prediction rows and folds
-    when = j.origin_departure_planned_local
-    splits = {"cv": j[when.ge(CV_START) & when.lt(HOLDOUT_START)],
-              "holdout": j[when.ge(HOLDOUT_START) & when.lt(HOLDOUT_END)]}
-    assert sum(len(s) for s in splits.values()) == len(j)
+    # Split, folds and prediction rows
+    is_holdout, j["fold"] = assign_splits(j)
+    splits = {"cv": j[~is_holdout], "holdout": j[is_holdout].drop(columns="fold")}
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     left_out = {}
     for split, frame in splits.items():
@@ -281,21 +282,21 @@ def main() -> None:
     write(stops, "stops.parquet")
     write(runs, "upstream_runs.parquet")
 
-    cv = splits["cv"]
-    folds = [{k: v if k == "fold" else str(v) for k, v in bounds.items()}
-             | {"train_journeys": int(train.sum()), "validation_journeys": int(val.sum())}
-             for (_, train, val), bounds in zip(cv_folds(cv), fold_bounds())]
-    (HERE / "cv_folds.json").write_text(json.dumps(folds, indent=2))
+    day = j.origin_departure_planned_local.dt.normalize()
+    split_sizes = {name: {"journeys": int(len(frame)), "days": int(day[frame.index].nunique())}
+                   for name, frame in splits.items()}
+    folds = {int(f): {"journeys": int(len(g)), "days": int(day[g.index].nunique())}
+             for f, g in splits["cv"].groupby("fold")}
 
     audit = {"source_files": [p.name for p in paths], "extraction": extraction_audit,
              "shared_departures": shared_audit, "unusual_journeys": unusual_audit, "journeys": int(len(j)),
-             **{f"{split}_journeys": int(len(frame)) for split, frame in splits.items()},
-             **{f"{split}_{name}": str(getattr(frame.origin_departure_planned_local, end)())
-                for split, frame in splits.items() for name, end in (("first", "min"), ("last", "max"))},
+             "first_departure": str(j.origin_departure_planned_local.min()),
+             "last_departure": str(j.origin_departure_planned_local.max()),
+             "splits": split_sizes, "folds": folds,
              **runs_audit, "cancellations": cancel_audit, "left_out_known_cancellation": left_out,
              "current_delay_known": {c: int(j[c].notna().sum()) for c in j if c.startswith("current_delay_")}}
     (HERE / "build_audit.json").write_text(json.dumps(audit, indent=2, ensure_ascii=False, default=str))
-    print(json.dumps(audit | {"folds": folds}, indent=2, ensure_ascii=False, default=str))
+    print(json.dumps(audit, indent=2, ensure_ascii=False, default=str))
 
 
 if __name__ == "__main__":

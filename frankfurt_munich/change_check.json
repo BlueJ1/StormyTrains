@@ -2,8 +2,8 @@
   "snapshots_last_day": "2026-10-01",
   "journeys_covered": 21800,
   "by_split": {
-    "cv": 11936,
-    "holdout": 9864
+    "cv": 17474,
+    "holdout": 4326
   },
   "arrival_source": {
     "after arrival": 20471,
@@ -11,6 +11,38 @@
     "before arrival": 132,
     "around arrival": 6,
     "no snapshot": 1
+  },
+  "arrival_source_by_split": {
+    "cv": {
+      "after arrival": 16425,
+      "around arrival": 4,
+      "before arrival": 90,
+      "cancelled": 954,
+      "no snapshot": 1
+    },
+    "holdout": {
+      "after arrival": 4046,
+      "around arrival": 2,
+      "before arrival": 42,
+      "cancelled": 236,
+      "no snapshot": 0
+    }
+  },
+  "arrival_source_by_period": {
+    "before_2025_10": {
+      "after arrival": 11378,
+      "around arrival": 4,
+      "before arrival": 6,
+      "cancelled": 548,
+      "no snapshot": 0
+    },
+    "from_2025_10": {
+      "after arrival": 9093,
+      "around arrival": 2,
+      "before arrival": 126,
+      "cancelled": 642,
+      "no snapshot": 1
+    }
   },
   "arrival_source_by_month": {
     "2024-07": {
@@ -396,21 +428,25 @@
     "2026-09": 22
   },
   "cancelled_in_cv": {
-    "journeys": 548,
-    "with_cancellation_time": 548,
+    "journeys": 954,
+    "with_cancellation_time": 954,
     "issued_before_planned_departure_by": {
-      "24h_or_more": 15,
-      "6h_or_more": 54,
-      "1h_or_more": 201,
-      "20min_or_more": 271,
-      "0min_or_more": 297
+      "24h_or_more": 42,
+      "6h_or_more": 133,
+      "1h_or_more": 395,
+      "20min_or_more": 520,
+      "0min_or_more": 565
     },
-    "issued_after_planned_departure": 251
+    "issued_after_planned_departure": 389
   },
   "cancellation_withdrawn": {
     "journeys_by_split": {
-      "holdout": 44,
-      "cv": 32
+      "cv": 67,
+      "holdout": 9
+    },
+    "journeys_by_period": {
+      "from_2025_10": 44,
+      "before_2025_10": 32
     },
     "cancelled_cv_journeys_withdrawn_at_both_ends": 0
   }

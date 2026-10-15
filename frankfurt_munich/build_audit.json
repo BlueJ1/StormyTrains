@@ -51,15 +51,45 @@
       "2923": 2
     },
     "additional_end_stop": 19,
-    "journeys_removed": 193
+    "journeys_removed": 193,
+    "removed_from_2025_10": 45,
+    "over_7h_canceled_share": 0.1609
   },
   "journeys": 21831,
-  "cv_journeys": 11936,
-  "holdout_journeys": 9895,
-  "cv_first": "2024-07-01 00:17:00",
-  "cv_last": "2025-09-30 20:54:00",
-  "holdout_first": "2025-10-01 02:25:00",
-  "holdout_last": "2026-09-30 19:57:00",
+  "first_departure": "2024-07-01 00:17:00",
+  "last_departure": "2026-09-30 19:57:00",
+  "splits": {
+    "cv": {
+      "journeys": 17505,
+      "days": 662
+    },
+    "holdout": {
+      "journeys": 4326,
+      "days": 160
+    }
+  },
+  "folds": {
+    "1": {
+      "journeys": 3490,
+      "days": 131
+    },
+    "2": {
+      "journeys": 3491,
+      "days": 132
+    },
+    "3": {
+      "journeys": 3510,
+      "days": 132
+    },
+    "4": {
+      "journeys": 3516,
+      "days": 134
+    },
+    "5": {
+      "journeys": 3498,
+      "days": 133
+    }
+  },
   "run_stops_read": 131695,
   "run_stops_off_panel": 15167,
   "cancellations": {
@@ -70,18 +100,18 @@
   },
   "left_out_known_cancellation": {
     "cv": {
-      "24h": 15,
-      "6h": 54,
-      "1h": 201,
-      "20min": 271,
-      "0min": 297
+      "24h": 42,
+      "6h": 133,
+      "1h": 395,
+      "20min": 520,
+      "0min": 565
     },
     "holdout": {
-      "24h": 35,
-      "6h": 99,
-      "1h": 273,
-      "20min": 356,
-      "0min": 393
+      "24h": 8,
+      "6h": 20,
+      "1h": 79,
+      "20min": 107,
+      "0min": 125
     }
   },
   "current_delay_known": {
