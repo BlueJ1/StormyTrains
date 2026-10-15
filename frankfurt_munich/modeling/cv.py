@@ -95,7 +95,9 @@ def git_commit() -> str:
         return subprocess.run(["git", *args], cwd=HERE, capture_output=True,
                               text=True).stdout.strip()
     commit = git("rev-parse", "HEAD")
-    return commit + (" (uncommitted changes)" if git("status", "--porcelain") else "")
+    # Results written earlier in the same run don't count as changes.
+    changed = git("status", "--porcelain", "--", ":/", ":(exclude)results")
+    return commit + (" (uncommitted changes)" if changed else "")
 
 
 def run_cv(name: str, task: str, make_model, prediction_times=PREDICTION_TIMES,
