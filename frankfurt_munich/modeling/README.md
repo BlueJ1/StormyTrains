@@ -92,18 +92,18 @@ To add a model: write a factory `make_x(numeric, categorical)` in `models.py` an
 
 ## Results, 15 October 2026
 
-Mean ± standard deviation over the 5 random day folds.
+Mean ± standard deviation over the 5 week folds.
 
 | Prediction time | Log loss: class shares | Log loss: logistic | Macro-F1: class shares | Macro-F1: logistic | RMSE: training mean | RMSE: linear |
 |---|---|---|---|---|---|---|
-| 24 h | 0.968 ± 0.005 | 0.923 ± 0.009 | 0.193 ± 0.000 | 0.221 ± 0.010 | 25.68 ± 0.62 | 24.68 ± 0.67 |
-| 6 h | 0.958 ± 0.008 | 0.914 ± 0.011 | 0.194 ± 0.001 | 0.222 ± 0.010 | 25.68 ± 0.62 | 24.68 ± 0.67 |
-| 1 h | 0.923 ± 0.009 | 0.825 ± 0.016 | 0.196 ± 0.001 | 0.322 ± 0.018 | 25.68 ± 0.62 | 23.24 ± 0.55 |
-| 20 min | 0.904 ± 0.009 | 0.792 ± 0.013 | 0.197 ± 0.001 | 0.347 ± 0.011 | 25.68 ± 0.62 | 22.59 ± 0.73 |
-| 0 min | 0.896 ± 0.011 | 0.776 ± 0.015 | 0.197 ± 0.001 | 0.361 ± 0.013 | 25.68 ± 0.62 | 22.30 ± 0.66 |
+| 24 h | 0.968 ± 0.009 | 0.927 ± 0.017 | 0.193 ± 0.001 | 0.223 ± 0.003 | 25.43 ± 0.91 | 24.56 ± 0.88 |
+| 6 h | 0.958 ± 0.007 | 0.918 ± 0.016 | 0.194 ± 0.001 | 0.222 ± 0.005 | 25.43 ± 0.91 | 24.56 ± 0.88 |
+| 1 h | 0.923 ± 0.009 | 0.824 ± 0.014 | 0.196 ± 0.002 | 0.329 ± 0.009 | 25.43 ± 0.91 | 22.92 ± 0.82 |
+| 20 min | 0.905 ± 0.006 | 0.794 ± 0.016 | 0.196 ± 0.001 | 0.350 ± 0.015 | 25.43 ± 0.91 | 22.37 ± 0.87 |
+| 0 min | 0.897 ± 0.005 | 0.778 ± 0.015 | 0.197 ± 0.001 | 0.361 ± 0.014 | 25.43 ± 0.91 | 22.03 ± 1.00 |
 
 - Both models beat their reference at every prediction time.
 - The largest gain comes from 1 h on, when `current_delay` is available.
 - The class-share reference always predicts `normal_minor`, so its macro-F1 stays near 0.2.
 - The `delay` rows are the same at 24 h and 6 h (completed journeys, no `current_delay`), so the scores are too.
-- The standard deviations are much smaller than with the earlier chronological folds, because random folds of days resemble each other. The scores are not comparable with the results from 12 October.
+- The standard deviations are much smaller than with the earlier chronological folds, because every fold mixes weeks from the whole period. The scores are not comparable with the chronological results from 12 October.

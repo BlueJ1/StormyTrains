@@ -1,8 +1,8 @@
 {
-  "name": "linear_regression",
+  "name": "training_mean",
   "task": "delay",
   "target": "arrival_delay_min",
-  "model": "Pipeline(steps=[('preprocess',\n                 ColumnTransformer(transformers=[('numeric',\n                                                  Pipeline(steps=[('simpleimputer',\n                                                                   SimpleImputer(add_indicator=True,\n                                                                                 fill_value=0,\n                                                                                 strategy='constant')),\n                                                                  ('standardscaler',\n                                                                   StandardScaler())]),\n                                                  ['planned_travel_min',\n                                                   'observed_stops',\n                                                   'unobserved_sequence_positions']),\n                                                 ('categorical',\n                                                  OneHotEncoder(handle_unknown='ignore'),\n                                                  ['train_type',\n                                                   'starts_at_origin',\n                                                   'recorded_route', 'hour',\n                                                   'weekday', 'month'])])),\n                ('model', LinearRegression())])",
+  "model": "DummyRegressor()",
   "features": {
     "24h": {
       "numeric": [
@@ -83,6 +83,6 @@
       ]
     }
   },
-  "git_commit": "3b8b8e7809b07b36e1db908fe9de3122a084b203",
-  "created": "2026-10-15T13:15:44"
+  "git_commit": "b80d7444206c4671883ec07a952cd2094bd60126",
+  "created": "2026-10-15T14:07:56"
 }
