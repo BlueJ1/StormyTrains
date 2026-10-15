@@ -1,0 +1,1730 @@
+{
+  "review_date": "2026-10-16",
+  "original_weather_provider": "Deutscher Wetterdienst (DWD), Climate Data Center (CDC)",
+  "dwd_base_url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/",
+  "station_catalogues": [
+    {
+      "filename": "TU_Stundenwerte_Beschreibung_Stationen.txt",
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/TU_Stundenwerte_Beschreibung_Stationen.txt",
+      "retrieved_date": "2026-10-12",
+      "sha256": "f0021fb0b6a8e6125f5df6555559827242262e4028174f35ede3ba85e59f9759"
+    },
+    {
+      "filename": "RR_Stundenwerte_Beschreibung_Stationen.txt",
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/RR_Stundenwerte_Beschreibung_Stationen.txt",
+      "retrieved_date": "2026-10-12",
+      "sha256": "ade6924b170ef7e73629928dad2983a80b0b39ea68cc2d3b123f8c75d0110c59"
+    },
+    {
+      "filename": "FF_Stundenwerte_Beschreibung_Stationen.txt",
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/FF_Stundenwerte_Beschreibung_Stationen.txt",
+      "retrieved_date": "2026-10-12",
+      "sha256": "83641e50dbce83c791852832a49304d81006f959260648c918599764c8582ae0"
+    },
+    {
+      "filename": "FX_Stundenwerte_Beschreibung_Stationen.txt",
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/FX_Stundenwerte_Beschreibung_Stationen.txt",
+      "retrieved_date": "2026-10-12",
+      "sha256": "4706732180831dab0c472e80b614ac23ba0ed3f5948cbd1c4437ceff7e4046a8"
+    },
+    {
+      "filename": "KL_Tageswerte_Beschreibung_Stationen.txt",
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/KL_Tageswerte_Beschreibung_Stationen.txt",
+      "retrieved_date": "2026-10-12",
+      "sha256": "f66b99074bf7a681df52d8d67ea7c8f87323ae48994747f115098e1188ec92b6"
+    }
+  ],
+  "project_railway_inputs": [
+    {
+      "filename": "journeys_cv.parquet",
+      "role": "Development set: 17,507 journeys; recorded_route, scheduled departure and fold inspected without using target labels.",
+      "sha256": "5204a6b67b573ffaa2b210dd8ca42c7ba6e503126deee8e316305745587ea450",
+      "bytes": 792223
+    },
+    {
+      "filename": "journeys_holdout.parquet",
+      "role": "Final evaluation set: 4,324 journeys; recorded_route and scheduled departure inspected for scope and split checks without using target labels.",
+      "sha256": "e0c66b44d849d1069f026888aca2fa4659aa15650f424624172fcc0bb5ecc45b",
+      "bytes": 209963
+    },
+    {
+      "filename": "railway_station_coordinates.csv",
+      "role": "Railway EVA identifiers and coordinates, joined by exact station name.",
+      "sha256": "b008ee4ec28e25b51d722bbddb41c15d0c7bfd564ff5c957158082a6269cb7a3",
+      "bytes": 4302
+    }
+  ],
+  "dwd_archives": [
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_00232_19610101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:29.923587+00:00",
+      "sha256": "1e24ccf42c13d831b694691ca92df5e5cf1cabfe82ffbb9c0dcb4101d7272986",
+      "bytes": 2628273,
+      "last_modified": "Wed, 10 Jun 2026 23:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_00232_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:32.263608+00:00",
+      "sha256": "41692d44ccf2336ae2b7abdd4bab498710370892d8913464e7c98aa8547e632a",
+      "bytes": 73234,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_00282_19710801_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T22:39:53.733213+00:00",
+      "sha256": "21c4c4d01d7205dbc1ca3dc5cdc27f9369dc657da5a3d2162b463e205b27c890",
+      "bytes": 2210554,
+      "last_modified": "Wed, 10 Jun 2026 23:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_00282_akt.zip",
+      "downloaded_utc": "2026-10-15T22:39:57.578147+00:00",
+      "sha256": "a99607192763dbaea76cb0e8a0a22570e057054ec334c0172c0e5e2c349df895",
+      "bytes": 70175,
+      "last_modified": "Thu, 15 Oct 2026 11:55:16 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_01262_19920519_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:20.365696+00:00",
+      "sha256": "99c22f3f752d6ddebe1f84c56e2c7c2f98c052cb23ab00e84d9154ded1877ae2",
+      "bytes": 1438855,
+      "last_modified": "Wed, 10 Jun 2026 23:15:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_01262_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:23.588122+00:00",
+      "sha256": "896b931ae292812f59e37cb66b540595d1c4b4f637b6d160787f788ab4ee152e",
+      "bytes": 72676,
+      "last_modified": "Thu, 15 Oct 2026 11:55:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_01420_19670101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:32.042809+00:00",
+      "sha256": "0be507f35315ae1d59aa2dc889c2201b078f3a23879c816a51a4d706c2eb4f4f",
+      "bytes": 2346883,
+      "last_modified": "Wed, 10 Jun 2026 23:15:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_01420_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:34.675479+00:00",
+      "sha256": "e798995fc7129f8195428270098dab4dac8bbd752ed08a6d5e400c06c25cce54",
+      "bytes": 72983,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_01587_20031210_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:29.541680+00:00",
+      "sha256": "0870916d8120674ec75b67be38897b8164418e50eeed1d99b6abfcf75f4d6457",
+      "bytes": 920521,
+      "last_modified": "Wed, 10 Jun 2026 23:15:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_01587_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:30.144235+00:00",
+      "sha256": "1d9dd4203b0c966c96afd3dea6645e737243b353c7c4d3a25923ed44a4906d49",
+      "bytes": 70144,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_01886_20091126_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:08.563033+00:00",
+      "sha256": "97229588d27ef4039bb7c7e7d871e509975a809ee202e4574795cbf91762d92c",
+      "bytes": 682749,
+      "last_modified": "Wed, 10 Jun 2026 23:15:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_01886_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:09.282561+00:00",
+      "sha256": "f0b34838ceb4e11ec744d997dd15bdf3d933acc5c267de8d051a869d03ab6521",
+      "bytes": 69224,
+      "last_modified": "Thu, 15 Oct 2026 11:55:16 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_03379_19850101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:32.095023+00:00",
+      "sha256": "68bcc5b6b3cb381332c3a24923a95037e152a312aefcf47adfe6dcfe6b68d5c2",
+      "bytes": 1707987,
+      "last_modified": "Wed, 10 Jun 2026 23:15:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_03379_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:34.711001+00:00",
+      "sha256": "e07602176f27c77ec9cb4a7d69fddef5653813a2339238663e866cde4793d610",
+      "bytes": 71330,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_03668_19490101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:34.669679+00:00",
+      "sha256": "edf15def0c13edb4c7b8553f342c007159fcb78eac2fb6620d7dca13a64f1f12",
+      "bytes": 2798374,
+      "last_modified": "Wed, 10 Jun 2026 23:15:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_03668_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:38.378926+00:00",
+      "sha256": "8b5c0965b0b17d9dfa250531a1bd72d702a2003dd03e84c59b518ea173b93187",
+      "bytes": 72960,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_04280_19710101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:26.583601+00:00",
+      "sha256": "6522283b8c0a243dee0ecbe4c08238ed1cab0a1035c6ff233ce101e208cda493",
+      "bytes": 2067987,
+      "last_modified": "Wed, 10 Jun 2026 23:15:11 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_04280_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:29.626606+00:00",
+      "sha256": "452cde67ec30c57562220b80f9117d3d6815130f60a26ae278f9e5cfdf5c0984",
+      "bytes": 72698,
+      "last_modified": "Thu, 15 Oct 2026 11:55:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_04928_19760901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:37.115633+00:00",
+      "sha256": "28a4aeec5081ed89f4077c2e2132ed5ba0217a50f184576180f56c02210233ae",
+      "bytes": 2082081,
+      "last_modified": "Wed, 10 Jun 2026 23:15:11 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_04928_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:39.923394+00:00",
+      "sha256": "ce1c995e8e21367cf9d1ce42ef5f202952d8f240de56e1f4026b26a98c79c85e",
+      "bytes": 72799,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_05404_19720101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:52.542542+00:00",
+      "sha256": "204fd0297201f26315b227034c2837ed9c9b449e2d6c7b42af2c48a5e9805ff3",
+      "bytes": 1526718,
+      "last_modified": "Wed, 10 Jun 2026 23:15:11 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_05404_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:57.659395+00:00",
+      "sha256": "37858bb2f486b8df0fe28cca7495f9a58d4fe3fe0069799caf2a785f1832c00c",
+      "bytes": 72257,
+      "last_modified": "Thu, 15 Oct 2026 11:55:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_05705_19660101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:38.371813+00:00",
+      "sha256": "af1c0fa1c815069818ad8f8366b326e2740d5685c93baa56fec8b5f84fa9e2da",
+      "bytes": 2460785,
+      "last_modified": "Wed, 10 Jun 2026 23:15:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_05705_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:42.392713+00:00",
+      "sha256": "24b572788e29c8b29ee366269133e658905c0e447f7bf9687c165507a6e3f926",
+      "bytes": 72650,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_05906_19690101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:38.409614+00:00",
+      "sha256": "81955434e43f77f2e40d2710e36f8032d4a8123ed6eacbe73d04fb514867d181",
+      "bytes": 2340800,
+      "last_modified": "Wed, 10 Jun 2026 23:15:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_05906_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:42.387815+00:00",
+      "sha256": "4224172f0ea7bc7b76023b08029a339bfb033a511dc7fd03528019416280b27d",
+      "bytes": 72841,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_07341_20050801_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:40.956206+00:00",
+      "sha256": "a81301a1849bc8ba5d15953de5ccebc3fc57f324ed1b748983951b4d7a7eabdc",
+      "bytes": 851884,
+      "last_modified": "Wed, 10 Jun 2026 23:15:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_07341_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:44.685861+00:00",
+      "sha256": "fc0d32fde576ea4f3cc5305e0a76d61c152ae34dbed19bd253120cb01c5457a9",
+      "bytes": 70079,
+      "last_modified": "Tue, 13 Oct 2026 10:35:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_07412_20061001_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:44.691312+00:00",
+      "sha256": "850eefd7533b2de8086ca8c1dd145f633205a843107bc638bc87f0183d877aae",
+      "bytes": 811305,
+      "last_modified": "Wed, 10 Jun 2026 23:15:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_07412_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:46.749138+00:00",
+      "sha256": "7c36eafdb4ef12dd5d8093178f27592c11de60a433715b8909c8796fa8817cc4",
+      "bytes": 71022,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_10510_20090101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:46.410836+00:00",
+      "sha256": "6141bc2faa1bda95ec5bb2194ddcfab8d597e5535af0a6aac2dd8a8b4422226b",
+      "bytes": 706275,
+      "last_modified": "Wed, 10 Jun 2026 23:15:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_10510_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:47.988540+00:00",
+      "sha256": "d1a90bab2c6093fd6cf0bef0549b0446a4b2473deabf9e715a3c72c0d0443c82",
+      "bytes": 67785,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_13674_20070801_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:18.300068+00:00",
+      "sha256": "1c3bf2d474ead34df8bd6ee284d1e8450c557ff165b75cff6f7d140bec4288bd",
+      "bytes": 768667,
+      "last_modified": "Wed, 10 Jun 2026 23:15:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_13674_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:19.978518+00:00",
+      "sha256": "f1f5730d199b9359b7916810ee81848446e1330f580cfe2680ea588b04767fcb",
+      "bytes": 68829,
+      "last_modified": "Thu, 15 Oct 2026 11:55:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_15444_20140901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:47.987684+00:00",
+      "sha256": "84d035752ee5e2f1733a033ede47e1443e2899ef245b4c84c579e3e5dc5f902d",
+      "bytes": 478153,
+      "last_modified": "Wed, 10 Jun 2026 23:15:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_15444_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:49.461883+00:00",
+      "sha256": "3576dd0c7f2effcc729944b0ab688adfac6ec0f4a2ebc66a9d29a51dc4c82352",
+      "bytes": 70363,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/historical/stundenwerte_FF_15976_20200402_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:49.461950+00:00",
+      "sha256": "2e5181766daad9a43119f0856eb5e3e84428dbfbbf2397b4fa09e83b398557da",
+      "bytes": 249390,
+      "last_modified": "Wed, 10 Jun 2026 23:15:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/wind/recent/stundenwerte_FF_15976_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:51.112933+00:00",
+      "sha256": "f25149f3da2977e5009701b37fe367ddd7ef40053468d2b433248f08a511bb2e",
+      "bytes": 71269,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_00232_19900701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:17.941760+00:00",
+      "sha256": "c388740e99d0db3db6b1f308c51dd3cc7ba44a0f1fcff665c92b572e9b81fab8",
+      "bytes": 790706,
+      "last_modified": "Wed, 10 Jun 2026 23:05:04 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_00232_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:20.043011+00:00",
+      "sha256": "7bff3d907c7c22adc3830863a0ed2c1618212e19323a04b217c312c8f3a24e07",
+      "bytes": 58968,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_00282_19900701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T22:39:54.184203+00:00",
+      "sha256": "c62c46d9798e0b303b18db181e5351a8f668826adda02826a4d47ceac5f02dcd",
+      "bytes": 754137,
+      "last_modified": "Wed, 10 Jun 2026 23:05:04 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_00282_akt.zip",
+      "downloaded_utc": "2026-10-15T22:39:55.161732+00:00",
+      "sha256": "190debc83ee241747f6e9ba8cb29b8fbbb2ae49ce96178953118eebb0e08f924",
+      "bytes": 57113,
+      "last_modified": "Thu, 15 Oct 2026 11:55:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_01262_19920519_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:47.433617+00:00",
+      "sha256": "6228d992643aeb9e4dd4d804b4b7b58ebe2091c8215292d4ea7825884c1a460a",
+      "bytes": 761436,
+      "last_modified": "Wed, 10 Jun 2026 23:05:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_01262_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:48.118755+00:00",
+      "sha256": "704fc7d8203544a3071df2b2ee32d52727238965503d657e203c40a5cb2e10b4",
+      "bytes": 55460,
+      "last_modified": "Thu, 15 Oct 2026 11:55:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_01420_19900627_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:18.005911+00:00",
+      "sha256": "142011a9e7850fdb5342456351e0a39987c3e6269d84757930f3b72cc339e1b3",
+      "bytes": 803630,
+      "last_modified": "Wed, 10 Jun 2026 23:05:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_01420_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:20.043057+00:00",
+      "sha256": "363613705899e30f6d8bb719f8796741c961c30df8ee728c53f0f5138755234b",
+      "bytes": 59844,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_01587_19900705_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:19.783214+00:00",
+      "sha256": "ebfc8750ea29a6eaac0d773c6ed07146d0e0842be1dbe9a7987c66d2a3ec0cc1",
+      "bytes": 757607,
+      "last_modified": "Wed, 10 Jun 2026 23:05:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_01587_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:22.669249+00:00",
+      "sha256": "113d52b5c4f121265646895ad175fb7f29631ef71afbe0b39d8a7b00252291f9",
+      "bytes": 58339,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_01886_20091126_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:50.363712+00:00",
+      "sha256": "91121972e02ad05a14c0e35475b85dca06221af7aa41a969fcd9e1536bc684ca",
+      "bytes": 528021,
+      "last_modified": "Wed, 10 Jun 2026 23:05:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_01886_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:51.008601+00:00",
+      "sha256": "99c3417053d36a08b88011c22689e6133cda61cf47de572cfffe82d97e75b828",
+      "bytes": 56846,
+      "last_modified": "Thu, 15 Oct 2026 11:55:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_03379_19900701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:22.404502+00:00",
+      "sha256": "afee0d240f8e539fa6e5c936879de3d8990d8901e8c60a1f9660d50c1e3e4900",
+      "bytes": 782197,
+      "last_modified": "Wed, 10 Jun 2026 23:05:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_03379_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:24.072659+00:00",
+      "sha256": "5e8a02c9319c41c8b010f918f480efdc9630ebc8122b042897009456ba29a35a",
+      "bytes": 58727,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_03668_19900701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:24.011636+00:00",
+      "sha256": "669d07232ec9a0cd7e222a953c1a196aa3afb848f2b56dcb1b69047046a0fe32",
+      "bytes": 750607,
+      "last_modified": "Wed, 10 Jun 2026 23:05:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_03668_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:27.268504+00:00",
+      "sha256": "63bbbf81f033ce14453a0176321ec2399152126bdc17f88237a563792501f0ab",
+      "bytes": 54797,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_04280_19930302_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:28.672731+00:00",
+      "sha256": "0bffe3dcc2805dd9958b61c6bddc64c8bf931fc97cdd634f11c519b4b1ace090",
+      "bytes": 427002,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_04280_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:30.362573+00:00",
+      "sha256": "32aab2de5858a24436e87890ef8700f70e8c67aabedf3597dca5e5486de40ba4",
+      "bytes": 57586,
+      "last_modified": "Thu, 15 Oct 2026 11:55:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_04928_19900701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:23.952519+00:00",
+      "sha256": "f4ece4c4154289fc494160f937bcfa320343a0d90825d4c4c5c850186a80679b",
+      "bytes": 770573,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_04928_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:25.968093+00:00",
+      "sha256": "56bdb31e367335aca6a0e604493561dc0e2453edeefa77bfb93072fda7a30804",
+      "bytes": 58880,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_05404_20081124_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:33:21.991598+00:00",
+      "sha256": "fcc107abff8bbb1507c89bbb9a83566acaf63579bbad5f41f18fb6c4db211141",
+      "bytes": 550092,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_05404_akt.zip",
+      "downloaded_utc": "2026-10-15T20:33:22.931691+00:00",
+      "sha256": "f9dfa5b6092f053ced9cf96929d2fe852c9a251fcece011423ddf25f58c10d0c",
+      "bytes": 58777,
+      "last_modified": "Thu, 15 Oct 2026 11:55:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_05705_19900701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:25.661112+00:00",
+      "sha256": "8afb50d3569d383ee4262cf98844695b2ec2fb4994b3b1681bdab1cd29857fc0",
+      "bytes": 818510,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_05705_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:27.268555+00:00",
+      "sha256": "3a1ed15f507a53c4423fccd01aaa863f5feaf1c2a2b8345339b2a093443f1cba",
+      "bytes": 59453,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_05906_19900701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:29.625962+00:00",
+      "sha256": "966ae8be35942b819f53e2ccac25dc74d0aefb72d1441bf6c91f54f86f7fb38c",
+      "bytes": 782486,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_05906_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:30.548552+00:00",
+      "sha256": "0309dc6c5daa895a66ab5361beb17e6223da2dff65276524ac20b344018a2c72",
+      "bytes": 58701,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_07341_20050718_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:29.577788+00:00",
+      "sha256": "68da852376050580f9a9c528cb1f417bc53f8708c78586ee037a0167264600e2",
+      "bytes": 632503,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_07341_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:30.187373+00:00",
+      "sha256": "acebb0ce5a5fbd4e609d3fa0e9c2ca20612cf2531eb23421357c449a5a80ba7c",
+      "bytes": 58480,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_07412_20061001_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:30.151156+00:00",
+      "sha256": "b11d66a113a2e12dff1f08cee15aee7a8ea5daa3a5e969f64a8e7e8bf21b23bf",
+      "bytes": 605058,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_07412_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:32.974259+00:00",
+      "sha256": "50624a1da41eba99c9bba7831f6825cdf00c0da438fbac3b65a416fc0b34c865",
+      "bytes": 58771,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_10510_20090101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:30.158093+00:00",
+      "sha256": "43f0228c7c0c49196932f6e3ed9a03fc80e39d878857b9a0b5ef5755d6cc7d95",
+      "bytes": 540811,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_10510_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:32.972119+00:00",
+      "sha256": "b3bd3111d016185571c57c67c69918753969c218406aaca70974799b6277571a",
+      "bytes": 55618,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_13674_20070801_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:27.045577+00:00",
+      "sha256": "d11052a23f6695ec863a80ffbd74fafbc278ecbee985e7266632f98ae4932207",
+      "bytes": 581312,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_13674_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:28.630569+00:00",
+      "sha256": "d98a99e11d4fc4b9b6c34a86fc4229f8c5b650ad55b19d8575471b140417a6ed",
+      "bytes": 57086,
+      "last_modified": "Thu, 15 Oct 2026 11:55:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_14007_20200921_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:34.174821+00:00",
+      "sha256": "15a845e494c565fa4f216d00a59ad9791109a4394a52ea5348ebab875ab2566d",
+      "bytes": 185406,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_14007_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:35.602905+00:00",
+      "sha256": "9a50d3e40ff098b9967528dce72fd911a01b48e651036b3490ac66685308c664",
+      "bytes": 57030,
+      "last_modified": "Tue, 13 Oct 2026 10:35:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_14009_20200930_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:21.123124+00:00",
+      "sha256": "0915a60013c779ff306c40382520a65bada63e65b9523cfa9558b8a136940a00",
+      "bytes": 185653,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_14009_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:23.588091+00:00",
+      "sha256": "6be168e163f5550dc6f5b257489d4f2a676d70e2c9b81dd88ac35240980d42ac",
+      "bytes": 58055,
+      "last_modified": "Thu, 15 Oct 2026 11:55:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/historical/stundenwerte_FX_15444_20140901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:35.347330+00:00",
+      "sha256": "2f087d5065e907ce3f03198f9197f6cbe070ca48b8db17daeeac744572b4cd80",
+      "bytes": 390436,
+      "last_modified": "Wed, 10 Jun 2026 23:05:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/extreme_wind/recent/stundenwerte_FX_15444_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:36.765074+00:00",
+      "sha256": "d5e9b7c0a4d5ef080976aa80570d719b302450fdcdb5c32f1bacd5c7ab459b17",
+      "bytes": 58357,
+      "last_modified": "Tue, 13 Oct 2026 10:35:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_00130_20041201_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:42.635855+00:00",
+      "sha256": "b48d06d1d1a7bc6911d9db37ffbd738d7c599162cb1c91e2960f6d5ba5525f8b",
+      "bytes": 536727,
+      "last_modified": "Wed, 10 Jun 2026 23:05:04 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_00130_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:45.708692+00:00",
+      "sha256": "4a05e80f1e08019ea8783ab3c2c70b7c2ec73723cf5df8aa830286a352e779ea",
+      "bytes": 42798,
+      "last_modified": "Thu, 15 Oct 2026 12:40:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_00232_19961107_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:36.765696+00:00",
+      "sha256": "1784d6065a51049fb9a40ffdb597a7927dd52c5fcdd60060bbbc9a9a9d1b6328",
+      "bytes": 782271,
+      "last_modified": "Wed, 10 Jun 2026 23:05:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_00232_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:38.712838+00:00",
+      "sha256": "8df633326c1afa2f776b4bd0e1619e65318d2cc73e38c78efb0eacc40c31c123",
+      "bytes": 44828,
+      "last_modified": "Mon, 12 Oct 2026 09:00:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_00279_20061101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:36.765354+00:00",
+      "sha256": "665b0929d6ac5f65be1b317131bad827d9342850e4f62d74842e4c7170e6f6a8",
+      "bytes": 491896,
+      "last_modified": "Wed, 10 Jun 2026 23:05:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_00279_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:41.327825+00:00",
+      "sha256": "92148098f3a4c0df7e89b6a2b32b66ac6879bcb5ea3b66ec4f744c93103faa9a",
+      "bytes": 42038,
+      "last_modified": "Mon, 12 Oct 2026 09:00:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_00282_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:59.425578+00:00",
+      "sha256": "8f082130fb3e10f2595d0c427960d811753b9bfd66bdc1548e6d4db2909fb7e5",
+      "bytes": 832942,
+      "last_modified": "Wed, 10 Jun 2026 23:05:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_00282_akt.zip",
+      "downloaded_utc": "2026-10-15T20:33:00.160762+00:00",
+      "sha256": "6b3eaab0e59eaff23666e5e13de3311c07071c84bbdac04f082132ec2470e49b",
+      "bytes": 46779,
+      "last_modified": "Thu, 15 Oct 2026 12:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_00917_20040901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:39.908017+00:00",
+      "sha256": "d0d9a05ddc157c95e6870dd6487abb8ff0c690b09794925e2727eed3a8811672",
+      "bytes": 541387,
+      "last_modified": "Wed, 10 Jun 2026 23:05:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_00917_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:43.951068+00:00",
+      "sha256": "a5b12e54ecc0530d24e6cc68a88ce7c3993537191bd1eb39c48988f622e095cd",
+      "bytes": 41041,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_01262_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:08.809845+00:00",
+      "sha256": "5b0870ade938d88b9e124ad8fac021f0e96584042a0effc89a7ec35a6085c46c",
+      "bytes": 803531,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_01262_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:15.472830+00:00",
+      "sha256": "b59e39c5d8cb1e1547564e02b0b1c652c12499a9832f6a120285c03fc798eecc",
+      "bytes": 47100,
+      "last_modified": "Thu, 15 Oct 2026 12:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_01279_20060701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:33:55.387394+00:00",
+      "sha256": "f6840f1252980bb3a19f0328a92ba9b34537b7ae28244aad17a80003fd117595",
+      "bytes": 492876,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_01279_akt.zip",
+      "downloaded_utc": "2026-10-15T20:33:59.169913+00:00",
+      "sha256": "38f8e58df1b76d92c7e4334ad6e8f70c8fa7b8d3639a5edcd6c4a9a726e443de",
+      "bytes": 42998,
+      "last_modified": "Thu, 15 Oct 2026 12:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_01420_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:06.716915+00:00",
+      "sha256": "caddeacaeaeca14cb5af9a06cb718ef6a6238d0ed693b1fcf492c30d4e7fd953",
+      "bytes": 788625,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_01420_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:07.366051+00:00",
+      "sha256": "cc7b2d6d9fa9bb3a09d40d17fe9079ed914021ccc2d9fca5f259720a7aceecc3",
+      "bytes": 46671,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_01424_20080801_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:39.908057+00:00",
+      "sha256": "d9ac15e9e7a1badf248d3a59501410d48b31b4ff81851ebc549a0b0e1b022c7e",
+      "bytes": 443082,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_01424_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:43.837403+00:00",
+      "sha256": "74b614b0ca745d4784f10234539e74bddd48f3951ac018861cd8831a142b1d3c",
+      "bytes": 40889,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_01587_19960830_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:14.252430+00:00",
+      "sha256": "66a40fc2798d62baf6b4cdcdd0b9be6414905d818225f0737724aa2dc27b153b",
+      "bytes": 773956,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_01587_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:14.829919+00:00",
+      "sha256": "4538da0d71dc92cc77095d98a1b1499d44715281e64f64e4568251501ca39767",
+      "bytes": 46446,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_01851_20030429_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:42.701993+00:00",
+      "sha256": "ffdf229d2ff59c779bcf62216a54cb09f2188b0a0904725dd443536f84527ad5",
+      "bytes": 593150,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_01851_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:47.647846+00:00",
+      "sha256": "c37f85ecf61ba752a59946eaa7ef218b97184a24972f67ca165f001432fe9071",
+      "bytes": 40389,
+      "last_modified": "Mon, 12 Oct 2026 09:00:11 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_02023_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:50.369417+00:00",
+      "sha256": "b8282761b70cefceb149bc1f7815b9f1c817daf9369a403fd741444a1b0ad8b9",
+      "bytes": 795026,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_02023_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:51.326300+00:00",
+      "sha256": "c3f29b606b0118cf4889fbbb2a4c2e50c45acc4e4e96ff8eea084db52c6e96d3",
+      "bytes": 46567,
+      "last_modified": "Thu, 15 Oct 2026 12:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_02409_20090101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:45.304478+00:00",
+      "sha256": "f96a66360b2bec5c4938a080312868a5125ab372660f99cc802899657c8a24a6",
+      "bytes": 434387,
+      "last_modified": "Wed, 10 Jun 2026 23:05:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_02409_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:51.277188+00:00",
+      "sha256": "8996478f94912a1efab060e0f38027ada8d775081c2d3fc2245841ab3a64528b",
+      "bytes": 40772,
+      "last_modified": "Mon, 12 Oct 2026 09:00:11 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_02485_20110502_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:28.741721+00:00",
+      "sha256": "3de40c9bb625479967774b5c441acd61003f18f527218282a0016adaab77a28f",
+      "bytes": 389665,
+      "last_modified": "Wed, 10 Jun 2026 23:05:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_02485_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:31.712688+00:00",
+      "sha256": "b423e2fb0a6488c25e799ae2d6cccb60ffda30083d0222af7cf57addb699480b",
+      "bytes": 47930,
+      "last_modified": "Thu, 15 Oct 2026 12:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_02597_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:31.664386+00:00",
+      "sha256": "03f6728ea53d110ddb5beed502bdecbb1dab2e7569877c0d719e860fc88979f9",
+      "bytes": 851877,
+      "last_modified": "Wed, 10 Jun 2026 23:05:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_02597_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:35.564540+00:00",
+      "sha256": "00357dadcd52e11782c72fec0f8a166927a28b8b80b50ef539cb252f38e18f9b",
+      "bytes": 46980,
+      "last_modified": "Thu, 15 Oct 2026 12:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_02601_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:16.642798+00:00",
+      "sha256": "44205b0b5ceff5247b1feff0b0eff7f6353c686326f4dab5354c9eb9c92e437f",
+      "bytes": 817333,
+      "last_modified": "Wed, 10 Jun 2026 23:05:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_02601_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:18.525597+00:00",
+      "sha256": "ae490f85628e647c4b1293509f5afa40dc0b0e811402a39ec172d1b34c5f8351",
+      "bytes": 48018,
+      "last_modified": "Thu, 15 Oct 2026 12:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_02700_20041201_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:33:29.784778+00:00",
+      "sha256": "73099e4d4fcc1847620a6fbf963290e5707c7dfadd7df09701d3a6652c8393ec",
+      "bytes": 535961,
+      "last_modified": "Wed, 10 Jun 2026 23:05:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_02700_akt.zip",
+      "downloaded_utc": "2026-10-15T20:33:31.641320+00:00",
+      "sha256": "a0eb38d233e8c99fd7c0f7e64f97c4d1d42bc140e8aae60eaffa09af60a7836c",
+      "bytes": 40852,
+      "last_modified": "Thu, 15 Oct 2026 12:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_02792_20040801_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:59.199814+00:00",
+      "sha256": "0bc5bf4c301d051be817bc9f04a4df191747f01012f2158ffb5031ca36053d2e",
+      "bytes": 557395,
+      "last_modified": "Wed, 10 Jun 2026 23:05:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_02792_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:59.943075+00:00",
+      "sha256": "e93f4503905f93d7cf6975eccb4e134a09e7c493ea90778405e38d39ecb61e0b",
+      "bytes": 41604,
+      "last_modified": "Thu, 15 Oct 2026 12:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_02860_20041201_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:38.136745+00:00",
+      "sha256": "c77ea8a40998b9c3774abb576187548089d48965f36e2afa1fb0696974c38eb9",
+      "bytes": 536792,
+      "last_modified": "Wed, 10 Jun 2026 23:05:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_02860_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:40.055221+00:00",
+      "sha256": "85e6d978a6ae4ae7b90a9a08ff11fdb8f8b8781f49e180d5381ccf52a8d17168",
+      "bytes": 42241,
+      "last_modified": "Thu, 15 Oct 2026 12:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_03136_20021101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:51.236787+00:00",
+      "sha256": "6fb1272e3b5568facc70122f4a6f23f44eb8232dde1b7bde6b5c19cad6049305",
+      "bytes": 572236,
+      "last_modified": "Wed, 10 Jun 2026 23:05:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_03136_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:53.935621+00:00",
+      "sha256": "4bf2d00e05bacbf8d1fa8457fb6dad6a4874506980a3133660ae6a4a936c3038",
+      "bytes": 42777,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_03379_19970707_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:52.694065+00:00",
+      "sha256": "a7002c3b7627259694fc3f817c590cbdfd5dbdcfb9413bed01fb83eceddd790e",
+      "bytes": 824112,
+      "last_modified": "Wed, 10 Jun 2026 23:05:11 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_03379_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:56.972427+00:00",
+      "sha256": "abd58bf650689917a62a772096c9739b77969687643ae6be009a62930017314a",
+      "bytes": 46820,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_03448_20100610_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:50.659569+00:00",
+      "sha256": "9e0a5a00c03d6ec8298a843db208a5e3df6a40016964ffcbf85d35c6e7a0ace1",
+      "bytes": 397947,
+      "last_modified": "Wed, 10 Jun 2026 23:05:11 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_03448_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:53.647307+00:00",
+      "sha256": "4aad41698f493abc57107d83f693e7fca90843fbc1e4807410b765876a8d4186",
+      "bytes": 41297,
+      "last_modified": "Thu, 15 Oct 2026 12:40:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_03668_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:52.694654+00:00",
+      "sha256": "207b9c23e7ca669c921445fe5a6d2b88adac280bfe0c48219fe846d6e78dde4e",
+      "bytes": 786598,
+      "last_modified": "Wed, 10 Jun 2026 23:05:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_03668_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:56.972456+00:00",
+      "sha256": "7714be8afae9281de64ffa37e2691bfb5fa32fd1bae537e4d0054bc83a1cc730",
+      "bytes": 46658,
+      "last_modified": "Mon, 12 Oct 2026 09:00:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_03722_20050101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:37.866258+00:00",
+      "sha256": "ca2a086b217f127ce599f237c835f0a77471c292712ab888c35749842d375e85",
+      "bytes": 545939,
+      "last_modified": "Wed, 10 Jun 2026 23:05:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_03722_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:38.431257+00:00",
+      "sha256": "4c55cd14d9bdf51167991d09a65c9d96eb84d5519eec195cfa973973559ec178",
+      "bytes": 41294,
+      "last_modified": "Thu, 15 Oct 2026 12:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_04599_20050101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:51.851349+00:00",
+      "sha256": "6681a7924c3c88f2cbe906d1923e1ee195af68cd1fc7cbcf3313008b2bf5b8cd",
+      "bytes": 534007,
+      "last_modified": "Wed, 10 Jun 2026 23:05:13 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_04599_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:52.622038+00:00",
+      "sha256": "0283b61499abb73e225051cf142acba1eec8be45c4b0a62a5bf630ee5c582bb8",
+      "bytes": 41250,
+      "last_modified": "Thu, 15 Oct 2026 12:40:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_04887_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:42.638889+00:00",
+      "sha256": "b9249752e14996b4c06009bf4de747786eb67e216ad4310ec0f9ebd2812f1c90",
+      "bytes": 884646,
+      "last_modified": "Wed, 10 Jun 2026 23:05:14 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_04887_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:45.708644+00:00",
+      "sha256": "7b23b8eccd8ce7ee104c56481e7758c929358f2e6047f39b6cc5d04b2ba32c5c",
+      "bytes": 47465,
+      "last_modified": "Thu, 15 Oct 2026 12:40:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_04928_19980601_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:55.742547+00:00",
+      "sha256": "10c99760163e80f6af7a7ab97882d95372d3dad0c59b3d54fc36d2e680ff63ca",
+      "bytes": 727032,
+      "last_modified": "Wed, 10 Jun 2026 23:05:14 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_04928_akt.zip",
+      "downloaded_utc": "2026-10-13T10:49:00.682549+00:00",
+      "sha256": "6d73166a2d14624176f8451b500f161d9f0b2be80c13e1a203e02409cbb8b647",
+      "bytes": 46655,
+      "last_modified": "Mon, 12 Oct 2026 09:00:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_04931_19951004_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:19.891626+00:00",
+      "sha256": "c13309c9128d56701a02a5a6700d938533b490597f97af3762c661c2f9a45ed5",
+      "bytes": 788607,
+      "last_modified": "Wed, 10 Jun 2026 23:05:14 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_04931_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:20.520707+00:00",
+      "sha256": "482658ecf8d945ff7f6bf5e5b080b8c01feb0f04aac2b0e3be8766c6c81acd1c",
+      "bytes": 46884,
+      "last_modified": "Mon, 12 Oct 2026 09:00:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_05426_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:57.697050+00:00",
+      "sha256": "71c4c774aef7b38c287346225de61b1b015a13be432b5bc6526b2c3db0b31661",
+      "bytes": 837341,
+      "last_modified": "Wed, 10 Jun 2026 23:05:15 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_05426_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:59.791543+00:00",
+      "sha256": "d23b649a2e46de2ff97e5429bd4ffd024c87a5a288583e9029731e62d973fafb",
+      "bytes": 46881,
+      "last_modified": "Thu, 15 Oct 2026 12:40:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_05440_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:59.927350+00:00",
+      "sha256": "2f0f499e3a78eeaff6377dc8c4a786561de3f7124070c11e51aa44bbc5ed4c58",
+      "bytes": 871567,
+      "last_modified": "Wed, 10 Jun 2026 23:05:15 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_05440_akt.zip",
+      "downloaded_utc": "2026-10-15T20:33:02.961372+00:00",
+      "sha256": "1b8176e04bd1b644f428d3e5ecd8e37eb00d8f15b2ab0c2fd8d2a5a96e849074",
+      "bytes": 46955,
+      "last_modified": "Thu, 15 Oct 2026 12:40:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_05444_20040701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:25.166861+00:00",
+      "sha256": "1e1cfba8b69fa396d7dfe15d4be38d4003f744ebf4a96f9de2dd8a0c79960ebc",
+      "bytes": 557250,
+      "last_modified": "Wed, 10 Jun 2026 23:05:15 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_05444_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:26.833203+00:00",
+      "sha256": "81c9fc5c7678bd7feb378ace923d809873b0a1570c189c53ba99bef851b5c2d6",
+      "bytes": 42992,
+      "last_modified": "Thu, 15 Oct 2026 12:40:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_05705_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:59.498988+00:00",
+      "sha256": "768d2342f5033987b3a1a79b4a6f2b2f818583dea632341f2c536e3021b93c81",
+      "bytes": 788513,
+      "last_modified": "Wed, 10 Jun 2026 23:05:15 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_05705_akt.zip",
+      "downloaded_utc": "2026-10-13T10:49:03.460761+00:00",
+      "sha256": "c1f25f782966a03360aa09dc98be573ec5647087e3db469a6ae67c0dffd24314",
+      "bytes": 44617,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_05906_19950901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:49:03.282313+00:00",
+      "sha256": "9559f23760483ffb9548c9688a4298810c296fbf2c0530da3284021fdc46fbda",
+      "bytes": 838224,
+      "last_modified": "Wed, 10 Jun 2026 23:05:15 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_05906_akt.zip",
+      "downloaded_utc": "2026-10-13T10:49:07.411928+00:00",
+      "sha256": "7e4eed6dcef4362e3792b9c411b9bdf334aaa8c22710e16a0f4fffc4665c83da",
+      "bytes": 47266,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_06275_20040701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:33:53.394677+00:00",
+      "sha256": "82c0e85e18615927e3148c64fa71d257c823fbdfb79f88cbac2e75eb04bcc24f",
+      "bytes": 547141,
+      "last_modified": "Wed, 10 Jun 2026 23:05:16 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_06275_akt.zip",
+      "downloaded_utc": "2026-10-15T20:33:55.493756+00:00",
+      "sha256": "7e7e6a97b6e8d3bc42ef302e6741594cd2aee4a6fe95dc72c27c0f1ef7110929",
+      "bytes": 41602,
+      "last_modified": "Thu, 15 Oct 2026 12:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_06317_20081001_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:50.911331+00:00",
+      "sha256": "37ed2659d460e51f43319868b0703c8009b03bf9ffb6b7d854122f3f739a42f0",
+      "bytes": 410024,
+      "last_modified": "Wed, 10 Jun 2026 23:05:16 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_06317_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:53.730378+00:00",
+      "sha256": "89f02ca0bacd253c84ab76e52014da284be65d5b1f692a6db6e64168d6e5f6a7",
+      "bytes": 40140,
+      "last_modified": "Thu, 15 Oct 2026 12:40:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_07341_20050718_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:10.942450+00:00",
+      "sha256": "e017e567a2b1daa878f3c3e7c7ea7e1fa8f8304e8abb73d7e15cdab9cd377c69",
+      "bytes": 556203,
+      "last_modified": "Wed, 10 Jun 2026 23:05:17 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_07341_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:11.479424+00:00",
+      "sha256": "e67a4fef4efdbdb486ae6d12465a03516fcaad544eb1aed81b31918cee685d26",
+      "bytes": 46608,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_07412_20061001_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:51:59.966396+00:00",
+      "sha256": "5b636a1b1cc348dbfb10f5c411607e02fea25495f859e2b7d4e748586084a74d",
+      "bytes": 528198,
+      "last_modified": "Wed, 10 Jun 2026 23:05:17 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_07412_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:01.542596+00:00",
+      "sha256": "6e7b6f683ff5c02a231176f06e5496bfced162eede55970900a69c474633d923",
+      "bytes": 47171,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_14007_20120213_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:49:03.281821+00:00",
+      "sha256": "7bcb58b5fc2f47b16a2414d1c236a235dcd621c194719ced4a4bd8a875ff2d74",
+      "bytes": 246167,
+      "last_modified": "Wed, 10 Jun 2026 23:05:17 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_14007_akt.zip",
+      "downloaded_utc": "2026-10-13T10:49:06.060719+00:00",
+      "sha256": "5ef5a85e381d7b8cdb31be743d2abaf95b4e4932f89703895b7ddd2ed625d676",
+      "bytes": 41648,
+      "last_modified": "Mon, 12 Oct 2026 09:00:11 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_15444_20140901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:49:06.061131+00:00",
+      "sha256": "38e6b875a969d19f4a190675dc991814876019f1aa3c0e74757c6d9c40aca007",
+      "bytes": 298818,
+      "last_modified": "Wed, 10 Jun 2026 23:05:18 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_15444_akt.zip",
+      "downloaded_utc": "2026-10-13T10:49:09.744454+00:00",
+      "sha256": "885e9514611430735913f2c71998fa6dd82488bf6ad96806188fa988de504bd8",
+      "bytes": 46714,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/historical/stundenwerte_RR_15514_20171101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:49:12.024228+00:00",
+      "sha256": "74a3151d6027fa9a475f6233022bb85e3af155d4bad773d9b1f252cdcddc9c36",
+      "bytes": 204808,
+      "last_modified": "Wed, 10 Jun 2026 23:05:18 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/recent/stundenwerte_RR_15514_akt.zip",
+      "downloaded_utc": "2026-10-13T10:49:14.754563+00:00",
+      "sha256": "67493eb26420db93bab52101fb3282de77cf0d9b77a6b1f712b54ad3942f4868",
+      "bytes": 42310,
+      "last_modified": "Mon, 12 Oct 2026 09:00:10 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_00191_20041104_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:59.482645+00:00",
+      "sha256": "064b15a422b3ca060e6feb919bdfa229cb4e23bdbe947745650115f0b232709f",
+      "bytes": 1011061,
+      "last_modified": "Wed, 10 Jun 2026 23:05:04 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_00191_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:03.557529+00:00",
+      "sha256": "81b901509e89601baa4f465ba90e8fa8bc5409100d68a60de2294a6dca00e6c5",
+      "bytes": 81260,
+      "last_modified": "Thu, 15 Oct 2026 12:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_00232_19550101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:55.807410+00:00",
+      "sha256": "272d223d52de8d3e7d998b41291250ff8887abfa07ef1c2d5f58cfcf34a2e4b4",
+      "bytes": 3353665,
+      "last_modified": "Wed, 10 Jun 2026 23:05:04 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_00232_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:57.077313+00:00",
+      "sha256": "a1e5fc984271782a4fbedd9267dd6cf2a3fd1f85a1a0e94b14110f4ee6bd1243",
+      "bytes": 80189,
+      "last_modified": "Tue, 13 Oct 2026 10:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_00282_19610101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T22:39:53.428843+00:00",
+      "sha256": "3ba19cb5e35d23dd7b55b89ca8eeffa52f1d5ee8fbc9a9989f4cff45bb8007d6",
+      "bytes": 3078201,
+      "last_modified": "Wed, 10 Jun 2026 23:05:04 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_00282_akt.zip",
+      "downloaded_utc": "2026-10-15T22:39:54.578282+00:00",
+      "sha256": "5a6e086a0565d9686fe2f9014a3a6b8201a4c2c48ca33a9afacd9d181491e5bd",
+      "bytes": 81283,
+      "last_modified": "Thu, 15 Oct 2026 12:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_00917_20040901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:58.861629+00:00",
+      "sha256": "5399662153494fb8b44766f59d889440601d6cdf1002de0692c082955f308718",
+      "bytes": 1021096,
+      "last_modified": "Wed, 10 Jun 2026 23:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_00917_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:59.424065+00:00",
+      "sha256": "19bb01c7de5e390164243abc370322d28a5421ff728fb47240064bc93b249054",
+      "bytes": 76487,
+      "last_modified": "Tue, 13 Oct 2026 10:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_01424_20080801_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:58.438575+00:00",
+      "sha256": "597cbe46c6ad2b6303f12a33b32b52452cc44fb3aa3c9fd7f5fa724f3d01bd67",
+      "bytes": 837880,
+      "last_modified": "Wed, 10 Jun 2026 23:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_01424_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:00.976152+00:00",
+      "sha256": "cae25acf538558772ac37219013f2b4cf3937750512a2fdd815ac05eb3c0d3c4",
+      "bytes": 79445,
+      "last_modified": "Tue, 13 Oct 2026 10:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_02410_19610102_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:02.148641+00:00",
+      "sha256": "3caddb62bac045abaa42f79a0670a0c0f62ed571dc898a6c2a1671a066fbed09",
+      "bytes": 2857790,
+      "last_modified": "Wed, 10 Jun 2026 23:05:12 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_02410_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:06.027992+00:00",
+      "sha256": "29b87e373796273431e3c94f61ba77e5e98485e9ea59617a492fa9b610021be5",
+      "bytes": 83347,
+      "last_modified": "Tue, 13 Oct 2026 10:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_02480_20040901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:00.603276+00:00",
+      "sha256": "e961c1a00da617e78eabe43d0c8572673a532fb7b96e73460a5008eb37f10e44",
+      "bytes": 1025749,
+      "last_modified": "Wed, 10 Jun 2026 23:05:13 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_02480_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:02.148819+00:00",
+      "sha256": "c219552d5bddd7edb58add03a28bf77a5e546b4de707261cd9b2906875d13a3b",
+      "bytes": 81345,
+      "last_modified": "Tue, 13 Oct 2026 10:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_02700_20041201_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:28.671489+00:00",
+      "sha256": "bbf4ba01e1cbfc19496690b718e69edfc8efee007d8bc3c446ea07c093dc6fba",
+      "bytes": 998223,
+      "last_modified": "Wed, 10 Jun 2026 23:05:14 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_02700_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:31.712468+00:00",
+      "sha256": "5355e4cd0303831f0e7a533ea278ec5647af095ed6337db7629feaf3ee48a682",
+      "bytes": 78585,
+      "last_modified": "Thu, 15 Oct 2026 12:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_02905_20020101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:47.516978+00:00",
+      "sha256": "1be4a7d178a4415cee8e8d3dbf7e5953926d56ffdc98e1e2a819b9aa5f4fff49",
+      "bytes": 1158535,
+      "last_modified": "Wed, 10 Jun 2026 23:05:14 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_02905_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:49.325163+00:00",
+      "sha256": "fa78d0a76c182d2dc0a43e0e85bce0c410ae280342de85c85e243408062bdcd3",
+      "bytes": 80657,
+      "last_modified": "Thu, 15 Oct 2026 12:05:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_03137_20080501_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:03.348555+00:00",
+      "sha256": "fa2b85580a6338cd3a3f3ab323e3f42c4b241a98eaa8dbc9396e10dd581b97ac",
+      "bytes": 803302,
+      "last_modified": "Wed, 10 Jun 2026 23:05:15 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_03137_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:04.329318+00:00",
+      "sha256": "d91dcb3161275318ca73af946f35a538ffa3fdccd1df54aec7394980c863258c",
+      "bytes": 79337,
+      "last_modified": "Tue, 13 Oct 2026 10:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_03379_19970701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:05.484214+00:00",
+      "sha256": "c1386fc0637eb4db10455a7b1daf8b84132f23910c0fe922cf1a2127d9029377",
+      "bytes": 1364664,
+      "last_modified": "Wed, 10 Jun 2026 23:05:15 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_03379_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:06.157795+00:00",
+      "sha256": "096084a149091c5817cbdae8e595fc37b6d74bc4141c9d4a17862367f851f0c1",
+      "bytes": 81708,
+      "last_modified": "Tue, 13 Oct 2026 10:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_03667_20050301_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:18.350896+00:00",
+      "sha256": "18cce14fc4765f7184bdc45c6c8a854324599b352d4379c4c1d8314cbd27465c",
+      "bytes": 993500,
+      "last_modified": "Wed, 10 Jun 2026 23:05:16 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_03667_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:20.490201+00:00",
+      "sha256": "c1542b5ef00bec6689bd7f126b487a649cfdae6c2bea1bca0d2b7a453b2bad70",
+      "bytes": 80985,
+      "last_modified": "Thu, 15 Oct 2026 12:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_03668_19510101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:06.016228+00:00",
+      "sha256": "25b9c764f8fad1f9061a576dd1c1338e094fe258e0ba53ddb200dbe7448c0bc9",
+      "bytes": 3377276,
+      "last_modified": "Wed, 10 Jun 2026 23:05:16 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_03668_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:09.938547+00:00",
+      "sha256": "3967b8aabda61ad91790a09dee87cb05036680a246a2df5d17f5a553e8ac267c",
+      "bytes": 80578,
+      "last_modified": "Tue, 13 Oct 2026 10:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_04928_19770701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:07.288896+00:00",
+      "sha256": "84f6da969d2f1ba46d5e65e4a43f4bcb9bd26df5a3fa277ec9ac33376fe24ca6",
+      "bytes": 2332013,
+      "last_modified": "Wed, 10 Jun 2026 23:05:20 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_04928_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:09.989850+00:00",
+      "sha256": "e016fd3ce1d1d116326416ed3d2e310669d6cc19958adb65bef687e3fc4d44cc",
+      "bytes": 82054,
+      "last_modified": "Tue, 13 Oct 2026 10:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_05275_20040601_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:38.422446+00:00",
+      "sha256": "658798dd55bfb7432f7f5cb50bdf9b3c838bb47ea47411c7bbcab39209cc80e8",
+      "bytes": 1041390,
+      "last_modified": "Wed, 10 Jun 2026 23:05:21 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_05275_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:43.533551+00:00",
+      "sha256": "3f7c037ca02ddb95c8cb9f52193355c718892dca4c2d779efa5ecd5036c2da36",
+      "bytes": 81535,
+      "last_modified": "Thu, 15 Oct 2026 12:05:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_05705_19480101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:09.981564+00:00",
+      "sha256": "cccd65f4ebf08c783a7819ccd0a0a65617c4a9af025121e4b0c8592a1582be34",
+      "bytes": 3712354,
+      "last_modified": "Wed, 10 Jun 2026 23:05:22 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_05705_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:13.605675+00:00",
+      "sha256": "54258d44902c629e6ba48ef147b96e02a3eab1c968c79590ca0cbff94272fa97",
+      "bytes": 82171,
+      "last_modified": "Tue, 13 Oct 2026 10:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_05906_19480101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:13.451137+00:00",
+      "sha256": "0d394e7e4ac23e8055fd6df1b6207832ffb736d2293bda49a626c8b41574f7c8",
+      "bytes": 3721890,
+      "last_modified": "Wed, 10 Jun 2026 23:05:23 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_05906_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:18.391033+00:00",
+      "sha256": "4e4781aae4008c09f9fa157fdbe331d71b361db781633637abee484ceadcad6b",
+      "bytes": 82744,
+      "last_modified": "Tue, 13 Oct 2026 10:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_06275_20040701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:13.143352+00:00",
+      "sha256": "2f0bfc1ce2ea77d490c9b48dc9632acf72d96f5c20fbb9d87bc5d1614c812b24",
+      "bytes": 1039648,
+      "last_modified": "Wed, 10 Jun 2026 23:05:23 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_06275_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:16.010076+00:00",
+      "sha256": "e5f3daaae5dd3950adf0f67ae383e5514b4a9b0029a4bf94986b4226d182e975",
+      "bytes": 79972,
+      "last_modified": "Tue, 13 Oct 2026 10:40:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_07431_20071101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:46.944408+00:00",
+      "sha256": "16a6818e9262e2df35da6141ef349e6782766abb2cc73ad84d5afa5fdb404fe9",
+      "bytes": 864319,
+      "last_modified": "Wed, 10 Jun 2026 23:05:23 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_07431_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:50.615658+00:00",
+      "sha256": "876fa74b4a082a47fdd81c87cfee0ba548ce21bbeb3443d7a77f7cca16d73086",
+      "bytes": 80624,
+      "last_modified": "Thu, 15 Oct 2026 12:05:09 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/historical/stundenwerte_TU_15444_20140901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:48:13.124683+00:00",
+      "sha256": "0ee70ac4f611d697ddacb8ae90157b89a6d68372bda2390ca9ff238c1ce337c3",
+      "bytes": 544960,
+      "last_modified": "Wed, 10 Jun 2026 23:05:24 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/air_temperature/recent/stundenwerte_TU_15444_akt.zip",
+      "downloaded_utc": "2026-10-13T10:48:14.809647+00:00",
+      "sha256": "31b509cc6872532a9ad1ee9b9e29b8a450ec442e0bd878d23cd322a79e3393ee",
+      "bytes": 80245,
+      "last_modified": "Tue, 13 Oct 2026 10:40:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_00232_19470101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:49.575200+00:00",
+      "sha256": "9dfeea305f1467bd304d35616357683e72a92acbc9ffc7fb8f60ee7fd253dde4",
+      "bytes": 748971,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_00232_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:51.135208+00:00",
+      "sha256": "9cababbce62b6c4146875bf4295edf63141b17fbf69119b5c1ea9deda770f633",
+      "bytes": 42292,
+      "last_modified": "Mon, 12 Oct 2026 09:00:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_00282_19490101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T22:39:52.899096+00:00",
+      "sha256": "1d0637cb5160a4434f58a16e3cff8dc7a0fbcad411fed21a0e95da5577dcf6f8",
+      "bytes": 705162,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_00282_akt.zip",
+      "downloaded_utc": "2026-10-15T22:39:53.216793+00:00",
+      "sha256": "db2291a16c318e027890a0d930bdd2439f90c63e9ef7e57e05a1565321a5744e",
+      "bytes": 41724,
+      "last_modified": "Thu, 15 Oct 2026 13:25:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_01420_19350701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:10.027420+00:00",
+      "sha256": "32d9445509b95da8f639ad7a66e3405a7438976a085686ceeed6e31635f6bb11",
+      "bytes": 804127,
+      "last_modified": "Wed, 17 Jun 2026 10:15:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_01420_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:10.400660+00:00",
+      "sha256": "74f911dab55419c33a59c0d6f073dbefed93eaea4321361c757de743d358e560",
+      "bytes": 43806,
+      "last_modified": "Mon, 12 Oct 2026 09:00:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_01587_19980101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:17.450260+00:00",
+      "sha256": "97aaa5d33c25b8a211d1ae6109892d794c2f095e36b23407a41189a84a842acc",
+      "bytes": 314354,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_01587_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:17.775900+00:00",
+      "sha256": "fab652dd8466258aac029450ce52392c0bbf1f0abfccc37ad6ed066404b7bacc",
+      "bytes": 38661,
+      "last_modified": "Mon, 12 Oct 2026 09:00:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_02023_19980101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:55.974392+00:00",
+      "sha256": "6827d891204da48d33e6042cf15d50691577c4eb26a9217e989ff3023ec013a4",
+      "bytes": 313713,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_02023_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:59.425069+00:00",
+      "sha256": "93ee3ab05763c4fa8031a0844b64e5a364b201e2367b8a307f1ef53311ea963b",
+      "bytes": 38856,
+      "last_modified": "Thu, 15 Oct 2026 13:25:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_02485_20110501_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:24.444386+00:00",
+      "sha256": "e1fb78608c48eccfb17aab34e12be8d8430bc640af44e23d58454056de64d1d7",
+      "bytes": 164459,
+      "last_modified": "Wed, 17 Jun 2026 10:15:04 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_02485_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:24.688811+00:00",
+      "sha256": "b959dd941d9ef53f53e0d09df0f30e2d6ccf2658df6005393ebef791bd263964",
+      "bytes": 38657,
+      "last_modified": "Mon, 12 Oct 2026 09:00:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_03287_19871001_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:05.787527+00:00",
+      "sha256": "f655648ac272adaf7d037ecc71a776615fa8afeb1da7b777bd0fc1f89bd4e0da",
+      "bytes": 391093,
+      "last_modified": "Wed, 17 Jun 2026 10:15:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_03287_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:06.136805+00:00",
+      "sha256": "f6ff4437b042528b5657a574a3f399ef6e9bb9a3d3a0e9ba16060ecb5438a3d3",
+      "bytes": 42094,
+      "last_modified": "Mon, 12 Oct 2026 09:00:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_03379_19540601_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:53.159820+00:00",
+      "sha256": "0c6a4b938c2e777dab670555217119b3a00f5f30d5abbf27867634947eb78a97",
+      "bytes": 563072,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_03379_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:53.635140+00:00",
+      "sha256": "f6a2eb5fc5b4fd4a98e30717c472ffe4a61c33c427cf6703434261bff62e9aea",
+      "bytes": 41487,
+      "last_modified": "Mon, 12 Oct 2026 09:00:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_03668_18790101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:53.727877+00:00",
+      "sha256": "7f64ace313813a4a3b3ff796e3f9421756877d97f68b2d8433dedaeb22df0482",
+      "bytes": 689886,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_03668_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:54.136165+00:00",
+      "sha256": "e4b03aa2e23837d048c74407aabd846f2b51bfa3307b8a569612fc1005bdd996",
+      "bytes": 43655,
+      "last_modified": "Mon, 12 Oct 2026 09:00:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_04280_19710101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:52.438508+00:00",
+      "sha256": "9d37c1b317652f4e5f59df58479f6670793990ae28394a9f18626fd83d29754a",
+      "bytes": 288725,
+      "last_modified": "Wed, 17 Jun 2026 10:15:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_04280_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:52.748404+00:00",
+      "sha256": "2857667775c8c420235536af56d663af5c914b2bf865da4d1936d2d2de7d0006",
+      "bytes": 37623,
+      "last_modified": "Thu, 15 Oct 2026 13:25:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_04887_19470101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:32:42.724233+00:00",
+      "sha256": "b07a9208cc9111b30430d0acbee39677822096c6abc94b178ff42def986ba0bd",
+      "bytes": 776384,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_04887_akt.zip",
+      "downloaded_utc": "2026-10-15T20:32:45.708610+00:00",
+      "sha256": "455030358d3a1dc0f0a451edde808a7d5deaed728ea458a9cf6fe83b6112797b",
+      "bytes": 39535,
+      "last_modified": "Thu, 15 Oct 2026 13:25:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_04928_19580101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:54.284676+00:00",
+      "sha256": "3492cbd0004f0e33c6096a4c6f708fdfa307fe80245a5886fe1f9698ac35d70b",
+      "bytes": 624178,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_04928_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:54.607021+00:00",
+      "sha256": "cf98e605fa1036f177fc14131d29a505b73406ab6819e12a419c3e5e7a05b9c9",
+      "bytes": 41783,
+      "last_modified": "Mon, 12 Oct 2026 09:00:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_04931_19530101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:23.632175+00:00",
+      "sha256": "f9db034e5a67f28c990368865d44a5d6356f8f81b64d71e222fb3a776f043aa4",
+      "bytes": 684932,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_04931_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:23.992048+00:00",
+      "sha256": "213e5376c235c83ebb3d79827d7b04501d25cd2a7d52ca292214c770bada7e8a",
+      "bytes": 42257,
+      "last_modified": "Mon, 12 Oct 2026 09:00:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_05404_19360701_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:18.384838+00:00",
+      "sha256": "73cb32e9b1afb36482de1ad704bc98e03ba3758f4034f01c95bf6f12cc1c4532",
+      "bytes": 710474,
+      "last_modified": "Wed, 17 Jun 2026 10:15:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_05404_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:18.743340+00:00",
+      "sha256": "e6cac4a42a19c2afa38d90d0b1de74f3c156451c058c21978bc9cb920802a09b",
+      "bytes": 43471,
+      "last_modified": "Mon, 12 Oct 2026 09:00:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_05426_19530101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-15T20:31:48.125963+00:00",
+      "sha256": "390d9dcae12b65dd9f2c696f36610a59c86026fb4b60f8a9c611d7375a9b21f0",
+      "bytes": 629075,
+      "last_modified": "Wed, 17 Jun 2026 10:15:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_05426_akt.zip",
+      "downloaded_utc": "2026-10-15T20:31:50.621482+00:00",
+      "sha256": "52e88a3f285804f35859ccc6eb55f1b596c3ebb9f3233aacf4d0265c8e13078e",
+      "bytes": 42500,
+      "last_modified": "Thu, 15 Oct 2026 13:25:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_05705_19470101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:53.842351+00:00",
+      "sha256": "e01fdef586b4a3b9d1fb2be34dc696c12fe19ed09b1340b3a7f7fd71cfa2508f",
+      "bytes": 744021,
+      "last_modified": "Wed, 17 Jun 2026 10:15:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_05705_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:54.224739+00:00",
+      "sha256": "bff095534a5660e42c89b3dfd3f74325a5e5e3b1681adf5c0dd770d80d0393f2",
+      "bytes": 42614,
+      "last_modified": "Mon, 12 Oct 2026 09:00:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_05906_17810101_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:56.636390+00:00",
+      "sha256": "d7fd8a1ca6f2e033c402a970c5f647e542a9432b4a63880050acd530a4b328d7",
+      "bytes": 812768,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_05906_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:57.083920+00:00",
+      "sha256": "7b05a65a1580e39a45910e037dc04ae48be519a726016d5c931f0e5242301aa0",
+      "bytes": 45340,
+      "last_modified": "Mon, 12 Oct 2026 09:00:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_07341_20050715_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:04.985169+00:00",
+      "sha256": "d2723ef5a12bedecf320c04d8564f66782d74ec4bcc4263011882726eb4f6f8d",
+      "bytes": 220341,
+      "last_modified": "Wed, 17 Jun 2026 10:15:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_07341_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:05.246427+00:00",
+      "sha256": "d2428592dc9e190bfb175fd6df755e25ae55c94a1fca715a084ec15c282ebefb",
+      "bytes": 38372,
+      "last_modified": "Mon, 12 Oct 2026 09:00:07 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_07412_20061001_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:52:04.208256+00:00",
+      "sha256": "2df6105f4f04fd1cebbef0c69ae796679e3e643360230d333f6a45ec96c5d041",
+      "bytes": 207318,
+      "last_modified": "Wed, 17 Jun 2026 10:15:06 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_07412_akt.zip",
+      "downloaded_utc": "2026-10-13T10:52:04.555594+00:00",
+      "sha256": "3b968536f28daaac1c8ac18c3b8e85e7643847988746b5925727e38ae84c9b45",
+      "bytes": 38227,
+      "last_modified": "Mon, 12 Oct 2026 09:00:08 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/tageswerte_KL_15444_20140901_20251231_hist.zip",
+      "downloaded_utc": "2026-10-13T10:47:54.681089+00:00",
+      "sha256": "84b00715a52c2d8fa3bc5ac63a1217801da18da36976aef51721d57242937b27",
+      "bytes": 133100,
+      "last_modified": "Wed, 17 Jun 2026 10:15:05 GMT"
+    },
+    {
+      "url": "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/recent/tageswerte_KL_15444_akt.zip",
+      "downloaded_utc": "2026-10-13T10:47:54.984330+00:00",
+      "sha256": "a23188cb0c51559e6ae5fa10f1f0b2b1377379fde52892ba849f664f3d38b55c",
+      "bytes": 38531,
+      "last_modified": "Mon, 12 Oct 2026 09:00:07 GMT"
+    }
+  ],
+  "supporting_file_sha256": {
+    "station_mapping.json": "5a663b98abe14a1b5f20ae4ef4674c9ff234293ab23d45da17eb2caf2736f339",
+    "coverage_snapshot.json": "c03a862e1d999fd66c82922ebdd38b51154109eb26a131a45daca535937ed58d"
+  },
+  "version_note": "Recent DWD archives are mutable. URLs, original download times and SHA256 identify the versions used. The coverage snapshot reproduces coverage counts only; it does not reproduce the full raw-observation audit or candidate search."
+}
