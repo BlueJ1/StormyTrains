@@ -88,18 +88,20 @@ To add a model: write a factory `make_x(numeric, categorical)` in `models.py` an
 - with the answer given as a feature, the logistic model reaches log loss < 0.05 and macro-F1 = 1, and the linear model reaches RMSE ≈ 0, so predictions line up with their rows;
 - with shuffled labels, the full logistic model does not beat the class shares, so there is no hidden leak.
 
-## Results, 12 October 2026
+## Results, 15 October 2026
 
-Mean ± standard deviation over the 5 folds.
+Mean ± standard deviation over the 5 random day folds.
 
 | Prediction time | Log loss: class shares | Log loss: logistic | Macro-F1: class shares | Macro-F1: logistic | RMSE: training mean | RMSE: linear |
 |---|---|---|---|---|---|---|
-| 24 h | 0.956 ± 0.065 | 0.926 ± 0.057 | 0.195 | 0.208 | 25.50 ± 1.46 | 25.03 ± 1.16 |
-| 6 h | 0.951 ± 0.066 | 0.921 ± 0.058 | 0.195 | 0.209 | 25.50 ± 1.46 | 25.02 ± 1.15 |
-| 1 h | 0.915 ± 0.065 | 0.846 ± 0.039 | 0.197 | 0.290 | 25.50 ± 1.46 | 24.13 ± 0.82 |
-| 20 min | 0.896 ± 0.064 | 0.810 ± 0.044 | 0.198 | 0.307 | 25.50 ± 1.46 | 23.06 ± 0.85 |
-| 0 min | 0.888 ± 0.060 | 0.796 ± 0.042 | 0.198 | 0.325 | 25.50 ± 1.46 | 22.84 ± 0.90 |
+| 24 h | 0.968 ± 0.005 | 0.923 ± 0.009 | 0.193 ± 0.000 | 0.221 ± 0.010 | 25.68 ± 0.62 | 24.68 ± 0.67 |
+| 6 h | 0.958 ± 0.008 | 0.914 ± 0.011 | 0.194 ± 0.001 | 0.222 ± 0.010 | 25.68 ± 0.62 | 24.68 ± 0.67 |
+| 1 h | 0.923 ± 0.009 | 0.825 ± 0.016 | 0.196 ± 0.001 | 0.322 ± 0.018 | 25.68 ± 0.62 | 23.24 ± 0.55 |
+| 20 min | 0.904 ± 0.009 | 0.792 ± 0.013 | 0.197 ± 0.001 | 0.347 ± 0.011 | 25.68 ± 0.62 | 22.59 ± 0.73 |
+| 0 min | 0.896 ± 0.011 | 0.776 ± 0.015 | 0.197 ± 0.001 | 0.361 ± 0.013 | 25.68 ± 0.62 | 22.30 ± 0.66 |
 
 - Both models beat their reference at every prediction time.
 - The largest gain comes from 1 h on, when `current_delay` is available.
 - The class-share reference always predicts `normal_minor`, so its macro-F1 stays near 0.2.
+- The `delay` rows are the same at 24 h and 6 h (completed journeys, no `current_delay`), so the scores are too.
+- The standard deviations are much smaller than with the earlier chronological folds, because random folds of days resemble each other. The scores are not comparable with the results from 12 October.
