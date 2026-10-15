@@ -2,7 +2,7 @@
 
 Updated: 2026-10-16
 
-Status: **mapping and observation-coverage review**. Detailed weather-quality review and journey integration are in progress.
+Status: **mapping and observation-coverage review**. 
 
 **EVA ID identifies a railway station/stop place, not a journey. DWD station ID identifies a weather station.** Each weather cell is **primary / backup**, both five-digit DWD IDs. One railway station can use several weather stations.
 
