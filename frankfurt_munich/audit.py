@@ -7,7 +7,7 @@ The hold-out set is not to be looked at yet, so outcome statistics (classes,
 delays, cancellations) are computed on the CV set only. For the hold-out set
 the audit reports counts, coverage and missing values. Changes over time compare
 July 2024 to September 2025 with October 2025 to September 2026
-(LATER_PERIOD_START in folds.py).
+(period_of in folds.py).
 
 Run from the project root: .venv/bin/python frankfurt_munich/audit.py
 """
@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from folds import LATER_PERIOD_START, cv_folds
+from folds import CALENDAR_END, CALENDAR_START, EARLIER_PERIOD, LATER_PERIOD, cv_folds, period_of
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data"
@@ -40,14 +40,14 @@ def main() -> None:
     month = planned.dt.to_period("M")
     quarter = planned.dt.to_period("Q")
     is_cv = j.split.eq("cv")
-    period = pd.Series(np.where(planned.ge(LATER_PERIOD_START), "from_2025_10", "before_2025_10"), index=j.index)
+    period = period_of(planned)
     delay = j.arrival_delay_min
     canceled = j.journey_canceled
     A: dict = {}
 
     # Coverage over time
     per_day = j.groupby(planned.dt.date).size().reindex(
-        pd.date_range(planned.min().normalize(), planned.max().normalize()).date, fill_value=0)
+        pd.date_range(CALENDAR_START, CALENDAR_END - pd.Timedelta(days=1)).date, fill_value=0)
     stops["delay"] = (stops.event_reported_time - stops.event_planned_time).dt.total_seconds() / 60
     same_as_plan = stops.event_reported_time.eq(stops.event_planned_time).groupby(stops.journey_id).all()
     no_update = j.journey_id.map(same_as_plan)
@@ -72,13 +72,6 @@ def main() -> None:
         "cv_class_shares": shares(cv.severity_class.value_counts(normalize=True)),
         "cv_class_shares_by_quarter": {str(q): shares(g.severity_class.value_counts(normalize=True))
                                        for q, g in j[is_cv].groupby(quarter[is_cv])},
-        # Only how far the hold-out class shares are from CV, not the shares themselves
-        "holdout_max_class_share_difference_from_cv": round(float(
-            (holdout.severity_class.value_counts(normalize=True)
-             - cv.severity_class.value_counts(normalize=True)).abs().max()), 4),
-        "max_fold_class_share_difference_from_cv": round(max(float(
-            (cv[cv.fold.eq(f)].severity_class.value_counts(normalize=True)
-             - cv.severity_class.value_counts(normalize=True)).abs().max()) for f in range(1, 6)), 4),
         "holdout_days_by_month": {str(k): int(v) for k, v in holdout.origin_departure_planned_local.dt.normalize()
                                   .drop_duplicates().dt.to_period("M").value_counts().sort_index().items()},
         "holdout_journeys_with_train_number_unseen_in_cv":
@@ -86,9 +79,12 @@ def main() -> None:
         "ic_journeys_by_quarter": {str(q): int(g.train_type.eq("IC").sum()) for q, g in j.groupby(quarter)},
         "ic_journeys_by_period": j.train_type.eq("IC").groupby(period).sum().to_dict(),
     }
+    cv_shares = cv.severity_class.value_counts(normalize=True)
     A["folds"] = {fold: {"validation_journeys": int(val.sum()),
                          "train": shares(cv[train].severity_class.value_counts(normalize=True)),
-                         "validation": shares(cv[val].severity_class.value_counts(normalize=True))}
+                         "validation": shares(cv[val].severity_class.value_counts(normalize=True)),
+                         "max_class_share_difference_from_cv": round(float(
+                             (cv[val].severity_class.value_counts(normalize=True) - cv_shares).abs().max()), 4)}
                   for fold, train, val in cv_folds(cv)}
     family = np.select([j.recorded_route.str.contains("Würzburg"), j.recorded_route.str.contains("Stuttgart")],
                        ["wuerzburg", "stuttgart"], "other")
@@ -126,7 +122,7 @@ def main() -> None:
                      "median_delay_at_previous_stop": float(prev[delay.eq(v) & in_p].median()),
                      "share_previous_stop_10_plus": round(float(prev[delay.eq(v) & in_p].ge(10).mean()), 4)}
             for v in (-1, 0, 1)}
-        for p, in_p in ((p, period.eq(p)) for p in ("before_2025_10", "from_2025_10"))}
+        for p, in_p in ((p, period.eq(p)) for p in (EARLIER_PERIOD, LATER_PERIOD))}
     A["no_live_updates"] = {"journeys": int(no_update.sum()),
                             "canceled": int((no_update & canceled).sum()),
                             "completed": int((no_update & ~canceled).sum())}

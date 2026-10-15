@@ -8,7 +8,7 @@ The modelling dataset for the chosen origin–destination pair, railway data onl
   - journeys over 7 h and journeys with an additional stop at Frankfurt or München are dropped;
   - `current_delay` is added at each prediction time;
   - the time a cancellation was announced is added, so that no prediction is made once a cancellation is known;
-  - the data are split at random by day into a cross-validation set (80% of the days, in 5 folds) and a hold-out set (20%).
+  - the data are split by week into a cross-validation set (about 80% of the weeks, in 5 folds) and a hold-out set (about 20%).
 - **Source:** the 27 monthly files from July 2024 to September 2026 and the matching live-update snapshots, as rebuilt by the source on 6–8 October 2026 and downloaded on 8 October 2026 (checked against the published SHA-256 sums).
 
 **The hold-out set is not to be looked at yet.** Outcome statistics below (classes, delays, cancellations) are for the CV set only. For the hold-out set we only check data quality: counts, coverage, missing values and where the labels come from. Where something changes over time, the README compares July 2024–September 2025 with October 2025–September 2026; these are periods, not splits.
@@ -17,12 +17,13 @@ The modelling dataset for the chosen origin–destination pair, railway data onl
 
 | File | Rows | Contents |
 |---|---|---|
-| `data/journeys_cv.parquet` | 17,505 | The cross-validation set: journeys on 662 of the 822 days (80%), planned Frankfurt departure from 1 July 2024 to 30 September 2026, with their `fold` |
-| `data/journeys_holdout.parquet` | 4,326 | The hold-out set: journeys on the other 160 days (20%) |
-| `data/prediction_rows_cv.parquet` | 85,870 | One row per CV journey and prediction time, without known cancellations (see below). A model for one prediction time uses the rows with that `prediction_time` |
-| `data/prediction_rows_holdout.parquet` | 21,291 | The same for the hold-out set |
+| `data/journeys_cv.parquet` | 17,507 | The cross-validation set: journeys in 95 of the 118 weeks, planned Frankfurt departure from 1 July 2024 to 30 September 2026, with their `fold` |
+| `data/journeys_holdout.parquet` | 4,324 | The hold-out set: journeys in the other 23 weeks |
+| `data/prediction_rows_cv.parquet` | 85,901 | One row per CV journey and prediction time, without known cancellations (see below). A model for one prediction time uses the rows with that `prediction_time` |
+| `data/prediction_rows_holdout.parquet` | 21,260 | The same for the hold-out set |
 | `data/stops.parquet` | 133,794 | Recorded stops from Frankfurt to München of the kept journeys |
 | `data/upstream_runs.parquet` | 116,528 | Every recorded stop of each run up to and including Frankfurt, used for `current_delay` |
+| `split_weeks.csv` | 118 | The committed week assignment: `week_start` (Monday), `split` (`cv` or `holdout`), `fold` |
 | `data/change_check.parquet` | 21,831 | Per journey: where the München arrival time comes from, and when a cancellation was issued (see below) |
 | `build_audit.json`, `audit.json`, `change_check.json` | | Counts behind every number in this README |
 
@@ -119,7 +120,7 @@ Both `data/monthly_processed_data` and `data/monthly_processed_data_change` from
 
 | Script | Purpose |
 |---|---|
-| `build_dataset.py` | Builds every file in `data/` and `build_audit.json` |
+| `build_dataset.py` | Builds every file in `data/` and `build_audit.json`; with `--new-split` it first makes a new `split_weeks.csv` |
 | `folds.py` | Hold-out set and cross-validation folds |
 | `snapshots.py` | Reads the live-update snapshots; used by the two scripts above and below |
 | `audit.py` | Data-quality audit, `audit.json` |
@@ -127,21 +128,21 @@ Both `data/monthly_processed_data` and `data/monthly_processed_data_change` from
 
 ## Hold-out set and cross-validation folds
 
-We have only about two years of data, so the split is random rather than chronological. The definition is in `folds.py`.
+We have only about two years of data, so the split is not chronological. The definition is in `folds.py`.
 
-- **By day.** All journeys whose planned Frankfurt departure falls on the same calendar day go to the same part. Journeys on one day share weather, strikes and network disruptions, and delays carry over from train to train, so splitting single journeys would make the scores too optimistic.
-- **Hold-out set:** 20% of the days, 160 days with 4,326 journeys (19.8% of the journeys). Every month has hold-out days, 2 to 11 of them.
-- **CV set:** the other 662 days, 17,505 journeys, divided into 5 folds of days in the same way. Fold *k* validates on the journeys with `fold == k` and trains on the other four folds.
-- **Stratified** by `severity_class` (scikit-learn's `StratifiedGroupKFold`), so the class shares of the hold-out set and of every fold are within 0.3 percentage points of the CV set's.
-- **Fixed seed** (42), so a rebuild gives the same split.
+- **By week.** All journeys whose planned Frankfurt departure falls in the same ISO week (Monday to Sunday) go to the same part. Neighbouring days share weather, strikes and network disruptions, which often last several days, so splitting single journeys or single days would make the scores too optimistic. Disruptions lasting longer than a week, such as some construction work, can still fall on both sides.
+- **Hold-out set:** 23 of the 118 weeks (19.5%), with 4,324 journeys (19.8%). Hold-out weeks fall in 20 of the 27 months.
+- **CV set:** the other 95 weeks, 17,507 journeys, divided into 5 folds of weeks in the same way. Fold *k* validates on the journeys with `fold == k` and trains on the other four folds.
+- **Stratified, greedy assignment.** The weeks were assigned by scikit-learn's `StratifiedGroupKFold` (seed 42), stratified by `severity_class`. This is not a random draw: the weeks are sorted by how uneven their class counts are, and each is put where it best balances the class shares, so the seed changes little. The class shares of every fold are within 1.2 percentage points of the CV set's.
+- **Fixed assignment.** The week assignment is committed in `split_weeks.csv`, so a rebuild of the data keeps every week in its part even if the data change. `build_dataset.py` fails on weeks that are not in the file; `build_dataset.py --new-split` makes a new assignment and should only be run on purpose.
 
-| Fold | Days | Journeys |
+| Fold | Weeks | Journeys |
 |---|---|---|
-| 1 | 131 | 3,490 |
-| 2 | 132 | 3,491 |
-| 3 | 132 | 3,510 |
-| 4 | 134 | 3,516 |
-| 5 | 133 | 3,498 |
+| 1 | 19 | 3,454 |
+| 2 | 18 | 3,429 |
+| 3 | 21 | 3,734 |
+| 4 | 19 | 3,496 |
+| 5 | 18 | 3,394 |
 
 ## Evaluation
 
@@ -155,11 +156,11 @@ We have only about two years of data, so the split is random rather than chronol
 - `severity_class`: `normal_minor` (under 20 min), `moderate` (20–59 min; exactly 20 belongs here), `severe` (60 min or more), `canceled`.
 - `severe_or_canceled`: the binary version.
 
-CV class shares: 62.9% under 20 min, 25.2% 20–59 min, 6.4% 60+ min, 5.5% cancelled.
+CV class shares: 62.8% under 20 min, 25.5% 20–59 min, 6.2% 60+ min, 5.5% cancelled.
 
 ## One journey per departure
 
-Some departures appear as two or more journeys under different train numbers, with the same planned Frankfurt departure and München arrival. There were 1,341 such groups, covering 2,765 journeys. After unusual journeys are dropped (see below), 1,337 of these departures remain: 271 from July 2024 to September 2025 and 1,066 from October 2025 on (1,107 in the CV set, 230 in the hold-out set).
+Some departures appear as two or more journeys under different train numbers, with the same planned Frankfurt departure and München arrival. There were 1,341 such groups, covering 2,765 journeys. After unusual journeys are dropped (see below), 1,337 of these departures remain: 271 from July 2024 to September 2025 and 1,066 from October 2025 on (1,036 in the CV set, 301 in the hold-out set).
 
 - **The usual case:** the scheduled train is marked cancelled, and a replacement train with another number ran at the same times.
 - **Rule (passenger's view):** one journey is kept per departure: one that completed if there is one, then one not flagged as a replacement, then the lowest train number. 1,424 journeys were removed.
@@ -188,19 +189,19 @@ The value is the latest delay known at that moment, from the train's own run up 
 
 Only stations in `data/stations_present_in_all_months.csv` are used, so the coverage expansion on 3 November 2025 does not add upstream stops from then on.
 
-Missing values in the CV set (17,505 journeys):
+Missing values in the CV set (17,507 journeys):
 
 | Prediction time | Missing | Train starts in Frankfurt | Run not started yet | No usable upstream report | Cancelled, missing vs known |
 |---|---|---|---|---|---|
-| 24 h | 17,505 (100%) | 2,084 | 15,335 | 86 | 5.5% vs – |
-| 6 h | 16,568 (95%) | 2,084 | 14,398 | 86 | 5.6% vs 3.0% |
-| 1 h | 2,485 (14%) | 2,084 | 315 | 86 | 10.4% vs 4.6% |
-| 20 min | 2,409 (14%) | 2,084 | 239 | 86 | 10.0% vs 4.7% |
-| 0 min | 1,755 (10%) | 1,510 | 159 | 86 | 13.1% vs 4.6% |
+| 24 h | 17,507 (100%) | 2,106 | 15,311 | 90 | 5.5% vs – |
+| 6 h | 16,578 (95%) | 2,106 | 14,382 | 90 | 5.6% vs 3.6% |
+| 1 h | 2,519 (14%) | 2,106 | 323 | 90 | 10.3% vs 4.7% |
+| 20 min | 2,435 (14%) | 2,106 | 239 | 90 | 10.0% vs 4.7% |
+| 0 min | 1,804 (10%) | 1,559 | 155 | 90 | 12.9% vs 4.6% |
 
-At 0 min, the 1,510 trains that start in Frankfurt and have no value had not left by their scheduled time.
+At 0 min, the 1,559 trains that start in Frankfurt and have no value had not left by their scheduled time.
 
-**Decided treatment.** Missing values are not set to plain 0: a 0 means "on time", while a missing value goes with two to three times as many cancellations.
+**Decided treatment.** Missing values are not set to plain 0: a 0 means "on time", while from 1 h on a missing value goes with two to three times as many cancellations.
 - 24 h: not used (always missing). 6 h: probably not used (95% missing).
 - From 1 h on: 0 plus a missing indicator for linear models; left missing for tree models.
 - The files keep the missing values; the treatment is applied when a model is fitted.
@@ -213,9 +214,9 @@ The monthly files keep, for each stop, the values from the latest live-update sn
 
 | Source of the München arrival time | Jul 2024–Sep 2025 | Oct 2025–Sep 2026 | CV set | Hold-out set |
 |---|---|---|---|---|
-| Snapshot taken after the train arrived (an actual time) | 11,378 | 9,093 | 16,425 | 4,046 |
-| Snapshot taken before arrival (a forecast) | 6 | 126 | 90 | 42 |
-| Snapshot within 45 min of arrival (can't tell which) | 4 | 2 | 4 | 2 |
+| Snapshot taken after the train arrived (an actual time) | 11,378 | 9,093 | 16,424 | 4,047 |
+| Snapshot taken before arrival (a forecast) | 6 | 126 | 93 | 39 |
+| Snapshot within 45 min of arrival (can't tell which) | 4 | 2 | 2 | 4 |
 | No snapshot at all, so the planned time was used | 0 | 1 | 1 | 0 |
 
 Our files reproduce the snapshot values exactly for every completed journey.
@@ -225,37 +226,37 @@ Our files reproduce the snapshot values exactly for every completed journey.
 
 **Exactly 0 min arrivals.**
 - 1,547 of the 1,563 covered 0-min arrivals are DB's own time, read after arrival; 15 are forecasts and 1 is the journey without a snapshot.
-- In the CV set until September 2025 they are no more common than −1 or +1 min (523, 502, 454). The delay at the stop before is normal (median 1 min, 0.4% at 10+ min).
-- In the CV set from October 2025 they are more than twice as common as −1 or +1 min (759, 328, 326). They are DB's own reported times as well, so they are not a gap in our data. Whether DB changed how it reports on-time arrivals can't be told from the snapshots.
+- In the CV set until September 2025 they are no more common than −1 or +1 min (548, 564, 466). The delay at the stop before is normal (median 1 min, 0.7% at 10+ min).
+- In the CV set from October 2025 they are more than twice as common as −1 or +1 min (695, 300, 300). They are DB's own reported times as well, so they are not a gap in our data. Whether DB changed how it reports on-time arrivals can't be told from the snapshots.
 
 **Snapshot times are UTC.** `snapshot_timestamp` is UTC, while every train time is German local time. Until early November 2025, it is the start of the 6-hour fetch block, and the request itself can be up to about 45 min later. The script converts it before comparing.
 
 ## When cancellations were issued
 
-The snapshots carry the time each cancellation was issued (`cancellation_time`). All 954 cancelled CV journeys have one (`cancellation_announced`): the issue time of the cancellation in force at the Frankfurt departure or the München arrival, whichever was earlier.
+The snapshots carry the time each cancellation was issued (`cancellation_time`). All 956 cancelled CV journeys have one (`cancellation_announced`): the issue time of the cancellation in force at the Frankfurt departure or the München arrival, whichever was earlier.
 
 | Issued at least … before planned departure | Cancelled CV journeys |
 |---|---|
-| 24 h | 42 |
-| 6 h | 133 |
-| 1 h | 395 |
-| 20 min | 520 |
-| 0 min | 565 |
-| after planned departure | 389 |
+| 24 h | 41 |
+| 6 h | 127 |
+| 1 h | 393 |
+| 20 min | 513 |
+| 0 min | 560 |
+| after planned departure | 396 |
 
-So at 1 h ahead, 41% of the eventual cancellations were already announced, and at 20 min ahead, 55%.
+So at 1 h ahead, 41% of the eventual cancellations were already announced, and at 20 min ahead, 54%.
 
 **Decision: no prediction when a cancellation is already known.** A journey whose cancellation was announced at or before the prediction time has no prediction row for that prediction time. The journey files keep every journey.
 
 | Prediction time | CV rows | Left out | Cancelled share of the rows | Hold-out rows |
 |---|---|---|---|---|
-| 24 h | 17,463 | 42 | 5.2% | 4,318 |
-| 6 h | 17,372 | 133 | 4.7% | 4,306 |
-| 1 h | 17,110 | 395 | 3.3% | 4,247 |
-| 20 min | 16,985 | 520 | 2.6% | 4,219 |
-| 0 min | 16,940 | 565 | 2.3% | 4,201 |
+| 24 h | 17,466 | 41 | 5.2% | 4,315 |
+| 6 h | 17,380 | 127 | 4.8% | 4,298 |
+| 1 h | 17,114 | 393 | 3.3% | 4,243 |
+| 20 min | 16,994 | 513 | 2.6% | 4,210 |
+| 0 min | 16,947 | 560 | 2.3% | 4,194 |
 
-**Flag: withdrawn cancellations stay in.** A journey whose cancellation was announced and later withdrawn, so the train ran, stays in at every prediction time and keeps its real outcome, even if the cancellation was announced before the prediction time. They are marked `cancellation_withdrawn`: 67 in the CV set and 9 in the hold-out set (32 until September 2025, 44 from October 2025). With the rebuilt source files they all count as completed; 30 of them, all until September 2025, were still marked cancelled in the old files.
+**Flag: withdrawn cancellations stay in.** A journey whose cancellation was announced and later withdrawn, so the train ran, stays in at every prediction time and keeps its real outcome, even if the cancellation was announced before the prediction time. They are marked `cancellation_withdrawn`: 59 in the CV set and 17 in the hold-out set (32 until September 2025, 44 from October 2025). With the rebuilt source files they all count as completed; 30 of them, all until September 2025, were still marked cancelled in the old files.
 
 ## Data-quality audit
 
@@ -263,27 +264,27 @@ Numbers come from `audit.json` and `change_check.json`.
 
 ### Open issues
 
-1. **Negative `current_delay` (kept; revisit).** At 20 min ahead, 61 CV values are below −10 min, 53 of them the night train 699 arriving at Frankfurt well before its long planned stop. A train cannot leave early.
+1. **Negative `current_delay` (kept; revisit).** At 20 min ahead, 58 CV values are below −10 min, 51 of them the night train 699 arriving at Frankfurt well before its long planned stop. A train cannot leave early.
 2. **Forecast labels in summer 2026.** 128 arrival times from October 2025 on come from a forecast or an unclear snapshot, 102 of them in May–September 2026 (see above). The decision to keep forecast labels without a flag was made when there were 22.
 3. **0-min arrivals from October 2025** are more than twice as common as −1 or +1 min. They are DB's reported times; whether DB changed how it reports them is unknown.
-4. **Early arrivals at München.** In the CV set, 49 arrivals are more than 10 min early, down to −30 min, most often the evening and night trains 821, 729 and 693. This is plausibly timetable slack.
+4. **Early arrivals at München.** In the CV set, 47 arrivals are more than 10 min early, down to −57 min, most often the evening and night trains 821, 729 and 693. This is plausibly timetable slack.
 
 ### Checked, no action needed
 
 - **Forecast labels until September 2025.** 10 München arrival times come from a forecast or an unclear snapshot. Kept as they are, without a flag.
 - **Rebuilt source files.** Compared with the files from before the rebuild, only the 30 withdrawn cancellations (now completed) and a few `current_delay` values changed until September 2025 (26 at 1 h, 32 at 0 min). From October 2025, 35 cancellations became completed journeys, and in 4 departures a different train of the same departure is kept.
-- **Coverage.** Every day has journeys.
+- **Coverage.** Every day from 1 July 2024 to 30 September 2026 has journeys.
   - The lowest days until September 2025 are 4, 6, 7, 8 and 10 May and 19 July 2025, with 10 or 11.
   - From October 2025, weekends in late August and September 2026 have 2 to 6. On those days Frankfurt Hbf has under half its usual ICE/IC events while Frankfurt Airport and Mannheim are normal, which points to construction work.
-- **Cancellations (CV).** Both ends cancelled: 262. Frankfurt only: 288 (the train still reached München, median 24 min late). München only: 404 (mostly ending at Würzburg or Aschaffenburg). A cancellation only at an intermediate stop does not count: 428 journeys.
-- **No live updates at any stop (CV).** 87 journeys, 78 of them cancelled.
+- **Cancellations (CV).** Both ends cancelled: 258. Frankfurt only: 295 (the train still reached München, median 27 min late). München only: 403 (mostly ending at Würzburg or Aschaffenburg). A cancellation only at an intermediate stop does not count: 433 journeys.
+- **No live updates at any stop (CV).** 88 journeys, 80 of them cancelled.
 - **Time consistency (CV).**
-  - Planned times never go backwards (the 5 journeys where they did had an additional stop and were dropped); reported times go backwards by more than a minute in 59.
+  - Planned times never go backwards (the 5 journeys where they did had an additional stop and were dropped); reported times go backwards by more than a minute in 62.
   - Delays are whole minutes.
-  - 6 night journeys leave in the early hours of a clock-change date. Times are local clock time, so a travel time across the change can be off by up to an hour.
-- **Class boundaries (CV).** 203 arrivals are exactly 20 min late (`moderate`) and 32 exactly 60 min late (`severe`).
+  - 2 night journeys leave in the early hours of a clock-change date. Times are local clock time, so a travel time across the change can be off by up to an hour.
+- **Class boundaries (CV).** 225 arrivals are exactly 20 min late (`moderate`) and 36 exactly 60 min late (`severe`).
 - **IC trains.** There are 196 until September 2025, 30 in late 2025, and none in 2026.
-- **Unseen trains.** 4 hold-out journeys (0.1%) have a train number never seen in the CV set.
+- **Unseen trains.** 6 hold-out journeys (0.1%) have a train number never seen in the CV set.
 - **Edges of the data.**
   - Trains departing late on 30 September 2026 that arrive after midnight are missing, because there is no October file.
   - Runs that started on 30 June 2024 lack their upstream stops.

@@ -3,7 +3,7 @@
 For each prediction time and each fold of frankfurt_munich/folds.py:
 
 1. the validation rows are the CV rows with that `fold`, the training rows
-   all other CV rows (folds are random groups of days, see folds.py);
+   all other CV rows (folds are groups of whole weeks, see folds.py);
 2. a fresh model is fitted on the training rows and predicts the validation
    rows;
 3. the fold is scored: log loss and macro-F1 for `severity`, RMSE for
@@ -38,11 +38,6 @@ TARGETS = {"severity": "severity_class", "delay": "arrival_delay_min"}
 PROBA_COLUMNS = [f"p_{c}" for c in CLASSES]
 
 
-def fold_splits(rows: pd.DataFrame):
-    """Yield (fold, training mask, validation mask)."""
-    yield from cv_folds(rows)
-
-
 def class_probabilities(model, X) -> np.ndarray:
     """predict_proba with its columns put in CLASSES order."""
     classes = list(model.classes_)
@@ -63,7 +58,7 @@ def cross_validate(rows: pd.DataFrame, prediction_time: str, task: str,
     features = numeric + categorical
 
     metrics, predictions = [], []
-    for fold, train, validation in fold_splits(rows):
+    for fold, train, validation in cv_folds(rows):
         model = make_model(numeric, categorical)
         model.fit(rows.loc[train, features], rows.loc[train, target])
         X, y = rows.loc[validation, features], rows.loc[validation, target]

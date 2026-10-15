@@ -28,7 +28,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from folds import LATER_PERIOD_START
+from folds import period_of
 from snapshots import event_summary, read_snapshots
 
 HERE = Path(__file__).resolve().parent
@@ -81,8 +81,7 @@ def main() -> None:
 
     c = out[covered]
     month = c.origin_departure_planned_local.dt.to_period("M").astype(str)
-    period = c.origin_departure_planned_local.ge(LATER_PERIOD_START).map(
-        {False: "before_2025_10", True: "from_2025_10"})
+    period = period_of(c.origin_departure_planned_local)
     zero = c.arrival_delay_min.eq(0)
     canceled = c[c.journey_canceled & c.split.eq("cv")]  # outcome statistics for CV only
     lead = canceled.cancellation_lead_min

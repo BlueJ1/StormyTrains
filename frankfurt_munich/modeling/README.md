@@ -29,7 +29,7 @@ To add a model: write a factory `make_x(numeric, categorical)` in `models.py` an
 ## Method
 
 - **One model per prediction time** (24 h, 6 h, 1 h, 20 min, 0 min), fitted on the rows of that prediction time only.
-- **Folds:** the 5 folds of `../folds.py`, stored in the `fold` column: random groups of whole days, stratified by `severity_class` (see `../README.md`). Fold *k* validates on the rows with `fold == k` and trains on all other CV rows, including days after the validation days. There is no gap between training and validation: keeping each day on one side already separates journeys that share weather and disruptions.
+- **Folds:** the 5 folds of `../folds.py`, stored in the `fold` column: groups of whole ISO weeks, assigned by a greedy stratified split on `severity_class` and committed in `../split_weeks.csv` (see `../README.md`). Fold *k* validates on the rows with `fold == k` and trains on all other CV rows, including weeks after the validation weeks. There is no gap between training and validation: keeping each week on one side already separates most journeys that share weather and disruptions.
 - **Fresh model per fold.** All preprocessing is inside the model's pipeline, so it is fitted on the training rows only.
 - **Targets:**
   - `severity`: `severity_class`, with probabilities for the classes in the order `normal_minor, moderate, severe, canceled`.
@@ -79,8 +79,10 @@ To add a model: write a factory `make_x(numeric, categorical)` in `models.py` an
 
 `tests/test_pipeline.py` checks the method, not the models:
 
-- the rows' folds equal those in `../data/journeys_cv.parquet`;
-- at every prediction time, the 5 folds split the rows into training and validation with no day on both sides, and every row is validated exactly once;
+- the data files follow the committed week assignment `../split_weeks.csv`, so a build with another split fails;
+- no week is in both the hold-out set and the CV set or in two folds; the hold-out set is 15–25% of the weeks;
+- the class shares of every fold are within 2 percentage points of the CV set's;
+- at every prediction time, the rows' folds equal those in `../data/journeys_cv.parquet`;
 - `current_delay` is used only from 1 h on;
 - loading the hold-out set raises an error;
 - log loss agrees with scikit-learn's, and the class-share reference scores exactly the cross-entropy computed by hand;

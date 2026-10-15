@@ -8,9 +8,9 @@ script
 2. drops unusual journeys (UNUSUAL JOURNEYS below);
 3. adds `current_delay` at each prediction time (CURRENT DELAY below);
 4. adds when a cancellation was announced (KNOWN CANCELLATIONS below);
-5. splits the journeys at random by day (see folds.py) into
-   data/journeys_cv.parquet (80% of the days, with a `fold` column 1 to 5) and
-   data/journeys_holdout.parquet (the other 20%);
+5. splits the journeys by week, using the committed assignment in
+   split_weeks.csv (see folds.py), into data/journeys_cv.parquet (with a `fold`
+   column 1 to 5) and data/journeys_holdout.parquet;
 6. writes the prediction rows, one per journey and prediction time, to
    data/prediction_rows_cv.parquet (with `fold`) and
    data/prediction_rows_holdout.parquet.
@@ -67,6 +67,9 @@ those journeys keep every prediction row and are marked
 `cancellation_withdrawn`.
 
 Run from the project root: .venv/bin/python frankfurt_munich/build_dataset.py
+With --new-split, a new week assignment is made and written to split_weeks.csv
+first; only do this on purpose, since it moves weeks between the hold-out set
+and the CV set.
 """
 from __future__ import annotations
 
@@ -83,7 +86,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "corridor_analysis"))
 import extract  # noqa: E402  corridor_analysis/extract.py
 
-from folds import LATER_PERIOD_START, assign_splits  # noqa: E402
+from folds import (ASSIGNMENT_FILE, LATER_PERIOD, assign_splits, new_assignment,  # noqa: E402
+                   period_of, read_assignment, week_of)
 from snapshots import event_summary, read_snapshots  # noqa: E402
 
 INPUT_DIR = ROOT / "data" / "monthly_processed_data"
@@ -154,7 +158,7 @@ def drop_unusual_journeys(journeys: pd.DataFrame, stops: pd.DataFrame) -> tuple[
     drop = too_long | additional
     audit = {"over_7h": int(too_long.sum()), "over_7h_trains": journeys.train_number[too_long].value_counts().to_dict(),
              "additional_end_stop": int(additional.sum()), "journeys_removed": int(drop.sum()),
-             "removed_from_2025_10": int((drop & journeys.origin_departure_planned_local.ge(LATER_PERIOD_START)).sum()),
+             "removed_from_2025_10": int((drop & period_of(journeys.origin_departure_planned_local).eq(LATER_PERIOD)).sum()),
              "over_7h_canceled_share": round(float(journeys.journey_canceled[too_long].mean()), 4)}
     return journeys[~drop].reset_index(drop=True), audit
 
@@ -243,7 +247,7 @@ def write(frame: pd.DataFrame, name: str) -> None:
     frame.to_parquet(OUTPUT_DIR / name, index=False, compression="zstd")
 
 
-def main() -> None:
+def main(new_split: bool = False) -> None:
     paths = sorted(INPUT_DIR.glob("data-????-??.parquet"))
     panel = set(pd.read_csv(PANEL_FILE).station_name)
 
@@ -271,7 +275,9 @@ def main() -> None:
     j = j.join(cancellations).reset_index()
 
     # Split, folds and prediction rows
-    is_holdout, j["fold"] = assign_splits(j)
+    if new_split:
+        new_assignment(j).to_csv(ASSIGNMENT_FILE, index=False, date_format="%Y-%m-%d")
+    is_holdout, j["fold"] = assign_splits(j, read_assignment())
     splits = {"cv": j[~is_holdout], "holdout": j[is_holdout].drop(columns="fold")}
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     left_out = {}
@@ -282,10 +288,10 @@ def main() -> None:
     write(stops, "stops.parquet")
     write(runs, "upstream_runs.parquet")
 
-    day = j.origin_departure_planned_local.dt.normalize()
-    split_sizes = {name: {"journeys": int(len(frame)), "days": int(day[frame.index].nunique())}
+    week = week_of(j.origin_departure_planned_local)
+    split_sizes = {name: {"journeys": int(len(frame)), "weeks": int(week[frame.index].nunique())}
                    for name, frame in splits.items()}
-    folds = {int(f): {"journeys": int(len(g)), "days": int(day[g.index].nunique())}
+    folds = {int(f): {"journeys": int(len(g)), "weeks": int(week[g.index].nunique())}
              for f, g in splits["cv"].groupby("fold")}
 
     audit = {"source_files": [p.name for p in paths], "extraction": extraction_audit,
@@ -300,4 +306,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main(new_split="--new-split" in sys.argv[1:])

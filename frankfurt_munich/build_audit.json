@@ -60,34 +60,34 @@
   "last_departure": "2026-09-30 19:57:00",
   "splits": {
     "cv": {
-      "journeys": 17505,
-      "days": 662
+      "journeys": 17507,
+      "weeks": 95
     },
     "holdout": {
-      "journeys": 4326,
-      "days": 160
+      "journeys": 4324,
+      "weeks": 23
     }
   },
   "folds": {
     "1": {
-      "journeys": 3490,
-      "days": 131
+      "journeys": 3454,
+      "weeks": 19
     },
     "2": {
-      "journeys": 3491,
-      "days": 132
+      "journeys": 3429,
+      "weeks": 18
     },
     "3": {
-      "journeys": 3510,
-      "days": 132
+      "journeys": 3734,
+      "weeks": 21
     },
     "4": {
-      "journeys": 3516,
-      "days": 134
+      "journeys": 3496,
+      "weeks": 19
     },
     "5": {
-      "journeys": 3498,
-      "days": 133
+      "journeys": 3394,
+      "weeks": 18
     }
   },
   "run_stops_read": 131695,
@@ -100,18 +100,18 @@
   },
   "left_out_known_cancellation": {
     "cv": {
-      "24h": 42,
-      "6h": 133,
-      "1h": 395,
-      "20min": 520,
-      "0min": 565
+      "24h": 41,
+      "6h": 127,
+      "1h": 393,
+      "20min": 513,
+      "0min": 560
     },
     "holdout": {
-      "24h": 8,
-      "6h": 20,
-      "1h": 79,
-      "20min": 107,
-      "0min": 125
+      "24h": 9,
+      "6h": 26,
+      "1h": 81,
+      "20min": 114,
+      "0min": 130
     }
   },
   "current_delay_known": {
