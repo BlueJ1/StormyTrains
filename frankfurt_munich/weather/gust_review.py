@@ -50,7 +50,7 @@ def export_gust_review(workflow):
     frame=workflow._stable_export_types(reviewed.rename(columns={'value':workflow.column}))
     protected=[c for c in original if c not in ['review_required','review_status']]
     pd.testing.assert_frame_equal(original[protected],frame[protected])
-    path=workflow.out/'railway_gust_reviewed.parquet'
+    path=workflow.out/'railway_gust_final.parquet'
     frame.to_parquet(path,index=False,compression='zstd')
     pd.testing.assert_frame_equal(frame,pd.read_parquet(path))
     workflow.gust_applied.to_csv(workflow.qc/'review_decisions.csv',index=False)
@@ -88,7 +88,7 @@ def finalize_gust_report(workflow,report):
     report=report.replace(old,new)
     report=report.replace('Review the listed candidates before treating the initial selection as a reviewed final dataset.',
                           'The recorded project review is applied to the separate reviewed railway table; the initial table preserves the original pending-review state. This review records source choices, not independent proof that every measurement is accurate.')
-    section=f"\n## Recorded gust review\n\nAll {count} initial flagged records retain their mapped primary station under the recorded project decision. No wind values, sources or quality codes changed. Diagnostic flags remain visible; outstanding study records: zero. The high observation at DWD 03668 is shared across railway mappings.\n\nCurrent input: [reviewed gust table](../../observations/railway_gust_reviewed.parquet). [Applied decisions](review_decisions.csv) and [decision registry](review_decisions.json) retain the review trail.\n"
+    section=f"\n## Recorded gust review\n\nAll {count} initial flagged records retain their mapped primary station under the recorded project decision. No wind values, sources or quality codes changed. Diagnostic flags remain visible; outstanding study records: zero. The high observation at DWD 03668 is shared across railway mappings.\n\nCurrent input: [reviewed gust table](../../observations/railway_gust_final.parquet). [Applied decisions](review_decisions.csv) and [decision registry](review_decisions.json) retain the review trail.\n"
     report+=section
     (workflow.qc/'gust_report.md').write_text(report)
     index=workflow.qc/'review_candidates.md'

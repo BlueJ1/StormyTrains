@@ -1,56 +1,41 @@
 # Frankfurt–München weather data
 
-Updated: 2026-10-16.
+Updated: 16 October 2026.
 
-[Station mapping and original sources](railway_to_dwd_station_mapping.md) · [Temperature notebook](01_temperature_read_raw.ipynb) · [Temperature report](quality/temperature/temperature_report.md)
+[Short quality report](QUALITY_REPORT.md) · [Railway-to-DWD station mapping and original sources](railway_to_dwd_station_mapping.md)
 
-## Scope and delivery status
+## Current data
 
-Railway scope: 17,507 CV journeys and 4,324 holdout journeys; 21,831 distinct journeys and 19 recorded railway stations. The existing split is preserved. Shared station mappings, DWD source versions and mapping-support files remain in this folder.
+Five variables are available for 19 railway stations: temperature, precipitation, mean wind, gust and daily snow depth. Precipitation type (WRTR) is not included at this stage. The shared mapping still contains its entries for reference.
 
-Temperature was delivered previously. This update supplies **precipitation, mean wind, gust and daily snow depth**. Precipitation type (WRTR) is not part of this delivery; its notebook, observation tables and quality outputs are intentionally excluded. The shared mapping and generic processing code still contain its definition, which does not mean that its observations have been delivered.
+Use **`_final.parquet`** for integration. **`_initial.parquet`** preserves the first primary/backup selection and original screening state. There are ten railway-observation files in [observations/](observations/).
 
-## Four-variable quality and review results
+| Variable | DWD field | Final dataset | Notebook | Detailed report |
+| --- | --- | --- | --- | --- |
+| Temperature | `TT_TU` | [temperature](observations/railway_temperature_final.parquet) | [Run](01_temperature_read_raw.ipynb) | [Report](quality/temperature/temperature_report.md) |
+| Precipitation | `R1` | [precipitation](observations/railway_precipitation_final.parquet) | [Run](02_precipitation.ipynb) | [Report](quality/precipitation/precipitation_report.md) |
+| Mean wind | `F` | [mean_wind](observations/railway_mean_wind_final.parquet) | [Run](04_mean_wind.ipynb) | [Report](quality/mean_wind/mean_wind_report.md) |
+| Gust | `FX_911` | [gust](observations/railway_gust_final.parquet) | [Run](05_gust.ipynb) | [Report](quality/gust/gust_report.md) |
+| Snow depth | `SHK_TAG` | [snow_depth](observations/railway_snow_depth_final.parquet) | [Run](06_snow_depth.ipynb) | [Report](quality/snow_depth/snow_depth_report.md) |
 
-| Variable | Frequency | Backup positions | Remaining missing | Initially flagged | Pending review |
-| --- | --- | --- | --- | --- | --- |
-| Precipitation | hourly | 1837 | 0 | 52 | 0 |
-| Mean wind | hourly | 1872 | 0 | 0 | 0 |
-| Gust | hourly | 1630 | 0 | 3 | 0 |
-| Snow depth | daily | 9 | 0 | 1 | 0 |
+## Match to journeys
 
-Hourly counts are railway station-hours; daily counts are railway station-dates. Counts cover 2024-07-01 to 2026-10-01 exclusive. Exports additionally contain a 48-hour buffer, or two preceding dates for daily snow depth. Shared DWD observations at different railway stations are repeated mappings, not independent measurements.
+- Hourly tables: key = `railway_eva_id` + `timestamp_utc`. Convert railway times to UTC before matching.
+- Snow depth: key = `railway_eva_id` + `observation_date`; `measurement_time_utc` records its 06 UTC reference. Measurement time is not publication time.
+- IDs are strings. Preserve leading zeros in DWD IDs. These are station observations, so each journey still needs its applicable route and agreed prediction time to produce journey-level features. Keep retrospective quality/review fields out of prediction features.
 
-- Precipitation: all 52 initially flagged records retain the primary. Sudden heavy rainfall, rapid changes, repeated small amounts and spatial differences alone do not trigger substitution.
-- Mean wind: no railway study records trigger the configured screening rules; the validated initial table is the current integration input.
-- Gust: all three flagged railway records retain their respective primary observations; values and sources are unchanged.
-- Snow depth: the one flagged Plochingen record retains 25 cm from primary DWD 02485. The project reviewer accepted the current mapping after inspecting station distances and nearby observations. No nearest-available remapping has been applied. Daily dates and the 06 UTC measurement reference are preserved.
+Study period: 2024-07-01 to 2026-10-01 exclusive; exports include a preceding 48-hour buffer (two dates for snow depth). Each hourly final file has 375,744 rows including the buffer; snow depth has 15,656 rows. The final study tables have no remaining missing values or pending review under the current rules. See the short report for review outcomes and remaining scope.
 
-For reviewed variables, `review_required` is false and applied decisions remain traceable. Diagnostic flags remain visible; a completed source-choice review does not independently prove every measurement accurate. These diagnostics are retrospective audit fields, not model features.
+## Run and reproduce
 
-## Notebooks, reports and integration inputs
+Keep the notebooks beside `station_mapping.json`, `source_manifest.json`, `weather_processing.py` and the three variable-specific review modules. Requirements are in [requirements.txt](requirements.txt). The temperature notebook contains its own processing code. All notebooks end with a consolidated report.
 
-- **Precipitation**: [notebook](02_precipitation.ipynb) · [report](quality/precipitation/precipitation_report.md) · [current integration table](observations/railway_precipitation_reviewed.parquet).
-- **Mean wind**: [notebook](04_mean_wind.ipynb) · [report](quality/mean_wind/mean_wind_report.md) · [current integration table](observations/railway_mean_wind_initial.parquet).
-- **Gust**: [notebook](05_gust.ipynb) · [report](quality/gust/gust_report.md) · [current integration table](observations/railway_gust_reviewed.parquet).
-- **Snow depth**: [notebook](06_snow_depth.ipynb) · [report](quality/snow_depth/snow_depth_report.md) · [current integration table](observations/railway_snow_depth_reviewed.parquet).
+Keep the decision registries under `quality/`: temperature uses `temperature/railway_initial/manual_review_decisions.json`; precipitation, gust and snow depth use `<variable>/review_decisions.json`. These reproduce the recorded review decisions.
 
-The notebooks use six sections, ending with one consolidated report. Source observations are saved as `observations/<variable>.parquet`; railway initial tables preserve the original screening state. Reviewed railway tables include the recorded decisions. Keys are railway EVA ID plus UTC hour, or observation date for daily snow depth. These are station-observation tables, not journey-feature tables.
+Original DWD ZIPs are excluded from GitHub. Supply the exact recorded archive versions and configure the archive directory in each notebook: temperature defaults to `raw/air_temperature/`; the other four default to `raw/dwd/`. URLs and hashes are recorded in `source_manifest.json`, the temperature workflow manifest, and each other variable's `archive_inventory.csv`. Notebooks may generate DWD-station intermediate tables locally; only the ten railway initial/final observation files are published here.
 
-The current temperature integration input remains [railway_temperature_reviewed.parquet](observations/railway_temperature_reviewed.parquet), delivered previously. This update does not replace temperature files.
+`quality/` retains monthly coverage, gaps, duplicate/conflict checks, quality codes, screening evidence, decisions and processing manifests. The [short report](QUALITY_REPORT.md) summarizes these results. The shared `coverage_snapshot.json` and `verify_mapping.py` check the earlier mapping-coverage snapshot; they do not replace the observation-quality workflow.
 
-## Processing and reproducibility
+## Remaining integration work
 
-Primary observations are selected first. If a primary is unavailable, use the mapped backup at the same UTC hour, or the same compatible daily reference date for snow depth. `-999`, blanks and non-numeric/non-finite tokens become unavailable while raw tokens remain traceable. Historical rows take priority over recent overlaps, including missing historical rows; same-priority conflicting values remain unavailable pending review. No interpolation or zero filling is used.
-
-Each variable's `quality/` folder contains monthly station/variable coverage, continuous gaps, duplicate/conflict diagnostics, quality-code distributions, screening records, context, validation checks and input/output hashes. Precipitation, gust and snow depth also include saved decision registries and applied decision logs. Screening thresholds are project review rules, not DWD error/deletion standards.
-
-Requirements: Python 3, pandas, numpy, matplotlib and pyarrow; notebook dependencies are listed in `requirements.txt`. Keep the notebooks beside `weather_processing.py`, `precipitation_review.py`, `gust_review.py`, `snow_depth_review.py`, the existing `station_mapping.json` and `source_manifest.json`. Preserve each reviewed variable's `quality/<variable>/review_decisions.json`.
-
-Place the exact original DWD ZIP versions in `raw/dwd/`, or set `ARCHIVE_DIR` in the notebook setup cell. Required URLs, original download times and SHA-256 hashes are listed in each variable's `archive_inventory.csv`. Raw ZIPs are excluded from this GitHub upload. The previously supplied local execution package contains the original archives; use this update's notebooks/modules and review registries with those archives to rerun the latest decisions.
-
-## Remaining project work
-
-Precipitation-type observations are not delivered in this update. Detailed instrument/site interpretation, observation publication-time availability and prediction-time journey integration remain separate tasks. Measurement reference times do not establish when observations became available for prediction.
-
-The existing mapping files describe 114 station-variable pairs. Keep those shared files unchanged; the present snow-depth decision retains their mapping. `python3 verify_mapping.py` checks the saved mapping-coverage snapshot and does not rerun this observation-processing workflow.
+Align observations with prediction times, define the daily snow-depth lag, construct route/rolling features and check publication-time availability. Detailed instrument/site interpretation remains separate. Screening and manual review do not establish independent measurement ground truth.
