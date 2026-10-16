@@ -2,7 +2,7 @@
 
 Updated: 2026-10-16
 
-Status: **mapping and observation-coverage review**. 
+Status: **mapping and observation-coverage review**. Detailed weather-quality review and journey integration are in progress.
 
 **EVA ID identifies a railway station/stop place, not a journey. DWD station ID identifies a weather station.** Each weather cell is **primary / backup**, both five-digit DWD IDs. One railway station can use several weather stations.
 
@@ -307,6 +307,6 @@ This reproduces the reported coverage counts without downloading the full observ
 python3 verify_mapping.py --archives /path/to/original_dwd_zips
 ```
 
-DWD recent archives are revised over time. The recorded download times and hashes identify the versions used in this review. Cleaned weather measurements and the full quality-check workflow will be documented as the next project deliverable.
+DWD recent archives are revised over time. The recorded download times and hashes identify the versions used in this review. Temperature automated processing is documented in the [temperature notebook](01_temperature_read_raw.ipynb) and [consolidated temperature report](quality/temperature/temperature_report.md). Flagged-temperature review and processing of the other weather variables remain pending.
 
-The fixed hourly review starts at 2024-07-01 00:00 UTC. Early departures expressed in German local time and rolling lookback features need observations before this boundary. Extraction for cleaned observations must include that buffer; the coverage percentages above refer only to the stated review window.
+The fixed hourly review starts at 2024-07-01 00:00 UTC. Early departures expressed in German local time and rolling lookback features need observations before this boundary. The temperature observation export includes an additional 48-hour buffer for local departure-time alignment and lookbacks up to 24 hours. The mapping-coverage percentages above refer only to the stated review window; longer lookbacks require a larger extraction window.

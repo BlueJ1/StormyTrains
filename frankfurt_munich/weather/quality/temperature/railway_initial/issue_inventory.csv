@@ -1,0 +1,16 @@
+check,railway_station_hours,status
+remaining_missing_after_backup,0,Missing values remain null; treatment pending if present.
+primary_missing_covered_by_backup,2704,Recorded substitutions under the agreed selection rule.
+source_changes,131,Diagnostic; a source change is not itself an error.
+review_below_absolute_zero,0,Flagged observations retained; interpretation/treatment pending.
+review_extreme,0,Flagged observations retained; interpretation/treatment pending.
+review_jump,17,Flagged observations retained; interpretation/treatment pending.
+review_jump_at_source_change,0,Flagged observations retained; interpretation/treatment pending.
+review_pair_difference,12,Flagged observations retained; interpretation/treatment pending.
+review_constant,0,Flagged observations retained; interpretation/treatment pending.
+review_quality_token,0,Flagged observations retained; interpretation/treatment pending.
+review_archive_conflict,0,Flagged observations retained; interpretation/treatment pending.
+source_station_review_flag,17,Flagged observations retained; interpretation/treatment pending.
+source_quality_code_conflict,0,Flagged observations retained; interpretation/treatment pending.
+duplicate_railway_station_hour_keys,0,Structural check.
+selected_source_beyond_50km,0,Structural check against the station-mapping distance limit.
