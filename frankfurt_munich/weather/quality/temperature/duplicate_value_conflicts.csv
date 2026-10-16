@@ -1,1 +1,0 @@
-station_id_raw,timestamp_label_raw,quality_code_raw,temperature_raw_token,dwd_station_id,timestamp_utc,source_kind,source_archive,source_member,temperature_raw_c,missing_marker,blank_value,parse_error,nonfinite,below_absolute_zero,temperature_c
