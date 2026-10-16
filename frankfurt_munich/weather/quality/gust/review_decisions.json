@@ -1,0 +1,37 @@
+{
+  "review_date": "2026-10-16",
+  "variable": "FX_911",
+  "policy": "Retain each mapped primary gust observation. High gusts and spatial differences alone do not trigger substitution; use the mapped same-hour backup only for unavailable primary observations.",
+  "records": [
+    {
+      "record_id": "GU-R00001",
+      "event_id": "GU-G0001",
+      "railway_eva_id": "8000114",
+      "railway_station": "F\u00fcrth (Bay) Hbf",
+      "timestamp_utc": "2026-07-14 17:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 36.2,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "GU-R00002",
+      "event_id": "GU-G0002",
+      "railway_eva_id": "8000284",
+      "railway_station": "N\u00fcrnberg Hbf",
+      "timestamp_utc": "2026-07-14 17:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 36.2,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "GU-R00003",
+      "event_id": "GU-G0003",
+      "railway_eva_id": "8000025",
+      "railway_station": "Bamberg",
+      "timestamp_utc": "2026-07-14 17:00:00+00:00",
+      "primary_dwd_station_id": "00282",
+      "expected_primary_value": 8.9,
+      "decision": "keep_primary"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "review_date": "2026-10-16",
+  "variable": "SHK_TAG",
+  "policy": "Retain the current snow-depth station mapping after project review of distance and nearby-observation comparisons. Keep the Plochingen primary observation at 25 cm; use mapped same-date compatible-window backup only when the primary is unavailable. No nearest-available remapping is applied.",
+  "records": [
+    {
+      "record_id": "SD-R00001",
+      "event_id": "SD-G0001",
+      "railway_eva_id": "8000302",
+      "railway_station": "Plochingen",
+      "timestamp_utc": "2026-01-26T00:00:00+00:00",
+      "observation_date": "2026-01-26",
+      "primary_dwd_station_id": "02485",
+      "expected_primary_value": 25.0,
+      "decision": "keep_primary"
+    }
+  ]
+}

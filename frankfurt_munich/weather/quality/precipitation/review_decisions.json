@@ -1,0 +1,528 @@
+{
+  "review_date": "2026-10-16",
+  "variable": "R1",
+  "policy": "Retain the nearest available eligible primary station. Sudden heavy precipitation, rapid changes, repeated small positive amounts and spatial differences alone do not trigger substitution. Use the mapped same-hour backup only for unavailable primary observations.",
+  "decision_basis": "Project reviewer instruction: allow sudden large precipitation values and use the weather station nearest to the railway station.",
+  "records": [
+    {
+      "record_id": "P-R00001",
+      "event_id": "P-G0001",
+      "railway_eva_id": "8000105",
+      "railway_station": "Frankfurt (Main) Hbf",
+      "timestamp_utc": "2024-08-07 15:00:00+00:00",
+      "primary_dwd_station_id": "01424",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00002",
+      "event_id": "P-G0002",
+      "railway_eva_id": "8000105",
+      "railway_station": "Frankfurt (Main) Hbf",
+      "timestamp_utc": "2026-07-01 02:00:00+00:00",
+      "primary_dwd_station_id": "01424",
+      "expected_primary_value": 1.3,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00003",
+      "event_id": "P-G0003",
+      "railway_eva_id": "8000261",
+      "railway_station": "München Hbf",
+      "timestamp_utc": "2024-07-06 16:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 12.7,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00004",
+      "event_id": "P-G0004",
+      "railway_eva_id": "8000261",
+      "railway_station": "München Hbf",
+      "timestamp_utc": "2024-07-15 23:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 3.8,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00005",
+      "event_id": "P-G0005",
+      "railway_eva_id": "8000261",
+      "railway_station": "München Hbf",
+      "timestamp_utc": "2024-07-21 18:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 0.3,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00006",
+      "event_id": "P-G0006",
+      "railway_eva_id": "8000261",
+      "railway_station": "München Hbf",
+      "timestamp_utc": "2025-08-20 15:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 20.3,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00007",
+      "event_id": "P-G0007",
+      "railway_eva_id": "8000261",
+      "railway_station": "München Hbf",
+      "timestamp_utc": "2026-06-29 19:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 24.2,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00008",
+      "event_id": "P-G0008",
+      "railway_eva_id": "8000261",
+      "railway_station": "München Hbf",
+      "timestamp_utc": "2026-08-01 16:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 20.7,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00009",
+      "event_id": "P-G0009",
+      "railway_eva_id": "8002041",
+      "railway_station": "Frankfurt (Main) Süd",
+      "timestamp_utc": "2024-08-07 15:00:00+00:00",
+      "primary_dwd_station_id": "01424",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00010",
+      "event_id": "P-G0010",
+      "railway_eva_id": "8002041",
+      "railway_station": "Frankfurt (Main) Süd",
+      "timestamp_utc": "2026-07-01 02:00:00+00:00",
+      "primary_dwd_station_id": "01424",
+      "expected_primary_value": 1.3,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00011",
+      "event_id": "P-G0011",
+      "railway_eva_id": "8000010",
+      "railway_station": "Aschaffenburg Hbf",
+      "timestamp_utc": "2026-06-12 17:00:00+00:00",
+      "primary_dwd_station_id": "01851",
+      "expected_primary_value": 0.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00012",
+      "event_id": "P-G0012",
+      "railway_eva_id": "8000260",
+      "railway_station": "Würzburg Hbf",
+      "timestamp_utc": "2024-08-07 15:00:00+00:00",
+      "primary_dwd_station_id": "05705",
+      "expected_primary_value": 33.7,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00013",
+      "event_id": "P-G0012",
+      "railway_eva_id": "8000260",
+      "railway_station": "Würzburg Hbf",
+      "timestamp_utc": "2024-08-07 16:00:00+00:00",
+      "primary_dwd_station_id": "05705",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00014",
+      "event_id": "P-G0013",
+      "railway_eva_id": "8000114",
+      "railway_station": "Fürth (Bay) Hbf",
+      "timestamp_utc": "2024-08-01 14:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 10.8,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00015",
+      "event_id": "P-G0014",
+      "railway_eva_id": "8000114",
+      "railway_station": "Fürth (Bay) Hbf",
+      "timestamp_utc": "2026-06-28 21:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 37.5,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00016",
+      "event_id": "P-G0014",
+      "railway_eva_id": "8000114",
+      "railway_station": "Fürth (Bay) Hbf",
+      "timestamp_utc": "2026-06-28 22:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 1.2,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00017",
+      "event_id": "P-G0015",
+      "railway_eva_id": "8000114",
+      "railway_station": "Fürth (Bay) Hbf",
+      "timestamp_utc": "2026-07-14 18:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 29.7,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00018",
+      "event_id": "P-G0016",
+      "railway_eva_id": "8000284",
+      "railway_station": "Nürnberg Hbf",
+      "timestamp_utc": "2024-07-06 13:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 0.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00019",
+      "event_id": "P-G0017",
+      "railway_eva_id": "8000284",
+      "railway_station": "Nürnberg Hbf",
+      "timestamp_utc": "2025-07-26 14:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 0.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00020",
+      "event_id": "P-G0018",
+      "railway_eva_id": "8000284",
+      "railway_station": "Nürnberg Hbf",
+      "timestamp_utc": "2026-06-28 21:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 37.5,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00021",
+      "event_id": "P-G0018",
+      "railway_eva_id": "8000284",
+      "railway_station": "Nürnberg Hbf",
+      "timestamp_utc": "2026-06-28 22:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 1.2,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00022",
+      "event_id": "P-G0019",
+      "railway_eva_id": "8000284",
+      "railway_station": "Nürnberg Hbf",
+      "timestamp_utc": "2026-07-14 18:00:00+00:00",
+      "primary_dwd_station_id": "03668",
+      "expected_primary_value": 29.7,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00023",
+      "event_id": "P-G0020",
+      "railway_eva_id": "8000025",
+      "railway_station": "Bamberg",
+      "timestamp_utc": "2024-07-20 17:00:00+00:00",
+      "primary_dwd_station_id": "00282",
+      "expected_primary_value": 24.9,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00024",
+      "event_id": "P-G0021",
+      "railway_eva_id": "8000025",
+      "railway_station": "Bamberg",
+      "timestamp_utc": "2025-06-01 16:00:00+00:00",
+      "primary_dwd_station_id": "00282",
+      "expected_primary_value": 20.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00025",
+      "event_id": "P-G0022",
+      "railway_eva_id": "8000025",
+      "railway_station": "Bamberg",
+      "timestamp_utc": "2025-07-26 13:00:00+00:00",
+      "primary_dwd_station_id": "00282",
+      "expected_primary_value": 0.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00026",
+      "event_id": "P-G0023",
+      "railway_eva_id": "8000025",
+      "railway_station": "Bamberg",
+      "timestamp_utc": "2026-07-17 14:00:00+00:00",
+      "primary_dwd_station_id": "00282",
+      "expected_primary_value": 20.5,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00027",
+      "event_id": "P-G0024",
+      "railway_eva_id": "8000025",
+      "railway_station": "Bamberg",
+      "timestamp_utc": "2026-07-17 19:00:00+00:00",
+      "primary_dwd_station_id": "00282",
+      "expected_primary_value": 0.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00028",
+      "event_id": "P-G0025",
+      "railway_eva_id": "8000240",
+      "railway_station": "Mainz Hbf",
+      "timestamp_utc": "2026-07-01 02:00:00+00:00",
+      "primary_dwd_station_id": "14007",
+      "expected_primary_value": 1.5,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00029",
+      "event_id": "P-G0026",
+      "railway_eva_id": "8000068",
+      "railway_station": "Darmstadt Hbf",
+      "timestamp_utc": "2024-08-13 22:00:00+00:00",
+      "primary_dwd_station_id": "00917",
+      "expected_primary_value": 21.2,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00030",
+      "event_id": "P-G0027",
+      "railway_eva_id": "8000068",
+      "railway_station": "Darmstadt Hbf",
+      "timestamp_utc": "2025-07-07 15:00:00+00:00",
+      "primary_dwd_station_id": "00917",
+      "expected_primary_value": 27.7,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00031",
+      "event_id": "P-G0028",
+      "railway_eva_id": "8000244",
+      "railway_station": "Mannheim Hbf",
+      "timestamp_utc": "2025-08-01 16:00:00+00:00",
+      "primary_dwd_station_id": "05906",
+      "expected_primary_value": 20.8,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00032",
+      "event_id": "P-G0029",
+      "railway_eva_id": "8000244",
+      "railway_station": "Mannheim Hbf",
+      "timestamp_utc": "2025-08-01 19:00:00+00:00",
+      "primary_dwd_station_id": "05906",
+      "expected_primary_value": 21.3,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00033",
+      "event_id": "P-G0030",
+      "railway_eva_id": "8000156",
+      "railway_station": "Heidelberg Hbf",
+      "timestamp_utc": "2025-07-25 12:00:00+00:00",
+      "primary_dwd_station_id": "15514",
+      "expected_primary_value": 0.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00034",
+      "event_id": "P-G0031",
+      "railway_eva_id": "8000156",
+      "railway_station": "Heidelberg Hbf",
+      "timestamp_utc": "2026-07-01 03:00:00+00:00",
+      "primary_dwd_station_id": "15514",
+      "expected_primary_value": 5.5,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00035",
+      "event_id": "P-G0032",
+      "railway_eva_id": "8000302",
+      "railway_station": "Plochingen",
+      "timestamp_utc": "2026-07-17 13:00:00+00:00",
+      "primary_dwd_station_id": "00279",
+      "expected_primary_value": 22.7,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00036",
+      "event_id": "P-G0033",
+      "railway_eva_id": "8000170",
+      "railway_station": "Ulm Hbf",
+      "timestamp_utc": "2024-08-14 17:00:00+00:00",
+      "primary_dwd_station_id": "15444",
+      "expected_primary_value": 29.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00037",
+      "event_id": "P-G0034",
+      "railway_eva_id": "8000170",
+      "railway_station": "Ulm Hbf",
+      "timestamp_utc": "2024-09-04 19:00:00+00:00",
+      "primary_dwd_station_id": "15444",
+      "expected_primary_value": 26.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00038",
+      "event_id": "P-G0035",
+      "railway_eva_id": "8000170",
+      "railway_station": "Ulm Hbf",
+      "timestamp_utc": "2025-07-26 15:00:00+00:00",
+      "primary_dwd_station_id": "15444",
+      "expected_primary_value": 0.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00039",
+      "event_id": "P-G0035",
+      "railway_eva_id": "8000170",
+      "railway_station": "Ulm Hbf",
+      "timestamp_utc": "2025-07-26 16:00:00+00:00",
+      "primary_dwd_station_id": "15444",
+      "expected_primary_value": 0.0,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00040",
+      "event_id": "P-G0036",
+      "railway_eva_id": "8000013",
+      "railway_station": "Augsburg Hbf",
+      "timestamp_utc": "2024-07-21 22:00:00+00:00",
+      "primary_dwd_station_id": "00232",
+      "expected_primary_value": 25.4,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00041",
+      "event_id": "P-G0037",
+      "railway_eva_id": "8000013",
+      "railway_station": "Augsburg Hbf",
+      "timestamp_utc": "2026-01-10 10:00:00+00:00",
+      "primary_dwd_station_id": "00232",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00042",
+      "event_id": "P-G0037",
+      "railway_eva_id": "8000013",
+      "railway_station": "Augsburg Hbf",
+      "timestamp_utc": "2026-01-10 11:00:00+00:00",
+      "primary_dwd_station_id": "00232",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00043",
+      "event_id": "P-G0037",
+      "railway_eva_id": "8000013",
+      "railway_station": "Augsburg Hbf",
+      "timestamp_utc": "2026-01-10 12:00:00+00:00",
+      "primary_dwd_station_id": "00232",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00044",
+      "event_id": "P-G0037",
+      "railway_eva_id": "8000013",
+      "railway_station": "Augsburg Hbf",
+      "timestamp_utc": "2026-01-10 13:00:00+00:00",
+      "primary_dwd_station_id": "00232",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00045",
+      "event_id": "P-G0037",
+      "railway_eva_id": "8000013",
+      "railway_station": "Augsburg Hbf",
+      "timestamp_utc": "2026-01-10 14:00:00+00:00",
+      "primary_dwd_station_id": "00232",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00046",
+      "event_id": "P-G0037",
+      "railway_eva_id": "8000013",
+      "railway_station": "Augsburg Hbf",
+      "timestamp_utc": "2026-01-10 15:00:00+00:00",
+      "primary_dwd_station_id": "00232",
+      "expected_primary_value": 0.1,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00047",
+      "event_id": "P-G0038",
+      "railway_eva_id": "8004158",
+      "railway_station": "München-Pasing",
+      "timestamp_utc": "2024-07-06 16:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 12.7,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00048",
+      "event_id": "P-G0039",
+      "railway_eva_id": "8004158",
+      "railway_station": "München-Pasing",
+      "timestamp_utc": "2024-07-15 23:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 3.8,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00049",
+      "event_id": "P-G0040",
+      "railway_eva_id": "8004158",
+      "railway_station": "München-Pasing",
+      "timestamp_utc": "2024-07-21 18:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 0.3,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00050",
+      "event_id": "P-G0041",
+      "railway_eva_id": "8004158",
+      "railway_station": "München-Pasing",
+      "timestamp_utc": "2025-08-20 15:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 20.3,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00051",
+      "event_id": "P-G0042",
+      "railway_eva_id": "8004158",
+      "railway_station": "München-Pasing",
+      "timestamp_utc": "2026-06-29 19:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 24.2,
+      "decision": "keep_primary"
+    },
+    {
+      "record_id": "P-R00052",
+      "event_id": "P-G0043",
+      "railway_eva_id": "8004158",
+      "railway_station": "München-Pasing",
+      "timestamp_utc": "2026-08-01 16:00:00+00:00",
+      "primary_dwd_station_id": "03379",
+      "expected_primary_value": 20.7,
+      "decision": "keep_primary"
+    }
+  ]
+}
