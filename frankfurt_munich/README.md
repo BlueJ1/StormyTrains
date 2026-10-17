@@ -1,6 +1,6 @@
 # Frankfurt (Main) Hbf → München Hbf dataset
 
-The modelling dataset for the chosen origin–destination pair, railway data only.
+The modelling dataset for the chosen origin–destination pair: railway data, and the same prediction rows with weather added (see [Weather](#weather)).
 
 - **Journeys and targets** follow `corridor_analysis/extract.py`. `build_dataset.py` reuses its functions for this pair alone.
 - **On top of that:**
@@ -21,11 +21,12 @@ The modelling dataset for the chosen origin–destination pair, railway data onl
 | `data/journeys_holdout.parquet` | 4,324 | The hold-out set: journeys in the other 23 weeks |
 | `data/prediction_rows_cv.parquet` | 85,901 | One row per CV journey and prediction time, without known cancellations (see below). A model for one prediction time uses the rows with that `prediction_time` |
 | `data/prediction_rows_holdout.parquet` | 21,260 | The same for the hold-out set |
+| `data/prediction_rows_weather_cv.parquet`, `data/prediction_rows_weather_holdout.parquet` | 85,901, 21,260 | The prediction rows, same order, with the weather known at the prediction time added (see [Weather](#weather)) |
 | `data/stops.parquet` | 133,794 | Recorded stops from Frankfurt to München of the kept journeys |
 | `data/upstream_runs.parquet` | 116,528 | Every recorded stop of each run up to and including Frankfurt, used for `current_delay` |
 | `split_weeks.csv` | 118 | The committed week assignment: `week_start` (Monday), `split` (`cv` or `holdout`), `fold` |
 | `data/change_check.parquet` | 21,831 | Per journey: where the München arrival time comes from, and when a cancellation was issued (see below) |
-| `build_audit.json`, `audit.json`, `change_check.json` | | Counts behind every number in this README |
+| `build_audit.json`, `audit.json`, `change_check.json`, `weather_features_audit.json` | | Counts behind every number in this README |
 
 ## Dataset files
 
@@ -114,6 +115,7 @@ One row per journey, both splits, with what the live-update snapshots say about 
 .venv/bin/python frankfurt_munich/build_dataset.py      # about 1 min; needs both data folders
 .venv/bin/python frankfurt_munich/audit.py
 .venv/bin/python frankfurt_munich/check_change_data.py
+.venv/bin/python frankfurt_munich/weather_features.py    # under 1 min; downloads WRTR archives on the first run
 ```
 
 Both `data/monthly_processed_data` and `data/monthly_processed_data_change` from the Hugging Face dataset are needed.
@@ -125,6 +127,7 @@ Both `data/monthly_processed_data` and `data/monthly_processed_data_change` from
 | `snapshots.py` | Reads the live-update snapshots; used by the two scripts above and below |
 | `audit.py` | Data-quality audit, `audit.json` |
 | `check_change_data.py` | Where each label comes from and when cancellations were announced, `change_check.json` and `data/change_check.parquet` |
+| `weather_features.py` | Adds the weather features to the prediction rows, `data/prediction_rows_weather_*.parquet` and `weather_features_audit.json` |
 
 ## Hold-out set and cross-validation folds
 
@@ -205,6 +208,32 @@ At 0 min, the 1,559 trains that start in Frankfurt and have no value had not lef
 - 24 h: not used (always missing). 6 h: probably not used (95% missing).
 - From 1 h on: 0 plus a missing indicator for linear models; left missing for tree models.
 - The files keep the missing values; the treatment is applied when a model is fitted.
+
+## Weather
+
+`weather_features.py` adds the weather known at the prediction time along the journey's route to every prediction row. The station observations are the `_final` tables in `weather/observations/` (see `weather/README.md`); their gaps are already filled from a backup station within 50 km.
+
+- **Prediction time.** `predicted_at` is clock time, so on the spring clock-change days "24 h before" is only 23 h of real time. The weather uses the earlier of `predicted_at` and the planned departure minus the real lead, both in UTC (74 rows move, all at 24 h or 6 h). In the repeated autumn hour the earlier moment is taken.
+- **Weather hour.** The latest DWD hour label at or before the prediction time. DWD's hourly rain, mean wind and gust at label H are built from the 10-minute values stamped H−60 to H−10 min, so they contain nothing measured after H. This was checked against the 10-minute data of Frankfurt airport (station 01420) on 17 October 2026: hourly rain equals the sum of those six values in 77% of wet hours (mean difference 0.03 mm), wind and gust in 100%; any other offset fits far worse. Temperature is the value at the hour. How long DWD takes to publish an observation is not modelled, and this is observed weather, not a forecast.
+- **Route.** The journey's recorded stops from Frankfurt to München in `stops.parquet`, both ends and cancelled stops included (the same caveat as `recorded_route`). The stops store EVA numbers as `08000105`, the weather tables as `8000105`.
+- **Missing values.** Aggregates use the stations and hours that have a value, and nothing is filled in. No feature is missing at present. Only the earliest row (24 h ahead of the first departure) has a 24-hour window that starts before the weather tables, so it uses 23 hours.
+
+| Column | Meaning |
+|---|---|
+| `weather_hour_utc` | The DWD hour used |
+| `origin_temperature_c`, `destination_temperature_c` | Temperature at Frankfurt Hbf and München Hbf in that hour |
+| `route_temp_max_c`, `route_temp_min_c` | Highest and lowest temperature at any route station in that hour |
+| `route_temp_max_24h_c`, `route_temp_min_24h_c` | The same over the 24 hours ending with that hour |
+| `route_precip_max_mm` | Highest hourly precipitation at any route station |
+| `route_precip_24h_mm` | 24-hour precipitation total at the wettest route station |
+| `route_wind_max_ms`, `route_wind_max_24h_ms` | Highest hourly mean wind at any route station, in that hour and over 24 h |
+| `route_gust_max_ms`, `route_gust_max_24h_ms` | Highest gust (FX_911), the same |
+| `snow_on_route_24h` | A route station reported solid or mixed precipitation (WRTR 7 or 8) in the 24 hours; 13.7% of CV rows, none from May to October |
+| `route_snow_depth_cm` | Deepest snow at any route station, from the latest daily measurement (06 UTC) at or before the prediction time |
+
+**Precipitation type (WRTR)** is not in the weather tables, so `weather_features.py` reads it from DWD's hourly precipitation archives, downloaded on 17 October 2026 into `weather/raw/wrtr/` (not committed; their SHA-256 sums are in `weather_features_audit.json`). It uses the stations in `weather/station_mapping.json`: the primary first, the backup in the same hour when the primary has no usable code (0, 6, 7 or 8). The backup and remaining-gap counts equal the mapping's for all 19 stations; up to 31 hours per station stay unknown (Augsburg).
+
+Some railway stations take mean wind and gust from different DWD stations, so in 49 CV rows the route's highest gust is below its highest mean wind.
 
 ## Where the labels come from
 
@@ -297,4 +326,3 @@ The other railway features in the Initial Data Exploration document:
 - `route_id`, `planned_travel_min`, `planned_stops`, `upstream_planned_min`;
 - the recent-reliability features. Decided: they may use every earlier journey, including hold-out journeys, as long as it is known at the prediction time.
 
-Weather has not been joined for this pair yet.

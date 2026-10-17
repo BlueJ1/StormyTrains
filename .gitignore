@@ -34,3 +34,6 @@ arrival_delays/data/*.parquet
 
 # Modelling: out-of-fold predictions. Rebuild with frankfurt_munich/modeling/run_linear_models.py.
 frankfurt_munich/modeling/results/**/*.parquet
+
+# Frankfurt–München weather: DWD archives downloaded by frankfurt_munich/weather_features.py.
+frankfurt_munich/weather/raw/
