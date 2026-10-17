@@ -1,0 +1,136 @@
+{
+  "precipitation_type_by_station": {
+    "Frankfurt (Main) Hbf": {
+      "backup_hours": 106,
+      "missing_hours": 0
+    },
+    "München Hbf": {
+      "backup_hours": 126,
+      "missing_hours": 17
+    },
+    "Frankfurt (Main) Süd": {
+      "backup_hours": 106,
+      "missing_hours": 0
+    },
+    "Hanau Hbf": {
+      "backup_hours": 106,
+      "missing_hours": 0
+    },
+    "Aschaffenburg Hbf": {
+      "backup_hours": 389,
+      "missing_hours": 0
+    },
+    "Würzburg Hbf": {
+      "backup_hours": 68,
+      "missing_hours": 16
+    },
+    "Fürth (Bay) Hbf": {
+      "backup_hours": 71,
+      "missing_hours": 8
+    },
+    "Nürnberg Hbf": {
+      "backup_hours": 71,
+      "missing_hours": 8
+    },
+    "Ingolstadt Hbf": {
+      "backup_hours": 180,
+      "missing_hours": 8
+    },
+    "Bamberg": {
+      "backup_hours": 243,
+      "missing_hours": 8
+    },
+    "Mainz Hbf": {
+      "backup_hours": 220,
+      "missing_hours": 0
+    },
+    "Darmstadt Hbf": {
+      "backup_hours": 220,
+      "missing_hours": 0
+    },
+    "Mannheim Hbf": {
+      "backup_hours": 111,
+      "missing_hours": 7
+    },
+    "Heidelberg Hbf": {
+      "backup_hours": 111,
+      "missing_hours": 7
+    },
+    "Stuttgart Hbf": {
+      "backup_hours": 83,
+      "missing_hours": 4
+    },
+    "Plochingen": {
+      "backup_hours": 82,
+      "missing_hours": 5
+    },
+    "Ulm Hbf": {
+      "backup_hours": 189,
+      "missing_hours": 22
+    },
+    "Augsburg Hbf": {
+      "backup_hours": 96,
+      "missing_hours": 31
+    },
+    "München-Pasing": {
+      "backup_hours": 129,
+      "missing_hours": 14
+    }
+  },
+  "wrtr_archives_sha256": {
+    "stundenwerte_RR_00232_19961107_20251231_hist.zip": "1784d6065a51049fb9a40ffdb597a7927dd52c5fcdd60060bbbc9a9a9d1b6328",
+    "stundenwerte_RR_00232_akt.zip": "893a970f588bbddc37e36ed1aecbdfff33f845c52a901ece074956ca641f5824",
+    "stundenwerte_RR_00282_19950901_20251231_hist.zip": "8f082130fb3e10f2595d0c427960d811753b9bfd66bdc1548e6d4db2909fb7e5",
+    "stundenwerte_RR_00282_akt.zip": "3206efd7e66d0ff9fc936f8725df405b7bd602f2404773c7fa68ac8573f172aa",
+    "stundenwerte_RR_01262_19950901_20251231_hist.zip": "5b0870ade938d88b9e124ad8fac021f0e96584042a0effc89a7ec35a6085c46c",
+    "stundenwerte_RR_01262_akt.zip": "a10e20a0e91c8b5c58ad51a23feaafd672ed32b22e3aa3d7089e5e09b2897d46",
+    "stundenwerte_RR_01420_19950901_20251231_hist.zip": "caddeacaeaeca14cb5af9a06cb718ef6a6238d0ed693b1fcf492c30d4e7fd953",
+    "stundenwerte_RR_01420_akt.zip": "94cc4121d7303caf9f51926ab3d4dc573d99f26ff989812378f3534537f52eda",
+    "stundenwerte_RR_01587_19960830_20251231_hist.zip": "66a40fc2798d62baf6b4cdcdd0b9be6414905d818225f0737724aa2dc27b153b",
+    "stundenwerte_RR_01587_akt.zip": "5fdf6525f99c6d58a2a4f7830060c925b65b37cb0127aede81d86685c8c57c70",
+    "stundenwerte_RR_02023_19950901_20251231_hist.zip": "b8282761b70cefceb149bc1f7815b9f1c817daf9369a403fd741444a1b0ad8b9",
+    "stundenwerte_RR_02023_akt.zip": "c5913d149b17b48f09348a428d0db0efad83b22fc6ebf7bfb84066630111a150",
+    "stundenwerte_RR_02485_20110502_20251231_hist.zip": "3de40c9bb625479967774b5c441acd61003f18f527218282a0016adaab77a28f",
+    "stundenwerte_RR_02485_akt.zip": "aac77b1691b0969889d50cd26800752a5bcd5cd11df5124eb180e4dda77f0c27",
+    "stundenwerte_RR_02597_19950901_20251231_hist.zip": "03f6728ea53d110ddb5beed502bdecbb1dab2e7569877c0d719e860fc88979f9",
+    "stundenwerte_RR_02597_akt.zip": "fa121e116e9dd896f3291d0e8366fea3b3d0fef963227c892710e3fa308909b9",
+    "stundenwerte_RR_02601_19950901_20251231_hist.zip": "44205b0b5ceff5247b1feff0b0eff7f6353c686326f4dab5354c9eb9c92e437f",
+    "stundenwerte_RR_02601_akt.zip": "32b196a105d53a6fa23e59b292eb3044f517fb6724119e788cd1e8f400e55404",
+    "stundenwerte_RR_03379_19970707_20251231_hist.zip": "a7002c3b7627259694fc3f817c590cbdfd5dbdcfb9413bed01fb83eceddd790e",
+    "stundenwerte_RR_03379_akt.zip": "75a512f6c4dbc0e9ce7297a6eba086a8b7c285f2f043acf43d15758aefaf24d5",
+    "stundenwerte_RR_03668_19950901_20251231_hist.zip": "207b9c23e7ca669c921445fe5a6d2b88adac280bfe0c48219fe846d6e78dde4e",
+    "stundenwerte_RR_03668_akt.zip": "790b8c82fac5e6cd95a05745c77e3412761f8ae42488059edf0a24ac90647150",
+    "stundenwerte_RR_04887_19950901_20251231_hist.zip": "b9249752e14996b4c06009bf4de747786eb67e216ad4310ec0f9ebd2812f1c90",
+    "stundenwerte_RR_04887_akt.zip": "6be75fad62fa3161e09b28c031940a6eada64e67dee4f145789ebb1f28d79159",
+    "stundenwerte_RR_04928_19980601_20251231_hist.zip": "10c99760163e80f6af7a7ab97882d95372d3dad0c59b3d54fc36d2e680ff63ca",
+    "stundenwerte_RR_04928_akt.zip": "65c81ea6e9d30f57e12cdda5f8a278f66536807e90f32e3928b0c3fe8c33aa4f",
+    "stundenwerte_RR_04931_19951004_20251231_hist.zip": "c13309c9128d56701a02a5a6700d938533b490597f97af3762c661c2f9a45ed5",
+    "stundenwerte_RR_04931_akt.zip": "9455e3ced9748abfbceb399a1c207a9a33d52a9b87258cf037a352b11f30d0b6",
+    "stundenwerte_RR_05426_19950901_20251231_hist.zip": "71c4c774aef7b38c287346225de61b1b015a13be432b5bc6526b2c3db0b31661",
+    "stundenwerte_RR_05426_akt.zip": "7d070965aa6c164a930b9f18bb8360b12961e9c612ebb61c853d2d624263ddd5",
+    "stundenwerte_RR_05440_19950901_20251231_hist.zip": "2f0f499e3a78eeaff6377dc8c4a786561de3f7124070c11e51aa44bbc5ed4c58",
+    "stundenwerte_RR_05440_akt.zip": "b3d9b1cdc78b2947912854a85984adb768062b8eb447667b2e6d844b05df32e0",
+    "stundenwerte_RR_05705_19950901_20251231_hist.zip": "768d2342f5033987b3a1a79b4a6f2b2f818583dea632341f2c536e3021b93c81",
+    "stundenwerte_RR_05705_akt.zip": "f563b7caf37f402e165ad6233289fcdbc8a2c819706e80952346ef7cea2f4acf",
+    "stundenwerte_RR_05906_19950901_20251231_hist.zip": "9559f23760483ffb9548c9688a4298810c296fbf2c0530da3284021fdc46fbda",
+    "stundenwerte_RR_05906_akt.zip": "e6c44f2eae56f7972d9daa41b3af1a7c992475b867c021ef281bf0bcb998fce1",
+    "stundenwerte_RR_07341_20050718_20251231_hist.zip": "e017e567a2b1daa878f3c3e7c7ea7e1fa8f8304e8abb73d7e15cdab9cd377c69",
+    "stundenwerte_RR_07341_akt.zip": "460467809dc9727c8ddbcc2753328a684bafe5908f31bd624d6fb21fd2bd5656",
+    "stundenwerte_RR_07412_20061001_20251231_hist.zip": "5b636a1b1cc348dbfb10f5c411607e02fea25495f859e2b7d4e748586084a74d",
+    "stundenwerte_RR_07412_akt.zip": "920a885812eace3dad657347460aea9b555401ec78879a93def21619c5b5df5d",
+    "stundenwerte_RR_15444_20140901_20251231_hist.zip": "38e6b875a969d19f4a190675dc991814876019f1aa3c0e74757c6d9c40aca007",
+    "stundenwerte_RR_15444_akt.zip": "e06c2ff047008347b0eaeadba4eabe0ad8d542d4b79b4ea5116d313c131dd7d4"
+  },
+  "cv": {
+    "rows": 85901,
+    "missing": {},
+    "rows_with_24h_window_before_first_hour": 1,
+    "snow_on_route_24h_true": 11726
+  },
+  "holdout": {
+    "rows": 21260,
+    "missing": {},
+    "rows_with_24h_window_before_first_hour": 0,
+    "snow_on_route_24h_true": 3596
+  }
+}

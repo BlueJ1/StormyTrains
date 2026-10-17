@@ -20,7 +20,7 @@ Use **`_final.parquet`** for integration; **`_initial.parquet`** preserves the f
 
 Hourly keys are `railway_eva_id` + `timestamp_utc`. Snow depth uses `railway_eva_id` + `observation_date`, with a 06 UTC measurement reference. Convert train times to UTC before matching and preserve station IDs as strings. Measurement time is not publication time.
 
-The study period is 2024-07-01 to 2026-10-01 exclusive. Files include a preceding 48-hour buffer (two dates for snow depth): 375,744 rows per hourly variable and 15,656 snow-depth rows. Final study tables have zero remaining missing values and zero pending review under the recorded rules. These are station observations; journey prediction-time matching, route aggregation and rolling features remain integration tasks. Retrospective quality flags are not model features.
+The study period is 2024-07-01 to 2026-10-01 exclusive. Files include a preceding 48-hour buffer (two dates for snow depth): 375,744 rows per hourly variable and 15,656 snow-depth rows. Final study tables have zero remaining missing values and zero pending review under the recorded rules. These are station observations. [`../weather_features.py`](../weather_features.py) matches them to the prediction rows at each prediction time and builds the route features, including a snow flag from WRTR (see the [dataset README](../README.md#weather)). Retrospective quality flags are not model features.
 
 ## Quality and reproduction
 
