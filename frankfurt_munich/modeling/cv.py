@@ -13,7 +13,7 @@ Only the mean and standard deviation of the fold scores are reported; the
 validation predictions are saved but not pooled into one score.
 
 run_cv writes results/<name>/<timestamp>/:
-- config.json: task, model, features, git commit;
+- config.json: task, model, whether weather is used, features, git commit;
 - fold_metrics.csv: one row per prediction time and fold;
 - summary.csv: mean and standard deviation over the folds;
 - oof_predictions.parquet: every validation prediction.
@@ -95,12 +95,15 @@ def git_commit() -> str:
     return commit + (" (uncommitted changes)" if changed else "")
 
 
-def run_cv(name: str, task: str, make_model, prediction_times=PREDICTION_TIMES,
-           results_dir: Path = RESULTS) -> pd.DataFrame:
-    """Cross-validate one model at every prediction time and save the results."""
+def run_cv(name: str, task: str, make_model, weather: bool = False,
+           prediction_times=PREDICTION_TIMES, results_dir: Path = RESULTS) -> pd.DataFrame:
+    """Cross-validate one model at every prediction time and save the results.
+
+    weather=True adds the weather features (features.WEATHER).
+    """
     all_metrics, all_predictions, config_features = [], [], {}
     for prediction_time in prediction_times:
-        numeric, categorical = feature_columns(prediction_time)
+        numeric, categorical = feature_columns(prediction_time, weather)
         config_features[prediction_time] = {"numeric": numeric, "categorical": categorical}
         metrics, predictions = cross_validate(load_rows(prediction_time), prediction_time,
                                               task, make_model, numeric, categorical)
@@ -112,8 +115,8 @@ def run_cv(name: str, task: str, make_model, prediction_times=PREDICTION_TIMES,
     out = results_dir / name / datetime.now().strftime("%Y%m%d-%H%M%S")
     out.mkdir(parents=True)
     config = {"name": name, "task": task, "target": TARGETS[task],
-              "model": str(make_model(*feature_columns(prediction_times[0]))),
-              "features": config_features, "git_commit": git_commit(),
+              "model": str(make_model(*feature_columns(prediction_times[0], weather))),
+              "weather": weather, "features": config_features, "git_commit": git_commit(),
               "created": datetime.now().isoformat(timespec="seconds")}
     (out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
     fold_metrics.to_csv(out / "fold_metrics.csv", index=False)
