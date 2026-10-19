@@ -9,7 +9,7 @@ Only the CV set is used (`../data/prediction_rows_cv.parquet`). The weather mode
 ```bash
 .venv/bin/python -m pip install -r frankfurt_munich/modeling/requirements.txt
 .venv/bin/python -m pytest frankfurt_munich/modeling/tests          # about 5 s
-.venv/bin/python frankfurt_munich/modeling/run_linear_models.py     # about 10 s
+.venv/bin/python frankfurt_munich/modeling/run_linear_models.py     # about 30 s
 ```
 
 `.venv` is at the repository root (Python 3.13).
@@ -102,31 +102,31 @@ The railway-only and weather models use the same rows and folds, so they can be 
 
 ## Results, 19 October 2026
 
-Mean ± standard deviation over the 5 week folds. The railway-only scores are identical to those of 15 October.
+Mean ± standard deviation over the 5 week folds, with the fixed weather route. The railway-only scores are identical to those of 15 October, so only the `*_weather` runs of 19 October are in `results/`.
 
 **Severity**
 
 | Prediction time | Log loss: class shares | Log loss: logistic | Log loss: logistic + weather | Macro-F1: class shares | Macro-F1: logistic | Macro-F1: logistic + weather |
 |---|---|---|---|---|---|---|
-| 24 h | 0.968 ± 0.009 | 0.927 ± 0.017 | 0.927 ± 0.021 | 0.193 ± 0.001 | 0.223 ± 0.003 | 0.232 ± 0.006 |
-| 6 h | 0.958 ± 0.007 | 0.918 ± 0.016 | 0.919 ± 0.017 | 0.194 ± 0.001 | 0.222 ± 0.005 | 0.231 ± 0.006 |
-| 1 h | 0.923 ± 0.009 | 0.824 ± 0.014 | 0.825 ± 0.016 | 0.196 ± 0.002 | 0.329 ± 0.009 | 0.337 ± 0.019 |
-| 20 min | 0.905 ± 0.006 | 0.794 ± 0.016 | 0.795 ± 0.019 | 0.196 ± 0.001 | 0.350 ± 0.015 | 0.355 ± 0.012 |
-| 0 min | 0.897 ± 0.005 | 0.778 ± 0.015 | 0.779 ± 0.017 | 0.197 ± 0.001 | 0.361 ± 0.014 | 0.365 ± 0.014 |
+| 24 h | 0.968 ± 0.009 | 0.927 ± 0.017 | 0.926 ± 0.021 | 0.193 ± 0.001 | 0.223 ± 0.003 | 0.233 ± 0.005 |
+| 6 h | 0.958 ± 0.007 | 0.918 ± 0.016 | 0.919 ± 0.017 | 0.194 ± 0.001 | 0.222 ± 0.005 | 0.232 ± 0.005 |
+| 1 h | 0.923 ± 0.009 | 0.824 ± 0.014 | 0.825 ± 0.016 | 0.196 ± 0.002 | 0.329 ± 0.009 | 0.336 ± 0.020 |
+| 20 min | 0.905 ± 0.006 | 0.794 ± 0.016 | 0.796 ± 0.019 | 0.196 ± 0.001 | 0.350 ± 0.015 | 0.355 ± 0.012 |
+| 0 min | 0.897 ± 0.005 | 0.778 ± 0.015 | 0.779 ± 0.017 | 0.197 ± 0.001 | 0.361 ± 0.014 | 0.368 ± 0.017 |
 
 **Delay** (completed journeys)
 
 | Prediction time | RMSE: training mean | RMSE: linear | RMSE: linear + weather |
 |---|---|---|---|
-| 24 h | 25.43 ± 0.91 | 24.56 ± 0.88 | 24.55 ± 0.88 |
-| 6 h | 25.43 ± 0.91 | 24.56 ± 0.88 | 24.58 ± 0.86 |
+| 24 h | 25.43 ± 0.91 | 24.56 ± 0.88 | 24.54 ± 0.87 |
+| 6 h | 25.43 ± 0.91 | 24.56 ± 0.88 | 24.57 ± 0.86 |
 | 1 h | 25.43 ± 0.91 | 22.92 ± 0.82 | 22.92 ± 0.76 |
-| 20 min | 25.43 ± 0.91 | 22.37 ± 0.87 | 22.37 ± 0.80 |
-| 0 min | 25.43 ± 0.91 | 22.03 ± 1.00 | 22.04 ± 0.94 |
+| 20 min | 25.43 ± 0.91 | 22.37 ± 0.87 | 22.37 ± 0.81 |
+| 0 min | 25.43 ± 0.91 | 22.03 ± 1.00 | 22.04 ± 0.95 |
 
 - Both models beat their reference at every prediction time.
 - The largest gain comes from 1 h on, when `current_delay` is available.
-- **Weather adds almost nothing to these linear models.** Per fold (weather minus railway-only), log loss is 0.0004–0.0015 higher on average, macro-F1 0.003–0.010 higher, and RMSE changes by less than 0.02 min on average. All are far smaller than the spread between folds. Macro-F1 counts only the most probable class; log loss, which judges the probabilities and is used for choosing models, does not improve. A linear model can only use each weather value as a straight line, so this does not yet show that weather is useless; non-linear models may use it better.
+- **Weather adds almost nothing to these linear models.** Per fold (weather minus railway-only), log loss is 0.0013–0.0015 higher on average from 6 h on and 0.0003 lower at 24 h, macro-F1 0.005–0.011 higher, and RMSE changes by less than 0.03 min on average. All are far smaller than the spread between folds. Macro-F1 counts only the most probable class; log loss, which judges the probabilities and is used for choosing models, does not improve beyond noise. A linear model can only use each weather value as a straight line, so this does not yet show that weather is useless; non-linear models may use it better.
 - The class-share reference always predicts `normal_minor`, so its macro-F1 stays near 0.2.
 - The `delay` rows are the same at 24 h and 6 h (completed journeys, no `current_delay`). The railway-only scores are therefore identical; the weather scores differ slightly because the weather differs.
 - The standard deviations are much smaller than with the earlier chronological folds, because every fold mixes weeks from the whole period. The scores are not comparable with the chronological results from 12 October.
