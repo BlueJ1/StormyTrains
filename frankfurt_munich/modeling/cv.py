@@ -95,18 +95,19 @@ def git_commit() -> str:
     return commit + (" (uncommitted changes)" if changed else "")
 
 
-def run_cv(name: str, task: str, make_model, weather: bool = False,
+def run_cv(name: str, task: str, make_model, *, weather: bool = False,
            prediction_times=PREDICTION_TIMES, results_dir: Path = RESULTS) -> pd.DataFrame:
     """Cross-validate one model at every prediction time and save the results.
 
-    weather=True adds the weather features (features.WEATHER).
+    weather=True adds the weather features (features.WEATHER); it is keyword-only.
     """
     all_metrics, all_predictions, config_features = [], [], {}
     for prediction_time in prediction_times:
         numeric, categorical = feature_columns(prediction_time, weather)
         config_features[prediction_time] = {"numeric": numeric, "categorical": categorical}
-        metrics, predictions = cross_validate(load_rows(prediction_time), prediction_time,
-                                              task, make_model, numeric, categorical)
+        rows = load_rows(prediction_time, weather=weather)
+        metrics, predictions = cross_validate(rows, prediction_time, task, make_model,
+                                              numeric, categorical)
         all_metrics.append(metrics)
         all_predictions.append(predictions)
     fold_metrics = pd.concat(all_metrics, ignore_index=True)

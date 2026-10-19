@@ -2,7 +2,7 @@
 
 Every model for Frankfurt (Main) Hbf → München Hbf is trained and scored by the same procedure, so that models differ only in their features and estimator. A model is a function that returns a fresh, unfitted scikit-learn estimator; `cv.py` does the rest.
 
-Only the CV set is used (`../data/prediction_rows_weather_cv.parquet`: the prediction rows plus the route weather, same rows and order). Loading the hold-out set needs `allow_holdout=True`.
+Only the CV set is used (`../data/prediction_rows_cv.parquet`). The weather models merge on the route weather from `../data/prediction_rows_weather_cv.parquet`; the railway-only models never read that file. Loading the hold-out set needs `allow_holdout=True`.
 
 ## Run
 
@@ -16,15 +16,15 @@ Only the CV set is used (`../data/prediction_rows_weather_cv.parquet`: the predi
 
 | File | Purpose |
 |---|---|
-| `data.py` | `load_rows(prediction_time)`: the prediction rows for one prediction time, joined with journey columns, plus derived columns |
+| `data.py` | `load_rows(prediction_time, weather=False)`: the prediction rows for one prediction time, joined with journey columns, plus derived columns and, with `weather=True`, the weather columns |
 | `features.py` | Feature columns per prediction time |
 | `models.py` | Model factories: logistic regression, linear regression, and the two references |
 | `metrics.py` | Class order, log loss, macro-F1, RMSE |
 | `cv.py` | `cross_validate` (one prediction time) and `run_cv` (all prediction times, writes the results) |
-| `run_linear_models.py` | Runs the four models below |
+| `run_linear_models.py` | Runs the six models below |
 | `tests/test_pipeline.py` | Checks of the method itself |
 
-To add a model: write a factory `make_x(numeric, categorical)` in `models.py` and call `run_cv("x", "severity" or "delay", make_x)`; `weather=True` adds the weather features.
+To add a model: write a factory `make_x(numeric, categorical)` in `models.py` and call `run_cv("x", "severity" or "delay", make_x)`; the keyword argument `weather=True` adds the weather features.
 
 ## Method
 
@@ -56,14 +56,15 @@ To add a model: write a factory `make_x(numeric, categorical)` in `models.py` an
 | `hour`, `weekday`, `month` | categorical | planned Frankfurt departure |
 | Weather (`*_weather` models only): `origin_temperature_c`, `destination_temperature_c`, `route_temp_max_c`, `route_temp_min_c`, `route_temp_max_24h_c`, `route_temp_min_24h_c`, `route_precip_max_mm`, `route_precip_24h_mm`, `route_wind_max_ms`, `route_wind_max_24h_ms`, `route_gust_max_ms`, `route_gust_max_24h_ms`, `route_snow_depth_cm`, `snow_on_route_24h` (0/1) | numeric | `../weather_features.py`, see the Weather section of `../README.md` |
 
-- **Weather** is the same set at every prediction time: the observed route weather at that time. `weather_hour_utc` (the DWD hour used) is not a feature. No weather value is missing; the columns are only standardised, with no other transform.
+- **Weather** is the same set at every prediction time: the observed route weather at that time. The route is a fixed station list for the train number's usual branch (via Nürnberg or via Stuttgart), not the recorded stops, so it does not depend on the outcome. The column list is `FEATURE_COLUMNS` in `../weather_features.py`. `weather_hour_utc` (the DWD hour used) is not a feature. No weather value is missing; the columns are only standardised, with no other transform.
+- **Stale weather file:** `load_rows` refuses a weather file whose rows (`journey_id`, `prediction_time`, `predicted_at`, in order) differ from the prediction rows, for example after `build_dataset.py` is re-run without `weather_features.py`.
 
 - **Left out because they describe the outcome:**
   - reported times;
   - the cancellation columns, `cancellation_announced` and `cancellation_withdrawn`;
   - `shared_departure` and `is_replacement_train`;
   - the targets.
-- **Caveat:** `recorded_route`, `observed_stops` and `unobserved_sequence_positions` come from the recorded stops, not the planned ones.
+- **Caveat:** `recorded_route`, `observed_stops` and `unobserved_sequence_positions` come from the recorded stops, not the planned ones. The weather features don't (see above).
 - **Linear models:**
   - missing `current_delay` becomes 0 plus a 0/1 missing indicator;
   - numeric columns are standardised;
@@ -91,7 +92,7 @@ The railway-only and weather models use the same rows and folds, so they can be 
 - the class shares of every fold are within 2 percentage points of the CV set's;
 - at every prediction time, the rows' folds equal those in `../data/journeys_cv.parquet`;
 - `current_delay` is used only from 1 h on;
-- the weather file has exactly the prediction rows (same rows, order and values), its weather features are never missing, and the weather hour is never after `predicted_at`;
+- loading with weather adds only the weather columns (same rows, order and values), an out-of-date weather file is refused (CV files only), the weather features are never missing, and the weather hour is never after `predicted_at` or after the planned departure minus the real lead;
 - weather features are used only by the `*_weather` models;
 - loading the hold-out set raises an error;
 - log loss agrees with scikit-learn's, and the class-share reference scores exactly the cross-entropy computed by hand;

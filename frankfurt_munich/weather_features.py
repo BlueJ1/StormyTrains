@@ -20,10 +20,14 @@ Frankfurt airport, 01420, on 17 October 2026), so they contain nothing after
 H. Temperature is the value at the hour. The time DWD needs to publish an
 observation is not modelled.
 
-ROUTE. The journey's recorded stops from Frankfurt to München in
-data/stops.parquet, both ends and cancelled stops included. Each station's
-weather comes from weather/observations/railway_<variable>_final.parquet,
-where gaps are already filled from a backup weather station.
+ROUTE. A fixed list of stations per branch (ROUTES), not the journey's
+recorded stops, which can depend on the outcome (a diverted train records
+other stations). A journey takes the usual branch of its train number: the
+branch most of that train number's journeys in data/stops.parquet recorded
+(via Würzburg or Nürnberg, or via Mannheim, Stuttgart or Ulm; all journeys,
+hold-out included, as this is a timetable fact). Each station's weather
+comes from weather/observations/railway_<variable>_final.parquet, where gaps
+are already filled from a backup weather station.
 
 FEATURES (the latest hour unless "24h": the 24 hours ending with it):
 - origin_temperature_c, destination_temperature_c: Frankfurt and München;
@@ -74,6 +78,23 @@ HOURLY = {"temperature": "temperature_c", "precipitation": "precipitation_mm",
           "mean_wind": "mean_wind_ms", "gust": "gust_ms"}
 SNOW_CODES = [7, 8]  # solid; liquid and solid
 ORIGIN, DESTINATION = "8000105", "8000261"  # EVA numbers of Frankfurt (Main) Hbf and München Hbf
+ROUTES = {
+    # Frankfurt, Hanau, Aschaffenburg, Würzburg, Nürnberg, Ingolstadt, München
+    "nuernberg": [ORIGIN, "8000150", "8000010", "8000260", "8000284", "8000183", DESTINATION],
+    # Frankfurt, Darmstadt, Mainz, Mannheim, Heidelberg, Stuttgart, Ulm, Augsburg, München-Pasing, München
+    "stuttgart": [ORIGIN, "8000068", "8000240", "8000244", "8000156", "8000096", "8000170",
+                  "8000013", "8004158", DESTINATION],
+}
+# A recorded stop here puts the journey on that branch: Würzburg, Nürnberg; Mannheim, Stuttgart, Ulm.
+BRANCH_STATIONS = {"nuernberg": {"8000260", "8000284"}, "stuttgart": {"8000244", "8000096", "8000170"}}
+# The columns added to every prediction row, besides weather_hour_utc (see FEATURES).
+FEATURE_COLUMNS = ["origin_temperature_c", "destination_temperature_c",
+                   "route_temp_max_c", "route_temp_min_c",
+                   "route_temp_max_24h_c", "route_temp_min_24h_c",
+                   "route_precip_max_mm", "route_precip_24h_mm",
+                   "route_wind_max_ms", "route_wind_max_24h_ms",
+                   "route_gust_max_ms", "route_gust_max_24h_ms",
+                   "route_snow_depth_cm", "snow_on_route_24h"]
 
 
 def hourly_table(variable: str, column: str) -> pd.DataFrame:
@@ -151,12 +172,27 @@ def station_values() -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     return hourly, depth.set_index(["snow_date", "eva"])[["snow_depth_cm"]].astype(float), wrtr_audit
 
 
+def route_stations(stops: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    """(journey_id, eva) of each journey's fixed route (see ROUTE), and counts for the audit."""
+    journeys = stops.groupby("journey_id").agg(train_number=("train_number", "first"), eva=("eva", set))
+    recorded = journeys.eva.map(lambda evas: next((b for b, s in BRANCH_STATIONS.items() if evas & s), None))
+    usual = recorded.dropna().groupby(journeys.train_number).agg(lambda b: b.mode().iloc[0])
+    branch = journeys.train_number.map(usual)
+    assert branch.notna().all(), "train number without a recorded branch"
+    stations = pd.DataFrame([(b, eva) for b, evas in ROUTES.items() for eva in evas], columns=["branch", "eva"])
+    route = branch.rename("branch").rename_axis("journey_id").reset_index().merge(stations, on="branch")
+    audit = {"journeys_by_branch": branch.value_counts().to_dict(),
+             "journeys_without_recorded_branch": int(recorded.isna().sum()),
+             "journeys_recorded_on_the_other_branch": int((recorded.notna() & recorded.ne(branch)).sum())}
+    return route[["journey_id", "eva"]], audit
+
+
 def utc(local: pd.Series) -> pd.Series:
     """German local time in UTC: the earlier moment in a repeated hour, just before a skipped one."""
     return local.dt.tz_localize("Europe/Berlin", ambiguous=True, nonexistent="shift_backward").dt.tz_convert("UTC")
 
 
-def features(rows: pd.DataFrame, stops: pd.DataFrame, hourly: pd.DataFrame,
+def features(rows: pd.DataFrame, route: pd.DataFrame, hourly: pd.DataFrame,
              depth: pd.DataFrame) -> pd.DataFrame:
     """The weather features of each prediction row (see FEATURES)."""
     rows = rows.reset_index(drop=True)
@@ -168,34 +204,37 @@ def features(rows: pd.DataFrame, stops: pd.DataFrame, hourly: pd.DataFrame,
     # Nothing measured after the prediction time: the hour label and the 06 UTC snow measurement.
     assert hour.le(at).all() and (snow_date.dt.tz_localize("UTC") + pd.Timedelta(hours=6)).le(at).all()
     pairs = pd.DataFrame({"row": rows.index, "journey_id": rows.journey_id, "weather_hour_utc": hour,
-                          "snow_date": snow_date}).merge(stops, on="journey_id")
+                          "snow_date": snow_date}).merge(route, on="journey_id")
     pairs = pairs.join(hourly, on=["weather_hour_utc", "eva"]).join(depth, on=["snow_date", "eva"])
-    route = pairs.groupby("row").agg(
+    aggregates = pairs.groupby("row").agg(
         route_temp_max_c=("temp", "max"), route_temp_min_c=("temp", "min"),
         route_temp_max_24h_c=("temp_max_24h", "max"), route_temp_min_24h_c=("temp_min_24h", "min"),
         route_precip_max_mm=("precip", "max"), route_precip_24h_mm=("precip_24h", "max"),
         route_wind_max_ms=("wind", "max"), route_wind_max_24h_ms=("wind_max_24h", "max"),
         route_gust_max_ms=("gust", "max"), route_gust_max_24h_ms=("gust_max_24h", "max"),
-        snow_on_route_24h=("snow_24h", "max"), route_snow_depth_cm=("snow_depth_cm", "max"))
-    assert len(route) == len(rows)
-    route["snow_on_route_24h"] = route.snow_on_route_24h.astype("boolean")
+        route_snow_depth_cm=("snow_depth_cm", "max"), snow_on_route_24h=("snow_24h", "max"))
+    assert len(aggregates) == len(rows)
+    aggregates["snow_on_route_24h"] = aggregates.snow_on_route_24h.astype("boolean")
     out = rows[["journey_id", "prediction_time"]].assign(weather_hour_utc=hour)
     for name, eva in (("origin_temperature_c", ORIGIN), ("destination_temperature_c", DESTINATION)):
         out[name] = pairs[pairs.eva.eq(eva)].set_index("row").temp
-    return out.join(route)
+    out = out.join(aggregates)
+    assert list(out.columns) == ["journey_id", "prediction_time", "weather_hour_utc", *FEATURE_COLUMNS]
+    return out
 
 
 def main() -> None:
-    stops = pd.read_parquet(DATA / "stops.parquet", columns=["journey_id", "eva"])
+    stops = pd.read_parquet(DATA / "stops.parquet", columns=["journey_id", "train_number", "eva"])
     stops["eva"] = stops.eva.astype(int).astype(str)  # "08000105" in the stops, "8000105" in the weather tables
+    route, route_audit = route_stations(stops)
     hourly, depth, wrtr_audit = station_values()
-    assert set(stops.eva) <= set(hourly.index.get_level_values("eva")), "route station without weather"
+    assert set(route.eva) <= set(hourly.index.get_level_values("eva")), "route station without weather"
     first_hour = hourly.index.get_level_values("weather_hour_utc").min()
-    audit = {"precipitation_type_by_station": wrtr_audit,
+    audit = {"route": route_audit, "precipitation_type_by_station": wrtr_audit,
              "wrtr_archives_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(RAW.glob("*.zip"))}}
     for split in ("cv", "holdout"):
         rows = pd.read_parquet(DATA / f"prediction_rows_{split}.parquet").reset_index(drop=True)
-        out = features(rows, stops, hourly, depth)
+        out = features(rows, route, hourly, depth)
         assert out.journey_id.equals(rows.journey_id) and out.prediction_time.equals(rows.prediction_time)
         rows.join(out.drop(columns=["journey_id", "prediction_time"])).to_parquet(
             DATA / f"prediction_rows_weather_{split}.parquet", index=False, compression="zstd")

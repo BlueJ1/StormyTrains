@@ -1,19 +1,21 @@
 """Load the modelling rows for one prediction time.
 
-The rows are data/prediction_rows_weather_<split>.parquet for that prediction
-time: the prediction rows plus the route weather at the prediction time (see
-frankfurt_munich/weather_features.py), in the same rows and order. They are
+The rows are data/prediction_rows_<split>.parquet for that prediction time,
 joined with the journey columns the features need and with the derived
-columns below. Railway-only models simply leave the weather columns unused,
-so railway-only and weather models see exactly the same rows. Missing
+columns below. With weather=True, the route weather at the prediction time
+(see frankfurt_munich/weather_features.py) is merged on from
+data/prediction_rows_weather_<split>.parquet; the railway-only models never
+read that file. The weather file must hold exactly the prediction rows (same
+rows, order and `predicted_at`), or it is out of date and loading fails. So
+railway-only and weather models see exactly the same rows. Missing
 `current_delay` values are kept; the models decide how to treat them.
 
 Derived columns:
 - `planned_travel_min`: planned München arrival minus planned Frankfurt
   departure, in minutes;
 - `hour`, `weekday` (0 = Monday), `month`: of the planned Frankfurt departure;
-- `snow_on_route_24h` is turned from a boolean into 0/1, so that it can be
-  used as a numeric feature.
+- with weather, `snow_on_route_24h` is turned from a boolean into 0/1, so
+  that it can be used as a numeric feature.
 
 CV rows keep their `fold` (see frankfurt_munich/folds.py). The hold-out set is
 not to be looked at yet, so loading it needs allow_holdout=True.
@@ -29,15 +31,17 @@ HERE = Path(__file__).resolve().parent
 DATA = HERE.parent / "data"
 sys.path.insert(0, str(HERE.parent))
 from folds import TIME_COLUMN  # noqa: E402  frankfurt_munich/folds.py
+from features import WEATHER  # noqa: E402
 
 PREDICTION_TIMES = ["24h", "6h", "1h", "20min", "0min"]
 JOURNEY_COLUMNS = ["journey_id", "train_type", "starts_at_origin",
                    "destination_arrival_planned_local", "observed_stops",
                    "recorded_route", "unobserved_sequence_positions"]
+ROW_KEY = ["journey_id", "prediction_time", "predicted_at"]
 
 
-def load_rows(prediction_time: str, split: str = "cv",
-              allow_holdout: bool = False) -> pd.DataFrame:
+def load_rows(prediction_time: str, split: str = "cv", allow_holdout: bool = False,
+              weather: bool = False) -> pd.DataFrame:
     if prediction_time not in PREDICTION_TIMES:
         raise ValueError(f"unknown prediction time {prediction_time!r}")
     if split not in ("cv", "holdout"):
@@ -46,7 +50,15 @@ def load_rows(prediction_time: str, split: str = "cv",
         raise PermissionError("The hold-out set is not to be looked at yet; "
                               "pass allow_holdout=True for the final evaluation.")
 
-    rows = pd.read_parquet(DATA / f"prediction_rows_weather_{split}.parquet")
+    rows = pd.read_parquet(DATA / f"prediction_rows_{split}.parquet")
+    if weather:
+        path = DATA / f"prediction_rows_weather_{split}.parquet"
+        weather_rows = pd.read_parquet(path, columns=[*ROW_KEY, "weather_hour_utc", *WEATHER])
+        if not weather_rows[ROW_KEY].equals(rows[ROW_KEY]):
+            raise ValueError(f"{path.name} does not match the prediction rows; "
+                             "re-run frankfurt_munich/weather_features.py")
+        rows = rows.join(weather_rows.drop(columns=ROW_KEY))
+        rows["snow_on_route_24h"] = rows["snow_on_route_24h"].astype(float)
     rows = rows[rows["prediction_time"] == prediction_time]
     journeys = pd.read_parquet(DATA / f"journeys_{split}.parquet",
                                columns=JOURNEY_COLUMNS)
@@ -58,5 +70,4 @@ def load_rows(prediction_time: str, split: str = "cv",
     rows["hour"] = departure.dt.hour
     rows["weekday"] = departure.dt.dayofweek
     rows["month"] = departure.dt.month
-    rows["snow_on_route_24h"] = rows["snow_on_route_24h"].astype(float)
     return rows.reset_index(drop=True)

@@ -8,6 +8,7 @@ import pandas as pd
 import pytest
 from sklearn.metrics import log_loss
 
+import data
 from cv import PROBA_COLUMNS, class_probabilities, cross_validate
 from data import DATA, PREDICTION_TIMES, TIME_COLUMN, load_rows
 from features import WEATHER, feature_columns
@@ -17,8 +18,8 @@ from models import make_class_shares, make_linear_regression, make_logistic_regr
 
 
 @cache
-def rows_for(prediction_time):
-    return load_rows(prediction_time)
+def rows_for(prediction_time, weather=False):
+    return load_rows(prediction_time, weather=weather)
 
 
 @cache
@@ -77,30 +78,45 @@ def test_current_delay_only_from_1h():
         assert ("current_delay" in numeric) == (prediction_time in ("1h", "20min", "0min"))
 
 
-def test_weather_rows_are_the_prediction_rows():
-    """The weather file adds columns only: same rows, same order, same values."""
-    for split in ("cv", "holdout"):
-        rows = pd.read_parquet(DATA / f"prediction_rows_{split}.parquet")
-        weather = pd.read_parquet(DATA / f"prediction_rows_weather_{split}.parquet")
-        pd.testing.assert_frame_equal(weather[rows.columns], rows)
+@pytest.mark.parametrize("prediction_time", PREDICTION_TIMES)
+def test_weather_only_adds_columns(prediction_time):
+    """With weather, load_rows gives the same rows, order and values, plus the weather."""
+    railway, weather = rows_for(prediction_time), rows_for(prediction_time, weather=True)
+    pd.testing.assert_frame_equal(weather[railway.columns], railway)
+    assert set(weather.columns) - set(railway.columns) == {"weather_hour_utc", *WEATHER}
+
+
+def test_out_of_date_weather_file_is_refused(tmp_path, monkeypatch):
+    """CV files only: the hold-out file is checked when it is loaded for the final evaluation."""
+    rows = pd.read_parquet(DATA / "prediction_rows_cv.parquet")
+    weather = pd.read_parquet(DATA / "prediction_rows_weather_cv.parquet")
+    rows.to_parquet(tmp_path / "prediction_rows_cv.parquet")
+    weather.iloc[1:].to_parquet(tmp_path / "prediction_rows_weather_cv.parquet")
+    monkeypatch.setattr(data, "DATA", tmp_path)
+    with pytest.raises(ValueError, match="re-run"):
+        load_rows("1h", weather=True)
 
 
 @pytest.mark.parametrize("prediction_time", PREDICTION_TIMES)
 def test_weather_features_are_complete(prediction_time):
-    rows = rows_for(prediction_time)
+    rows = rows_for(prediction_time, weather=True)
     assert rows[WEATHER].notna().all().all()
     assert set(rows["snow_on_route_24h"]) <= {0.0, 1.0}
 
 
 def test_weather_is_not_from_after_the_prediction_time():
-    """The weather hour is at or before `predicted_at` (German local time)."""
+    """The weather hour is at or before both `predicted_at` and the planned departure
+    minus the real lead (they differ by an hour around a clock change)."""
+    def utc(local):  # Clock-change hours: take the earlier possible moment, the stricter check.
+        return local.dt.tz_localize("Europe/Berlin", ambiguous=np.ones(len(local), dtype=bool),
+                                    nonexistent="shift_backward")
+
     for prediction_time in PREDICTION_TIMES:
-        rows = rows_for(prediction_time)
-        # Clock-change hours: take the earlier possible moment, the stricter check.
-        predicted_at = rows["predicted_at"].dt.tz_localize(
-            "Europe/Berlin", ambiguous=np.ones(len(rows), dtype=bool),
-            nonexistent="shift_backward")
-        assert (rows["weather_hour_utc"] <= predicted_at).all()
+        rows = rows_for(prediction_time, weather=True)
+        departure = rows[TIME_COLUMN]
+        lead = departure - rows["predicted_at"]  # 24 h, 6 h, ... on the clock
+        assert (rows["weather_hour_utc"] <= utc(rows["predicted_at"])).all()
+        assert (rows["weather_hour_utc"] <= utc(departure) - lead).all()
 
 
 def test_weather_features_only_when_asked():
@@ -162,7 +178,7 @@ def test_validation_predictions_line_up_with_their_rows():
 @pytest.mark.parametrize("weather", [False, True])
 def test_shuffled_labels_do_not_beat_class_shares(weather):
     """With labels unrelated to the features, the full model can't learn anything."""
-    rows = rows_for("1h").copy()
+    rows = rows_for("1h", weather=weather).copy()
     rows["severity_class"] = np.random.default_rng(0).permutation(rows["severity_class"].to_numpy())
     numeric, categorical = feature_columns("1h", weather)
     model, _ = cross_validate(rows, "1h", "severity", make_logistic_regression, numeric, categorical)

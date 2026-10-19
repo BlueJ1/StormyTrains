@@ -27,4 +27,4 @@ if __name__ == "__main__":
     pd.set_option("display.width", 200)
     for name, task, make_model, weather in RUNS:
         print(f"\n{name} ({task})")
-        print(run_cv(name, task, make_model, weather).round(4).to_string(index=False))
+        print(run_cv(name, task, make_model, weather=weather).round(4).to_string(index=False))
