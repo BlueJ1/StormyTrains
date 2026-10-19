@@ -10,7 +10,7 @@ from sklearn.metrics import log_loss
 
 from cv import PROBA_COLUMNS, class_probabilities, cross_validate
 from data import DATA, PREDICTION_TIMES, TIME_COLUMN, load_rows
-from features import WEATHER, feature_columns
+from features import feature_columns
 from folds import N_FOLDS, cv_folds, read_assignment, week_of
 from metrics import CLASSES, class_log_loss
 from models import make_class_shares, make_linear_regression, make_logistic_regression
@@ -77,41 +77,6 @@ def test_current_delay_only_from_1h():
         assert ("current_delay" in numeric) == (prediction_time in ("1h", "20min", "0min"))
 
 
-def test_weather_rows_are_the_prediction_rows():
-    """The weather file adds columns only: same rows, same order, same values."""
-    for split in ("cv", "holdout"):
-        rows = pd.read_parquet(DATA / f"prediction_rows_{split}.parquet")
-        weather = pd.read_parquet(DATA / f"prediction_rows_weather_{split}.parquet")
-        pd.testing.assert_frame_equal(weather[rows.columns], rows)
-
-
-@pytest.mark.parametrize("prediction_time", PREDICTION_TIMES)
-def test_weather_features_are_complete(prediction_time):
-    rows = rows_for(prediction_time)
-    assert rows[WEATHER].notna().all().all()
-    assert set(rows["snow_on_route_24h"]) <= {0.0, 1.0}
-
-
-def test_weather_is_not_from_after_the_prediction_time():
-    """The weather hour is at or before `predicted_at` (German local time)."""
-    for prediction_time in PREDICTION_TIMES:
-        rows = rows_for(prediction_time)
-        # Clock-change hours: take the earlier possible moment, the stricter check.
-        predicted_at = rows["predicted_at"].dt.tz_localize(
-            "Europe/Berlin", ambiguous=np.ones(len(rows), dtype=bool),
-            nonexistent="shift_backward")
-        assert (rows["weather_hour_utc"] <= predicted_at).all()
-
-
-def test_weather_features_only_when_asked():
-    for prediction_time in PREDICTION_TIMES:
-        railway, categorical = feature_columns(prediction_time)
-        weather, categorical_weather = feature_columns(prediction_time, weather=True)
-        assert not set(WEATHER) & set(railway)
-        assert weather == railway + WEATHER
-        assert categorical_weather == categorical
-
-
 def test_holdout_needs_explicit_permission():
     with pytest.raises(PermissionError):
         load_rows("1h", split="holdout")
@@ -159,12 +124,11 @@ def test_validation_predictions_line_up_with_their_rows():
     assert (metrics["rmse"] < 1e-6).all()
 
 
-@pytest.mark.parametrize("weather", [False, True])
-def test_shuffled_labels_do_not_beat_class_shares(weather):
+def test_shuffled_labels_do_not_beat_class_shares():
     """With labels unrelated to the features, the full model can't learn anything."""
     rows = rows_for("1h").copy()
     rows["severity_class"] = np.random.default_rng(0).permutation(rows["severity_class"].to_numpy())
-    numeric, categorical = feature_columns("1h", weather)
+    numeric, categorical = feature_columns("1h")
     model, _ = cross_validate(rows, "1h", "severity", make_logistic_regression, numeric, categorical)
     shares, _ = cross_validate(rows, "1h", "severity", make_class_shares, numeric, categorical)
     assert model["log_loss"].mean() > shares["log_loss"].mean() - 0.005
