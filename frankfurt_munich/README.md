@@ -211,11 +211,11 @@ At 0 min, the 1,559 trains that start in Frankfurt and have no value had not lef
 
 ## Weather
 
-`weather_features.py` adds the weather known at the prediction time along the journey's route to every prediction row. The station observations are the `_final` tables in `weather/observations/` (see `weather/README.md`); their gaps are already filled from a backup station within 50 km.
+`weather_features.py` adds the weather known at the prediction time along the route to every prediction row. The station observations are the `_final` tables in `weather/observations/` (see `weather/README.md`); their gaps are already filled from a backup station within 50 km.
 
 - **Prediction time.** `predicted_at` is clock time, so on the spring clock-change days "24 h before" is only 23 h of real time. The weather uses the earlier of `predicted_at` and the planned departure minus the real lead, both in UTC (74 rows move, all at 24 h or 6 h). In the repeated autumn hour the earlier moment is taken.
 - **Weather hour.** The latest DWD hour label at or before the prediction time. DWD's hourly rain, mean wind and gust at label H are built from the 10-minute values stamped H−60 to H−10 min, so they contain nothing measured after H. This was checked against the 10-minute data of Frankfurt airport (station 01420) on 17 October 2026: hourly rain equals the sum of those six values in 77% of wet hours (mean difference 0.03 mm), wind and gust in 100%; any other offset fits far worse. Temperature is the value at the hour. How long DWD takes to publish an observation is not modelled, and this is observed weather, not a forecast.
-- **Route.** The journey's recorded stops from Frankfurt to München in `stops.parquet`, both ends and cancelled stops included (the same caveat as `recorded_route`). The stops store EVA numbers as `08000105`, the weather tables as `8000105`.
+- **Route.** A fixed station list per branch, not the journey's recorded stops, which can depend on the outcome (a diverted train records other stations). Nürnberg branch: Frankfurt, Hanau, Aschaffenburg, Würzburg, Nürnberg, Ingolstadt, München. Stuttgart branch: Frankfurt, Darmstadt, Mainz, Mannheim, Heidelberg, Stuttgart, Ulm, Augsburg, München-Pasing, München. A journey takes the usual branch of its train number, the one most of that train number's journeys recorded (Würzburg or Nürnberg, or Mannheim, Stuttgart or Ulm): 12,584 journeys on the Nürnberg branch, 9,247 on the Stuttgart branch. This lookup uses all journeys, hold-out included, since the branch is a timetable fact. 75 journeys recorded the other branch and 6 neither. The lists include stops that many trains skip (such as Hanau and Ingolstadt), so most journeys get more stations than they recorded. The stops store EVA numbers as `08000105`, the weather tables as `8000105`.
 - **Missing values.** Aggregates use the stations and hours that have a value, and nothing is filled in. No feature is missing at present. Only the earliest row (24 h ahead of the first departure) has a 24-hour window that starts before the weather tables, so it uses 23 hours.
 
 | Column | Meaning |
@@ -228,12 +228,12 @@ At 0 min, the 1,559 trains that start in Frankfurt and have no value had not lef
 | `route_precip_24h_mm` | 24-hour precipitation total at the wettest route station |
 | `route_wind_max_ms`, `route_wind_max_24h_ms` | Highest hourly mean wind at any route station, in that hour and over 24 h |
 | `route_gust_max_ms`, `route_gust_max_24h_ms` | Highest gust (FX_911), the same |
-| `snow_on_route_24h` | A route station reported solid or mixed precipitation (WRTR 7 or 8) in the 24 hours; 13.7% of CV rows, none from May to October |
+| `snow_on_route_24h` | A route station reported solid or mixed precipitation (WRTR 7 or 8) in the 24 hours; 14.3% of CV rows, none from May to October |
 | `route_snow_depth_cm` | Deepest snow at any route station, from the latest daily measurement (06 UTC) at or before the prediction time |
 
 **Precipitation type (WRTR)** is not in the weather tables, so `weather_features.py` reads it from DWD's hourly precipitation archives, downloaded on 17 October 2026 into `weather/raw/wrtr/` (not committed; their SHA-256 sums are in `weather_features_audit.json`). It uses the stations in `weather/station_mapping.json`: the primary first, the backup in the same hour when the primary has no usable code (0, 6, 7 or 8). The backup and remaining-gap counts equal the mapping's for all 19 stations; up to 31 hours per station stay unknown (Augsburg).
 
-Some railway stations take mean wind and gust from different DWD stations, so in 49 CV rows the route's highest gust is below its highest mean wind.
+Some railway stations take mean wind and gust from different DWD stations, so in 203 CV rows the route's highest gust is below its highest mean wind.
 
 ## Where the labels come from
 

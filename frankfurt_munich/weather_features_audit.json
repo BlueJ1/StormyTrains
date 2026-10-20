@@ -1,4 +1,12 @@
 {
+  "route": {
+    "journeys_by_branch": {
+      "nuernberg": 12584,
+      "stuttgart": 9247
+    },
+    "journeys_without_recorded_branch": 6,
+    "journeys_recorded_on_the_other_branch": 75
+  },
   "precipitation_type_by_station": {
     "Frankfurt (Main) Hbf": {
       "backup_hours": 106,
@@ -125,12 +133,12 @@
     "rows": 85901,
     "missing": {},
     "rows_with_24h_window_before_first_hour": 1,
-    "snow_on_route_24h_true": 11726
+    "snow_on_route_24h_true": 12272
   },
   "holdout": {
     "rows": 21260,
     "missing": {},
     "rows_with_24h_window_before_first_hour": 0,
-    "snow_on_route_24h_true": 3596
+    "snow_on_route_24h_true": 3791
   }
 }
