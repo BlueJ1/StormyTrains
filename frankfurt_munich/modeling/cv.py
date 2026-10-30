@@ -110,18 +110,28 @@ def run_cv(name: str, task: str, make_model, *, weather: bool = False,
                                               numeric, categorical)
         all_metrics.append(metrics)
         all_predictions.append(predictions)
-    fold_metrics = pd.concat(all_metrics, ignore_index=True)
-    summary = summarize(fold_metrics)
-
-    out = results_dir / name / datetime.now().strftime("%Y%m%d-%H%M%S")
-    out.mkdir(parents=True)
     config = {"name": name, "task": task, "target": TARGETS[task],
               "model": str(make_model(*feature_columns(prediction_times[0], weather))),
-              "weather": weather, "features": config_features, "git_commit": git_commit(),
+              "weather": weather, "features": config_features}
+    _, summary = save_run(results_dir, name, config, pd.concat(all_metrics, ignore_index=True),
+                          pd.concat(all_predictions, ignore_index=True))
+    return summary
+
+
+def save_run(results_dir: Path, name: str, config: dict, fold_metrics: pd.DataFrame,
+             predictions: pd.DataFrame) -> tuple[Path, pd.DataFrame]:
+    """Write config.json (plus the git commit and time), fold_metrics.csv,
+    summary.csv and oof_predictions.parquet to results/<name>/<timestamp>/.
+
+    Return that directory and the summary.
+    """
+    out = results_dir / name / datetime.now().strftime("%Y%m%d-%H%M%S")
+    out.mkdir(parents=True)
+    config = {**config, "git_commit": git_commit(),
               "created": datetime.now().isoformat(timespec="seconds")}
+    summary = summarize(fold_metrics)
     (out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
     fold_metrics.to_csv(out / "fold_metrics.csv", index=False)
     summary.to_csv(out / "summary.csv", index=False)
-    pd.concat(all_predictions, ignore_index=True).to_parquet(
-        out / "oof_predictions.parquet", index=False)
-    return summary
+    predictions.to_parquet(out / "oof_predictions.parquet", index=False)
+    return out, summary
