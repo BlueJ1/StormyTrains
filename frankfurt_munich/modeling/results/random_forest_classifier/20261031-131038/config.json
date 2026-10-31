@@ -1,0 +1,147 @@
+{
+  "name": "random_forest_classifier",
+  "task": "severity",
+  "target": "severity_class",
+  "model": "make_random_forest_classifier",
+  "weather": false,
+  "search": {
+    "n_configs": 50,
+    "seed": 42,
+    "space": {
+      "max_features": "<scipy.stats._distn_infrastructure.rv_continuous_frozen object at 0x11c3bd6a0>",
+      "min_samples_leaf": "LogUniformInt(1, 50)",
+      "max_depth": "[None, 8, 16, 32]",
+      "max_samples": "<scipy.stats._distn_infrastructure.rv_continuous_frozen object at 0x11c4116d0>"
+    },
+    "selection": "lowest mean log_loss over the folds"
+  },
+  "chosen": {
+    "24h": {
+      "config_id": 17,
+      "params": {
+        "max_depth": null,
+        "max_features": 0.4498095607205338,
+        "max_samples": 0.6356745158869479,
+        "min_samples_leaf": 26
+      }
+    },
+    "6h": {
+      "config_id": 17,
+      "params": {
+        "max_depth": null,
+        "max_features": 0.4498095607205338,
+        "max_samples": 0.6356745158869479,
+        "min_samples_leaf": 26
+      }
+    },
+    "1h": {
+      "config_id": 34,
+      "params": {
+        "max_depth": 16,
+        "max_features": 0.3919105189047466,
+        "max_samples": 0.5610439773503366,
+        "min_samples_leaf": 4
+      }
+    },
+    "20min": {
+      "config_id": 41,
+      "params": {
+        "max_depth": null,
+        "max_features": 0.35635644493972085,
+        "max_samples": 0.5184434736772664,
+        "min_samples_leaf": 11
+      }
+    },
+    "0min": {
+      "config_id": 41,
+      "params": {
+        "max_depth": null,
+        "max_features": 0.35635644493972085,
+        "max_samples": 0.5184434736772664,
+        "min_samples_leaf": 11
+      }
+    }
+  },
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "git_commit": "87060b11ad127734a785d695311f8fe42189a25f (uncommitted changes)",
+  "created": "2026-10-31T13:10:38"
+}

@@ -8,8 +8,9 @@ For each prediction time:
    prediction time, try the same configurations.
 2. Every configuration is cross-validated on the 5 week folds exactly as in
    cv.py (cross_validate), so its score is the mean of its 5 fold scores.
-3. The configuration with the lowest mean score (RMSE for `delay`) is chosen
-   and its fold scores and validation predictions are the run's result.
+3. The configuration with the lowest mean score (RMSE for `delay`, log loss
+   for `severity`) is chosen and its fold scores and validation predictions
+   are the run's result.
 
 This is a flat search: the folds that choose the configuration also score it,
 so the chosen configuration's score is optimistic (the best of N_CONFIGS on
@@ -38,7 +39,7 @@ from features import feature_columns
 
 N_CONFIGS = 50
 SEED = 42
-SCORE = {"delay": "rmse"}  # lower is better
+SCORE = {"delay": "rmse", "severity": "log_loss"}  # lower is better
 
 
 class LogUniformInt:
