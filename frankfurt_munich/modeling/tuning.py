@@ -151,7 +151,7 @@ def run_search(name: str, task: str, factory, space: dict, *, weather: bool = Fa
         best = int(table.loc[table["chosen"], "config_id"].iloc[0])
         chosen[prediction_time] = {"config_id": best, "params": configs[best]}
         tables.append(table)
-        all_metrics.append(metrics.drop(columns="config_id"))
+        all_metrics.append(metrics)
         all_predictions.append(predictions)
         print(f"  {prediction_time}: config {best}, "
               f"{SCORE[task]} {table[f'{SCORE[task]}_mean'].min():.3f}, "

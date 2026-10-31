@@ -13,7 +13,7 @@ from data import load_rows
 from features import feature_columns
 from models import (CategoryCodes, make_lightgbm, make_random_forest, make_svr,
                     make_training_mean, make_xgboost)
-from tuning import N_CONFIGS, SPACES, LogUniformInt, sample_configs, search
+from tuning import N_CONFIGS, SPACES, LogUniformInt, run_search, sample_configs, search
 
 # Small configurations, so the tests run in seconds.
 SMALL = {
@@ -107,3 +107,20 @@ def test_search_chooses_the_lowest_mean_rmse():
     assert metrics["rmse"].tolist() == table.loc[1, [f"rmse_fold{f}" for f in range(1, 6)]].tolist()
     assert (predictions["config_id"] == 1).all()
     assert np.allclose(predictions["predicted_delay"], configs[1]["value"])
+
+
+def test_run_search_writes_the_chosen_configurations(tmp_path):
+    """The whole run, at two prediction times, with constant predictions."""
+    def constant(numeric, categorical, *, value):
+        return DummyRegressor(strategy="constant", constant=value)
+
+    space = {"value": [0.0, 20.0, 100.0]}
+    summary = run_search("constant", "delay", constant, space, prediction_times=["1h", "0min"],
+                         n_configs=3, results_dir=tmp_path)
+    (out,) = (tmp_path / "constant").iterdir()
+    table = pd.read_csv(out / "search_results.csv")
+    assert len(table) == 6 and table["chosen"].sum() == 2
+    assert summary["prediction_time"].tolist() == ["1h", "0min"]
+    assert set(pd.read_csv(out / "fold_metrics.csv").columns) == {
+        "prediction_time", "fold", "train_rows", "validation_rows", "rmse"}
+    assert (out / "config.json").exists() and (out / "oof_predictions.parquet").exists()
