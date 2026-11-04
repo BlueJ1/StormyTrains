@@ -1,0 +1,241 @@
+{
+  "name": "xgboost_classifier_weather",
+  "task": "severity",
+  "target": "severity_class",
+  "model": "make_xgboost_classifier",
+  "weather": true,
+  "search": {
+    "n_configs": 50,
+    "seed": 42,
+    "space": {
+      "n_estimators": "LogUniformInt(100, 2000)",
+      "learning_rate": "<scipy.stats._distn_infrastructure.rv_continuous_frozen object at 0x11c411a90>",
+      "max_depth": "[2, 3, 4, 5, 6, 7, 8, 9, 10]",
+      "min_child_weight": "<scipy.stats._distn_infrastructure.rv_continuous_frozen object at 0x11c3b4510>",
+      "subsample": "<scipy.stats._distn_infrastructure.rv_continuous_frozen object at 0x11c3b5e00>",
+      "colsample_bytree": "<scipy.stats._distn_infrastructure.rv_continuous_frozen object at 0x11c424170>",
+      "reg_lambda": "<scipy.stats._distn_infrastructure.rv_continuous_frozen object at 0x11c399bf0>",
+      "reg_alpha": "<scipy.stats._distn_infrastructure.rv_continuous_frozen object at 0x11c39a580>"
+    },
+    "selection": "lowest mean log_loss over the folds"
+  },
+  "chosen": {
+    "24h": {
+      "config_id": 9,
+      "params": {
+        "colsample_bytree": 0.5054417223026266,
+        "learning_rate": 0.00529670833106808,
+        "max_depth": 4,
+        "min_child_weight": 25.92475660475159,
+        "n_estimators": 888,
+        "reg_alpha": 1.2164139351417065,
+        "reg_lambda": 0.002345434227726052,
+        "subsample": 0.6792328642721364
+      }
+    },
+    "6h": {
+      "config_id": 9,
+      "params": {
+        "colsample_bytree": 0.5054417223026266,
+        "learning_rate": 0.00529670833106808,
+        "max_depth": 4,
+        "min_child_weight": 25.92475660475159,
+        "n_estimators": 888,
+        "reg_alpha": 1.2164139351417065,
+        "reg_lambda": 0.002345434227726052,
+        "subsample": 0.6792328642721364
+      }
+    },
+    "1h": {
+      "config_id": 41,
+      "params": {
+        "colsample_bytree": 0.6096465608117732,
+        "learning_rate": 0.013345910155142493,
+        "max_depth": 7,
+        "min_child_weight": 26.865309327169083,
+        "n_estimators": 723,
+        "reg_alpha": 0.013174543864342761,
+        "reg_lambda": 59.473897949884034,
+        "subsample": 0.8689484583478843
+      }
+    },
+    "20min": {
+      "config_id": 41,
+      "params": {
+        "colsample_bytree": 0.6096465608117732,
+        "learning_rate": 0.013345910155142493,
+        "max_depth": 7,
+        "min_child_weight": 26.865309327169083,
+        "n_estimators": 723,
+        "reg_alpha": 0.013174543864342761,
+        "reg_lambda": 59.473897949884034,
+        "subsample": 0.8689484583478843
+      }
+    },
+    "0min": {
+      "config_id": 24,
+      "params": {
+        "colsample_bytree": 0.66164512388971,
+        "learning_rate": 0.01454667472222164,
+        "max_depth": 2,
+        "min_child_weight": 1.535343432485703,
+        "n_estimators": 1470,
+        "reg_alpha": 3.996430167694254,
+        "reg_lambda": 1.4638860976621426,
+        "subsample": 0.6695148955243504
+      }
+    }
+  },
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "git_commit": "87060b11ad127734a785d695311f8fe42189a25f (uncommitted changes)",
+  "created": "2026-10-31T12:56:13"
+}
