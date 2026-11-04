@@ -16,23 +16,23 @@ import numpy as np
 from threadpoolctl import threadpool_limits
 
 from advanced_data import ADVANCED, load_advanced_rows, read_inputs
-from cv import RESULTS, TARGETS, class_probabilities, score_fold
+from cv import PROBA_COLUMNS, RESULTS, TARGETS, class_probabilities, cross_validate, score_fold
 from data import HERE, PREDICTION_TIMES, ROW_KEY, merge_inputs
+from ensembles import FittedAverage, apply_isotonic, apply_temperature, fit_isotonic, fit_temperature
 from experiment_models import DISTRIBUTION_CLASSIFIERS, DISTRIBUTIONS, MODELS
 from experiment_specs import AUTO_VARIANTS, Run, nested_feature_variants
-from features import PHASE2_GROUPS, WEATHER
+from features import PHASE2_GROUPS, WEATHER, feature_groups
 from folds import cv_folds
 from final_analysis import (calibration_reliability, example_risk_trajectories,
                             paired_bootstrap_ci, paired_error_table)
-from group_selection import lightgbm_contributions
+from group_selection import columns_for, greedy_groups, lightgbm_contributions
 from holdout_gate import REGISTRY, committed_registration
 from report_cv import run_index
 from representations import REPRESENTATIONS, extreme_weather, route_representation
 from sequence_inputs import SEQUENCE_COLUMN
-from tuning import SCORE, sample_configs, search, select_feature_variant
+from tuning import N_CONFIGS, SCORE, sample_configs, search, select_feature_variant
 
-# These runners fit a single estimator or an estimator that fits both targets.
-DIRECT_STEPS = {"0.8", "6.1", "6.3", "6.5", "7.1", "7.2", "7.3", "7.4", "7.5"}
+REFIT_STEPS = {"0.8", "3.3", "5.2", "6.1", "6.2", "6.3", "6.5", "7.1", "7.2", "7.3", "7.4", "7.5"}
 FEATURE_FILES = {
     frozenset(PHASE2_GROUPS["recent_reliability"][0]): "reliability",
     frozenset(PHASE2_GROUPS["network_state"][0]): "network",
@@ -43,7 +43,7 @@ FEATURE_FILES = {
 def matched_candidates(results_dir):
     pairs = {}
     for path, config, scores in run_index(results_dir):
-        if config["step"] not in DIRECT_STEPS or config["evaluation"] not in ("nested", "prespecified"):
+        if config["step"] not in REFIT_STEPS or config["evaluation"] not in ("nested", "prespecified"):
             continue
         if config.get("variant", "").startswith("weather_"):
             continue
@@ -85,11 +85,54 @@ def registered_factory(spec):
     numeric = list(spec["features"]["numeric"])
     categorical = list(spec["features"]["categorical"])
     variant = spec.get("variant", "")
+    if spec["step"] == "3.3" and variant == "l1":
+        factory = partial(factory, l1=True)
     if variant in REPRESENTATIONS or variant == "route_target":
         rep = route_representation(variant, spec["task"])
         raw_numeric = [column for column in numeric if column not in rep.extra_inputs]
         factory, numeric, categorical = rep.wrap(factory, raw_numeric, categorical)
     return factory, numeric, categorical
+
+
+def final_group_selection(config, prediction_time, task, inputs_dir):
+    """Select railway groups on CV and reuse them in both registered arms."""
+    groups = feature_groups(prediction_time)
+    numeric, categorical = columns_for(groups, groups)
+    rows = load_advanced_rows(prediction_time, inputs_dir=inputs_dir, extra_inputs=tuple(numeric + categorical))
+    factory = MODELS[config["model"]][1]
+
+    def evaluate(selected):
+        columns = columns_for(groups, selected)
+        metrics, _ = cross_validate(rows, prediction_time, task, factory, *columns)
+        return metrics[SCORE[task]].mean()
+
+    return greedy_groups(groups, evaluate, config["variant"])
+
+
+def tune_finalist(spec, config, inputs_dir):
+    task, pt, weather, step = (spec[key] for key in ("task", "prediction_time", "weather", "step"))
+    n_configs = N_CONFIGS if step in ("5.2", "6.2") else config.get("search", {}).get("n_configs")
+    if n_configs:
+        factory, numeric, categorical = registered_factory(spec)
+        configs = sample_configs(MODELS[spec["model"]][2], n=n_configs)
+        rows = load_advanced_rows(pt, weather=weather, inputs_dir=inputs_dir, extra_inputs=tuple(numeric + categorical))
+        table, _, _ = search(rows, pt, task, factory, configs, numeric, categorical)
+        policy = {"method": "five CV week folds", "n_configs": n_configs}
+        if step == "5.2":
+            ids = table.nsmallest(5, f"{SCORE[task]}_mean").config_id.astype(int).tolist()
+            policy["members"] = 5
+            return {"params": {}, "member_params": [configs[i] for i in ids], "config_ids": ids,
+                    "tuning_policy": policy}
+        selected = int(table.loc[table["chosen"], "config_id"].item())
+        policy["config_id"] = selected
+        if step == "6.2":
+            policy["calibration"] = "fit on predictions from the five CV week folds at the chosen configuration"
+        return {"params": configs[selected], "tuning_policy": policy}
+    if step == "7.3":
+        budget = float(np.median(list(config["cpu_budgets"][pt].values()))) * 1.25
+        return {"params": {"cpu_budget": budget}, "tuning_policy": {
+            "method": "inner-week gate search at 1.25 times the median CV CPU budget"}}
+    return {"params": {}, "tuning_policy": {"method": "same as CV"}}
 
 
 def register(results_dir, inputs_dir, registry):
@@ -105,6 +148,7 @@ def register(results_dir, inputs_dir, registry):
         railway = pair[False][1]
         variant = railway.get("variant", "")
         selection = None
+        selected_groups = None
         if variant in AUTO_VARIANTS:
             _, factory, space = MODELS[railway["model"]]
             run = Run(railway["step"], railway["model"], variant=variant)
@@ -113,6 +157,8 @@ def register(results_dir, inputs_dir, registry):
             rows = load_advanced_rows(pt, inputs_dir=inputs_dir, extra_inputs=inputs)
             selection = select_feature_variant(rows, pt, task, candidates, sample_configs(space)[0],
                                                cv_folds)
+        elif railway["step"] == "3.3" and variant in ("forward", "backward"):
+            selected_groups = final_group_selection(railway, pt, task, inputs_dir)
         for weather in (False, True):
             source, config, scores = pair[weather]
             spec = {key: config[key] for key in ("model", "task", "weather", "step")}
@@ -124,27 +170,14 @@ def register(results_dir, inputs_dir, registry):
                 run = Run(config["step"], config["model"], weather, variant=variant)
                 _, numeric, categorical = nested_feature_variants(run, pt, task, factory)[selection]
                 spec.update(variant=selection, features={"numeric": numeric, "categorical": categorical})
-            factory, numeric, categorical = registered_factory(spec)
-            n_configs = config.get("search", {}).get("n_configs")
-            if n_configs:
-                space = MODELS[spec["model"]][2]
-                configs = sample_configs(space, n=n_configs)
-                rows = load_advanced_rows(pt, weather=weather, inputs_dir=inputs_dir,
-                                          extra_inputs=tuple(numeric + categorical))
-                table, _, _ = search(rows, pt, task, factory, configs, numeric, categorical)
-                selected = int(table.loc[table["chosen"], "config_id"].item())
-                spec.update(params=configs[selected], tuning_policy={"method": "five CV week folds",
-                                                                     "n_configs": n_configs,
-                                                                     "config_id": selected})
-                if selection is not None:
-                    spec["tuning_policy"]["feature_selection"] = f"{variant} on the railway CV arm"
-            elif spec["step"] == "7.3":
-                cv_budgets = list(config["cpu_budgets"][pt].values())
-                budget = float(np.median(cv_budgets)) * 1.25
-                spec.update(params={"cpu_budget": budget}, tuning_policy={
-                    "method": "inner-week gate search at 1.25 times the median CV CPU budget"})
-            else:
-                spec.update(params={}, tuning_policy={"method": "same as CV"})
+            if selected_groups is not None:
+                groups = feature_groups(pt, weather)
+                weather_groups = groups.keys() - feature_groups(pt).keys()
+                numeric, categorical = columns_for(groups, selected_groups | weather_groups)
+                spec["features"] = {"numeric": numeric, "categorical": categorical}
+            spec.update(tune_finalist(spec, config, inputs_dir))
+            if selection is not None or selected_groups is not None:
+                spec["tuning_policy"]["feature_selection"] = f"{variant} on the railway CV arm"
             finalists.append(spec)
             print(task, pt, spec["model"], "weather" if weather else "railway", flush=True)
     registration = {"policy": "one matched pair ranked by railway-only CV score per task and horizon",
@@ -163,6 +196,11 @@ def committed_registry(path):
 
 def validate_registry(registration):
     finalists = registration["finalists"]
+    for spec in finalists:
+        if spec["step"] == "5.2" and (spec["variant"] != "top5_nested" or len(spec.get("member_params", [])) != 5):
+            raise ValueError("registered configuration bagging requires five members")
+        if spec["step"] == "6.2" and (spec["task"] != "severity" or spec["variant"] not in ("temperature", "isotonic")):
+            raise ValueError("registered calibration requires a severity classifier and calibration method")
     keys = [(spec["task"], spec["prediction_time"], spec["weather"]) for spec in finalists]
     expected = {(task, pt, weather) for task in SCORE for pt in PREDICTION_TIMES
                 for weather in (False, True)}
@@ -182,14 +220,28 @@ def validate_registry(registration):
 
 
 def fitted_model(spec, rows, factory, numeric, categorical):
-    model = factory(numeric, categorical, **spec["params"])
+    models = [factory(numeric, categorical, **params)
+              for params in spec.get("member_params", [spec["params"]])]
+    model = models[0]
     features = numeric + categorical
     if hasattr(model, "fit_joint"):
         model.fit_joint(rows[features], rows[TARGETS["severity"]], rows[TARGETS["delay"]])
     else:
         target = TARGETS[spec["task"]]
         rows = rows[rows[target].notna()]
-        model.fit(rows[features], rows[target])
+        for member in models:
+            member.fit(rows[features], rows[target])
+    if len(models) > 1:
+        model = FittedAverage(models, spec["task"])
+    elif spec["step"] == "6.2":
+        fixed = partial(factory, **spec["params"])
+        _, oof = cross_validate(rows, spec["prediction_time"], spec["task"], fixed, numeric, categorical)
+        labels, probabilities = oof[TARGETS["severity"]], oof[PROBA_COLUMNS].to_numpy()
+        if spec["variant"] == "temperature":
+            calibrate = partial(apply_temperature, temperature=fit_temperature(labels, probabilities))
+        else:
+            calibrate = partial(apply_isotonic, models=fit_isotonic(labels, probabilities))
+        model = FittedAverage(models, spec["task"], calibrate)
     return model, len(rows)
 
 
@@ -336,8 +388,8 @@ def run_final_arms(registration, registry, inputs_dir, output, distribution_pyth
         if spec["weather"]:
             metadata.setdefault(spec["task"], []).append(pd.read_parquet(arm_dir / "metadata.parquet"))
         shap_rows.append(pd.read_parquet(arm_dir / "shap.parquet"))
-        metric_rows.append({**scores, "model": spec["model"], "task": spec["task"],
-                            "weather": spec["weather"]})
+        metric_rows.append({**scores, "step": spec["step"], "model": spec["model"], "variant": spec["variant"],
+                            "task": spec["task"], "weather": spec["weather"]})
     pd.DataFrame(metric_rows).drop(columns="fold").to_csv(output / "scores.csv", index=False)
     if shap_rows:
         pd.concat(shap_rows, ignore_index=True).to_csv(output / "shap.csv", index=False)

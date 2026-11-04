@@ -50,15 +50,19 @@ def comparison_table(runs):
             continue
         table = pd.read_csv(file)
         evaluation = table["evaluation"] if "evaluation" in table else config["evaluation"]
+        variant = config.get("variant", "")
+        contrast = ""
+        if config["step"] == "3.1":
+            contrast = "timetable-only" if variant.startswith("add_") else "full"
         comparisons.append(table.assign(
             step=config["step"], task=config["task"], method=config["model"],
-            variant=config.get("variant", ""), evaluation=evaluation,
+            variant=variant, evaluation=evaluation, weather=config["weather"], contrast=contrast,
             result=f"[folds](results/{path.parent.name}/{path.name}/paired_vs_base.csv)"))
     if not comparisons:
         return pd.DataFrame()
     table = pd.concat(comparisons, ignore_index=True)
-    best = table.groupby(["step", "task", "evaluation", "prediction_time"])["mean"].idxmin()
-    return table.loc[best, ["step", "task", "evaluation", "prediction_time", "method", "variant",
+    best = table.groupby(["step", "task", "evaluation", "prediction_time", "contrast"])["mean"].idxmin()
+    return table.loc[best, ["step", "task", "evaluation", "prediction_time", "method", "variant", "weather", "contrast",
                             "mean", "folds_improved", "reaches_minimum_gain", "result"]]
 
 

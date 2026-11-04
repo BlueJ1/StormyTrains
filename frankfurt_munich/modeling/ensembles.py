@@ -64,6 +64,26 @@ def mean_prediction(predictions, *, geometric=False):
     return predictions.mean(axis=1)
 
 
+class FittedAverage:
+    """Combine final fitted estimators and optionally calibrate their mean probabilities."""
+
+    classes_ = np.asarray(CLASSES)
+
+    def __init__(self, members, task, calibrate=None):
+        self.members = members
+        self.task = task
+        self.calibrate = calibrate
+
+    def predict(self, X):
+        if self.task == "severity":
+            return self.classes_[self.predict_proba(X).argmax(axis=1)]
+        return np.mean([model.predict(X) for model in self.members], axis=0)
+
+    def predict_proba(self, X):
+        probabilities = np.mean([class_probabilities(model, X) for model in self.members], axis=0)
+        return self.calibrate(probabilities) if self.calibrate else probabilities
+
+
 def greedy_weights(y, predictions, inner_fold, task, *, iterations=30):
     """Caruana selection with replacement, judged by equally weighted fold scores."""
     score = class_log_loss if task == "severity" else rmse
