@@ -16,4 +16,8 @@ def committed_registration(path: Path = REGISTRY) -> dict:
                                capture_output=True, check=False)
     if committed.returncode or committed.stdout != path.read_bytes():
         raise PermissionError("commit the exact finalist registration before opening the hold-out set")
-    return json.loads(committed.stdout)
+    registration = json.loads(committed.stdout)
+    finalists = registration.get("finalists") if isinstance(registration, dict) else None
+    if not isinstance(finalists, list) or not finalists:
+        raise PermissionError("the committed registration must list the finalists")
+    return registration

@@ -129,13 +129,11 @@ def _predict(model, rows: pd.DataFrame, features: list[str], task: str) -> np.nd
     return class_probabilities(model, X) if task == "severity" else np.asarray(model.predict(X))
 
 
-def _fit_with_init_model(source_rows: pd.DataFrame, target_training: pd.DataFrame,
+def _fit_with_init_model(source_fit: pd.DataFrame, target_fit: pd.DataFrame,
                          numeric: list[str], categorical: list[str], params: Mapping,
-                         task: str, factory: Callable) -> tuple[object, int, int]:
+                         task: str, factory: Callable):
     """Pretrain and continue with a shared, training-fitted category schema."""
     label = TARGETS[task]
-    source_fit = source_rows.loc[source_rows[label].notna()]
-    target_fit = target_training.loc[target_training[label].notna()]
     if source_fit.empty or target_fit.empty:
         raise ValueError("init_model transfer needs labeled source and target training rows")
     if task == "severity":
@@ -169,7 +167,7 @@ def _fit_with_init_model(source_rows: pd.DataFrame, target_training: pd.DataFram
     # Keep the shared transformer attached for predictions, too.  Returning the
     # raw estimator would pass unencoded strings to LightGBM at validation time.
     target_pipeline.steps[0] = ("categories", codes)
-    return target_pipeline, len(target_fit), len(source_fit)
+    return target_pipeline
 
 
 def _source_prediction_columns(task: str) -> list[str]:
@@ -253,91 +251,47 @@ def evaluate_corridor_transfer(
     model_factory = factory or (make_lightgbm_classifier if task == "severity" else make_lightgbm)
     metrics, predictions = [], []
     label = TARGETS[task]
+    features = [*base_numeric, *base_categorical]
+    if "corridor" in base_numeric:
+        raise ValueError("corridor must be categorical")
 
-    if method == "pooled":
-        if "corridor" in base_numeric:
-            raise ValueError("corridor must be categorical for pooled transfer")
-        pooled_categorical = base_categorical + ([] if "corridor" in base_categorical else ["corridor"])
-        pooled_features = [*base_numeric, *pooled_categorical]
-        for fold, training_mask, validation_mask in splits(target):
-            training = target.loc[training_mask]
-            validation = target.loc[validation_mask]
-            source_fit = _source_training_rows(source, training, validation,
-                                               prediction_time, task)
-            target_fit = training.loc[training[label].notna()]
+    for fold, training_mask, validation_mask in splits(target):
+        training = target.loc[training_mask]
+        validation = target.loc[validation_mask]
+        source_fit = _source_training_rows(source, training, validation, prediction_time, task)
+        target_fit = training.loc[training[label].notna()]
+        valid = validation.loc[validation[label].notna()]
+        details = {"method": method, "target_train_rows": len(target_fit), "source_train_rows": len(source_fit)}
+        fit_features = features
+        if method == "pooled":
+            pooled_categorical = list(dict.fromkeys([*base_categorical, "corridor"]))
+            fit_features = [*base_numeric, *pooled_categorical]
             combined = pd.concat([target_fit, source_fit], ignore_index=True, sort=False)
-            if combined.empty:
-                raise ValueError("pooled transfer has no labeled training rows")
-            if "corridor" in combined:
-                combined["corridor"] = combined["corridor"].astype("string").fillna("unknown")
-            if task == "severity":
-                _check_severity_classes(combined, name="pooled")
             model, _ = _fit(model_factory(base_numeric, pooled_categorical, **dict(params)),
-                            combined, pooled_features, task)
-            valid = validation.loc[validation[label].notna()]
-            if "corridor" in valid:
-                valid = valid.copy()
-                valid["corridor"] = valid["corridor"].astype("string").fillna("unknown")
-            pred = _predict(model, valid, pooled_features, task)
-            scores, out = score_fold(valid, prediction_time, fold, task,
-                                     len(target_fit) + len(source_fit), pred)
-            scores.update(method=method, target_train_rows=len(target_fit),
-                          source_train_rows=len(source_fit))
-            metrics.append(scores)
-            predictions.append(out.assign(method=method))
-
-    elif method == "init_model":
-        features = [*base_numeric, *base_categorical]
-        for fold, training_mask, validation_mask in splits(target):
-            training = target.loc[training_mask]
-            validation = target.loc[validation_mask]
-            source_fit = _source_training_rows(source, training, validation,
-                                               prediction_time, task)
-            model, target_count, source_count = _fit_with_init_model(
-                source_fit, training, base_numeric, base_categorical, params,
-                task, model_factory)
-            valid = validation.loc[validation[label].notna()]
-            pred = _predict(model, valid, features, task)
-            scores, out = score_fold(valid, prediction_time, fold, task,
-                                     target_count + source_count, pred)
-            scores.update(method=method, target_train_rows=target_count,
-                          source_train_rows=source_count)
-            metrics.append(scores)
-            predictions.append(out.assign(method=method))
-
-    else:  # stacked
-        features = [*base_numeric, *base_categorical]
-        source_pred_columns = _source_prediction_columns(task)
-        target_numeric = [*base_numeric, *source_pred_columns]
-        for fold, training_mask, validation_mask in splits(target):
-            training = target.loc[training_mask]
-            validation = target.loc[validation_mask]
+                            combined, fit_features, task)
+        elif method == "init_model":
+            model = _fit_with_init_model(source_fit, target_fit, base_numeric, base_categorical,
+                                         params, task, model_factory)
+        else:
+            source_pred_columns = _source_prediction_columns(task)
+            target_numeric = [*base_numeric, *source_pred_columns]
             source_oof, inner_source_rows = _source_predictions_for_outer_train(
                 training, validation, source, prediction_time, task, base_numeric,
                 base_categorical, params, model_factory, inner_splitter)
-            target_training = training.loc[training[label].notna()].copy()
-            target_training[source_pred_columns] = source_oof.loc[target_training.index]
-
-            source_fit = _source_training_rows(source, training, validation,
-                                               prediction_time, task)
-            if source_fit.empty:
-                raise ValueError("an outer week split has no eligible source-corridor training rows")
-            source_model, source_count = _fit(
+            target_fit = target_fit.join(source_oof)
+            source_model, _ = _fit(
                 model_factory(base_numeric, base_categorical, **dict(params)),
                 source_fit, features, task)
-            valid = validation.loc[validation[label].notna()].copy()
+            valid = valid.copy()
             valid[source_pred_columns] = _predict(source_model, valid, features, task).reshape(
                 len(valid), len(source_pred_columns))
-            target_model, _ = _fit(
-                model_factory(target_numeric, base_categorical, **dict(params)),
-                target_training, [*target_numeric, *base_categorical], task)
-            pred = _predict(target_model, valid, [*target_numeric, *base_categorical], task)
-            scores, out = score_fold(valid, prediction_time, fold, task,
-                                     len(target_training) + source_count, pred)
-            scores.update(method=method, target_train_rows=len(target_training),
-                          source_train_rows=source_count,
-                          source_inner_fit_rows=inner_source_rows)
-            metrics.append(scores)
-            predictions.append(out.assign(method=method))
+            fit_features = [*target_numeric, *base_categorical]
+            model, _ = _fit(model_factory(target_numeric, base_categorical, **dict(params)),
+                            target_fit, fit_features, task)
+            details["source_inner_fit_rows"] = inner_source_rows
+        pred = _predict(model, valid, fit_features, task)
+        scores, out = score_fold(valid, prediction_time, fold, task, len(target_fit) + len(source_fit), pred)
+        metrics.append({**scores, **details})
+        predictions.append(out.assign(method=method))
 
     return pd.DataFrame(metrics), pd.concat(predictions, ignore_index=True)

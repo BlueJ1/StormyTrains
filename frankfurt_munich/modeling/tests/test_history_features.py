@@ -9,10 +9,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 import history_features
 from history_features import (
-    build_recent_reliability,
-    build_recent_reliability_cv_file,
-    _candidate_outcomes_asof,
-    _candidate_pairs_for_target_batch,
     build_delay_dynamics,
     build_history_dynamics_split,
     build_upstream_events_asof,
@@ -21,6 +17,8 @@ from history_features import (
     latest_snapshot_asof,
     request_upper_bound_utc,
 )
+from recent_reliability import (_candidate_outcomes_asof, _candidate_pairs_for_target_batch,
+                                build_recent_reliability, build_reliability_file)
 
 
 def test_legacy_snapshot_request_uses_latest_possible_block_time():
@@ -437,7 +435,7 @@ def test_holdout_reliability_builder_gates_before_reading_any_input(tmp_path, mo
     monkeypatch.setattr(history_features.pd, "read_parquet", unexpected_read)
 
     with pytest.raises(PermissionError, match="registration not committed"):
-        build_recent_reliability_cv_file(
+        build_reliability_file(
             split="holdout", data_dir=tmp_path, output=tmp_path / "reliability.parquet",
             plan_dir=tmp_path / "plan", change_dir=tmp_path / "change",
             registry_path=tmp_path / "finalists.json",

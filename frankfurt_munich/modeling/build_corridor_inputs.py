@@ -116,6 +116,14 @@ def prediction_rows(journeys, upstream, changes, plans):
 
 def build(output, plan_dir, change_dir, monthly_dir):
     paths = sorted(monthly_dir.glob("data-????-??.parquet"))
+    if not paths:
+        raise FileNotFoundError(f"no monthly railway files in {monthly_dir}")
+    first_exact_month = PLAN_EXACT_UTC_FROM.tz_localize(None).to_period("M")
+    for path in paths:
+        month = pd.Period(path.stem.removeprefix("data-"), freq="M")
+        for directory in ((change_dir, plan_dir) if month >= first_exact_month else (change_dir,)):
+            if not (directory / path.name).is_file():
+                raise FileNotFoundError(f"missing auxiliary snapshot archive {directory / path.name}")
     weeks = read_assignment().query("split == 'cv'").week_start
     journeys = source_journeys(paths, source_segments(paths, weeks), weeks)
     upstream = read_upstream(paths, journeys)
@@ -126,7 +134,7 @@ def build(output, plan_dir, change_dir, monthly_dir):
         ids |= set(month_rows.id_origin) | set(month_rows.id_destination)
         options = {"months": (month - 1, month, month + 1), "plan_dir": plan_dir, "change_dir": change_dir}
         changes = _read_snapshot_ids_in_months(ids, kind="change", **options)
-        plans = (_read_snapshot_ids_in_months(ids, kind="plan", **options) if month >= pd.Period("2025-11")
+        plans = (_read_snapshot_ids_in_months(ids, kind="plan", **options) if month >= first_exact_month
                  else pd.DataFrame())
         if not plans.empty:
             plans = plans.loc[pd.to_datetime(plans.snapshot_timestamp, utc=True).ge(PLAN_EXACT_UTC_FROM)]
