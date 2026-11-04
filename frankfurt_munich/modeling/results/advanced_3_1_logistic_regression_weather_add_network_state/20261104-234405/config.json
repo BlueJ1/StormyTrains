@@ -1,0 +1,91 @@
+{
+  "name": "advanced_3_1_logistic_regression_weather_add_network_state",
+  "step": "3.1",
+  "task": "severity",
+  "model": "logistic_regression",
+  "target": "severity_class",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "add_network_state",
+  "evaluation": "exploratory",
+  "git_commit": "871eb681be9a983bb9d21badf684fb8cffe3cc8d (uncommitted changes)",
+  "chosen": {},
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-04T23:44:05"
+}

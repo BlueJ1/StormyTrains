@@ -1,0 +1,163 @@
+{
+  "name": "advanced_3_1_lightgbm_classifier_weather_add_route",
+  "step": "3.1",
+  "task": "severity",
+  "model": "lightgbm_classifier",
+  "target": "severity_class",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "route_id"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "route_id"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "route_id"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "route_id"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "route_id"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "add_route",
+  "evaluation": "exploratory",
+  "git_commit": "17315487379e45abee19df349a5fead603c01387 (uncommitted changes)",
+  "chosen": {
+    "24h": {
+      "config_id": 32,
+      "params": {
+        "cat_smooth": 3.741816659607169,
+        "colsample_bytree": 0.7135832823983075,
+        "learning_rate": 0.0056650541034924205,
+        "min_child_samples": 6,
+        "n_estimators": 1176,
+        "num_leaves": 18,
+        "reg_alpha": 0.003222864528968034,
+        "reg_lambda": 0.4085228003668622,
+        "subsample": 0.8849967765493054
+      }
+    },
+    "6h": {
+      "config_id": 41,
+      "params": {
+        "cat_smooth": 1.3763300805327483,
+        "colsample_bytree": 0.3705446009641986,
+        "learning_rate": 0.00538730007236937,
+        "min_child_samples": 7,
+        "n_estimators": 774,
+        "num_leaves": 5,
+        "reg_alpha": 0.01887567630782228,
+        "reg_lambda": 16.76395764312379,
+        "subsample": 0.511635967867913
+      }
+    },
+    "1h": {
+      "config_id": 33,
+      "params": {
+        "cat_smooth": 2.7017306829257257,
+        "colsample_bytree": 0.7360233330733001,
+        "learning_rate": 0.007091379146823413,
+        "min_child_samples": 6,
+        "n_estimators": 491,
+        "num_leaves": 38,
+        "reg_alpha": 0.3545843846227982,
+        "reg_lambda": 4.270283109049074,
+        "subsample": 0.9879260397312672
+      }
+    },
+    "20min": {
+      "config_id": 32,
+      "params": {
+        "cat_smooth": 3.741816659607169,
+        "colsample_bytree": 0.7135832823983075,
+        "learning_rate": 0.0056650541034924205,
+        "min_child_samples": 6,
+        "n_estimators": 1176,
+        "num_leaves": 18,
+        "reg_alpha": 0.003222864528968034,
+        "reg_lambda": 0.4085228003668622,
+        "subsample": 0.8849967765493054
+      }
+    },
+    "0min": {
+      "config_id": 32,
+      "params": {
+        "cat_smooth": 3.741816659607169,
+        "colsample_bytree": 0.7135832823983075,
+        "learning_rate": 0.0056650541034924205,
+        "min_child_samples": 6,
+        "n_estimators": 1176,
+        "num_leaves": 18,
+        "reg_alpha": 0.003222864528968034,
+        "reg_lambda": 0.4085228003668622,
+        "subsample": 0.8849967765493054
+      }
+    }
+  },
+  "configuration_source": "lightgbm_classifier_weather/20261031-122533/config.json",
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-04T23:53:57"
+}

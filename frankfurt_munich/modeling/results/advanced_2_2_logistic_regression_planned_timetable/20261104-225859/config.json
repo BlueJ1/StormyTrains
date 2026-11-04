@@ -1,0 +1,94 @@
+{
+  "name": "advanced_2_2_logistic_regression_planned_timetable",
+  "step": "2.2",
+  "task": "severity",
+  "model": "logistic_regression",
+  "target": "severity_class",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "planned_stops",
+        "upstream_planned_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    }
+  },
+  "feature_set": "planned_timetable",
+  "variant": "planned_timetable",
+  "evaluation": "exploratory",
+  "chosen": {},
+  "git_commit": "c89401c5a851f6ff6f95cb52b864122377717c22 (uncommitted changes)",
+  "created": "2026-11-04T22:58:59"
+}

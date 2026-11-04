@@ -1,0 +1,216 @@
+{
+  "name": "advanced_0_7_xgboost_classifier_weather",
+  "step": "0.7",
+  "task": "severity",
+  "model": "xgboost_classifier",
+  "target": "severity_class",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "",
+  "evaluation": "exploratory",
+  "chosen": {
+    "24h": {
+      "config_id": 9,
+      "params": {
+        "colsample_bytree": 0.5054417223026266,
+        "learning_rate": 0.00529670833106808,
+        "max_depth": 4,
+        "min_child_weight": 25.92475660475159,
+        "n_estimators": 888,
+        "reg_alpha": 1.2164139351417065,
+        "reg_lambda": 0.002345434227726052,
+        "subsample": 0.6792328642721364
+      }
+    },
+    "6h": {
+      "config_id": 9,
+      "params": {
+        "colsample_bytree": 0.5054417223026266,
+        "learning_rate": 0.00529670833106808,
+        "max_depth": 4,
+        "min_child_weight": 25.92475660475159,
+        "n_estimators": 888,
+        "reg_alpha": 1.2164139351417065,
+        "reg_lambda": 0.002345434227726052,
+        "subsample": 0.6792328642721364
+      }
+    },
+    "1h": {
+      "config_id": 41,
+      "params": {
+        "colsample_bytree": 0.6096465608117732,
+        "learning_rate": 0.013345910155142493,
+        "max_depth": 7,
+        "min_child_weight": 26.865309327169083,
+        "n_estimators": 723,
+        "reg_alpha": 0.013174543864342761,
+        "reg_lambda": 59.473897949884034,
+        "subsample": 0.8689484583478843
+      }
+    },
+    "20min": {
+      "config_id": 41,
+      "params": {
+        "colsample_bytree": 0.6096465608117732,
+        "learning_rate": 0.013345910155142493,
+        "max_depth": 7,
+        "min_child_weight": 26.865309327169083,
+        "n_estimators": 723,
+        "reg_alpha": 0.013174543864342761,
+        "reg_lambda": 59.473897949884034,
+        "subsample": 0.8689484583478843
+      }
+    },
+    "0min": {
+      "config_id": 24,
+      "params": {
+        "colsample_bytree": 0.66164512388971,
+        "learning_rate": 0.01454667472222164,
+        "max_depth": 2,
+        "min_child_weight": 1.535343432485703,
+        "n_estimators": 1470,
+        "reg_alpha": 3.996430167694254,
+        "reg_lambda": 1.4638860976621426,
+        "subsample": 0.6695148955243504
+      }
+    }
+  },
+  "configuration_source": "xgboost_classifier_weather/20261031-125613/config.json",
+  "git_commit": "c89401c5a851f6ff6f95cb52b864122377717c22 (uncommitted changes)",
+  "created": "2026-11-04T22:44:41"
+}

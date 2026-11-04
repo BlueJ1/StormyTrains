@@ -1,6 +1,6 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. **All decisions are made. Nothing in this plan has been run.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 5 November 2026. **The cutoff audit and reference runs are complete. Nested tuning and feature screens are in progress.**
 
 **Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact.
 
@@ -33,12 +33,12 @@ Where an experiment or phase depends on a decision, it names it (for example D2)
 | D2 | How to screen many variants cheaply | Reuse the configuration chosen per prediction time and re-tune only finalists. Because the reused configurations were chosen on all five folds, screening results are exploratory (rule 4). |
 | D3 | When the CV folds choose something (configuration, feature subset, ensemble weights, stacking, early stopping) | Nested: inner week folds inside each outer training set. Flat only for a handful of pre-listed comparisons, which are then exploratory. |
 | D4 | One model per prediction time, or one pooled model | Test pooling in 8.2; one model per prediction time stays the default. |
-| D5 | New dependencies | All approved: catboost, torch, pytabkit (RealMLP, TabM), tabpfn, tabicl, interpret (EBM), ngboost, quantile-forest, lightgbmlss. Each is installed and pinned in `requirements.txt` when its phase starts. tabpfn and tabicl are no longer needed (D11). |
+| D5 | New dependencies | All approved: catboost, torch, pytabkit (RealMLP, TabM), tabpfn, tabicl, interpret (EBM), ngboost, quantile-forest, lightgbmlss. The main learners are pinned in `requirements.txt`. The distributional learners have a separate `requirements-distributions.txt` because their dependency constraints differ. tabpfn and tabicl are no longer needed (D11). |
 | D6 | Compute | No foundation model is run or fine-tuned on this laptop. Simple MLPs run on it. |
 | D7 | `train_number` as a feature | Left out. 1.3 encodes only the route; 6.4 is dropped. 2.1 uses the scheduled service number only to look up past journeys, as the weather branch already does. |
 | D8 | Recorded-route fields | Replaced: they leave the base set in 0.7, planned versions come in 2.2, and the old fields are used only for a leakage diagnostic. |
 | D9 | Extra reported metrics | None. 0.5 is dropped; the distributional models in 6.5 are scored by the RMSE of their mean and, through 4.2, by the severity log loss. |
-| D10 | Other corridors' data for transfer learning (8.3) | Decided after Phase 2. Needs prediction rows for those corridors. |
+| D10 | Other corridors' data for transfer learning (8.3) | Run all three methods with railway inputs. The auxiliary build has cutoff-specific prediction rows and restricts source fits to target training weeks. |
 | D11 | Where to run what this laptop cannot | Nothing is run off this laptop (no Colab, UPPMAX or external API). 8.1 is dropped; 7.5 is dropped if it does not fit. |
 | D12 | Smallest gain that counts (rule 3) | 0.003 log loss and 0.1 min RMSE, two to three times the average optimism of the flat search measured in `README.md` (0.001 and 0.04 min). |
 | D13 | Budget for nested re-tuning of finalists (0.8) | 50 configurations for LightGBM and XGBoost, railway-only and with weather. Nesting multiplies a search by about 4 (4 inner folds). |
@@ -63,14 +63,23 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 
 | ID | Step | Cost | Status |
 |---|---|---|---|
-| 0.7 | **Inputs known at the cutoff** (D8). Remove `recorded_route`, `observed_stops` and `unobserved_sequence_positions` from the base set. In the 216 CV departures where `drop_shared_departures()` keeps a replacement train, check which base inputs come from the replacement (`train_type`, `starts_at_origin`, the weather branch chosen by train number) and take them from the scheduled train instead. Rerun class shares, logistic and linear regression, and LightGBM and XGBoost at their saved configurations (exploratory); these become the reference scores. The removed fields are used afterwards only to measure how much they leaked | S–M | todo |
-| 0.1 | **Named feature sets** in `features.py` (`feature_columns(pt, feature_set="base")`), and representation options (encodings, transforms) applied inside each model's pipeline | S | todo |
-| 0.2 | **`compare.py`**: the five paired fold differences between two runs, their mean, folds improved, and whether the mean reaches the D12 threshold; no t-tests (rule 3). Writes the tables for `README.md` | S | todo |
-| 0.3 | **Inner week folds** inside each training set (grouped by ISO week, stratified like `folds.py`) for nested selection, tuning, stacking, cross-fitting, calibration and neural-network early stopping | S | todo |
-| 0.4 | **Fixed-configuration runner:** refit a tuned model with the configuration chosen per prediction time in an earlier run's `config.json` (D2). Its results are marked exploratory | S | todo |
-| 0.8 | **Nested tuning** in `tuning.py`: each outer fold chooses its configuration on the inner folds of its training weeks only (D3). Used for finalists; the budget is D13 | S to build, M–L to run | todo |
+| 0.7 | **Inputs known at the cutoff** (D8). Remove `recorded_route`, `observed_stops` and `unobserved_sequence_positions` from the base set. In the 216 CV departures where `drop_shared_departures()` keeps a replacement train, check which base inputs come from the replacement (`train_type`, `starts_at_origin`, the weather branch chosen by train number) and take them from the scheduled train instead. Rerun class shares, logistic and linear regression, and LightGBM and XGBoost at their saved configurations (exploratory); these become the reference scores. The removed fields are used afterwards only to measure how much they leaked | S–M | done |
+| 0.1 | **Named feature sets** in `features.py` (`feature_columns(pt, feature_set="base")`), and representation options (encodings, transforms) applied inside each model's pipeline | S | done |
+| 0.2 | **`compare.py`**: the five paired fold differences between two runs, their mean, folds improved, and whether the mean reaches the D12 threshold; no t-tests (rule 3). Writes the tables for `README.md` | S | done |
+| 0.3 | **Inner week folds** inside each training set (grouped by ISO week, stratified like `folds.py`) for nested selection, tuning, stacking, cross-fitting, calibration and neural-network early stopping | S | done |
+| 0.4 | **Fixed-configuration runner:** refit a tuned model with the configuration chosen per prediction time in an earlier run's `config.json` (D2). Its results are marked exploratory | S | done |
+| 0.8 | **Nested tuning** in `tuning.py`: each outer fold chooses its configuration on the inner folds of its training weeks only (D3). Used for finalists; the budget is D13 | S to build, M–L to run | running |
 | 0.5 | Extra metrics | — | dropped (D9) |
-| 0.6 | **Tests** for each of the above, in the style of `tests/` (answer-as-feature, shuffled labels, no hold-out access, no outer-fold rows in nested choices) | S | todo |
+| 0.6 | **Tests** for each of the above, in the style of `tests/` (answer-as-feature, shuffled labels, no hold-out access, no outer-fold rows in nested choices) | S | done |
+
+- **0.7.** All 26 runs finished on the five committed folds. The best railway-only booster scored 0.9256 log loss at 24 h and 0.8465 at departure. The best delay RMSE was 24.58 and 24.26 min at those times. Adding recorded-route fields reduced 24 h LightGBM log loss by 0.0254 and RMSE by 0.196 min in the exploratory diagnostic, with all five folds improving. See the README for the paired results.
+- **0.1.** Base and recorded-route diagnostic sets defined. Phase 1 transformations run inside the fitted pipeline.
+- **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
+- **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
+- **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
+- **0.8.** The railway-only LightGBM and XGBoost delay arms finished all five horizons with 50 configurations per outer fold. The remaining baseline arms and the early-horizon representation confirmation are running.
+
+- **0.6.** The local suite passed 122 tests. Five tests were skipped in the main environment, including the optional distribution packages. All four distribution tests passed in their pinned environment.
 
 ## Phase 1. Feature representations
 
@@ -80,11 +89,21 @@ Expectation: trees split on the categories natively, so they should barely react
 
 | ID | Experiment | Variants | Models | Cost | Expected gain | Status |
 |---|---|---|---|---|---|---|
-| 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | todo |
-| 1.2 | **Finer time** | departure minute of day instead of hour; day of year (cyclic) instead of month; hour × weekday interaction for LR | LR, LightGBM | S | low | todo |
-| 1.3 | **Route encodings** (run after 2.2) | the planned `route_id` from 2.2: one-hot / native / frequency / target encoding fitted on inner folds. `train_number` stays out (D7) | LR, LightGBM | S | low | todo |
-| 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | todo |
-| 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | todo |
+| 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | done |
+| 1.2 | **Finer time** | departure minute of day instead of hour; day of year (cyclic) instead of month; hour × weekday interaction for LR | LR, LightGBM | S | low | done |
+| 1.3 | **Route encodings** (run after 2.2) | the planned `route_id` from 2.2: one-hot / native / frequency / target encoding fitted on inner folds. `train_number` stays out (D7) | LR, LightGBM | S | low | done |
+| 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | done |
+| 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | done |
+
+- **1.1.** Six of 80 exploratory comparisons reached D12, all for severity. Cyclic calendar gave LightGBM the largest reduction, 0.0188 log loss at 24 h with five folds improving. The best delay reduction was 0.093 min, below D12.
+
+- **1.2.** Day-of-year encoding reduced exploratory LightGBM log loss at 24 h and 6 h by 0.0050 and 0.0053, with four folds improving at each time. No delay variant reached D12.
+
+- **1.4.** None of the 42 paired horizon comparisons reached D12. The largest exploratory reductions were 0.00037 log loss and 0.004 min RMSE, both for an explicit LightGBM missing-value indicator at departure.
+
+- **1.5.** None of the 20 paired comparisons reached D12. The best severity change was −0.00127 log loss. Every delay comparison had higher mean RMSE than raw weather.
+
+- **1.3.** None of 50 paired comparisons reached D12. The best reductions were 0.00037 log loss and 0.034 min RMSE. Missing routes carry no target-encoded value. No routes were visible at 24 h or 6 h.
 
 ## Phase 2. New features
 
@@ -100,11 +119,23 @@ Each feature group is added to the base set on its own and then all together, wi
 
 | ID | Experiment | Content | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 2.1 | **Recent reliability** (`ProjectInstructions.md` feature group; allowed to use hold-out journeys, see `STATUS.md`) | past journeys of the same scheduled service: share severe or cancelled and mean delay over the last 7 and 28 days; for the whole corridor: the same over the last 24 h and last 3 h. Outcomes as known at `predicted_at` from the snapshots. The key is the scheduled train number: for a retained replacement, the number of the train it replaced, switching to the replacement only from a timestamped announcement in the snapshots. The number is a lookup key, not a feature (D7) | M | **high** | todo |
-| 2.2 | **Planned-timetable features** (D8) | `planned_stops`, a planned `route_id` and `upstream_planned_min` (time the run has been travelling before Frankfurt), all from the plan of the scheduled train; they replace the fields removed in 0.7 | M | medium | todo |
-| 2.3 | **Holidays** | public holidays in Hesse, Baden-Württemberg and Bavaria, school holidays, bridge days, day before and after a holiday | S | low–medium | todo |
-| 2.4 | **Delay dynamics** (1 h on) | change of `current_delay` between prediction times, number of upstream stops reported, minutes since the last report, planned minutes still to run before Frankfurt; all as known at `predicted_at` | S | medium at 1 h–0 min | todo |
-| 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf | M | medium | todo |
+| 2.1 | **Recent reliability** (`ProjectInstructions.md` feature group; allowed to use hold-out journeys, see `STATUS.md`) | past journeys of the same scheduled service: share severe or cancelled and mean delay over the last 7 and 28 days; for the whole corridor: the same over the last 24 h and last 3 h. Outcomes as known at `predicted_at` from the snapshots. The key is the scheduled train number: for a retained replacement, the number of the train it replaced, switching to the replacement only from a timestamped announcement in the snapshots. The number is a lookup key, not a feature (D7) | M | **high** | done |
+| 2.2 | **Planned-timetable features** (D8) | `planned_stops`, a planned `route_id` and `upstream_planned_min` (time the run has been travelling before Frankfurt), all from the plan of the scheduled train; they replace the fields removed in 0.7 | M | medium | done |
+| 2.3 | **Holidays** | public holidays in Hesse, Baden-Württemberg and Bavaria, school holidays, bridge days, day before and after a holiday | S | low–medium | done |
+| 2.4 | **Delay dynamics** (1 h on) | change of `current_delay` between prediction times, number of upstream stops reported, minutes since the last report, planned minutes still to run before Frankfurt; all as known at `predicted_at` | S | medium at 1 h–0 min | done |
+| 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf | M | medium | done |
+
+- **2.3.** Holidays reached D12 in the exploratory LightGBM runs at 24 h and 6 h for both tasks. At 24 h the mean reductions were 0.0224 log loss and 0.122 min RMSE. All five folds improved on both scores. Confirmation uses nested feature selection.
+
+- **2.2.** The timetable screen found no meaningful gain in 20 paired comparisons. The archived plan supplied route information for 728, 1,151 and 1,368 rows at the three late horizons and none at 24 h or 6 h.
+
+- **2.4.** LightGBM delay dynamics reached D12 for severity at 1 h and departure, and for delay at departure. The departure reductions were 0.0053 log loss and 0.105 min RMSE. All five folds improved in each of these three comparisons.
+
+- **2.1.** Recent reliability reached D12 in 11 of 20 exploratory comparisons. At 6 h, LightGBM log loss fell by 0.0197 (five folds) and RMSE by 0.134 min (four folds). At least one reliability feature was available on 34,850 of 85,901 CV rows. The rebuild and score rerun reproduced the results exactly.
+
+- **2.5.** The network-state group reached D12 for both LightGBM tasks at 24 h and 6 h. At 24 h, log loss fell by 0.0224 (five folds) and RMSE by 0.146 min (four folds). Network coverage was 23.7% of CV rows. The shares describe runs with visible event states.
+
+- **Combined groups.** Combining all five groups reached D12 in 11 of 20 exploratory comparisons. LightGBM reduced departure RMSE by 0.210 min with five folds improving. At 6 h, mean LightGBM log loss fell by 0.0205 with five folds improving.
 
 ## Phase 3. Feature subsets and importance
 
@@ -114,11 +145,15 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
-| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | todo |
-| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | todo |
+| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | done |
+| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | running |
 | 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | todo |
 | 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | todo |
 | 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | todo |
+
+- **3.1.** All 84 runs finished. Adding a group to timetable alone reached D12 in 70 of 172 comparisons. Calendar gave the largest reductions, 0.0250 LightGBM log loss at 24 h and 0.631 min linear-model RMSE at departure, both in all five folds. None of 192 removals from the full set reached D12.
+
+- **3.2.** Computing grouped permutation importance and LightGBM TreeSHAP on the validation folds.
 
 ## Phase 4. Two-stage and decomposed models
 
@@ -130,7 +165,7 @@ Question: does splitting the problem into parts that are easier to learn help? B
 | 4.2 | **Cancellation, then delay distribution** | as 4.1, but stage two is a predicted delay distribution (from 6.5); the class probabilities follow from it at 20 and 60 min. The severity and delay tasks then come from one model | M | medium | todo |
 | 4.3 | **Ordinal stage two** | the 3 delay classes as two binary models, P(delay ≥ 20) and P(delay ≥ 60), forced to be ordered | S | low | todo |
 | 4.4 | **Mixture of experts for delay** | a classifier routes each journey; one regressor per delay class; predicted delay = Σ P(k) · E[delay \| k]. Aimed at the 60+ min journeys that dominate RMSE | M | medium for RMSE | todo |
-| 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (2,362 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | todo |
+| 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (14,813 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | todo |
 
 ## Phase 5. Ensembles
 
@@ -181,6 +216,10 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 | 8.3 | **Other corridors** (D10) | Hamburg Hbf → München (26,526 journeys), Berlin Hbf → München (27,412) and Hamburg Hbf → Frankfurt (21,557) from `corridor_analysis/`. (a) pooled training with a corridor feature; (b) pretrain on the other corridors, then continue training on ours (LightGBM `init_model`, or fine-tune the network from 7.1); (c) the other-corridor model's prediction as a feature, cross-fitted (rule 7). Needs prediction rows (`current_delay`) for those corridors. Runs can belong to several corridors and share disruptions on the same days, so other-corridor journeys are used only from the training weeks of each fold | L | medium | todo |
 | 8.4 | **Network-wide delay propagation** | pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. `arrival_delays/` has only delays and train type, so this needs a new extraction from `data/monthly_processed_data`. Same week restriction as 8.3 | L | medium at 1 h–0 min | todo |
 | 8.5 | Self-supervised pretraining (masked-feature reconstruction, SCARF) | every row is labelled and there are about ten features, so there is little to learn without labels | — | low | dropped |
+
+- **8.4.** The cutoff audit yielded 191,653 distinct training pairs from 39 CV weeks. Every planned, reported and cutoff week is eligible. Arrival-based inference has 2,146, 2,579 and 2,931 usable Frankfurt–München contexts at the late horizons. Cross-fitted model runs are pending.
+
+- **8.3.** The cutoff-safe source build produced 265,684 prediction rows across the three auxiliary corridors. On the same stable station panel as the target corridor, 358, 617 and 1,505 rows have verified current delay at 1 h, 20 min and departure. All three railway-only transfer comparisons are pending.
 
 ## Phase 9. Final evaluation and analysis
 
