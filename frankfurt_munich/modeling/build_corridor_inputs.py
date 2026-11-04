@@ -10,7 +10,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 
 from advanced_data import ADVANCED
-from build_dataset import HORIZONS, INPUT_DIR, extract
+from build_dataset import HORIZONS, INPUT_DIR, PANEL_FILE, extract
 from corridors import CORRIDORS
 from data import ROW_KEY, TIME_COLUMN, merge_inputs
 from features import CURRENT_DELAY_TIMES
@@ -73,10 +73,12 @@ def read_upstream(paths, journeys):
     """Collect stop IDs and sequence numbers, leaving reported times in the archive."""
     origin = journeys.groupby("journey_id").origin_sequence.max()
     rides = sorted(origin.index.str.rsplit("-", n=1).str[0].unique())
+    panel = pd.read_csv(PANEL_FILE, usecols=["station_name"]).station_name.tolist()
     parts = []
     for path in paths:
         stops = pq.read_table(path, columns=STOP_COLUMNS, use_threads=False,
-                              filters=[("train_line_ride_id", "in", rides)]).to_pandas()
+                              filters=[("train_line_ride_id", "in", rides),
+                                       ("station_name", "in", panel)]).to_pandas()
         stops = extract.add_journey_id(stops)
         keep = stops.train_line_station_num.le(stops.journey_id.map(origin))
         parts.append(stops.loc[keep])

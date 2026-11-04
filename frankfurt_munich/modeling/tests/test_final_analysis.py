@@ -167,3 +167,24 @@ def test_module_import_does_not_read_any_dataset(monkeypatch):
     monkeypatch.setattr(pd, "read_parquet", forbidden)
     monkeypatch.setattr(pd, "read_csv", forbidden)
     importlib.reload(final_analysis)
+
+
+def test_worker_rejects_missing_lock_or_mismatched_manifest(tmp_path, monkeypatch):
+    import run_final
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("worker opened modeling rows before checking the evaluation")
+
+    monkeypatch.setattr(run_final, "committed_registry", lambda path: {"finalists": [{}]})
+    monkeypatch.setattr(run_final, "load_advanced_rows", forbidden)
+    registry = tmp_path / "finalists.json"
+    registry.write_text('{"finalists":[{}]}')
+    output = tmp_path / "evaluation"
+    output.mkdir()
+    with pytest.raises(PermissionError, match="no active"):
+        run_final.score_registered_arm(registry, tmp_path, output, 0)
+
+    (output / ".evaluation.lock").touch()
+    (output / "registration.json").write_text('{"finalists":[{"different":true}]}')
+    with pytest.raises(PermissionError, match="different registration"):
+        run_final.score_registered_arm(registry, tmp_path, output, 0)

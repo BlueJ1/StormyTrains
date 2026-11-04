@@ -17,7 +17,7 @@ from threadpoolctl import threadpool_limits
 
 from advanced_data import ADVANCED, load_advanced_rows, read_inputs
 from cv import PROBA_COLUMNS, RESULTS, TARGETS, class_probabilities, cross_validate, score_fold
-from data import HERE, PREDICTION_TIMES, ROW_KEY, merge_inputs
+from data import HERE, PREDICTION_TIMES, ROW_KEY, TIME_COLUMN, merge_inputs
 from ensembles import FittedAverage, apply_isotonic, apply_temperature, fit_isotonic, fit_temperature
 from experiment_models import DISTRIBUTION_CLASSIFIERS, DISTRIBUTIONS, MODELS
 from experiment_specs import AUTO_VARIANTS, Run, nested_feature_variants
@@ -285,7 +285,21 @@ def explanation(model, X, background, task):
                          "mean_abs_shap": np.abs(contributions / repeats).mean(axis=(1, 2))})
 
 
-def _fit_and_predict_arm(spec, inputs_dir):
+def score_registered_arm(registry, inputs_dir, output, index):
+    """Run one arm in its own process so its native libraries stay isolated."""
+    registration = committed_registry(registry)
+    if not (output / ".evaluation.lock").is_file() or (output / "completed.txt").exists():
+        raise PermissionError("no active registered hold-out evaluation")
+    manifest = (output / "registration.json").read_bytes()
+    if manifest != registry.read_bytes() or json.loads(manifest) != registration:
+        raise PermissionError("evaluation directory has a different registration")
+    if not 0 <= index < len(registration["finalists"]):
+        raise ValueError("registered arm index is out of range")
+    spec = registration["finalists"][index]
+    arm = output / "_arms" / str(index)
+    arm.mkdir(parents=True, exist_ok=True)
+    if (arm / "score.json").exists():
+        return
     task, pt, weather = (spec[key] for key in ("task", "prediction_time", "weather"))
     factory, numeric, categorical = registered_factory(spec)
     features = numeric + categorical
@@ -303,34 +317,15 @@ def _fit_and_predict_arm(spec, inputs_dir):
     metadata = pd.DataFrame()
     if weather:
         timetable = read_inputs(inputs_dir / "timetable_holdout.parquet", ("weather_branch",))
-        metadata = merge_inputs(holdout[[*ROW_KEY, "origin_departure_planned_local", "severity_class"]],
-                                timetable)
+        metadata = merge_inputs(holdout[[*ROW_KEY, TIME_COLUMN, "severity_class"]], timetable)
         flags = extreme_weather(holdout).filter(regex=r"^weather_(heat|gust|snow|heavy_rain)$")
         metadata = metadata.join(flags).drop(columns="predicted_at")
-    return score, prediction, metadata, shap
-
-
-def score_registered_arm(registry, inputs_dir, output, index):
-    """Run one arm in its own process so its native libraries stay isolated."""
-    registration = committed_registry(registry)
-    if not (output / ".evaluation.lock").is_file() or (output / "completed.txt").exists():
-        raise PermissionError("no active registered hold-out evaluation")
-    if (output / "registration.json").read_bytes() != registry.read_bytes():
-        raise PermissionError("evaluation directory has a different registration")
-    if not 0 <= index < len(registration["finalists"]):
-        raise ValueError("registered arm index is out of range")
-    spec = registration["finalists"][index]
-    arm = output / "_arms" / str(index)
-    arm.mkdir(parents=True, exist_ok=True)
-    if (arm / "score.json").exists():
-        return
-    scores, frame, meta, shap = _fit_and_predict_arm(spec, inputs_dir)
-    frame.to_parquet(arm / "predictions.parquet", index=False)
+    prediction.to_parquet(arm / "predictions.parquet", index=False)
     shap.to_parquet(arm / "shap.parquet", index=False)
     if spec["weather"]:
-        meta.to_parquet(arm / "metadata.parquet", index=False)
+        metadata.to_parquet(arm / "metadata.parquet", index=False)
     temporary = arm / "score.tmp"
-    temporary.write_text(json.dumps(scores))
+    temporary.write_text(json.dumps(score))
     temporary.replace(arm / "score.json")
 
 
