@@ -71,3 +71,13 @@ def load_rows(prediction_time: str, split: str = "cv", allow_holdout: bool = Fal
     rows["weekday"] = departure.dt.dayofweek
     rows["month"] = departure.dt.month
     return rows.reset_index(drop=True)
+
+
+def merge_inputs(rows: pd.DataFrame, inputs: pd.DataFrame) -> pd.DataFrame:
+    """Join one cutoff-specific input row per prediction, preserving cohort and order."""
+    index = pd.MultiIndex.from_frame(rows[ROW_KEY])
+    inputs = inputs.set_index(ROW_KEY)
+    if not index.is_unique or not inputs.index.is_unique or len(index.difference(inputs.index)):
+        raise ValueError("advanced inputs do not uniquely cover the prediction rows")
+    aligned = inputs.reindex(index).reset_index(drop=True)
+    return rows.reset_index(drop=True).drop(columns=aligned.columns, errors="ignore").join(aligned)

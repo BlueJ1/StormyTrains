@@ -1,0 +1,14 @@
+# Use a separate Python 3.13 environment for steps 6.5 and 4.2.
+# NGBoost and LightGBMLSS cannot resolve with the main environment's pins.
+numpy==2.3.5
+pandas==2.2.3
+scipy==1.16.1
+scikit-learn==1.6.1
+pyarrow==26.0.0
+lightgbm==4.7.0
+ngboost==0.5.11
+quantile-forest==1.4.2
+lightgbmlss==0.6.1
+torch==2.9.1
+pyro-ppl==1.9.2
+pytest==9.1.1

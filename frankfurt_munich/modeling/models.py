@@ -21,10 +21,8 @@ single-threaded (n_jobs=1), so results do not depend on the number of cores.
 """
 from __future__ import annotations
 
-import lightgbm as lgb
 import numpy as np
 import pandas as pd
-import xgboost as xgb
 from sklearn.base import BaseEstimator, ClassifierMixin, TransformerMixin
 from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 from sklearn.dummy import DummyClassifier, DummyRegressor
@@ -42,16 +40,20 @@ RF_TREES = 300  # not tuned: more trees only cost time
 def linear_preprocessing(numeric: list[str], categorical: list[str]) -> ColumnTransformer:
     return ColumnTransformer([
         ("numeric", make_pipeline(
-            SimpleImputer(strategy="constant", fill_value=0, add_indicator=True),
+            SimpleImputer(strategy="constant", fill_value=0, add_indicator=True,
+                          keep_empty_features=True),
             StandardScaler()), numeric),
         ("categorical", OneHotEncoder(handle_unknown="ignore"), categorical),
     ])
 
 
-def make_logistic_regression(numeric, categorical) -> Pipeline:
+def make_logistic_regression(numeric, categorical, *, l1=False) -> Pipeline:
     """Multinomial logistic regression, scikit-learn's default L2 penalty (C=1)."""
+    classifier = (LogisticRegression(C=1.0, l1_ratio=1.0, solver="saga", max_iter=4000,
+                                     random_state=SEED) if l1
+                  else LogisticRegression(C=1.0, max_iter=1000))
     return Pipeline([("preprocess", linear_preprocessing(numeric, categorical)),
-                     ("model", LogisticRegression(C=1.0, max_iter=1000))])
+                     ("model", classifier)])
 
 
 def make_linear_regression(numeric, categorical) -> Pipeline:
@@ -81,10 +83,12 @@ def make_svr(numeric, categorical, *, C, epsilon, gamma) -> Pipeline:
                      ("model", TransformedTargetRegressor(svr, transformer=StandardScaler()))])
 
 
-def forest_preprocessing(numeric: list[str], categorical: list[str]) -> ColumnTransformer:
-    """Numeric columns unchanged (missing stays missing), categorical one-hot."""
+def forest_preprocessing(numeric: list[str], categorical: list[str], *, impute_missing=False) -> ColumnTransformer:
+    """One-hot categories. Impute numeric values only for forests that require it."""
+    transform = (SimpleImputer(strategy="constant", fill_value=0, add_indicator=True,
+                                keep_empty_features=True) if impute_missing else "passthrough")
     return ColumnTransformer([
-        ("numeric", "passthrough", numeric),
+        ("numeric", transform, numeric),
         ("categorical", OneHotEncoder(handle_unknown="ignore", sparse_output=False), categorical),
     ])
 
@@ -121,13 +125,13 @@ class CategoryCodes(BaseEstimator, TransformerMixin):
         self.categorical = categorical
 
     def fit(self, X, y=None):
-        self.levels_ = {c: sorted(X[c].astype(str).unique()) for c in self.categorical}
+        self.levels_ = {c: sorted(X[c].astype("string").dropna().unique()) for c in self.categorical}
         return self
 
     def transform(self, X):
         X = X.copy()
         for c in self.categorical:
-            values = X[c].astype(str)
+            values = X[c].astype("string")
             X[c] = pd.Categorical(values.where(values.isin(self.levels_[c])),
                                   categories=self.levels_[c])
         return X
@@ -157,57 +161,65 @@ class IntegerLabels(ClassifierMixin, BaseEstimator):
 
 def make_xgboost(numeric, categorical, *, n_estimators, learning_rate, max_depth,
                  min_child_weight, subsample, colsample_bytree, reg_lambda,
-                 reg_alpha) -> Pipeline:
+                 reg_alpha, seed=SEED) -> Pipeline:
     """XGBoost (hist trees, squared error) with native categorical splits."""
+    import xgboost as xgb
+
     booster = xgb.XGBRegressor(
         n_estimators=n_estimators, learning_rate=learning_rate, max_depth=max_depth,
         min_child_weight=min_child_weight, subsample=subsample,
         colsample_bytree=colsample_bytree, reg_lambda=reg_lambda, reg_alpha=reg_alpha,
-        tree_method="hist", enable_categorical=True, n_jobs=1, random_state=SEED)
+        tree_method="hist", enable_categorical=True, n_jobs=1, random_state=seed)
     return Pipeline([("categories", CategoryCodes(categorical)), ("model", booster)])
 
 
 def make_xgboost_classifier(numeric, categorical, *, n_estimators, learning_rate, max_depth,
                             min_child_weight, subsample, colsample_bytree, reg_lambda,
-                            reg_alpha) -> Pipeline:
+                            reg_alpha, seed=SEED) -> Pipeline:
     """XGBoost multi-class classifier (softmax, log loss); otherwise as make_xgboost.
 
     Each boosting round fits one tree per class.
     """
+    import xgboost as xgb
+
     booster = xgb.XGBClassifier(
         objective="multi:softprob", n_estimators=n_estimators, learning_rate=learning_rate,
         max_depth=max_depth, min_child_weight=min_child_weight, subsample=subsample,
         colsample_bytree=colsample_bytree, reg_lambda=reg_lambda, reg_alpha=reg_alpha,
-        tree_method="hist", enable_categorical=True, n_jobs=1, random_state=SEED)
+        tree_method="hist", enable_categorical=True, n_jobs=1, random_state=seed)
     return Pipeline([("categories", CategoryCodes(categorical)),
                      ("model", IntegerLabels(booster))])
 
 
 def make_lightgbm(numeric, categorical, *, n_estimators, learning_rate, num_leaves,
                   min_child_samples, subsample, colsample_bytree, reg_lambda, reg_alpha,
-                  cat_smooth) -> Pipeline:
+                  cat_smooth, seed=SEED, objective=None) -> Pipeline:
     """LightGBM (squared error) with native categorical splits.
 
     subsample_freq=1, so that `subsample` takes effect (bagging every iteration).
     """
+    import lightgbm as lgb
+
     booster = lgb.LGBMRegressor(
         n_estimators=n_estimators, learning_rate=learning_rate, num_leaves=num_leaves,
         min_child_samples=min_child_samples, subsample=subsample, subsample_freq=1,
         colsample_bytree=colsample_bytree, reg_lambda=reg_lambda, reg_alpha=reg_alpha,
-        cat_smooth=cat_smooth, n_jobs=1, random_state=SEED, verbose=-1)
+        cat_smooth=cat_smooth, n_jobs=1, random_state=seed, verbose=-1, objective=objective)
     return Pipeline([("categories", CategoryCodes(categorical)), ("model", booster)])
 
 
 def make_lightgbm_classifier(numeric, categorical, *, n_estimators, learning_rate, num_leaves,
                              min_child_samples, subsample, colsample_bytree, reg_lambda,
-                             reg_alpha, cat_smooth) -> Pipeline:
+                             reg_alpha, cat_smooth, seed=SEED, objective="multiclass") -> Pipeline:
     """LightGBM multi-class classifier (softmax, log loss); otherwise as make_lightgbm.
 
     Each boosting round fits one tree per class.
     """
+    import lightgbm as lgb
+
     booster = lgb.LGBMClassifier(
-        objective="multiclass", n_estimators=n_estimators, learning_rate=learning_rate,
+        objective=objective, n_estimators=n_estimators, learning_rate=learning_rate,
         num_leaves=num_leaves, min_child_samples=min_child_samples, subsample=subsample,
         subsample_freq=1, colsample_bytree=colsample_bytree, reg_lambda=reg_lambda,
-        reg_alpha=reg_alpha, cat_smooth=cat_smooth, n_jobs=1, random_state=SEED, verbose=-1)
+        reg_alpha=reg_alpha, cat_smooth=cat_smooth, n_jobs=1, random_state=seed, verbose=-1)
     return Pipeline([("categories", CategoryCodes(categorical)), ("model", booster)])

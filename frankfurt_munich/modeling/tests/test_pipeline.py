@@ -24,7 +24,8 @@ def rows_for(prediction_time, weather=False):
 
 @cache
 def journeys(split):
-    return pd.read_parquet(DATA / f"journeys_{split}.parquet")
+    columns = ["journey_id", TIME_COLUMN] if split == "holdout" else None
+    return pd.read_parquet(DATA / f"journeys_{split}.parquet", columns=columns)
 
 
 def test_data_files_follow_the_committed_week_assignment():
