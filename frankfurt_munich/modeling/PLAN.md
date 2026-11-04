@@ -1,6 +1,6 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D10 made on 4 November 2026; revised the same day after the review of PR #11. **D11–D13 are open. Nothing in this plan has been run.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. **All decisions are made. Nothing in this plan has been run.**
 
 **Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact.
 
@@ -33,15 +33,15 @@ Where an experiment or phase depends on a decision, it names it (for example D2)
 | D2 | How to screen many variants cheaply | Reuse the configuration chosen per prediction time and re-tune only finalists. Because the reused configurations were chosen on all five folds, screening results are exploratory (rule 4). |
 | D3 | When the CV folds choose something (configuration, feature subset, ensemble weights, stacking, early stopping) | Nested: inner week folds inside each outer training set. Flat only for a handful of pre-listed comparisons, which are then exploratory. |
 | D4 | One model per prediction time, or one pooled model | Test pooling in 8.2; one model per prediction time stays the default. |
-| D5 | New dependencies | All approved: catboost, torch, pytabkit (RealMLP, TabM), tabpfn, tabicl, interpret (EBM), ngboost, quantile-forest, lightgbmlss. Each is installed and pinned in `requirements.txt` when its phase starts. |
-| D6 | Compute | No foundation model is run or fine-tuned on this laptop. Simple MLPs run on it. Where 8.1 runs is D11. |
+| D5 | New dependencies | All approved: catboost, torch, pytabkit (RealMLP, TabM), tabpfn, tabicl, interpret (EBM), ngboost, quantile-forest, lightgbmlss. Each is installed and pinned in `requirements.txt` when its phase starts. tabpfn and tabicl are no longer needed (D11). |
+| D6 | Compute | No foundation model is run or fine-tuned on this laptop. Simple MLPs run on it. |
 | D7 | `train_number` as a feature | Left out. 1.3 encodes only the route; 6.4 is dropped. 2.1 uses the scheduled service number only to look up past journeys, as the weather branch already does. |
 | D8 | Recorded-route fields | Replaced: they leave the base set in 0.7, planned versions come in 2.2, and the old fields are used only for a leakage diagnostic. |
 | D9 | Extra reported metrics | None. 0.5 is dropped; the distributional models in 6.5 are scored by the RMSE of their mean and, through 4.2, by the severity log loss. |
 | D10 | Other corridors' data for transfer learning (8.3) | Decided after Phase 2. Needs prediction rows for those corridors. |
-| D11 | **Open.** Where to run 8.1 | Google Colab / UPPMAX / the Prior Labs API (sends our rows to an external service) / skip 8.1. Suggestion: ask Qing He about UPPMAX. |
-| D12 | **Open.** Smallest gain that counts (rule 3) | Suggestion: 0.003 log loss and 0.1 min RMSE, two to three times the average optimism of the flat search measured in `README.md` (0.001 and 0.04 min). |
-| D13 | **Open.** Budget for nested re-tuning of finalists (0.8) | Nesting multiplies a search by about 4 (4 inner folds). Options: all 50 configurations / 20 / only LightGBM. Suggestion: 50 configurations for LightGBM and XGBoost, railway-only and with weather. |
+| D11 | Where to run what this laptop cannot | Nothing is run off this laptop (no Colab, UPPMAX or external API). 8.1 is dropped; 7.5 is dropped if it does not fit. |
+| D12 | Smallest gain that counts (rule 3) | 0.003 log loss and 0.1 min RMSE, two to three times the average optimism of the flat search measured in `README.md` (0.001 and 0.04 min). |
+| D13 | Budget for nested re-tuning of finalists (0.8) | 50 configurations for LightGBM and XGBoost, railway-only and with weather. Nesting multiplies a search by about 4 (4 inner folds). |
 
 ## Rules for every experiment
 
@@ -166,7 +166,7 @@ Question: does a neural network match or beat the boosters here, and does it add
 | 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | todo |
 | 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | todo |
 | 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | todo |
-| 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running | L | todo |
+| 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | todo |
 
 **About TabGNS.** The paper compares only with other architecture-search methods (TabNAS, AgE) and a large fixed MLP, on datasets of 31,000 to 940,000 rows. Its main results are smaller networks (51–82% fewer parameters) and faster search, with accuracy about equal to a large MLP. It has no comparison with gradient-boosted trees. So we should expect TabGNS to find a compact MLP about as good as 7.1, not to beat the boosters. The comparison is still worth making, and the method is a reasonable "advanced neural model" for the report.
 
@@ -176,25 +176,11 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 
 | ID | Experiment | What is transferred | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 8.1 | **Tabular foundation models**: TabPFN, TabICL (D11) | networks pretrained on millions of synthetic tables, which predict our rows from the training rows given as context, without training on our data. Training folds of about 14,000 rows are within TabPFN-2.5's 50,000-row design. Not run or fine-tuned on this laptop (D6). Checkpoints are listed below | M–L | medium; strong on small tables in benchmarks | todo |
+| 8.1 | Tabular foundation models: TabPFN, TabICL | networks pretrained on millions of synthetic tables, which predict our rows from the training rows given as context. Not run on this laptop (D6), and nothing runs elsewhere (D11) | — | medium | dropped (D6, D11) |
 | 8.2 | **Pooling the prediction times** (D4) | one model on all five prediction times (about 86,000 rows), with the prediction time as a feature; the 24 h model learns from the 0 min rows' calendar effects and vice versa. Rows of one journey stay in one fold | S | low–medium | todo |
 | 8.3 | **Other corridors** (D10) | Hamburg Hbf → München (26,526 journeys), Berlin Hbf → München (27,412) and Hamburg Hbf → Frankfurt (21,557) from `corridor_analysis/`. (a) pooled training with a corridor feature; (b) pretrain on the other corridors, then continue training on ours (LightGBM `init_model`, or fine-tune the network from 7.1); (c) the other-corridor model's prediction as a feature, cross-fitted (rule 7). Needs prediction rows (`current_delay`) for those corridors. Runs can belong to several corridors and share disruptions on the same days, so other-corridor journeys are used only from the training weeks of each fold | L | medium | todo |
 | 8.4 | **Network-wide delay propagation** | pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. `arrival_delays/` has only delays and train type, so this needs a new extraction from `data/monthly_processed_data`. Same week restriction as 8.3 | L | medium at 1 h–0 min | todo |
 | 8.5 | Self-supervised pretraining (masked-feature reconstruction, SCARF) | every row is labelled and there are about ten features, so there is little to learn without labels | — | low | dropped |
-
-**Checkpoints for 8.1**, Hugging Face revisions as of 4 November 2026. D5 covers the packages; which checkpoint we use is settled with D11, after reading the licences.
-
-| Checkpoint | Revision | Licence |
-|---|---|---|
-| `Prior-Labs/TabPFN-v2-clf` | `275f19d` | Prior Labs License v1.1: Apache 2.0 with an attribution clause |
-| `Prior-Labs/TabPFN-v2-reg` | `02a4470` | Prior Labs License v1.1 |
-| `Prior-Labs/tabpfn_2_5` | `6c45f3a` | TabPFN-2.5 License v1.1, non-commercial according to the `tabpfn` package documentation |
-| `Prior-Labs/tabpfn_2_6` | `2414887` | TabPFN-2.6 License v1.0, non-commercial (same source) |
-| `Prior-Labs/tabpfn_3` | `24a16a8` | TabPFN-3 License v1.0, non-commercial (same source) |
-| `jingang/TabICL-clf` | `eaf789a` | BSD-3-Clause |
-| `jingang/TabICL` | `4dcd344` | BSD-3-Clause |
-
-We have not yet read the full texts of the TabPFN-2.5, 2.6 and 3 licences; their terms and any access conditions are recorded here before one of them is used.
 
 ## Phase 9. Final evaluation and analysis
 
@@ -231,3 +217,4 @@ We have not yet read the full texts of the TabPFN-2.5, 2.6 and 3 licences; their
 
 - 4 November 2026: plan drafted.
 - 4 November 2026: decisions D1–D10 made. Revised after the review of PR #11: inputs known at the cutoff as a first step (0.7), nested tuning (0.8), exploratory vs confirmed results, descriptive fold comparisons, historical state from the snapshots, the scheduled service as key, a fallback for 4.5, pinned foundation-model checkpoints, cross-fitting of transferred features, matched weather pairs. New open decisions D11–D13.
+- 4 November 2026: decisions D11–D13 made: nothing runs off this laptop, so 8.1 is dropped and its checkpoint list removed; minimum gain 0.003 log loss and 0.1 min RMSE; nested re-tuning with 50 configurations for LightGBM and XGBoost, railway-only and with weather.
