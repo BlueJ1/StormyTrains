@@ -171,6 +171,11 @@ class LightGBMLSSDelayRegressor(_PreprocessedDelayRegressor):
             raise ImportError("LightGBMLSSDelayRegressor requires lightgbmlss and lightgbm") from exc
 
         features, target = self._fit_preprocessor(X, y)
+        # Fit the Gaussian mixture on the training fold's scale. Its default
+        # starting values are too narrow for raw delays in minutes.
+        self.target_mean_ = float(target.mean())
+        self.target_scale_ = max(float(target.std()), 1.0)
+        target = (target - self.target_mean_) / self.target_scale_
         frame = pd.DataFrame(features, columns=[f"feature_{i}" for i in range(features.shape[1])])
         self.distribution_ = Mixture(Gaussian(), M=self.mixture_components)
         self.model_ = LightGBMLSS(self.distribution_)
@@ -188,17 +193,16 @@ class LightGBMLSSDelayRegressor(_PreprocessedDelayRegressor):
         check_is_fitted(self, "model_")
         features = self._transform(X)
         frame = pd.DataFrame(features, columns=[f"feature_{i}" for i in range(features.shape[1])])
-        predicted_parameters = self.model_.predict(frame, pred_type="parameters")
         import torch
 
-        params = [
-            torch.as_tensor(
-                predicted_parameters[[f"{name}_{i}" for i in range(1, self.mixture_components + 1)]].to_numpy(),
-                dtype=torch.float32,
-            )
-            for name in self.distribution_.param_dict
-        ]
-        return self.distribution_.create_mixture_distribution(params)
+        raw = self.model_.booster.predict(frame, raw_score=True, num_threads=1)
+        raw = torch.as_tensor(raw + self.model_.start_values, dtype=torch.float32)
+        loc, scale, logits = raw.split(self.mixture_components, dim=1)
+        loc = self.distribution_.param_dict["loc"](loc) * self.target_scale_ + self.target_mean_
+        scale = self.distribution_.param_dict["scale"](scale) * self.target_scale_
+        # Gumbel draws are useful during training. The fitted categorical
+        # probabilities give a distribution independent of prediction batch order.
+        return self.distribution_.create_mixture_distribution([loc, scale, logits.softmax(dim=1)])
 
     def predict(self, X):
         distribution = self._predict_distribution(X)

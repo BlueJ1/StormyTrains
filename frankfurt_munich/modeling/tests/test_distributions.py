@@ -92,3 +92,5 @@ def test_lightgbmlss_mixture_mean_and_strict_continuous_cdf_are_consistent():
         torch.full(distribution.mean.shape, 20.0, dtype=distribution.mean.dtype)
     ).detach().cpu().numpy())
     assert np.all((0 <= cdf_20) & (cdf_20 <= cdf_60) & (cdf_60 <= 1))
+    assert np.ptp(model.predict(X)) > 0
+    assert model.predict(X.iloc[::-1])[::-1] == pytest.approx(model.predict(X))
