@@ -225,8 +225,8 @@ def saved_average(run, results_dir, prediction_times):
     if run.variant in ("plus_catboost", "plus_neural"):
         names.append(("6.1", CATBOOST[index]))
     if run.variant == "plus_neural":
-        names += [("7.1", NEURAL["7.1"][index]), ("7.4", NEURAL["7.4"][index]),
-                  ("7.4", NEURAL["7.4"][index + 2])]
+        names += [(step, model) for step in ("7.1", "7.2", "7.3", "7.4")
+                  for model in NEURAL[step][index::2]]
     sources = [latest_run(results_dir, Run(step, model, run.weather,
                                           calendar=run.calendar if step.startswith("7.") else ""))
                for step, model in names]

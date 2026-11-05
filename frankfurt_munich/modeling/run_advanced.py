@@ -270,6 +270,29 @@ def evaluate_pool(run, inputs_dir, results_dir, prediction_times, revision):
     return out
 
 
+def compare_ensemble_to_members(run, out, results_dir, task):
+    """Compare an exploratory ensemble with its strongest single member at each horizon."""
+    config = json.loads((out / "config.json").read_text())
+    if run.step == "5.1":
+        members = [results_dir / name for name in config["members"]]
+    else:
+        recipe = next(iter(config["combination"].values()))
+        members = [latest_run(results_dir, Run("0.7", name, run.weather)) for name in recipe["members"]]
+    score = f"{SCORE[task]}_mean"
+    means = pd.concat({path: pd.read_csv(path / "summary.csv").set_index("prediction_time")[score]
+                       for path in members}, axis=1)
+    leaders = means.idxmin(axis=1)
+    tables = []
+    for reference in leaders.unique():
+        differences = compare_runs(reference, out, task, subset_times=True)
+        selected = differences["prediction_time"].map(leaders).eq(reference)
+        table = differences.loc[selected].copy()
+        table.insert(0, "reference", str(reference.relative_to(results_dir)))
+        table["evaluation"] = "exploratory"
+        tables.append(table)
+    pd.concat(tables, ignore_index=True).to_csv(out / "paired_vs_base.csv", index=False)
+
+
 def compare_to_base(run, out, results_dir, *, require_reference=False):
     standalone = ("4.2", "6.1", "6.3", "6.5", *NEURAL)
     if out is None or (not run.variant and run.step not in standalone):
@@ -277,6 +300,9 @@ def compare_to_base(run, out, results_dir, *, require_reference=False):
     if run.variant in ("route_native", "full", "timetable"):
         return
     task = MODELS[run.model][0]
+    if run.step in ("5.1", "5.3", "5.4"):
+        compare_ensemble_to_members(run, out, results_dir, task)
+        return
     if run.step == "1.3":
         reference_run = Run("1.3", run.model, variant="route_native")
     elif run.step.startswith("3."):
