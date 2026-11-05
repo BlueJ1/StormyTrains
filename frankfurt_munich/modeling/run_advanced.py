@@ -349,6 +349,7 @@ def main():
     parser.add_argument("--prediction-time", nargs="+", choices=PREDICTION_TIMES, default=PREDICTION_TIMES)
     parser.add_argument("--jobs", type=int, default=1)
     parser.add_argument("--model", nargs="+", choices=MODELS)
+    parser.add_argument("--weather-arm", choices=("railway", "weather"), help="run one arm of a comparison")
     parser.add_argument("--variant", nargs="+", help="run only these registered variants")
     parser.add_argument("--compare-only", action="store_true", help="compare saved runs without refitting")
     parser.add_argument("--calendar", choices=VARIANTS["1.1"], help="Phase 1 calendar encoding for neural runs")
@@ -362,6 +363,8 @@ def main():
         runs = [run for run in runs if run.variant != "plus_neural"]
     if args.model:
         runs = [run for run in runs if run.model in args.model]
+    if args.weather_arm:
+        runs = [run for run in runs if run.weather == (args.weather_arm == "weather")]
     if args.variant:
         runs = [run for run in runs if run.variant in args.variant]
     if args.calendar:
