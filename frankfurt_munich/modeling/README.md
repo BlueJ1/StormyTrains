@@ -92,6 +92,7 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | [lightgbm](results/advanced_0_8_lightgbm/20261104-234257) | rmse | 24.549264 | 24.589544 | 24.335040 | 24.312546 | 24.250788 |
 | [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-001256) | rmse | 24.557616 | 24.467488 | 24.327460 | 24.274753 | 24.220357 |
 | [xgboost](results/advanced_0_8_xgboost/20261105-000345) | rmse | 24.602398 | 24.629562 | 24.366489 | 24.325133 | 24.280402 |
+| [xgboost + weather](results/advanced_0_8_xgboost_weather/20261105-020451) | rmse | 24.542324 | 24.558251 | 24.331420 | 24.264176 | 24.233997 |
 
 #### Smallest paired differences by step, task and horizon
 
@@ -229,6 +230,41 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 3.1 | severity | exploratory | 24h | lightgbm_classifier | add_calendar | True | timetable-only | -0.024978 | 5 | True | [folds](results/advanced_3_1_lightgbm_classifier_weather_add_calendar/20261104-235233/paired_vs_base.csv) |
 | 3.1 | severity | exploratory | 6h | logistic_regression | drop_network_state | True | full | -0.000558 | 3 | False | [folds](results/advanced_3_1_logistic_regression_weather_drop_network_state/20261104-234426/paired_vs_base.csv) |
 | 3.1 | severity | exploratory | 6h | logistic_regression | add_calendar | True | timetable-only | -0.024782 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_calendar/20261104-234332/paired_vs_base.csv) |
+| 3.3 | delay | nested | 0min | linear_regression | backward | True |  | -0.023563 | 2 | False | [folds](results/advanced_3_3_linear_regression_weather_backward/20261105-010034/paired_vs_base.csv) |
+| 3.3 | delay | nested | 1h | linear_regression | backward | False |  | -0.055853 | 4 | False | [folds](results/advanced_3_3_linear_regression_backward/20261105-005411/paired_vs_base.csv) |
+| 3.3 | delay | nested | 20min | linear_regression | backward | False |  | -0.018824 | 2 | False | [folds](results/advanced_3_3_linear_regression_backward/20261105-005411/paired_vs_base.csv) |
+| 3.3 | delay | nested | 24h | linear_regression | backward | False |  | +0.045116 | 2 | False | [folds](results/advanced_3_3_linear_regression_backward/20261105-005411/paired_vs_base.csv) |
+| 3.3 | delay | nested | 6h | linear_regression | forward | False |  | -0.016727 | 4 | False | [folds](results/advanced_3_3_linear_regression_forward/20261105-005405/paired_vs_base.csv) |
+| 3.3 | severity | nested | 0min | logistic_regression | backward | False |  | -0.000869 | 4 | False | [folds](results/advanced_3_3_logistic_regression_backward/20261105-010648/paired_vs_base.csv) |
+| 3.3 | severity | nested | 1h | logistic_regression | backward | False |  | -0.001442 | 4 | False | [folds](results/advanced_3_3_logistic_regression_backward/20261105-010648/paired_vs_base.csv) |
+| 3.3 | severity | nested | 20min | logistic_regression | backward | True |  | -0.001033 | 3 | False | [folds](results/advanced_3_3_logistic_regression_weather_backward/20261105-014524/paired_vs_base.csv) |
+| 3.3 | severity | nested | 24h | logistic_regression | forward | True |  | +0.003487 | 1 | False | [folds](results/advanced_3_3_logistic_regression_weather_forward/20261105-012030/paired_vs_base.csv) |
+| 3.3 | severity | nested | 6h | logistic_regression | backward | True |  | +0.002822 | 2 | False | [folds](results/advanced_3_3_logistic_regression_weather_backward/20261105-014524/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 0min | logistic_regression | l1 | True |  | -0.002387 | 5 | False | [folds](results/advanced_3_3_logistic_regression_weather_l1/20261105-020801/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 1h | logistic_regression | l1 | True |  | -0.002088 | 5 | False | [folds](results/advanced_3_3_logistic_regression_weather_l1/20261105-020801/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 20min | logistic_regression | l1 | True |  | -0.002349 | 5 | False | [folds](results/advanced_3_3_logistic_regression_weather_l1/20261105-020801/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 24h | logistic_regression | l1 | False |  | -0.000953 | 5 | False | [folds](results/advanced_3_3_logistic_regression_l1/20261105-020247/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 6h | logistic_regression | l1 | False |  | -0.000674 | 5 | False | [folds](results/advanced_3_3_logistic_regression_l1/20261105-020247/paired_vs_base.csv) |
+| 3.4 | delay | exploratory | 0min | lightgbm | temperature | True |  | -0.003110 | 4 | False | [folds](results/advanced_3_4_lightgbm_weather_temperature/20261105-020116/paired_vs_base.csv) |
+| 3.4 | delay | exploratory | 1h | lightgbm | temperature | True |  | -0.003368 | 3 | False | [folds](results/advanced_3_4_lightgbm_weather_temperature/20261105-020116/paired_vs_base.csv) |
+| 3.4 | delay | exploratory | 20min | lightgbm | temperature | True |  | +0.004078 | 1 | False | [folds](results/advanced_3_4_lightgbm_weather_temperature/20261105-020116/paired_vs_base.csv) |
+| 3.4 | delay | exploratory | 24h | lightgbm | temperature | True |  | +0.000000 | 0 | False | [folds](results/advanced_3_4_lightgbm_weather_temperature/20261105-020116/paired_vs_base.csv) |
+| 3.4 | delay | exploratory | 6h | lightgbm | temperature | True |  | +0.000000 | 0 | False | [folds](results/advanced_3_4_lightgbm_weather_temperature/20261105-020116/paired_vs_base.csv) |
+| 3.4 | severity | exploratory | 0min | lightgbm_classifier | temperature | True |  | -0.000184 | 3 | False | [folds](results/advanced_3_4_lightgbm_classifier_weather_temperature/20261105-020550/paired_vs_base.csv) |
+| 3.4 | severity | exploratory | 1h | lightgbm_classifier | temperature | True |  | -0.000529 | 4 | False | [folds](results/advanced_3_4_lightgbm_classifier_weather_temperature/20261105-020550/paired_vs_base.csv) |
+| 3.4 | severity | exploratory | 20min | lightgbm_classifier | temperature | True |  | -0.000260 | 3 | False | [folds](results/advanced_3_4_lightgbm_classifier_weather_temperature/20261105-020550/paired_vs_base.csv) |
+| 3.4 | severity | exploratory | 24h | lightgbm_classifier | temperature | True |  | +0.000000 | 0 | False | [folds](results/advanced_3_4_lightgbm_classifier_weather_temperature/20261105-020550/paired_vs_base.csv) |
+| 3.4 | severity | exploratory | 6h | lightgbm_classifier | temperature | True |  | +0.000000 | 0 | False | [folds](results/advanced_3_4_lightgbm_classifier_weather_temperature/20261105-020550/paired_vs_base.csv) |
+| 5.1 | delay | exploratory | 0min | lightgbm | plus_linear | False |  | -0.051638 | 4 | False | [folds](results/advanced_5_1_lightgbm_plus_linear/20261105-021334/paired_vs_base.csv) |
+| 5.1 | delay | exploratory | 1h | lightgbm | plus_linear | True |  | -0.080814 | 3 | False | [folds](results/advanced_5_1_lightgbm_weather_plus_linear/20261105-021336/paired_vs_base.csv) |
+| 5.1 | delay | exploratory | 20min | lightgbm | plus_linear | True |  | -0.041940 | 3 | False | [folds](results/advanced_5_1_lightgbm_weather_plus_linear/20261105-021336/paired_vs_base.csv) |
+| 5.1 | delay | exploratory | 24h | lightgbm | mean | False |  | -0.071677 | 5 | False | [folds](results/advanced_5_1_lightgbm_mean/20261105-021333/paired_vs_base.csv) |
+| 5.1 | delay | exploratory | 6h | lightgbm | mean | True |  | -0.097453 | 5 | False | [folds](results/advanced_5_1_lightgbm_weather_mean/20261105-021336/paired_vs_base.csv) |
+| 5.1 | severity | exploratory | 0min | lightgbm_classifier | geometric | True |  | -0.001884 | 4 | False | [folds](results/advanced_5_1_lightgbm_classifier_weather_geometric/20261105-021338/paired_vs_base.csv) |
+| 5.1 | severity | exploratory | 1h | lightgbm_classifier | plus_linear | True |  | -0.001188 | 3 | False | [folds](results/advanced_5_1_lightgbm_classifier_weather_plus_linear/20261105-021337/paired_vs_base.csv) |
+| 5.1 | severity | exploratory | 20min | lightgbm_classifier | plus_linear | True |  | -0.002960 | 4 | False | [folds](results/advanced_5_1_lightgbm_classifier_weather_plus_linear/20261105-021337/paired_vs_base.csv) |
+| 5.1 | severity | exploratory | 24h | lightgbm_classifier | geometric | False |  | -0.015199 | 5 | True | [folds](results/advanced_5_1_lightgbm_classifier_geometric/20261105-021335/paired_vs_base.csv) |
+| 5.1 | severity | exploratory | 6h | lightgbm_classifier | geometric | False |  | -0.016276 | 5 | True | [folds](results/advanced_5_1_lightgbm_classifier_geometric/20261105-021335/paired_vs_base.csv) |
 
 #### Step 3.2 leading permutation groups and TreeSHAP features
 
@@ -303,6 +339,54 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | delay | True | forward | 0min | route | 1 |
 | delay | True | forward | 0min | temperature | 4 |
 | delay | True | forward | 0min | precipitation | 1 |
+| severity | False | backward | 24h | recent_reliability | 4 |
+| severity | False | backward | 24h | route | 2 |
+| severity | False | backward | 24h | timetable | 5 |
+| severity | False | backward | 24h | calendar | 4 |
+| severity | False | backward | 24h | network_state | 1 |
+| severity | False | backward | 0min | calendar | 5 |
+| severity | False | backward | 0min | delay | 5 |
+| severity | False | backward | 0min | recent_reliability | 5 |
+| severity | False | backward | 0min | route | 1 |
+| severity | False | backward | 0min | timetable | 5 |
+| severity | False | forward | 24h | recent_reliability | 4 |
+| severity | False | forward | 24h | route | 2 |
+| severity | False | forward | 24h | timetable | 5 |
+| severity | False | forward | 24h | calendar | 4 |
+| severity | False | forward | 24h | network_state | 1 |
+| severity | False | forward | 0min | calendar | 5 |
+| severity | False | forward | 0min | delay | 5 |
+| severity | False | forward | 0min | recent_reliability | 5 |
+| severity | False | forward | 0min | route | 1 |
+| severity | False | forward | 0min | timetable | 5 |
+| severity | True | backward | 24h | precipitation | 5 |
+| severity | True | backward | 24h | recent_reliability | 4 |
+| severity | True | backward | 24h | route | 2 |
+| severity | True | backward | 24h | snow | 5 |
+| severity | True | backward | 24h | temperature | 3 |
+| severity | True | backward | 24h | timetable | 5 |
+| severity | True | backward | 24h | wind | 5 |
+| severity | True | backward | 24h | calendar | 4 |
+| severity | True | backward | 24h | network_state | 1 |
+| severity | True | backward | 0min | calendar | 5 |
+| severity | True | backward | 0min | delay | 5 |
+| severity | True | backward | 0min | recent_reliability | 4 |
+| severity | True | backward | 0min | route | 1 |
+| severity | True | backward | 0min | timetable | 5 |
+| severity | True | backward | 0min | temperature | 3 |
+| severity | True | backward | 0min | precipitation | 1 |
+| severity | True | forward | 24h | recent_reliability | 3 |
+| severity | True | forward | 24h | route | 3 |
+| severity | True | forward | 24h | temperature | 3 |
+| severity | True | forward | 24h | timetable | 5 |
+| severity | True | forward | 24h | calendar | 4 |
+| severity | True | forward | 0min | calendar | 5 |
+| severity | True | forward | 0min | delay | 5 |
+| severity | True | forward | 0min | recent_reliability | 4 |
+| severity | True | forward | 0min | route | 1 |
+| severity | True | forward | 0min | timetable | 5 |
+| severity | True | forward | 0min | temperature | 3 |
+| severity | True | forward | 0min | precipitation | 1 |
 
 <!-- END ADVANCED CV -->
 
