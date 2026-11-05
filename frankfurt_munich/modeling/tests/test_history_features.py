@@ -16,6 +16,7 @@ from history_features import (
     cutoff_instants,
     latest_snapshot_asof,
     request_upper_bound_utc,
+    ROW_KEY,
 )
 from recent_reliability import (_candidate_outcomes_asof, _candidate_pairs_for_target_batch,
                                 build_recent_reliability, build_reliability_file)
@@ -220,6 +221,41 @@ def test_recent_reliability_uses_only_known_prior_outcomes_in_each_window():
     assert result["corridor_mean_delay_min_24h"] == pytest.approx(65.0)
     assert result["corridor_severe_or_cancelled_rate_3h"] == pytest.approx(1.0)
     assert pd.isna(result["corridor_mean_delay_min_3h"])
+
+
+def test_unlinked_replacement_is_excluded_from_service_but_kept_for_corridor():
+    target = {
+        "journey_id": "target", "prediction_time": "1h",
+        "predicted_at": pd.Timestamp("2025-01-10 12:00:00"),
+        "history_train_type": "ICE", "history_train_number": "100",
+    }
+    cutoff = cutoff_instants(pd.Series([target["predicted_at"]])).iloc[0]
+    outcomes = pd.DataFrame([
+        {
+            **{key: target[key] for key in ROW_KEY},
+            "candidate_journey_id": "unlinked-replacement",
+            "history_train_type": "ICE", "history_train_number": "100",
+            "origin_departure_utc": cutoff - pd.Timedelta(hours=3),
+            "outcome_time_utc": cutoff - pd.Timedelta(hours=1),
+            "outcome_known": True, "cancelled": False, "arrival_delay_min": 90.0,
+            "is_replacement": True, "replacement_announced": False,
+        },
+        {
+            **{key: target[key] for key in ROW_KEY},
+            "candidate_journey_id": "ordinary",
+            "history_train_type": "ICE", "history_train_number": "100",
+            "origin_departure_utc": cutoff - pd.Timedelta(hours=2),
+            "outcome_time_utc": cutoff - pd.Timedelta(minutes=30),
+            "outcome_known": True, "cancelled": False, "arrival_delay_min": 10.0,
+        },
+    ])
+
+    result = build_recent_reliability(pd.DataFrame([target]), outcomes).iloc[0]
+
+    assert result["service_severe_or_cancelled_rate_7d"] == pytest.approx(0.0)
+    assert result["service_mean_delay_min_7d"] == pytest.approx(10.0)
+    assert result["corridor_severe_or_cancelled_rate_24h"] == pytest.approx(0.5)
+    assert result["corridor_mean_delay_min_24h"] == pytest.approx(50.0)
 
 
 def test_strict_events_exclude_legacy_plan_but_keep_visible_change_reports():
@@ -445,10 +481,14 @@ def test_holdout_reliability_builder_gates_before_reading_any_input(tmp_path, mo
         )
 
 
-def test_reliability_builder_reads_next_month_for_month_end_targets(tmp_path, monkeypatch):
+def _stub_reliability_builder_inputs(
+    tmp_path, monkeypatch, *, target_train_number="123", scheduled_train_number="123",
+    replacement_train_number=None, is_replacement_train=False,
+):
     import recent_reliability
     import scheduled_timetable
 
+    parquet_reader = pd.read_parquet
     data_dir = tmp_path / "data"
     advanced_dir = data_dir / "advanced"
     advanced_dir.mkdir(parents=True)
@@ -463,11 +503,11 @@ def test_reliability_builder_reads_next_month_for_month_end_targets(tmp_path, mo
     candidate_id = "candidate-2501312200"
     candidate_context = pd.DataFrame([{
         "journey_id": candidate_id,
-        "scheduled_train_type": "ICE",
-        "scheduled_train_number": "123",
-        "replacement_train_type": pd.NA,
-        "replacement_train_number": pd.NA,
-        "is_replacement_train": False,
+        "current_origin_id": f"{candidate_id}-0",
+        "scheduled_train_type": "ICE", "scheduled_train_number": scheduled_train_number,
+        "replacement_train_type": "ICE" if replacement_train_number is not None else pd.NA,
+        "replacement_train_number": replacement_train_number if replacement_train_number is not None else pd.NA,
+        "is_replacement_train": is_replacement_train,
     }])
     candidate_stops = pd.DataFrame([
         {"id": f"{candidate_id}-0", "journey_id": candidate_id,
@@ -491,9 +531,18 @@ def test_reliability_builder_reads_next_month_for_month_end_targets(tmp_path, mo
     monkeypatch.setattr(recent_reliability.pd, "read_parquet", read_parquet)
     monkeypatch.setattr(
         scheduled_timetable, "service_keys_asof",
-        lambda rows, journeys, context, announcements: rows.assign(
-            history_train_type="ICE", history_train_number="123"
+        lambda rows, journeys, context, announcements, **kwargs: rows.assign(
+            history_train_type="ICE",
+            history_train_number=(replacement_train_number or scheduled_train_number)
+            if "candidate_journey_id" in rows else target_train_number,
         ),
+    )
+    return recent_reliability, scheduled_timetable, data_dir, parquet_reader
+
+
+def test_reliability_builder_reads_next_month_for_month_end_targets(tmp_path, monkeypatch):
+    recent_reliability, _, data_dir, _ = _stub_reliability_builder_inputs(
+        tmp_path, monkeypatch,
     )
     observed = {}
 
@@ -512,6 +561,50 @@ def test_reliability_builder_reads_next_month_for_month_end_targets(tmp_path, mo
 
     assert observed["kind"] == "plan"
     assert "2025-02" in observed["months"]
+
+
+def test_reliability_builder_passes_cutoff_announcement_into_service_gate(tmp_path, monkeypatch):
+    recent_reliability, scheduled_timetable, data_dir, parquet_reader = _stub_reliability_builder_inputs(
+        tmp_path, monkeypatch, target_train_number="900", scheduled_train_number="100",
+        replacement_train_number="900", is_replacement_train=True,
+    )
+
+    monkeypatch.setattr(
+        recent_reliability, "_read_snapshot_ids_in_months",
+        lambda *args, **kwargs: pd.DataFrame(),
+    )
+
+    def announcements_asof(pairs, context, changes, *, row_keys, **kwargs):
+        result = pairs[row_keys].copy()
+        result["is_replacement"] = True
+        result["replacement_announced"] = True
+        return result
+
+    monkeypatch.setattr(scheduled_timetable, "replacement_announcements_asof", announcements_asof)
+
+    def candidate_outcomes(pairs, candidates, changes, plans):
+        result = pairs[ROW_KEY + ["candidate_journey_id"]].copy()
+        cutoff = cutoff_instants(result["predicted_at"])
+        result["origin_departure_utc"] = cutoff - pd.Timedelta(hours=3)
+        result["outcome_time_utc"] = cutoff - pd.Timedelta(hours=1)
+        result["outcome_known"] = True
+        result["cancelled"] = False
+        result["arrival_delay_min"] = 90.0
+        result["origin_train_type_asof"] = pd.NA
+        result["origin_train_number_asof"] = pd.NA
+        return result
+
+    monkeypatch.setattr(recent_reliability, "_candidate_outcomes_asof", candidate_outcomes)
+
+    output = build_reliability_file(
+        data_dir=data_dir, plan_dir=tmp_path / "plan", change_dir=tmp_path / "change",
+        output=tmp_path / "reliability.parquet", require_full_archive=False,
+    )
+    result = parquet_reader(output).iloc[0]
+
+    assert result["service_severe_or_cancelled_rate_7d"] == pytest.approx(1.0)
+    assert result["service_mean_delay_min_7d"] == pytest.approx(90.0)
+    assert result["corridor_mean_delay_min_24h"] == pytest.approx(90.0)
 
 
 def test_legacy_plan_is_static_before_its_label_and_exact_updates_stay_asof():

@@ -25,6 +25,8 @@ def build_recent_reliability(rows: pd.DataFrame,
     `outcome_known`, `cancelled`, and `arrival_delay_min`.  This boundary makes
     the rolling aggregations cheap to test and prevents them from silently
     reading final monthly outcomes.
+    Replacement outcomes enter service history only after a visible link
+    announcement. Their independently observed corridor outcomes stay eligible.
     """
     required = set(ROW_KEY) | {
         "candidate_journey_id", "history_train_type", "history_train_number",
@@ -45,6 +47,10 @@ def build_recent_reliability(rows: pd.DataFrame,
     states["outcome_time_utc"] = pd.to_datetime(states["outcome_time_utc"], utc=True)
     states["outcome_known"] = states["outcome_known"].fillna(False).astype(bool)
     states["cancelled"] = states["cancelled"].fillna(False).astype(bool)
+    default_flags = pd.Series(False, index=states.index)
+    replacement = states.get("is_replacement", default_flags).fillna(False).astype(bool)
+    announced = states.get("replacement_announced", default_flags).fillna(False).astype(bool)
+    states["service_outcome_known"] = states["outcome_known"] & (~replacement | announced)
     state_groups = {key: group.copy() for key, group in states.groupby(ROW_KEY, sort=False)}
     rate_columns = RECENT_RELIABILITY_COLUMNS
     records = []
@@ -69,7 +75,8 @@ def build_recent_reliability(rows: pd.DataFrame,
         for scope, suffix, window in periods:
             if scope == "service":
                 selected = eligible_base[
-                    eligible_base["origin_departure_utc"].lt(cutoff)
+                    eligible_base["service_outcome_known"]
+                    & eligible_base["origin_departure_utc"].lt(cutoff)
                     & eligible_base["origin_departure_utc"].ge(cutoff - window)
                 ]
                 selected = selected[
@@ -421,7 +428,8 @@ def build_reliability_file(
                 on=pair_keys, how="left", validate="one_to_one",
             )
             states = states.merge(
-                candidate_announcements[ROW_KEY + ["candidate_journey_id", "is_replacement"]],
+                candidate_announcements[ROW_KEY + ["candidate_journey_id", "is_replacement",
+                                                   "replacement_announced"]],
                 on=pair_keys, how="left", validate="one_to_one",
             )
             ordinary = ~states["is_replacement"].fillna(False).astype(bool)
