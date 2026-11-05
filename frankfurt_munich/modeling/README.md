@@ -158,6 +158,16 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 1.5 | severity | exploratory | 20min | lightgbm_classifier | weather_extremes | True |  | -0.002106 | 3 | False | [folds](results/advanced_1_5_lightgbm_classifier_weather_weather_extremes/20261105-100506/paired_vs_base.csv) |
 | 1.5 | severity | exploratory | 24h | lightgbm_classifier | weather_extremes | True |  | -0.003114 | 4 | True | [folds](results/advanced_1_5_lightgbm_classifier_weather_weather_extremes/20261105-100506/paired_vs_base.csv) |
 | 1.5 | severity | exploratory | 6h | lightgbm_classifier | weather_extremes | True |  | -0.000532 | 3 | False | [folds](results/advanced_1_5_lightgbm_classifier_weather_weather_extremes/20261105-100506/paired_vs_base.csv) |
+| 2.1 | delay | exploratory | 0min | linear_regression | recent_reliability | False |  | -0.429938 | 5 | True | [folds](results/advanced_2_1_linear_regression_recent_reliability/20261105-105841/paired_vs_base.csv) |
+| 2.1 | delay | exploratory | 1h | linear_regression | recent_reliability | False |  | -0.436979 | 5 | True | [folds](results/advanced_2_1_linear_regression_recent_reliability/20261105-105841/paired_vs_base.csv) |
+| 2.1 | delay | exploratory | 20min | linear_regression | recent_reliability | False |  | -0.445106 | 5 | True | [folds](results/advanced_2_1_linear_regression_recent_reliability/20261105-105841/paired_vs_base.csv) |
+| 2.1 | delay | exploratory | 24h | linear_regression | recent_reliability | False |  | -0.261842 | 5 | True | [folds](results/advanced_2_1_linear_regression_recent_reliability/20261105-105841/paired_vs_base.csv) |
+| 2.1 | delay | exploratory | 6h | linear_regression | recent_reliability | False |  | -0.444428 | 5 | True | [folds](results/advanced_2_1_linear_regression_recent_reliability/20261105-105841/paired_vs_base.csv) |
+| 2.1 | severity | exploratory | 0min | logistic_regression | recent_reliability | False |  | -0.016383 | 5 | True | [folds](results/advanced_2_1_logistic_regression_recent_reliability/20261105-105845/paired_vs_base.csv) |
+| 2.1 | severity | exploratory | 1h | logistic_regression | recent_reliability | False |  | -0.015453 | 5 | True | [folds](results/advanced_2_1_logistic_regression_recent_reliability/20261105-105845/paired_vs_base.csv) |
+| 2.1 | severity | exploratory | 20min | logistic_regression | recent_reliability | False |  | -0.016412 | 5 | True | [folds](results/advanced_2_1_logistic_regression_recent_reliability/20261105-105845/paired_vs_base.csv) |
+| 2.1 | severity | exploratory | 24h | logistic_regression | recent_reliability | False |  | -0.008616 | 5 | True | [folds](results/advanced_2_1_logistic_regression_recent_reliability/20261105-105845/paired_vs_base.csv) |
+| 2.1 | severity | exploratory | 6h | logistic_regression | recent_reliability | False |  | -0.015793 | 5 | True | [folds](results/advanced_2_1_logistic_regression_recent_reliability/20261105-105845/paired_vs_base.csv) |
 | 2.2 | delay | exploratory | 0min | lightgbm | planned_timetable | False |  | -0.102172 | 4 | True | [folds](results/advanced_2_2_lightgbm_planned_timetable/20261105-102639/paired_vs_base.csv) |
 | 2.2 | delay | exploratory | 1h | lightgbm | planned_timetable | False |  | -0.075283 | 4 | False | [folds](results/advanced_2_2_lightgbm_planned_timetable/20261105-102639/paired_vs_base.csv) |
 | 2.2 | delay | exploratory | 20min | lightgbm | planned_timetable | False |  | -0.111171 | 4 | True | [folds](results/advanced_2_2_lightgbm_planned_timetable/20261105-102639/paired_vs_base.csv) |
@@ -194,6 +204,16 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 2.5 | severity | exploratory | 20min | lightgbm_classifier | network_state | False |  | -0.000030 | 3 | False | [folds](results/advanced_2_5_lightgbm_classifier_network_state/20261105-103313/paired_vs_base.csv) |
 | 2.5 | severity | exploratory | 24h | logistic_regression | network_state | False |  | +0.000365 | 3 | False | [folds](results/advanced_2_5_logistic_regression_network_state/20261105-103136/paired_vs_base.csv) |
 | 2.5 | severity | exploratory | 6h | logistic_regression | network_state | False |  | +0.000370 | 3 | False | [folds](results/advanced_2_5_logistic_regression_network_state/20261105-103136/paired_vs_base.csv) |
+| 2.all | delay | exploratory | 0min | linear_regression | all_groups | False |  | -0.472125 | 5 | True | [folds](results/advanced_2_all_linear_regression_all_groups/20261105-110056/paired_vs_base.csv) |
+| 2.all | delay | exploratory | 1h | linear_regression | all_groups | False |  | -0.467021 | 5 | True | [folds](results/advanced_2_all_linear_regression_all_groups/20261105-110056/paired_vs_base.csv) |
+| 2.all | delay | exploratory | 20min | linear_regression | all_groups | False |  | -0.504726 | 5 | True | [folds](results/advanced_2_all_linear_regression_all_groups/20261105-110056/paired_vs_base.csv) |
+| 2.all | delay | exploratory | 24h | linear_regression | all_groups | False |  | -0.267659 | 5 | True | [folds](results/advanced_2_all_linear_regression_all_groups/20261105-110056/paired_vs_base.csv) |
+| 2.all | delay | exploratory | 6h | linear_regression | all_groups | False |  | -0.433193 | 5 | True | [folds](results/advanced_2_all_linear_regression_all_groups/20261105-110056/paired_vs_base.csv) |
+| 2.all | severity | exploratory | 0min | logistic_regression | all_groups | False |  | -0.016152 | 5 | True | [folds](results/advanced_2_all_logistic_regression_all_groups/20261105-110115/paired_vs_base.csv) |
+| 2.all | severity | exploratory | 1h | logistic_regression | all_groups | False |  | -0.014416 | 5 | True | [folds](results/advanced_2_all_logistic_regression_all_groups/20261105-110115/paired_vs_base.csv) |
+| 2.all | severity | exploratory | 20min | logistic_regression | all_groups | False |  | -0.015539 | 5 | True | [folds](results/advanced_2_all_logistic_regression_all_groups/20261105-110115/paired_vs_base.csv) |
+| 2.all | severity | exploratory | 24h | logistic_regression | all_groups | False |  | -0.005851 | 5 | True | [folds](results/advanced_2_all_logistic_regression_all_groups/20261105-110115/paired_vs_base.csv) |
+| 2.all | severity | exploratory | 6h | logistic_regression | all_groups | False |  | -0.013508 | 5 | True | [folds](results/advanced_2_all_logistic_regression_all_groups/20261105-110115/paired_vs_base.csv) |
 
 <!-- END ADVANCED CV -->
 
