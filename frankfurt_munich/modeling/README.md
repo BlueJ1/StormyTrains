@@ -101,6 +101,7 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-001256) | rmse | 24.557616 | 24.467488 | 24.327460 | 24.274753 | 24.220357 |
 | [xgboost](results/advanced_0_8_xgboost/20261105-000345) | rmse | 24.602398 | 24.629562 | 24.366489 | 24.325133 | 24.280402 |
 | [xgboost_classifier](results/advanced_0_8_xgboost_classifier/20261105-050916) | log_loss | 0.926479 | 0.917584 | 0.878099 | 0.857895 | 0.848623 |
+| [xgboost_classifier + weather](results/advanced_0_8_xgboost_classifier_weather/20261105-070052) | log_loss | 0.925592 | 0.917797 | 0.876556 | 0.856103 | 0.848240 |
 | [xgboost + weather](results/advanced_0_8_xgboost_weather/20261105-020451) | rmse | 24.542324 | 24.558251 | 24.331420 | 24.264176 | 24.233997 |
 
 #### Smallest paired differences by step, task and horizon

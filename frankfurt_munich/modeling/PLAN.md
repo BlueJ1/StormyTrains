@@ -77,7 +77,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** All four baseline delay arms finished. Weather reduced LightGBM 6 h RMSE by 0.122 min in four folds when both pipelines tuned independently. Nested feature-group selection reduced LightGBM departure RMSE by 0.114 min railway-only and 0.212 min with weather, with four and five folds improving respectively. The remaining nested arms are running.
+- **0.8.** All eight baseline booster arms finished with 50 configurations in each outer training set. Weather reached D12 only for LightGBM delay at 6 h (−0.122 min, four folds). Early nested representation selection reached D12 in none of eight comparisons. Nested feature-group selection is still running; the completed LightGBM delay policy reduced departure RMSE by 0.114 min railway-only and 0.212 min with weather.
 
 - **0.6.** A clean install from the main pins passed 148 tests with five skips. All four optional distribution tests passed in their pinned environment. Fresh departure LightGBM runs reproduced all 16,947 CV probability vectors per arm for both cutoff-safe references and both recorded-route diagnostics.
 
@@ -190,13 +190,13 @@ Question: do combinations of models beat the best single model? Boosters that ti
 | ID | Experiment | Method | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
 | 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | running |
-| 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | running |
+| 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | done |
 | 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
 | 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | done |
 
 - **5.1.** The ten booster and booster-plus-linear averages finished. None of their 50 paired horizon comparisons reached D12 against the strongest included single model. The largest reductions were 0.00188 log loss and 0.080 min RMSE. CatBoost and full-horizon neural additions are pending.
 
-- **5.2.** The 16 seed and flat top-five runs, all nested delay runs and both nested LightGBM severity arms finished. Weather LightGBM top-five severity reduced 20 min log loss by 0.00327 in all five folds. Nested XGBoost severity follows its baseline searches.
+- **5.2.** All 24 runs finished. Seven exploratory seed/flat-top-five comparisons reached D12. Among 40 nested-top-five comparisons, only weather LightGBM severity at 20 min reached D12 (−0.00327 log loss, five folds). No nested delay ensemble reached the RMSE threshold.
 
 - **5.3.** None of 20 exploratory greedy-weight comparisons reached D12 against the strongest included single model. The best RMSE reduction was 0.049 min with weather at 1 h, with four folds improving.
 
