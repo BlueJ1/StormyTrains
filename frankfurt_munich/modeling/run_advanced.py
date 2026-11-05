@@ -18,8 +18,9 @@ from cv import RESULTS, TARGETS, cross_validate, git_commit, pooled_cv, save_run
 from data import PREDICTION_TIMES, TIME_COLUMN, load_rows
 from ensembles import cv_ensemble, ensemble_recipe, saved_average
 from experiment_models import LIGHTGBM, LINEAR, MODELS, NEURAL, fixed_factory, flat_choices, flat_search_path, variant_model
-from experiment_specs import (AUTO_VARIANTS, DECOMPOSED, LATE_STEPS, LATE_VARIANTS, VARIANTS,
-                              Run, latest_run, nested_feature_variants, registered_runs, tuning_reference)
+from experiment_specs import (AUTO_VARIANTS, DECOMPOSED, LATE_STEPS, LATE_VARIANTS, SEARCH_CONFIGS,
+                              VARIANTS, Run, latest_run, nested_feature_variants, registered_runs,
+                              tuning_reference)
 from features import CURRENT_DELAY_TIMES, PHASE2_GROUPS, feature_columns, feature_groups
 from group_selection import ablations, columns_for, cv_importance, nested_groups
 from models import L1_LOGISTIC, make_lightgbm_classifier
@@ -348,7 +349,8 @@ def main():
     parser.add_argument("--results-dir", type=Path, default=RESULTS)
     parser.add_argument("--prediction-time", nargs="+", choices=PREDICTION_TIMES, default=PREDICTION_TIMES)
     parser.add_argument("--jobs", type=int, default=1)
-    parser.add_argument("--n-configs", type=int, help="configuration count for steps 0.8 and 6.1 (default 20)")
+    parser.add_argument("--n-configs", type=int,
+                        help=f"configuration count for steps 0.8 and 6.1 (default {SEARCH_CONFIGS})")
     parser.add_argument("--model", nargs="+", choices=MODELS)
     parser.add_argument("--weather-arm", choices=("railway", "weather"), help="run one arm of a comparison")
     parser.add_argument("--variant", nargs="+", help="run only these registered variants")

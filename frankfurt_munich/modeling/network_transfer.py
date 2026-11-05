@@ -210,9 +210,10 @@ def main():
     parser.add_argument("--plan-dir", type=Path, default=PLAN_DIR)
     parser.add_argument("--change-dir", type=Path, default=CHANGE_DIR)
     parser.add_argument("--month", nargs="+", help="restrict extraction for a local data check")
-    parser.add_argument("--output", type=Path, default=DATA / "advanced" / "network_training_cv.parquet")
+    default_output = DATA / "advanced" / "network_training_cv.parquet"
+    parser.add_argument("--output", type=Path, default=default_output)
     args = parser.parse_args()
-    if args.month and args.output.resolve() == (DATA / "advanced" / "network_training_cv.parquet").resolve():
+    if args.month and args.output.resolve() == default_output.resolve():
         parser.error("--month requires --output pointing to a separate sample file")
     assignment = read_assignment()
     weeks = assignment.loc[assignment["split"].eq("cv"), "week_start"]

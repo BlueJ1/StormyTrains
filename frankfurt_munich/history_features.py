@@ -650,7 +650,7 @@ def main() -> None:
     parser.add_argument("--change-dir", type=Path, default=CHANGE_DIR)
     parser.add_argument("--registry", type=Path)
     parser.add_argument("--allow-partial-archive", action="store_true",
-                        help="skip the 27-month completeness check; requires a separate --output-dir")
+                        help="skip the 27-month completeness check and write to a separate --output-dir")
     args = parser.parse_args()
     output_dir = args.output_dir or args.data_dir / "advanced"
     if args.allow_partial_archive and output_dir.resolve() == (args.data_dir / "advanced").resolve():

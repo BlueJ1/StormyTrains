@@ -1,13 +1,12 @@
-"""Cutoff-safe planned timetable inputs from the timestamped plan archive.
+"""Planned timetable features from the timestamped plan archive.
 
 The parsed plan archive is published at
 https://huggingface.co/datasets/piebro/deutsche-bahn-data/tree/d27b9c413536bb5fe393954371f572050e55176b/monthly_processed_data_plan
-and documents ``snapshot_timestamp`` as the API request time.  There is an
-important historical exception: the upstream pre-refactor fetch code writes
-plan XML as ``{eva}_plan_{hour}.xml``, where ``hour`` is the requested plan
-hour, not the fetch time.  Following the user decision on 5 November 2026,
-the earliest legacy plan per stop is accepted as its static schedule,
-regardless of fetch time.  Exact-request updates remain cutoff-bound.
+and documents ``snapshot_timestamp`` as the API request time. The older
+fetcher encoded the requested timetable hour in ``{eva}_plan_{hour}.xml``.
+Following the user decision on 5 November 2026, the earliest legacy plan
+per stop is accepted as its static schedule regardless of fetch time.
+Exact-request updates remain cutoff-bound.
 
 The default builder reads only CV journeys and their stop IDs.  The optional
 holdout builder calls the committed-registration gate before its first holdout
