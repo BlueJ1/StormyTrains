@@ -1,0 +1,384 @@
+{
+  "name": "advanced_6_1_catboost",
+  "step": "6.1",
+  "task": "delay",
+  "model": "catboost",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "",
+  "evaluation": "nested",
+  "git_commit": "0e110ee233662aaf86584daf90e8a31362cae77b",
+  "chosen": {
+    "24h": {
+      "1": {
+        "config_id": 9,
+        "params": {
+          "bagging_temperature": 0.7903004720036289,
+          "depth": 7,
+          "iterations": 505,
+          "l2_leaf_reg": 58.293845429947346,
+          "learning_rate": 0.007183284336890004,
+          "random_strength": 0.03872118032174583
+        }
+      },
+      "2": {
+        "config_id": 11,
+        "params": {
+          "bagging_temperature": 0.5618690193747615,
+          "depth": 7,
+          "iterations": 211,
+          "l2_leaf_reg": 0.7741417985242882,
+          "learning_rate": 0.00983647785774485,
+          "random_strength": 0.011140616389973707
+        }
+      },
+      "3": {
+        "config_id": 9,
+        "params": {
+          "bagging_temperature": 0.7903004720036289,
+          "depth": 7,
+          "iterations": 505,
+          "l2_leaf_reg": 58.293845429947346,
+          "learning_rate": 0.007183284336890004,
+          "random_strength": 0.03872118032174583
+        }
+      },
+      "4": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      },
+      "5": {
+        "config_id": 9,
+        "params": {
+          "bagging_temperature": 0.7903004720036289,
+          "depth": 7,
+          "iterations": 505,
+          "l2_leaf_reg": 58.293845429947346,
+          "learning_rate": 0.007183284336890004,
+          "random_strength": 0.03872118032174583
+        }
+      }
+    },
+    "6h": {
+      "1": {
+        "config_id": 9,
+        "params": {
+          "bagging_temperature": 0.7903004720036289,
+          "depth": 7,
+          "iterations": 505,
+          "l2_leaf_reg": 58.293845429947346,
+          "learning_rate": 0.007183284336890004,
+          "random_strength": 0.03872118032174583
+        }
+      },
+      "2": {
+        "config_id": 11,
+        "params": {
+          "bagging_temperature": 0.5618690193747615,
+          "depth": 7,
+          "iterations": 211,
+          "l2_leaf_reg": 0.7741417985242882,
+          "learning_rate": 0.00983647785774485,
+          "random_strength": 0.011140616389973707
+        }
+      },
+      "3": {
+        "config_id": 12,
+        "params": {
+          "bagging_temperature": 0.8468029614127393,
+          "depth": 4,
+          "iterations": 171,
+          "l2_leaf_reg": 0.10388823104027935,
+          "learning_rate": 0.1409236110165583,
+          "random_strength": 1.3199942261535018
+        }
+      },
+      "4": {
+        "config_id": 12,
+        "params": {
+          "bagging_temperature": 0.8468029614127393,
+          "depth": 4,
+          "iterations": 171,
+          "l2_leaf_reg": 0.10388823104027935,
+          "learning_rate": 0.1409236110165583,
+          "random_strength": 1.3199942261535018
+        }
+      },
+      "5": {
+        "config_id": 9,
+        "params": {
+          "bagging_temperature": 0.7903004720036289,
+          "depth": 7,
+          "iterations": 505,
+          "l2_leaf_reg": 58.293845429947346,
+          "learning_rate": 0.007183284336890004,
+          "random_strength": 0.03872118032174583
+        }
+      }
+    },
+    "1h": {
+      "1": {
+        "config_id": 13,
+        "params": {
+          "bagging_temperature": 1.4580143360819746,
+          "depth": 4,
+          "iterations": 516,
+          "l2_leaf_reg": 60.1038975477389,
+          "learning_rate": 0.0718924743806351,
+          "random_strength": 5.557494308839644
+        }
+      },
+      "2": {
+        "config_id": 14,
+        "params": {
+          "bagging_temperature": 1.7000771555795986,
+          "depth": 7,
+          "iterations": 245,
+          "l2_leaf_reg": 0.15512259126484748,
+          "learning_rate": 0.017862556214123325,
+          "random_strength": 0.09452571391072308
+        }
+      },
+      "3": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      },
+      "4": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      },
+      "5": {
+        "config_id": 13,
+        "params": {
+          "bagging_temperature": 1.4580143360819746,
+          "depth": 4,
+          "iterations": 516,
+          "l2_leaf_reg": 60.1038975477389,
+          "learning_rate": 0.0718924743806351,
+          "random_strength": 5.557494308839644
+        }
+      }
+    },
+    "20min": {
+      "1": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      },
+      "2": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      },
+      "3": {
+        "config_id": 14,
+        "params": {
+          "bagging_temperature": 1.7000771555795986,
+          "depth": 7,
+          "iterations": 245,
+          "l2_leaf_reg": 0.15512259126484748,
+          "learning_rate": 0.017862556214123325,
+          "random_strength": 0.09452571391072308
+        }
+      },
+      "4": {
+        "config_id": 14,
+        "params": {
+          "bagging_temperature": 1.7000771555795986,
+          "depth": 7,
+          "iterations": 245,
+          "l2_leaf_reg": 0.15512259126484748,
+          "learning_rate": 0.017862556214123325,
+          "random_strength": 0.09452571391072308
+        }
+      },
+      "5": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      }
+    },
+    "0min": {
+      "1": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      },
+      "2": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      },
+      "3": {
+        "config_id": 6,
+        "params": {
+          "bagging_temperature": 0.6092275383467414,
+          "depth": 8,
+          "iterations": 187,
+          "l2_leaf_reg": 0.5285382203816725,
+          "learning_rate": 0.0820192671822916,
+          "random_strength": 0.6760673666959456
+        }
+      },
+      "4": {
+        "config_id": 12,
+        "params": {
+          "bagging_temperature": 0.8468029614127393,
+          "depth": 4,
+          "iterations": 171,
+          "l2_leaf_reg": 0.10388823104027935,
+          "learning_rate": 0.1409236110165583,
+          "random_strength": 1.3199942261535018
+        }
+      },
+      "5": {
+        "config_id": 0,
+        "params": {
+          "bagging_temperature": 0.749080237694725,
+          "depth": 8,
+          "iterations": 164,
+          "l2_leaf_reg": 21.830968390524596,
+          "learning_rate": 0.057578435336562345,
+          "random_strength": 0.21751953118777648
+        }
+      }
+    }
+  },
+  "search": {
+    "n_configs": 20,
+    "selection": "inner mean rmse"
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-05T23:34:57"
+}
