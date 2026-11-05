@@ -215,7 +215,7 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | done |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | done |
 
-- **6.1.** CatBoost uses the same 50-configuration nested budget on both tasks and both weather arms.
+- **6.1.** The railway delay arm finished its nested search. All five RMSE comparisons were 0.067–0.093 min worse than nested LightGBM. The weather delay and both severity arms are still running.
 
 - **6.5.** All six distributional runs finished. All 30 conditional-mean comparisons had higher RMSE than nested LightGBM. The smallest increases were 0.071 min for NGBoost, 0.318 min for quantile forest and 6.072 min for LightGBMLSS. Training-fold standardization repaired the mixture's initial constant fit. Step 4.2 tests the CDFs for severity.
 
@@ -223,7 +223,7 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 
 - **6.6.** All 20 Huber and shifted-log comparisons had higher mean RMSE than the matched fixed LightGBM references. The smallest increase was 0.121 min for the weather shifted-log arm at 1 h.
 
-- **6.2.** LightGBM temperature and isotonic runs finished with reliability plots. None of 20 comparisons reached D12. Temperature's largest reduction was 0.00054 log loss. XGBoost and CatBoost calibration follow their nested searches.
+- **6.2.** All eight LightGBM/XGBoost temperature and isotonic runs finished with reliability plots. None of 40 comparisons reached D12. The largest log-loss reduction was 0.00054. CatBoost calibration follows its nested search.
 
 ## Phase 7. Neural networks
 
@@ -232,8 +232,8 @@ Question: does a neural network match or beat the boosters here, and does it add
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
 | 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | done |
-| 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | running |
-| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | todo |
+| 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | done |
+| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | running |
 | 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | todo |
 | 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | todo |
 
@@ -241,7 +241,9 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 - **7.1.** All four eight-configuration MLP arms finished with cyclic calendar inputs. All 20 paired comparisons were worse than matched nested LightGBM. RMSE increased by 0.287–0.385 min and log loss by 0.0143–0.0208.
 
-- **7.2.** Both weather arms and both targets are running with a shared severity/delay body, inner-week early stopping and the same cyclic calendar inputs as 7.1.
+- **7.2.** All four arms finished. Four of 20 comparisons reached D12 against the single-task MLP: weather delay at 24 h/6 h, railway severity at departure and weather severity at 24 h. All 20 multi-task scores remained worse than matched nested LightGBM.
+
+- **7.3.** TabGNS is running with the matching MLP calendar and per-outer-fold CPU allowance. The railway delay arm finished; the remaining arms are in progress.
 
 ## Phase 8. Transfer learning and pretraining
 
