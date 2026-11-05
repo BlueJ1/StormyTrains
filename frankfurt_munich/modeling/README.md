@@ -372,6 +372,11 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 7.1 | delay | nested | 20min | mlp |  | True |  | +0.342956 | 0 | False | [folds](results/advanced_7_1_mlp_weather_calendar_cyclic/20261105-061723/paired_vs_base.csv) |
 | 7.1 | delay | nested | 24h | mlp |  | True |  | +0.349560 | 0 | False | [folds](results/advanced_7_1_mlp_weather_calendar_cyclic/20261105-061723/paired_vs_base.csv) |
 | 7.1 | delay | nested | 6h | mlp |  | False |  | +0.287120 | 1 | False | [folds](results/advanced_7_1_mlp_calendar_cyclic/20261105-061555/paired_vs_base.csv) |
+| 7.1 | severity | nested | 0min | mlp_classifier |  | True |  | +0.016671 | 0 | False | [folds](results/advanced_7_1_mlp_classifier_weather_calendar_cyclic/20261105-064320/paired_vs_base.csv) |
+| 7.1 | severity | nested | 1h | mlp_classifier |  | True |  | +0.017357 | 0 | False | [folds](results/advanced_7_1_mlp_classifier_weather_calendar_cyclic/20261105-064320/paired_vs_base.csv) |
+| 7.1 | severity | nested | 20min | mlp_classifier |  | True |  | +0.016018 | 0 | False | [folds](results/advanced_7_1_mlp_classifier_weather_calendar_cyclic/20261105-064320/paired_vs_base.csv) |
+| 7.1 | severity | nested | 24h | mlp_classifier |  | True |  | +0.017956 | 0 | False | [folds](results/advanced_7_1_mlp_classifier_weather_calendar_cyclic/20261105-064320/paired_vs_base.csv) |
+| 7.1 | severity | nested | 6h | mlp_classifier |  | True |  | +0.014253 | 1 | False | [folds](results/advanced_7_1_mlp_classifier_weather_calendar_cyclic/20261105-064320/paired_vs_base.csv) |
 
 #### Step 3.2 leading permutation groups and TreeSHAP features
 
