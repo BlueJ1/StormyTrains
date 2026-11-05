@@ -79,7 +79,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
 - **0.8.** All eight baseline booster arms are running with 50 configurations per outer training set under the regenerated inputs. Feature-policy confirmations follow the new representation and feature screens.
 
-- **0.6.** The clean pinned environment passed 158 tests with five skips after the legacy timetable change. Regression checks cover the static legacy default, exact-update cutoffs, month-boundary extraction, inner/outer separation, recovery provenance and parallel registration. Prediction parity will be rechecked on the regenerated references.
+- **0.6.** The clean pinned environment passed 159 tests with five skips. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly in the original environment as well. Tests include static legacy plans, exact-update cutoffs, month-boundary extraction, inner/outer separation, recovery provenance and parallel registration.
 
 ## Phase 1. Feature representations
 
@@ -89,19 +89,19 @@ Expectation: trees split on the categories natively, so they should barely react
 
 | ID | Experiment | Variants | Models | Cost | Expected gain | Status |
 |---|---|---|---|---|---|---|
-| 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | running |
-| 1.2 | **Finer time** | departure minute of day instead of hour; day of year (cyclic) instead of month; hour × weekday interaction for LR | LR, LightGBM | S | low | todo |
+| 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | done |
+| 1.2 | **Finer time** | departure minute of day instead of hour; day of year (cyclic) instead of month; hour × weekday interaction for LR | LR, LightGBM | S | low | done |
 | 1.3 | **Route encodings** (run after 2.2) | the planned `route_id` from 2.2: one-hot / native / frequency / target encoding fitted on inner folds. `train_number` stays out (D7) | LR, LightGBM | S | low | todo |
-| 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | todo |
-| 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | todo |
+| 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | done |
+| 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | done |
 
-- **1.1.** The four cyclic/integer/spline calendar alternatives are being rerun against the regenerated base references.
+- **1.1.** All 16 calendar runs finished under the regenerated inputs. None of 80 exploratory paired comparisons reached D12. The native calendar remains the default for the neural comparisons.
 
-- **1.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **1.2.** All ten finer-time runs finished. None of 50 exploratory paired comparisons reached D12.
 
-- **1.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **1.4.** All 14 delay-transform runs finished. None of 42 exploratory paired comparisons reached D12.
 
-- **1.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **1.5.** One of 20 exploratory comparisons reached D12: weather-extreme indicators reduced LightGBM severity log loss at 24 h by 0.00311, with four folds improving. No delay comparison reached the RMSE threshold.
 
 - **1.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
@@ -261,9 +261,9 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 | 8.4 | **Network-wide delay propagation** | pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. `arrival_delays/` has only delays and train type, so this needs a new extraction from `data/monthly_processed_data`. Same week restriction as 8.3 | L | medium at 1 h–0 min | todo |
 | 8.5 | Self-supervised pretraining (masked-feature reconstruction, SCARF) | every row is labelled and there are about ten features, so there is little to learn without labels | — | low | dropped |
 
-- **8.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **8.4.** The regenerated network build has 783,935 unique training pairs covering all 95 CV weeks. All six planned, reported and cutoff week fields are CV-only. Cross-fitted model comparisons are queued.
 
-- **8.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **8.3.** The regenerated auxiliary build has 265,684 rows across the three corridors and verified current delay for 2,134/3,344/6,267 rows at the late horizons. All three railway-only model comparisons are queued.
 
 - **8.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
