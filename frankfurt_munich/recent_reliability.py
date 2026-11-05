@@ -379,7 +379,7 @@ def build_reliability_file(
             continue
         source_month_start = (lower_bound.tz_convert("Europe/Berlin").tz_localize(None)
                               - pd.Timedelta(days=3)).to_period("M")
-        source_month_end = upper_bound.tz_convert("Europe/Berlin").tz_localize(None).to_period("M")
+        source_month_end = upper_bound.tz_convert("Europe/Berlin").tz_localize(None).to_period("M") + 1
         source_months = list(pd.period_range(source_month_start, source_month_end, freq="M"))
         processed_months.extend(str(value) for value in source_months)
         event_ids = set(month_candidates["origin_id"].astype(str)) | set(

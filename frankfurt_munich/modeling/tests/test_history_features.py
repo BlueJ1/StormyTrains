@@ -445,6 +445,75 @@ def test_holdout_reliability_builder_gates_before_reading_any_input(tmp_path, mo
         )
 
 
+def test_reliability_builder_reads_next_month_for_month_end_targets(tmp_path, monkeypatch):
+    import recent_reliability
+    import scheduled_timetable
+
+    data_dir = tmp_path / "data"
+    advanced_dir = data_dir / "advanced"
+    advanced_dir.mkdir(parents=True)
+    (advanced_dir / "replacement_context_cv.parquet").touch()
+    (advanced_dir / "replacement_announcements_cv.parquet").touch()
+
+    target_rows = pd.DataFrame([{
+        "journey_id": "target-2502010000",
+        "prediction_time": "24h",
+        "predicted_at": pd.Timestamp("2025-01-31 23:30:00"),
+    }])
+    candidate_id = "candidate-2501312200"
+    candidate_context = pd.DataFrame([{
+        "journey_id": candidate_id,
+        "scheduled_train_type": "ICE",
+        "scheduled_train_number": "123",
+        "replacement_train_type": pd.NA,
+        "replacement_train_number": pd.NA,
+        "is_replacement_train": False,
+    }])
+    candidate_stops = pd.DataFrame([
+        {"id": f"{candidate_id}-0", "journey_id": candidate_id,
+         "station_name": "Frankfurt (Main) Hbf", "train_line_station_num": 0},
+        {"id": f"{candidate_id}-1", "journey_id": candidate_id,
+         "station_name": "München Hbf", "train_line_station_num": 1},
+    ])
+
+    def read_parquet(path, columns=None):
+        name = Path(path).name
+        if name == "prediction_rows_cv.parquet":
+            return target_rows.copy()
+        if name == "replacement_context_cv.parquet":
+            return candidate_context.copy()
+        if name == "replacement_announcements_cv.parquet":
+            return pd.DataFrame()
+        if name == "stops.parquet":
+            return candidate_stops.copy()
+        raise AssertionError(f"unexpected Parquet read before archive interception: {name}")
+
+    monkeypatch.setattr(recent_reliability.pd, "read_parquet", read_parquet)
+    monkeypatch.setattr(
+        scheduled_timetable, "service_keys_asof",
+        lambda rows, journeys, context, announcements: rows.assign(
+            history_train_type="ICE", history_train_number="123"
+        ),
+    )
+    observed = {}
+
+    def intercept_archive_read(ids, *, kind, months, change_dir, plan_dir):
+        observed["kind"] = kind
+        observed["months"] = {str(month) for month in months}
+        raise InterruptedError("archive read intercepted after source month selection")
+
+    monkeypatch.setattr(recent_reliability, "_read_snapshot_ids_in_months", intercept_archive_read)
+
+    with pytest.raises(InterruptedError, match="source month selection"):
+        build_reliability_file(
+            data_dir=data_dir, plan_dir=tmp_path / "plan", change_dir=tmp_path / "change",
+            output=tmp_path / "reliability.parquet", require_full_archive=False,
+        )
+
+    assert observed["kind"] == "plan"
+    assert "2025-02" in observed["months"]
+
+
 def test_legacy_plan_is_static_before_its_label_and_exact_updates_stay_asof():
     from history_features import latest_plan_asof
 
