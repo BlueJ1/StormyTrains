@@ -77,7 +77,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** Seven of eight 20-configuration baselines and three of eight feature-policy arms have finished. LightGBM railway severity reached D12 at all five horizons, including a 0.01573 departure log-loss reduction with all folds improving. LightGBM weather-arm delay reached D12 at all five horizons, including 0.369 min at departure. The XGBoost railway severity policy reproduced its base predictions exactly. Six controls reused their fixed first-20 inner scores and refitted all 150 outer models. All 150 chosen IDs passed independent audit.
+- **0.8.** Seven of eight 20-configuration baselines and four of eight feature-policy arms have finished. Fifteen of 20 paired comparisons reached D12, all from LightGBM. Departure improvements were 0.01573 log loss for railway severity, 0.01483 for weather-arm severity, and 0.369 min RMSE for weather-arm delay, with all five folds improving. The XGBoost railway severity policy reproduced all 85,901 base predictions exactly. The six reconstructed 20-configuration controls passed independent audit of all 150 chosen IDs.
 
 - **0.6.** The clean main environment passed 174 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. The budget tests cover the CLI, paired arms, eight-configuration neural searches, and the 20-configuration final-registration cap. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly across both main environments.
 
@@ -215,7 +215,7 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | running |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | todo |
 
-- **6.1.** Both CatBoost classifier arms are running with the user-approved 20-configuration nested budget. The regression arms are queued with the same budget.
+- **6.1.** The classifier searches are scheduled as independent single-core horizon jobs at the approved 20-configuration budget. Both regression arms use the same nested budget. The four inner week folds are shared with the baseline protocol.
 
 - **6.5.** The distributional-model sequence started in its separate pinned environment. The first NGBoost railway arm has finished. Runs are scheduled within the active CPU limit.
 

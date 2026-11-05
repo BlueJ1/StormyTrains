@@ -124,10 +124,10 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 0.8 | delay | nested | 24h | lightgbm | auto_groups | True |  | -0.169957 | 5 | True | [folds](results/advanced_0_8_lightgbm_weather_auto_groups/20261105-201848/paired_vs_base.csv) |
 | 0.8 | delay | nested | 6h | lightgbm | auto_groups | True |  | -0.362458 | 5 | True | [folds](results/advanced_0_8_lightgbm_weather_auto_groups/20261105-201848/paired_vs_base.csv) |
 | 0.8 | severity | nested | 0min | lightgbm_classifier | auto_groups | False |  | -0.015729 | 5 | True | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-202503/paired_vs_base.csv) |
-| 0.8 | severity | nested | 1h | lightgbm_classifier | auto_groups | False |  | -0.008375 | 5 | True | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-202503/paired_vs_base.csv) |
-| 0.8 | severity | nested | 20min | lightgbm_classifier | auto_groups | False |  | -0.010356 | 5 | True | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-202503/paired_vs_base.csv) |
+| 0.8 | severity | nested | 1h | lightgbm_classifier | auto_groups | True |  | -0.013601 | 5 | True | [folds](results/advanced_0_8_lightgbm_classifier_weather_auto_groups/20261105-212424/paired_vs_base.csv) |
+| 0.8 | severity | nested | 20min | lightgbm_classifier | auto_groups | True |  | -0.012866 | 5 | True | [folds](results/advanced_0_8_lightgbm_classifier_weather_auto_groups/20261105-212424/paired_vs_base.csv) |
 | 0.8 | severity | nested | 24h | lightgbm_classifier | auto_groups | False |  | -0.007578 | 5 | True | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-202503/paired_vs_base.csv) |
-| 0.8 | severity | nested | 6h | lightgbm_classifier | auto_groups | False |  | -0.010351 | 5 | True | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-202503/paired_vs_base.csv) |
+| 0.8 | severity | nested | 6h | lightgbm_classifier | auto_groups | True |  | -0.012943 | 5 | True | [folds](results/advanced_0_8_lightgbm_classifier_weather_auto_groups/20261105-212424/paired_vs_base.csv) |
 | 1.1 | delay | exploratory | 0min | lightgbm | calendar_cyclic | False |  | -0.036489 | 4 | False | [folds](results/advanced_1_1_lightgbm_calendar_cyclic/20261105-095024/paired_vs_base.csv) |
 | 1.1 | delay | exploratory | 1h | lightgbm | calendar_integer | False |  | -0.048392 | 4 | False | [folds](results/advanced_1_1_lightgbm_calendar_integer/20261105-094954/paired_vs_base.csv) |
 | 1.1 | delay | exploratory | 20min | lightgbm | calendar_cyclic | False |  | -0.036861 | 4 | False | [folds](results/advanced_1_1_lightgbm_calendar_cyclic/20261105-095024/paired_vs_base.csv) |
