@@ -63,21 +63,21 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 
 | ID | Step | Cost | Status |
 |---|---|---|---|
-| 0.7 | **Inputs known at the cutoff** (D8). Remove `recorded_route`, `observed_stops` and `unobserved_sequence_positions` from the base set. In the 216 CV departures where `drop_shared_departures()` keeps a replacement train, check which base inputs come from the replacement (`train_type`, `starts_at_origin`, the weather branch chosen by train number) and take them from the scheduled train instead. Rerun class shares, logistic and linear regression, and LightGBM and XGBoost at their saved configurations (exploratory); these become the reference scores. The removed fields are used afterwards only to measure how much they leaked | S–M | running |
+| 0.7 | **Inputs known at the cutoff** (D8). Remove `recorded_route`, `observed_stops` and `unobserved_sequence_positions` from the base set. In the 216 CV departures where `drop_shared_departures()` keeps a replacement train, check which base inputs come from the replacement (`train_type`, `starts_at_origin`, the weather branch chosen by train number) and take them from the scheduled train instead. Rerun class shares, logistic and linear regression, and LightGBM and XGBoost at their saved configurations (exploratory); these become the reference scores. The removed fields are used afterwards only to measure how much they leaked | S–M | done |
 | 0.1 | **Named feature sets** in `features.py` (`feature_columns(pt, feature_set="base")`), and representation options (encodings, transforms) applied inside each model's pipeline | S | done |
 | 0.2 | **`compare.py`**: the five paired fold differences between two runs, their mean, folds improved, and whether the mean reaches the D12 threshold; no t-tests (rule 3). Writes the tables for `README.md` | S | done |
 | 0.3 | **Inner week folds** inside each training set (grouped by ISO week, stratified like `folds.py`) for nested selection, tuning, stacking, cross-fitting, calibration and neural-network early stopping | S | done |
 | 0.4 | **Fixed-configuration runner:** refit a tuned model with the configuration chosen per prediction time in an earlier run's `config.json` (D2). Its results are marked exploratory | S | done |
-| 0.8 | **Nested tuning** in `tuning.py`: each outer fold chooses its configuration on the inner folds of its training weeks only (D3). Used for finalists; the budget is D13 | S to build, M–L to run | todo |
+| 0.8 | **Nested tuning** in `tuning.py`: each outer fold chooses its configuration on the inner folds of its training weeks only (D3). Used for finalists; the budget is D13 | S to build, M–L to run | running |
 | 0.5 | Extra metrics | — | dropped (D9) |
 | 0.6 | **Tests** for each of the above, in the style of `tests/` (answer-as-feature, shuffled labels, no hold-out access, no outer-fold rows in nested choices) | S | done |
 
-- **0.7.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **0.7.** All 26 reference and diagnostic runs finished under the user-approved legacy timetable policy. The best railway-only booster log loss was 0.9204 at 24 h and 0.8333 at departure. The best railway-only delay RMSE was 24.476 and 23.814 min. Fixed configurations retain their exploratory label.
 - **0.1.** Base and recorded-route diagnostic sets defined. Phase 1 transformations run inside the fitted pipeline.
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **0.8.** All eight baseline booster arms are running with 50 configurations per outer training set under the regenerated inputs. Feature-policy confirmations follow the new representation and feature screens.
 
 - **0.6.** The clean pinned environment passed 158 tests with five skips after the legacy timetable change. Regression checks cover the static legacy default, exact-update cutoffs, month-boundary extraction, inner/outer separation, recovery provenance and parallel registration. Prediction parity will be rechecked on the regenerated references.
 
@@ -89,13 +89,13 @@ Expectation: trees split on the categories natively, so they should barely react
 
 | ID | Experiment | Variants | Models | Cost | Expected gain | Status |
 |---|---|---|---|---|---|---|
-| 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | todo |
+| 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | running |
 | 1.2 | **Finer time** | departure minute of day instead of hour; day of year (cyclic) instead of month; hour × weekday interaction for LR | LR, LightGBM | S | low | todo |
 | 1.3 | **Route encodings** (run after 2.2) | the planned `route_id` from 2.2: one-hot / native / frequency / target encoding fitted on inner folds. `train_number` stays out (D7) | LR, LightGBM | S | low | todo |
 | 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | todo |
 | 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | todo |
 
-- **1.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **1.1.** The four cyclic/integer/spline calendar alternatives are being rerun against the regenerated base references.
 
 - **1.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 

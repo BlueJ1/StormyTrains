@@ -18,7 +18,12 @@ The prediction cohort supplies the planned Frankfurt departure and München arri
 
 Recent-reliability candidates come from the CV roster during development. The holdout feature build adds its roster for the historical lookup. Both builds reconstruct past outcomes from snapshots available at each cutoff.
 
-Input coverage and CV scores are being regenerated under this timetable policy.
+| Input coverage | 24 h | 6 h | 1 h | 20 min | 0 min |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| CV prediction rows | 17,466 | 17,380 | 17,114 | 16,994 | 16,947 |
+| Planned route available | 10,302 | 10,269 | 10,861 | 11,223 | 11,419 |
+| Weather branch available | 10,301 | 10,268 | 10,860 | 11,222 | 11,418 |
+| Snapshot-based `current_delay` used by models | — | — | 6,046 | 6,788 | 8,323 |
 
 ```bash
 .venv/bin/python frankfurt_munich/scheduled_timetable.py
@@ -66,7 +71,41 @@ Build any additional inputs named by the finalists with `--split holdout`. Use `
 
 ### Advanced CV results
 
-Pending rerun under the user-approved legacy timetable policy. Earlier strict-policy results are outside the primary result tree.
+Scores use the five committed CV week folds. Positive paired differences favor the reference.
+
+#### Step 0.7 reference scores
+
+| Model | Score | 24h | 6h | 1h | 20min | 0min |
+| --- | --- | --- | --- | --- | --- | --- |
+| [class_shares](results/advanced_0_7_class_shares/20261105-094255) | log_loss | 0.968037 | 0.958148 | 0.923149 | 0.904638 | 0.896917 |
+| [lightgbm](results/advanced_0_7_lightgbm/20261105-094317) | rmse | 24.475782 | 24.475782 | 24.061917 | 24.110516 | 23.871876 |
+| [lightgbm_classifier](results/advanced_0_7_lightgbm_classifier/20261105-094449) | log_loss | 0.920441 | 0.911750 | 0.867040 | 0.848649 | 0.833305 |
+| [lightgbm_classifier + weather](results/advanced_0_7_lightgbm_classifier_weather/20261105-094543) | log_loss | 0.926648 | 0.920599 | 0.870853 | 0.852692 | 0.837792 |
+| [lightgbm + weather](results/advanced_0_7_lightgbm_weather/20261105-094320) | rmse | 24.596359 | 24.636556 | 24.162988 | 24.118915 | 23.886333 |
+| [linear_regression](results/advanced_0_7_linear_regression/20261105-094255) | rmse | 24.725467 | 24.725467 | 24.306489 | 24.287113 | 24.075382 |
+| [linear_regression + weather](results/advanced_0_7_linear_regression_weather/20261105-094257) | rmse | 24.741384 | 24.745659 | 24.329880 | 24.303906 | 24.091288 |
+| [logistic_regression](results/advanced_0_7_logistic_regression/20261105-094300) | log_loss | 0.934693 | 0.925578 | 0.881563 | 0.862618 | 0.848278 |
+| [logistic_regression + weather](results/advanced_0_7_logistic_regression_weather/20261105-094306) | log_loss | 0.936857 | 0.926824 | 0.881350 | 0.862513 | 0.849384 |
+| [training_mean](results/advanced_0_7_training_mean/20261105-094254) | rmse | 25.427529 | 25.427529 | 25.427529 | 25.427529 | 25.427529 |
+| [xgboost](results/advanced_0_7_xgboost/20261105-094512) | rmse | 24.511355 | 24.511355 | 24.085740 | 24.059483 | 23.813927 |
+| [xgboost_classifier](results/advanced_0_7_xgboost_classifier/20261105-094634) | log_loss | 0.921781 | 0.912863 | 0.867956 | 0.851121 | 0.836399 |
+| [xgboost_classifier + weather](results/advanced_0_7_xgboost_classifier_weather/20261105-094757) | log_loss | 0.923900 | 0.916941 | 0.869718 | 0.850681 | 0.839115 |
+| [xgboost + weather](results/advanced_0_7_xgboost_weather/20261105-094544) | rmse | 24.516292 | 24.541405 | 24.131985 | 24.115664 | 23.883132 |
+
+#### Smallest paired differences by step, task and horizon
+
+| step | task | evaluation | prediction_time | method | variant | weather | contrast | mean | folds_improved | reaches_minimum_gain | result |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0.7 | delay | exploratory | 0min | lightgbm | recorded_route | True |  | -0.151353 | 5 | True | [folds](results/advanced_0_7_lightgbm_weather_recorded_route/20261105-094332/paired_vs_base.csv) |
+| 0.7 | delay | exploratory | 1h | linear_regression | recorded_route | True |  | -0.126682 | 4 | True | [folds](results/advanced_0_7_linear_regression_weather_recorded_route/20261105-094300/paired_vs_base.csv) |
+| 0.7 | delay | exploratory | 20min | lightgbm | recorded_route | True |  | -0.152879 | 5 | True | [folds](results/advanced_0_7_lightgbm_weather_recorded_route/20261105-094332/paired_vs_base.csv) |
+| 0.7 | delay | exploratory | 24h | linear_regression | recorded_route | True |  | -0.148750 | 5 | True | [folds](results/advanced_0_7_linear_regression_weather_recorded_route/20261105-094300/paired_vs_base.csv) |
+| 0.7 | delay | exploratory | 6h | lightgbm | recorded_route | True |  | -0.158027 | 5 | True | [folds](results/advanced_0_7_lightgbm_weather_recorded_route/20261105-094332/paired_vs_base.csv) |
+| 0.7 | severity | exploratory | 0min | logistic_regression | recorded_route | True |  | -0.007223 | 5 | True | [folds](results/advanced_0_7_logistic_regression_weather_recorded_route/20261105-094332/paired_vs_base.csv) |
+| 0.7 | severity | exploratory | 1h | logistic_regression | recorded_route | True |  | -0.006681 | 5 | True | [folds](results/advanced_0_7_logistic_regression_weather_recorded_route/20261105-094332/paired_vs_base.csv) |
+| 0.7 | severity | exploratory | 20min | logistic_regression | recorded_route | True |  | -0.007240 | 5 | True | [folds](results/advanced_0_7_logistic_regression_weather_recorded_route/20261105-094332/paired_vs_base.csv) |
+| 0.7 | severity | exploratory | 24h | logistic_regression | recorded_route | True |  | -0.007309 | 4 | True | [folds](results/advanced_0_7_logistic_regression_weather_recorded_route/20261105-094332/paired_vs_base.csv) |
+| 0.7 | severity | exploratory | 6h | logistic_regression | recorded_route | False |  | -0.006960 | 4 | True | [folds](results/advanced_0_7_logistic_regression_recorded_route/20261105-094304/paired_vs_base.csv) |
 
 <!-- END ADVANCED CV -->
 
