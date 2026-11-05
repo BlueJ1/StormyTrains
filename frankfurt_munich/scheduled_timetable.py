@@ -32,12 +32,12 @@ import pyarrow.parquet as pq
 if __package__:
     from .history_features import (
         CHANGE_DIR, PLAN_DIR, PLAN_COLUMNS, PLAN_EXACT_UTC_FROM, ROW_KEY, cutoff_instants,
-        request_upper_bound_utc, plan_availability_utc, prepare_plan_snapshots,
+        request_upper_bound_utc, plan_availability_utc, prepare_plan_snapshots, latest_snapshot_asof,
     )
 else:
     from history_features import (
         CHANGE_DIR, PLAN_DIR, PLAN_COLUMNS, PLAN_EXACT_UTC_FROM, ROW_KEY, cutoff_instants,
-        request_upper_bound_utc, plan_availability_utc, prepare_plan_snapshots,
+        request_upper_bound_utc, plan_availability_utc, prepare_plan_snapshots, latest_snapshot_asof,
     )
 
 HERE = Path(__file__).resolve().parent
@@ -78,23 +78,10 @@ TIMETABLE_COLUMNS = [
 
 def _asof_by_id(queries: pd.DataFrame, snapshots: pd.DataFrame) -> pd.DataFrame:
     """Attach the latest plan state under the static-legacy timetable policy."""
-    if queries.empty:
+    if queries.empty or snapshots.empty:
         return queries.copy()
-    if snapshots.empty:
-        return queries.copy()
-    right = snapshots[snapshots["available_at_utc"].notna()].copy()
-    if right.empty:
-        return queries.copy()
-    right["available_at_utc"] = pd.to_datetime(right["available_at_utc"], utc=True).dt.as_unit("ns")
-    left = queries.copy()
-    left["cutoff_utc"] = pd.to_datetime(left["cutoff_utc"], utc=True).dt.as_unit("ns")
-    left = left.sort_values(["cutoff_utc", "id"])
-    right = right.sort_values(["available_at_utc", "id"])
-    merged = pd.merge_asof(
-        left, right, left_on="cutoff_utc", right_on="available_at_utc", by="id",
-        direction="backward", allow_exact_matches=True, suffixes=("", "_plan"),
-    )
-    return merged.sort_values("_query_id").reset_index(drop=True)
+    available = snapshots.loc[snapshots["available_at_utc"].notna()]
+    return latest_snapshot_asof(queries, available, observed_col="available_at_utc", request_bound=False)
 
 
 def _path_to_destination(path: object) -> list[str] | None:

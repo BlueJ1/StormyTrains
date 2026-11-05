@@ -73,6 +73,8 @@ def test_timetable_features_use_latest_asof_snapshot_and_numpy_path():
         },
     ])
 
+    plans["id"] = plans["id"].astype(object)
+    context["scheduled_origin_id"] = context["scheduled_origin_id"].astype("string")
     result = build_timetable_features(rows, context, plans)
 
     assert result.loc[0, "scheduled_train_type"] == "ICE"
