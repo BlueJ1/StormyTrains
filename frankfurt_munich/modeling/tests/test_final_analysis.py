@@ -216,6 +216,11 @@ def test_failed_final_evaluation_rejects_changed_provenance_on_resume(tmp_path, 
     with pytest.raises(PermissionError, match="code or inputs changed"):
         run_final.final_evaluation(registry, tmp_path, tmp_path)
     assert len(calls) == 1
+    (output / "provenance.json").unlink()
+    (output / "_arms").mkdir()
+    with pytest.raises(PermissionError, match="arms have no provenance"):
+        run_final.final_evaluation(registry, tmp_path, tmp_path)
+    assert len(calls) == 1
 
 
 def test_evaluation_fingerprints_cover_source_and_both_data_splits(tmp_path, monkeypatch):

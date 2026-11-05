@@ -378,6 +378,8 @@ def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None
             raise PermissionError("evaluation directory has a different registration")
         manifest.write_bytes(registry_bytes)
         provenance = output / "provenance.json"
+        if not provenance.exists() and (output / "_arms").exists():
+            raise PermissionError("existing evaluation arms have no provenance")
         fingerprints = evaluation_fingerprints(registration, inputs_dir)
         if provenance.exists() and json.loads(provenance.read_text()) != fingerprints:
             raise PermissionError("evaluation code or inputs changed")

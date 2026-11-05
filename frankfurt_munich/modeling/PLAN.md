@@ -79,7 +79,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
 - **0.8.** All four baseline delay arms finished. Weather reduced LightGBM 6 h RMSE by 0.122 min in four folds when both pipelines tuned independently. Nested feature-group selection reduced LightGBM departure RMSE by 0.114 min railway-only and 0.212 min with weather, with four and five folds improving respectively. The remaining nested arms are running.
 
-- **0.6.** A clean install from the main pins passed 146 tests with five skips. All four optional distribution tests passed in their pinned environment. Fresh departure LightGBM runs reproduced all 16,947 CV probability vectors per arm for both cutoff-safe references and both recorded-route diagnostics.
+- **0.6.** A clean install from the main pins passed 148 tests with five skips. All four optional distribution tests passed in their pinned environment. Fresh departure LightGBM runs reproduced all 16,947 CV probability vectors per arm for both cutoff-safe references and both recorded-route diagnostics.
 
 ## Phase 1. Feature representations
 
