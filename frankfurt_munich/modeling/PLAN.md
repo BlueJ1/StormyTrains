@@ -79,7 +79,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
 - **0.8.** All eight baseline booster arms finished with 50 configurations in each outer training set. Weather reached D12 only for LightGBM delay at 6 h (−0.122 min, four folds). Early nested representation selection reached D12 in none of eight comparisons. Nested feature-group selection is still running; the completed LightGBM delay policy reduced departure RMSE by 0.114 min railway-only and 0.212 min with weather.
 
-- **0.6.** A clean install from the main pins passed 148 tests with five skips. All four optional distribution tests passed in their pinned environment. Fresh departure LightGBM runs reproduced all 16,947 CV probability vectors per arm for both cutoff-safe references and both recorded-route diagnostics.
+- **0.6.** A clean install from the main pins passed 150 tests with five skips. All four optional distribution tests passed in their pinned environment. Fresh departure LightGBM runs reproduced all 16,947 CV probability vectors per arm for both cutoff-safe references and both recorded-route diagnostics.
 
 ## Phase 1. Feature representations
 

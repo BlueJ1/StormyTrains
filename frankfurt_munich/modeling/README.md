@@ -52,12 +52,12 @@ Step 8.3 uses railway inputs from the three auxiliary corridors. The builder dro
 
 ### Holdout evaluation
 
-The evaluation fingerprints the pipeline source and both splits of its generated inputs. An interrupted run resumes completed arms only when those fingerprints and the committed registration match.
+The registration can re-tune arms in parallel after shared feature selection. It records the tuning environment, and the final report records each arm’s interpreter and package versions. The evaluation fingerprints the pipeline source and both splits of its generated inputs. An interrupted run resumes completed arms only when those fingerprints and the committed registration match.
 
 After the CV steps are complete, `run_final.py register` ranks eligible pipelines by the railway-only CV score and writes one matched pair per task and horizon to `finalists.json`. Commit that file with the preregistration entry in the plan before generating holdout inputs.
 
 ```bash
-.venv/bin/python frankfurt_munich/modeling/run_final.py register
+.venv/bin/python frankfurt_munich/modeling/run_final.py register --jobs 4
 # After committing the registry and the preregistration entry
 .venv/bin/python frankfurt_munich/scheduled_timetable.py --split holdout
 .venv/bin/python frankfurt_munich/history_features.py --split holdout

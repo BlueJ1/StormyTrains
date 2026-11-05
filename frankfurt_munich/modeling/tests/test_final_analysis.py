@@ -249,3 +249,68 @@ def test_evaluation_fingerprints_cover_source_and_both_data_splits(tmp_path, mon
     assert {key for key in original if original[key] != changed[key]} == {
         "source/modeling/pipeline.py", "data/prediction_rows_cv.parquet",
     }
+
+
+def test_parallel_registration_preserves_arm_order_and_serial_result(tmp_path, monkeypatch):
+    import run_final
+
+    (tmp_path / "PLAN.md").write_text("All development steps are complete.")
+    monkeypatch.setattr(run_final, "HERE", tmp_path)
+    monkeypatch.setattr(run_final, "git_commit", lambda: "test-revision")
+    monkeypatch.setattr(run_final, "runtime_versions", lambda: {"python": "test"})
+    results = tmp_path / "results"
+    pairs = []
+    for task, model, metric in (("delay", "lightgbm", "rmse_mean"),
+                                 ("severity", "lightgbm_classifier", "log_loss_mean")):
+        pair = {}
+        for weather in (False, True):
+            config = {"model": model, "task": task, "weather": weather, "step": "0.8",
+                      "features": {"24h": {"numeric": ["example"], "categorical": []}}}
+            scores = pd.DataFrame({metric: [1.0]}, index=pd.Index(["24h"], name="prediction_time"))
+            pair[weather] = (results / f"{model}_{weather}", config, scores)
+        pairs.append((task, "24h", pair))
+    monkeypatch.setattr(run_final, "choose_finalists", lambda path: iter(pairs))
+    monkeypatch.setattr(run_final, "tune_finalist", lambda spec, config, inputs: {
+        "params": {"weather": spec["weather"]}, "tuning_policy": {"method": "test CV"}})
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("registration attempted to open modeling rows")
+
+    monkeypatch.setattr(run_final, "load_advanced_rows", forbidden)
+    workers = []
+
+    class OrderedPool:
+        def __init__(self, max_workers):
+            workers.append(max_workers)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def map(self, function, records):
+            return map(function, records)
+
+    monkeypatch.setattr(run_final, "ProcessPoolExecutor", OrderedPool)
+    serial, parallel = tmp_path / "serial.json", tmp_path / "parallel.json"
+    run_final.register(results, tmp_path, serial)
+    run_final.register(results, tmp_path, parallel, jobs=2)
+    assert workers == [2]
+    assert serial.read_bytes() == parallel.read_bytes()
+    finalists = json.loads(parallel.read_text())["finalists"]
+    assert [(spec["task"], spec["weather"]) for spec in finalists] == [
+        ("delay", False), ("delay", True), ("severity", False), ("severity", True),
+    ]
+
+
+def test_registered_tuning_retains_shared_feature_policy(monkeypatch):
+    import run_final
+
+    monkeypatch.setattr(run_final, "tune_finalist", lambda *args: {
+        "params": {"chosen": 1}, "tuning_policy": {"method": "five CV week folds"}})
+    result = run_final.tune_registered_finalist(
+        ({"task": "delay"}, {}, "auto_groups on the railway CV arm"), inputs_dir=Path("unused"))
+    assert result["tuning_policy"] == {
+        "method": "five CV week folds", "feature_selection": "auto_groups on the railway CV arm",
+    }

@@ -8,6 +8,7 @@ import re
 import shutil
 import subprocess
 import sys
+from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
 from functools import partial
 from pathlib import Path
@@ -17,7 +18,8 @@ import numpy as np
 from threadpoolctl import threadpool_limits
 
 from advanced_data import ADVANCED, load_advanced_rows, read_inputs
-from cv import PROBA_COLUMNS, RESULTS, TARGETS, class_probabilities, cross_validate, score_fold
+from cv import (PROBA_COLUMNS, RESULTS, TARGETS, class_probabilities, cross_validate,
+                git_commit, runtime_versions, score_fold)
 from data import DATA, HERE, PREDICTION_TIMES, ROW_KEY, TIME_COLUMN, merge_inputs
 from ensembles import FittedAverage, apply_isotonic, apply_temperature, fit_isotonic, fit_temperature
 from experiment_models import DISTRIBUTION_CLASSIFIERS, DISTRIBUTIONS, MODELS
@@ -136,7 +138,16 @@ def tune_finalist(spec, config, inputs_dir):
     return {"params": {}, "tuning_policy": {"method": "same as CV"}}
 
 
-def register(results_dir, inputs_dir, registry):
+def tune_registered_finalist(record, *, inputs_dir):
+    spec, config, feature_policy = record
+    with threadpool_limits(limits=1):
+        spec.update(tune_finalist(spec, config, inputs_dir))
+    if feature_policy:
+        spec["tuning_policy"]["feature_selection"] = feature_policy
+    return spec
+
+
+def register(results_dir, inputs_dir, registry, jobs=1):
     """Choose configurations using all CV weeks, with zero access to the hold-out labels."""
     if registry.exists():
         raise FileExistsError(f"registration already exists: {registry}")
@@ -144,7 +155,7 @@ def register(results_dir, inputs_dir, registry):
     unfinished = re.findall(r"(?m)^\| ([0-8]\.\d+) \| .* \| (?:todo|running) \|$", plan)
     if unfinished:
         raise PermissionError(f"finish the CV plan before registering finalists: {', '.join(unfinished)}")
-    finalists = []
+    records = []
     for task, pt, pair in choose_finalists(results_dir):
         railway = pair[False][1]
         variant = railway.get("variant", "")
@@ -176,12 +187,20 @@ def register(results_dir, inputs_dir, registry):
                 weather_groups = groups.keys() - feature_groups(pt).keys()
                 numeric, categorical = columns_for(groups, selected_groups | weather_groups)
                 spec["features"] = {"numeric": numeric, "categorical": categorical}
-            spec.update(tune_finalist(spec, config, inputs_dir))
-            if selection is not None or selected_groups is not None:
-                spec["tuning_policy"]["feature_selection"] = f"{variant} on the railway CV arm"
-            finalists.append(spec)
-            print(task, pt, spec["model"], "weather" if weather else "railway", flush=True)
+            feature_policy = (f"{variant} on the railway CV arm"
+                              if selection is not None or selected_groups is not None else None)
+            records.append((spec, config, feature_policy))
+    tune = partial(tune_registered_finalist, inputs_dir=inputs_dir)
+    if jobs == 1:
+        finalists = list(map(tune, records))
+    else:
+        with ProcessPoolExecutor(max_workers=jobs) as pool:
+            finalists = list(pool.map(tune, records))
+    for spec in finalists:
+        print(spec["task"], spec["prediction_time"], spec["model"],
+              "weather" if spec["weather"] else "railway", flush=True)
     registration = {"policy": "one matched pair ranked by railway-only CV score per task and horizon",
+                    "git_commit": git_commit(), "runtime": runtime_versions(),
                     "finalists": finalists}
     with registry.open("x") as file:
         json.dump(registration, file, indent=2)
@@ -328,6 +347,8 @@ def score_registered_arm(registry, inputs_dir, output, index):
     shap.to_parquet(arm / "shap.parquet", index=False)
     if spec["weather"]:
         metadata.to_parquet(arm / "metadata.parquet", index=False)
+    (arm / "environment.json").write_text(json.dumps({
+        "interpreter": sys.executable, "runtime": runtime_versions()}, indent=2) + "\n")
     temporary = arm / "score.tmp"
     temporary.write_text(json.dumps(score))
     temporary.replace(arm / "score.json")
@@ -393,7 +414,7 @@ def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None
 
 
 def run_final_arms(registration, registry, inputs_dir, output, distribution_python):
-    metric_rows, shap_rows = [], []
+    metric_rows, shap_rows, environments = [], [], []
     predictions, metadata = {}, {}
     dist_models = set(DISTRIBUTIONS) | set(DISTRIBUTION_CLASSIFIERS)
     for index, spec in enumerate(registration["finalists"]):
@@ -404,6 +425,9 @@ def run_final_arms(registration, registry, inputs_dir, output, distribution_pyth
                             "--inputs-dir", str(inputs_dir), "--results-dir", str(output),
                             "--arm-index", str(index)], check=True)
         scores = json.loads((arm_dir / "score.json").read_text())
+        environment = json.loads((arm_dir / "environment.json").read_text())
+        environments.append({"task": spec["task"], "prediction_time": spec["prediction_time"],
+                             "weather": spec["weather"], **environment})
         arm = (spec["task"], spec["weather"])
         predictions.setdefault(arm, []).append(pd.read_parquet(arm_dir / "predictions.parquet"))
         if spec["weather"]:
@@ -412,6 +436,7 @@ def run_final_arms(registration, registry, inputs_dir, output, distribution_pyth
         metric_rows.append({**scores, "step": spec["step"], "model": spec["model"], "variant": spec["variant"],
                             "task": spec["task"], "weather": spec["weather"]})
     pd.DataFrame(metric_rows).drop(columns="fold").to_csv(output / "scores.csv", index=False)
+    (output / "environments.json").write_text(json.dumps(environments, indent=2) + "\n")
     if shap_rows:
         pd.concat(shap_rows, ignore_index=True).to_csv(output / "shap.csv", index=False)
     for task in SCORE:
@@ -445,11 +470,14 @@ def main():
     parser.add_argument("--results-dir", type=Path, default=RESULTS)
     parser.add_argument("--inputs-dir", type=Path, default=ADVANCED)
     parser.add_argument("--distribution-python", type=Path)
+    parser.add_argument("--jobs", type=int, default=1, help="parallel registration workers")
     parser.add_argument("--arm-index", type=int, help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if args.jobs < 1 or (args.action != "register" and args.jobs != 1):
+        parser.error("--jobs must be positive and applies only to registration")
     with threadpool_limits(limits=1):
         if args.action == "register":
-            register(args.results_dir, args.inputs_dir, args.registry)
+            register(args.results_dir, args.inputs_dir, args.registry, jobs=args.jobs)
         elif args.arm_index is not None:
             score_registered_arm(args.registry, args.inputs_dir, args.results_dir, args.arm_index)
         else:
