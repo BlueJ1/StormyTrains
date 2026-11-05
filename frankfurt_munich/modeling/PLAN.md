@@ -79,7 +79,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
 - **0.8.** All eight baseline booster arms are running with 50 configurations per outer training set under the regenerated inputs. Feature-policy confirmations follow the new representation and feature screens.
 
-- **0.6.** The clean pinned environment passed 161 tests with five skips, including replacement-service attribution and the actual builder announcement join. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly in the original environment as well.
+- **0.6.** The clean main environment passed 161 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly across both main environments.
 
 ## Phase 1. Feature representations
 
@@ -119,7 +119,7 @@ Each feature group is added to the base set on its own and then all together, wi
 
 | ID | Experiment | Content | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 2.1 | **Recent reliability** (`ProjectInstructions.md` feature group; allowed to use hold-out journeys, see `STATUS.md`) | past journeys of the same scheduled service: share severe or cancelled and mean delay over the last 7 and 28 days; for the whole corridor: the same over the last 24 h and last 3 h. Outcomes as known at `predicted_at` from the snapshots. The key is the scheduled train number: for a retained replacement, the number of the train it replaced, switching to the replacement only from a timestamped announcement in the snapshots. The number is a lookup key, not a feature (D7) | M | **high** | running |
+| 2.1 | **Recent reliability** (`ProjectInstructions.md` feature group; allowed to use hold-out journeys, see `STATUS.md`) | past journeys of the same scheduled service: share severe or cancelled and mean delay over the last 7 and 28 days; for the whole corridor: the same over the last 24 h and last 3 h. Outcomes as known at `predicted_at` from the snapshots. The key is the scheduled train number: for a retained replacement, the number of the train it replaced, switching to the replacement only from a timestamped announcement in the snapshots. The number is a lookup key, not a feature (D7) | M | **high** | done |
 | 2.2 | **Planned-timetable features** (D8) | `planned_stops`, a planned `route_id` and `upstream_planned_min` (time the run has been travelling before Frankfurt), all from the plan of the scheduled train; they replace the fields removed in 0.7 | M | medium | done |
 | 2.3 | **Holidays** | public holidays in Hesse, Baden-Württemberg and Bavaria, school holidays, bridge days, day before and after a holiday | S | low–medium | done |
 | 2.4 | **Delay dynamics** (1 h on) | change of `current_delay` between prediction times, number of upstream stops reported, minutes since the last report, planned minutes still to run before Frankfurt; all as known at `predicted_at` | S | medium at 1 h–0 min | done |
@@ -131,11 +131,11 @@ Each feature group is added to the base set on its own and then all together, wi
 
 - **2.4.** All four delay-dynamics arms finished. Two of 12 exploratory comparisons reached D12: linear RMSE at 20 min fell by 0.105 min, and logistic departure log loss fell by 0.00321. All five folds improved in both cases.
 
-- **2.1.** A verified attribution bug was fixed: replacement outcomes enter same-service history only after a cutoff-visible announcement links the services. Independently observed corridor outcomes remain eligible. The reliability cache and affected comparisons are being regenerated.
+- **2.1.** The corrected cache and all four model arms finished. All 85,901 feature rows reproduced exactly after adding the replacement-service guard. Seventeen of 20 exploratory comparisons reached D12. LightGBM departure log loss fell by 0.00679 and RMSE by 0.257 min.
 
 - **2.5.** All four network-state arms finished. None of 20 exploratory paired comparisons reached D12. These shares use runs with snapshot-visible reports as their denominator.
 
-- **Combined groups.** Combining all five groups reached D12 in 11 of 20 exploratory comparisons. LightGBM reduced departure RMSE by 0.210 min with five folds improving. At 6 h, mean LightGBM log loss fell by 0.0205 with five folds improving.
+- **Combined groups.** All four combined-feature arms finished with the corrected cache. Eighteen of 20 exploratory comparisons reached D12. LightGBM departure log loss fell by 0.01107 and RMSE by 0.375 min, with all five folds improving for both.
 
 ## Phase 3. Feature subsets and importance
 
@@ -145,13 +145,13 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
-| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | todo |
+| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | running |
 | 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | todo |
 | 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | todo |
 | 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | todo |
 | 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | todo |
 
-- **3.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **3.1.** All 84 pre-listed add-one/drop-one ablations are being evaluated on the regenerated full feature groups. The LightGBM classifier variants are finishing.
 
 - **3.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
@@ -171,7 +171,7 @@ Question: does splitting the problem into parts that are easier to learn help? B
 | 4.2 | **Cancellation, then delay distribution** | as 4.1, but stage two is a predicted delay distribution (from 6.5); the class probabilities follow from it at 20 and 60 min. The severity and delay tasks then come from one model | M | medium | todo |
 | 4.3 | **Ordinal stage two** | the 3 delay classes as two binary models, P(delay ≥ 20) and P(delay ≥ 60), forced to be ordered | S | low | todo |
 | 4.4 | **Mixture of experts for delay** | a classifier routes each journey; one regressor per delay class; predicted delay = Σ P(k) · E[delay \| k]. Aimed at the 60+ min journeys that dominate RMSE | M | medium for RMSE | todo |
-| 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (14,813 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | todo |
+| 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (11,068 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | todo |
 
 - **4.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 

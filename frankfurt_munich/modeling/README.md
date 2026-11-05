@@ -97,6 +97,7 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | Model | Score | 24h | 6h | 1h | 20min | 0min |
 | --- | --- | --- | --- | --- | --- | --- |
 | [lightgbm](results/advanced_0_8_lightgbm/20261105-104427) | rmse | 24.476322 | 24.498823 | 24.104596 | 24.050366 | 23.814612 |
+| [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-114530) | rmse | 24.557345 | 24.615389 | 24.168186 | 24.073497 | 23.859808 |
 
 #### Smallest paired differences by step, task and horizon
 
@@ -214,6 +215,26 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 2.all | severity | exploratory | 20min | logistic_regression | all_groups | False |  | -0.015539 | 5 | True | [folds](results/advanced_2_all_logistic_regression_all_groups/20261105-110115/paired_vs_base.csv) |
 | 2.all | severity | exploratory | 24h | logistic_regression | all_groups | False |  | -0.005851 | 5 | True | [folds](results/advanced_2_all_logistic_regression_all_groups/20261105-110115/paired_vs_base.csv) |
 | 2.all | severity | exploratory | 6h | logistic_regression | all_groups | False |  | -0.013508 | 5 | True | [folds](results/advanced_2_all_logistic_regression_all_groups/20261105-110115/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 0min | lightgbm | drop_wind | True | full | -0.029345 | 4 | False | [folds](results/advanced_3_1_lightgbm_weather_drop_wind/20261105-111138/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 0min | lightgbm | add_delay | True | timetable-only | -0.918203 | 5 | True | [folds](results/advanced_3_1_lightgbm_weather_add_delay/20261105-111017/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 1h | linear_regression | drop_wind | True | full | -0.023209 | 3 | False | [folds](results/advanced_3_1_linear_regression_weather_drop_wind/20261105-110428/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 1h | linear_regression | add_recent_reliability | True | timetable-only | -0.881939 | 5 | True | [folds](results/advanced_3_1_linear_regression_weather_add_recent_reliability/20261105-110409/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 20min | linear_regression | drop_wind | True | full | -0.023907 | 3 | False | [folds](results/advanced_3_1_linear_regression_weather_drop_wind/20261105-110428/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 20min | linear_regression | add_recent_reliability | True | timetable-only | -0.895016 | 5 | True | [folds](results/advanced_3_1_linear_regression_weather_add_recent_reliability/20261105-110409/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 24h | linear_regression | drop_temperature | True | full | -0.024948 | 4 | False | [folds](results/advanced_3_1_linear_regression_weather_drop_temperature/20261105-110422/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 24h | linear_regression | add_recent_reliability | True | timetable-only | -0.591364 | 5 | True | [folds](results/advanced_3_1_linear_regression_weather_add_recent_reliability/20261105-110409/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 6h | linear_regression | drop_temperature | True | full | -0.030636 | 5 | False | [folds](results/advanced_3_1_linear_regression_weather_drop_temperature/20261105-110422/paired_vs_base.csv) |
+| 3.1 | delay | exploratory | 6h | linear_regression | add_recent_reliability | True | timetable-only | -0.813482 | 5 | True | [folds](results/advanced_3_1_linear_regression_weather_add_recent_reliability/20261105-110409/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 0min | lightgbm_classifier | drop_wind | True | full | -0.001326 | 4 | False | [folds](results/advanced_3_1_lightgbm_classifier_weather_drop_wind/20261105-114341/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 0min | logistic_regression | add_recent_reliability | True | timetable-only | -0.033232 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 1h | logistic_regression | drop_wind | True | full | -0.000770 | 3 | False | [folds](results/advanced_3_1_logistic_regression_weather_drop_wind/20261105-110805/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 1h | logistic_regression | add_recent_reliability | True | timetable-only | -0.031956 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 20min | logistic_regression | drop_wind | True | full | -0.001057 | 2 | False | [folds](results/advanced_3_1_logistic_regression_weather_drop_wind/20261105-110805/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 20min | logistic_regression | add_recent_reliability | True | timetable-only | -0.032649 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 24h | logistic_regression | drop_wind | True | full | -0.001292 | 4 | False | [folds](results/advanced_3_1_logistic_regression_weather_drop_wind/20261105-110805/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 24h | logistic_regression | add_recent_reliability | True | timetable-only | -0.022537 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 6h | logistic_regression | drop_temperature | True | full | -0.001105 | 4 | False | [folds](results/advanced_3_1_logistic_regression_weather_drop_temperature/20261105-110721/paired_vs_base.csv) |
+| 3.1 | severity | exploratory | 6h | logistic_regression | add_recent_reliability | True | timetable-only | -0.031509 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
 
 <!-- END ADVANCED CV -->
 
