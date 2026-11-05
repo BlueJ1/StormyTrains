@@ -41,7 +41,7 @@ Where an experiment or phase depends on a decision, it names it (for example D2)
 | D10 | Other corridors' data for transfer learning (8.3) | Run all three methods with railway inputs. The auxiliary build has cutoff-specific prediction rows and restricts source fits to target training weeks. |
 | D11 | Where to run what this laptop cannot | Nothing is run off this laptop (no Colab, UPPMAX or external API). 8.1 is dropped; 7.5 is dropped if it does not fit. |
 | D12 | Smallest gain that counts (rule 3) | 0.003 log loss and 0.1 min RMSE, two to three times the average optimism of the flat search measured in `README.md` (0.001 and 0.04 min). |
-| D13 | Budget for nested re-tuning of finalists (0.8) | 20 configurations for remaining booster and CatBoost searches, approved on 5 November to reduce runtime. Six completed baseline arms retain their 50-configuration results. Final registration caps new searches at 20, and neural searches use eight. Railway/weather pairs use matching budgets. |
+| D13 | Budget for nested re-tuning of finalists (0.8) | 20 configurations for remaining booster and CatBoost searches, approved on 5 November to reduce runtime. Six completed 50-configuration baseline searches also supply budget-matched 20-configuration controls by reusing their fixed first 20 inner-score rows and refitting the outer models. The saved configurations link to the original searches. Final registration caps new searches at 20, and neural searches use eight. Railway/weather pairs use matching budgets. |
 
 ## Rules for every experiment
 
@@ -77,9 +77,9 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** Six baseline arms finished with 50 configurations. Following the user decision to reduce runtime, the two unfinished XGBoost classifiers and all feature-group confirmations are restarting with 20 configurations, retaining the four inner week folds and matched railway/weather budgets.
+- **0.8.** Six of eight 20-configuration baselines finished by reusing the fixed first 20 inner-score rows from their completed 50-configuration searches and refitting all 150 outer models. Predictions reproduced exactly in the 60 outer folds whose selected configuration was identical. The XGBoost classifiers and all eight feature-policy confirmations are running or queued with 20 configurations.
 
-- **0.6.** The clean main environment passed 166 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. New CLI regression checks prevent restricted builders from replacing full feature artifacts and verify custom data-directory output. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly across both main environments.
+- **0.6.** The clean main environment passed 174 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. The budget tests cover the CLI, paired arms, eight-configuration neural searches, and the 20-configuration final-registration cap. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly across both main environments.
 
 ## Phase 1. Feature representations
 
@@ -215,7 +215,7 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | todo |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | todo |
 
-- **6.1.** The unfinished CatBoost classifier searches are restarting with 20 configurations following the user decision to reduce runtime. Both regression arms will use the same 20-configuration budget.
+- **6.1.** Both CatBoost classifier arms are running with the user-approved 20-configuration nested budget. The regression arms are queued with the same budget.
 
 - **6.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 

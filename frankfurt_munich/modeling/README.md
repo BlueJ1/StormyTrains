@@ -35,7 +35,7 @@ Recent-reliability candidates come from the CV roster during development. The ho
 .venv/bin/python frankfurt_munich/modeling/report_cv.py --write-readme
 ```
 
-`run_advanced.py --help` lists the CV steps and filters. Fixed configurations come from the committed flat searches. Following the user decision on 5 November, remaining booster and CatBoost searches use 20 configurations inside each outer training set. Six completed baseline arms retain their 50-configuration results. The reference table and each run configuration record the actual count. Final registration uses at most 20 configurations. Neural searches use eight. The `auto_groups` and `auto_representations` options to `--nested-variant` also select features inside each outer training set. A variant fixed after seeing the exploratory results retains that label even when its parameters are tuned again.
+`run_advanced.py --help` lists the CV steps and filters. Fixed configurations come from the committed flat searches. Following the user decision on 5 November, remaining booster and CatBoost searches use 20 configurations inside each outer training set. Six completed 50-configuration baseline searches also supply budget-matched 20-configuration controls by reusing their fixed first 20 inner-score rows and refitting the outer models. The saved configurations link to the original searches. The reference table and each run configuration record the actual count. Final registration uses at most 20 configurations. Neural searches use eight. The `auto_groups` and `auto_representations` options to `--nested-variant` also select features inside each outer training set. A variant fixed after seeing the exploratory results retains that label even when its parameters are tuned again.
 
 The model-family screens use the cutoff-safe base columns for their learner comparisons. The nested booster feature-group policy evaluates the expanded Phase 2 inputs separately.
 
@@ -96,12 +96,12 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 
 | Model | Search configs | Score | 24h | 6h | 1h | 20min | 0min |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| [lightgbm](results/advanced_0_8_lightgbm/20261105-104427) | 50 | rmse | 24.476322 | 24.498823 | 24.104596 | 24.050366 | 23.814612 |
-| [lightgbm_classifier](results/advanced_0_8_lightgbm_classifier/20261105-132343) | 50 | log_loss | 0.920292 | 0.911456 | 0.867854 | 0.847832 | 0.833265 |
-| [lightgbm_classifier + weather](results/advanced_0_8_lightgbm_classifier_weather/20261105-163232) | 50 | log_loss | 0.925748 | 0.919832 | 0.874306 | 0.853488 | 0.837990 |
-| [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-114530) | 50 | rmse | 24.557345 | 24.615389 | 24.168186 | 24.073497 | 23.859808 |
-| [xgboost](results/advanced_0_8_xgboost/20261105-120428) | 50 | rmse | 24.534369 | 24.568876 | 24.107252 | 24.096992 | 23.862371 |
-| [xgboost + weather](results/advanced_0_8_xgboost_weather/20261105-143116) | 50 | rmse | 24.559085 | 24.624093 | 24.129380 | 24.125515 | 23.893265 |
+| [lightgbm](results/advanced_0_8_lightgbm/20261105-170728) | 20 | rmse | 24.558833 | 24.558978 | 24.158170 | 24.148049 | 23.851491 |
+| [lightgbm_classifier](results/advanced_0_8_lightgbm_classifier/20261105-170810) | 20 | log_loss | 0.927132 | 0.917266 | 0.870015 | 0.850262 | 0.837066 |
+| [lightgbm_classifier + weather](results/advanced_0_8_lightgbm_classifier_weather/20261105-170925) | 20 | log_loss | 0.927180 | 0.919514 | 0.874094 | 0.852796 | 0.838998 |
+| [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-170745) | 20 | rmse | 24.544852 | 24.667386 | 24.154075 | 24.117928 | 23.947489 |
+| [xgboost](results/advanced_0_8_xgboost/20261105-170959) | 20 | rmse | 24.536433 | 24.568876 | 24.107252 | 24.096992 | 23.862371 |
+| [xgboost + weather](results/advanced_0_8_xgboost_weather/20261105-171041) | 20 | rmse | 24.548736 | 24.610447 | 24.123494 | 24.115664 | 23.883132 |
 
 #### Smallest paired differences by step, task and horizon
 
