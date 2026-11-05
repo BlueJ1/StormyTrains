@@ -97,6 +97,7 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | Model | Score | 24h | 6h | 1h | 20min | 0min |
 | --- | --- | --- | --- | --- | --- | --- |
 | [lightgbm](results/advanced_0_8_lightgbm/20261105-104427) | rmse | 24.476322 | 24.498823 | 24.104596 | 24.050366 | 23.814612 |
+| [lightgbm_classifier](results/advanced_0_8_lightgbm_classifier/20261105-132343) | log_loss | 0.920292 | 0.911456 | 0.867854 | 0.847832 | 0.833265 |
 | [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-114530) | rmse | 24.557345 | 24.615389 | 24.168186 | 24.073497 | 23.859808 |
 | [xgboost](results/advanced_0_8_xgboost/20261105-120428) | rmse | 24.534369 | 24.568876 | 24.107252 | 24.096992 | 23.862371 |
 
@@ -236,6 +237,21 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 3.1 | severity | exploratory | 24h | logistic_regression | add_recent_reliability | True | timetable-only | -0.022537 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
 | 3.1 | severity | exploratory | 6h | logistic_regression | drop_temperature | True | full | -0.001105 | 4 | False | [folds](results/advanced_3_1_logistic_regression_weather_drop_temperature/20261105-110721/paired_vs_base.csv) |
 | 3.1 | severity | exploratory | 6h | logistic_regression | add_recent_reliability | True | timetable-only | -0.031509 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
+| 3.3 | delay | nested | 0min | linear_regression | backward | False |  | +0.030318 | 2 | False | [folds](results/advanced_3_3_linear_regression_backward/20261105-122432/paired_vs_base.csv) |
+| 3.3 | delay | nested | 1h | linear_regression | backward | False |  | +0.034461 | 0 | False | [folds](results/advanced_3_3_linear_regression_backward/20261105-122432/paired_vs_base.csv) |
+| 3.3 | delay | nested | 20min | linear_regression | forward | True |  | -0.000712 | 2 | False | [folds](results/advanced_3_3_linear_regression_weather_forward/20261105-122818/paired_vs_base.csv) |
+| 3.3 | delay | nested | 24h | linear_regression | backward | True |  | -0.032778 | 2 | False | [folds](results/advanced_3_3_linear_regression_weather_backward/20261105-123126/paired_vs_base.csv) |
+| 3.3 | delay | nested | 6h | linear_regression | backward | False |  | +0.033428 | 2 | False | [folds](results/advanced_3_3_linear_regression_backward/20261105-122432/paired_vs_base.csv) |
+| 3.3 | severity | nested | 0min | logistic_regression | forward | True |  | -0.000744 | 2 | False | [folds](results/advanced_3_3_logistic_regression_weather_forward/20261105-125543/paired_vs_base.csv) |
+| 3.3 | severity | nested | 1h | logistic_regression | backward | True |  | +0.001827 | 1 | False | [folds](results/advanced_3_3_logistic_regression_weather_backward/20261105-132531/paired_vs_base.csv) |
+| 3.3 | severity | nested | 20min | logistic_regression | backward | True |  | +0.002327 | 0 | False | [folds](results/advanced_3_3_logistic_regression_weather_backward/20261105-132531/paired_vs_base.csv) |
+| 3.3 | severity | nested | 24h | logistic_regression | backward | True |  | +0.000967 | 2 | False | [folds](results/advanced_3_3_logistic_regression_weather_backward/20261105-132531/paired_vs_base.csv) |
+| 3.3 | severity | nested | 6h | logistic_regression | backward | True |  | +0.003409 | 1 | False | [folds](results/advanced_3_3_logistic_regression_weather_backward/20261105-132531/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 0min | logistic_regression | l1 | True |  | -0.003006 | 5 | True | [folds](results/advanced_3_3_logistic_regression_weather_l1/20261105-132053/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 1h | logistic_regression | l1 | True |  | -0.003257 | 5 | True | [folds](results/advanced_3_3_logistic_regression_weather_l1/20261105-132053/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 20min | logistic_regression | l1 | True |  | -0.002956 | 5 | False | [folds](results/advanced_3_3_logistic_regression_weather_l1/20261105-132053/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 24h | logistic_regression | l1 | True |  | -0.003067 | 5 | True | [folds](results/advanced_3_3_logistic_regression_weather_l1/20261105-132053/paired_vs_base.csv) |
+| 3.3 | severity | prespecified | 6h | logistic_regression | l1 | True |  | -0.002946 | 5 | False | [folds](results/advanced_3_3_logistic_regression_weather_l1/20261105-132053/paired_vs_base.csv) |
 
 #### Step 3.2 leading permutation groups and TreeSHAP features
 
@@ -318,6 +334,31 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | severity | False | forward | 0min | recent_reliability | 5 |
 | severity | False | forward | 0min | timetable | 5 |
 | severity | False | forward | 0min | route | 4 |
+| severity | True | backward | 24h | recent_reliability | 5 |
+| severity | True | backward | 24h | temperature | 3 |
+| severity | True | backward | 24h | timetable | 5 |
+| severity | True | backward | 24h | calendar | 2 |
+| severity | True | backward | 24h | route | 3 |
+| severity | True | backward | 24h | snow | 1 |
+| severity | True | backward | 0min | delay | 5 |
+| severity | True | backward | 0min | recent_reliability | 5 |
+| severity | True | backward | 0min | temperature | 3 |
+| severity | True | backward | 0min | timetable | 5 |
+| severity | True | backward | 0min | route | 4 |
+| severity | True | backward | 0min | snow | 1 |
+| severity | True | backward | 0min | calendar | 2 |
+| severity | True | forward | 24h | recent_reliability | 5 |
+| severity | True | forward | 24h | temperature | 2 |
+| severity | True | forward | 24h | timetable | 5 |
+| severity | True | forward | 24h | calendar | 2 |
+| severity | True | forward | 24h | route | 3 |
+| severity | True | forward | 0min | calendar | 3 |
+| severity | True | forward | 0min | delay | 5 |
+| severity | True | forward | 0min | recent_reliability | 5 |
+| severity | True | forward | 0min | timetable | 5 |
+| severity | True | forward | 0min | route | 4 |
+| severity | True | forward | 0min | snow | 1 |
+| severity | True | forward | 0min | temperature | 2 |
 
 <!-- END ADVANCED CV -->
 

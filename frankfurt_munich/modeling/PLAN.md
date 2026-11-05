@@ -77,7 +77,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** All eight baseline booster arms are running with 50 configurations per outer training set under the regenerated inputs. Feature-policy confirmations follow the new representation and feature screens.
+- **0.8.** Four of eight 50-configuration baseline arms have finished. The remaining baseline and feature-group confirmation searches are running or queued with the same four inner week folds and full configuration budget.
 
 - **0.6.** The clean main environment passed 161 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly across both main environments.
 
@@ -147,19 +147,19 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 |---|---|---|---|---|
 | 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | done |
 | 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | done |
-| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | running |
+| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | done |
 | 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | todo |
-| 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | todo |
+| 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | done |
 
 - **3.1.** All 84 pre-listed ablation runs finished. Add-one screens reached D12 in 93 of 172 comparisons against timetable-only inputs. None of 192 drop-one comparisons reached D12 against the full groups. All are exploratory.
 
 - **3.2.** Both importance runs finished and reproduced the full-group ablation predictions exactly. Permutation importance favored calendar at 24 h, reliability at 6 h and delay dynamics near departure. Hour had the largest mean absolute TreeSHAP value in eight of ten task/horizon panels.
 
-- **3.3.** Nested forward/backward group selection and L1 logistic regression are running on the regenerated feature groups. Per-fold solver convergence is recorded for L1.
+- **3.3.** All 14 group-selection arms finished. Three of 50 comparisons reached D12, each from weather-arm L1 logistic regression versus its full-group counterpart, with all five folds improving. All 50 L1 outer fits converged. Forward and backward selection reached no D12 gains.
 
 - **3.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **3.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **3.5.** Across 40 outer-fold selections per horizon, timetable and recent reliability were retained in all 40 at 24 h and departure. Delay features were retained in all 40 departure selections. Calendar was chosen in 28/40 at 24 h and 31/40 at departure, while route rose from 12/40 to 24/40. These counts describe the pre-listed forward/backward linear-model selections.
 
 ## Phase 4. Two-stage and decomposed models
 

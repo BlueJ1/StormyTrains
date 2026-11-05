@@ -1,0 +1,597 @@
+{
+  "name": "advanced_3_3_linear_regression_weather_backward",
+  "step": "3.3",
+  "task": "delay",
+  "model": "linear_regression",
+  "target": "arrival_delay_min",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "public_holiday_by",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h",
+        "corridor_severe_or_cancelled_rate_3h",
+        "corridor_mean_delay_min_3h",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "public_holiday_by",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h",
+        "corridor_severe_or_cancelled_rate_3h",
+        "corridor_mean_delay_min_3h",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "public_holiday_by",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h",
+        "corridor_severe_or_cancelled_rate_3h",
+        "corridor_mean_delay_min_3h",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h",
+        "current_delay",
+        "current_delay_change_min",
+        "upstream_stops_reported",
+        "minutes_since_last_report",
+        "planned_minutes_remaining_before_frankfurt",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "public_holiday_by",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h",
+        "corridor_severe_or_cancelled_rate_3h",
+        "corridor_mean_delay_min_3h",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h",
+        "current_delay",
+        "current_delay_change_min",
+        "upstream_stops_reported",
+        "minutes_since_last_report",
+        "planned_minutes_remaining_before_frankfurt",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "public_holiday_by",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h",
+        "corridor_severe_or_cancelled_rate_3h",
+        "corridor_mean_delay_min_3h",
+        "network_delayed_or_cancelled_share_1h",
+        "network_frankfurt_delayed_or_cancelled_share_1h",
+        "network_munich_delayed_or_cancelled_share_1h",
+        "current_delay",
+        "current_delay_change_min",
+        "upstream_stops_reported",
+        "minutes_since_last_report",
+        "planned_minutes_remaining_before_frankfurt",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "backward",
+  "evaluation": "nested",
+  "git_commit": "9c19de7b8d1cd53558e70ad7cf415783405fa880",
+  "chosen": {},
+  "group_choices": [
+    {
+      "prediction_time": "24h",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.480774568832043
+    },
+    {
+      "prediction_time": "24h",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 24.940307228774348
+    },
+    {
+      "prediction_time": "24h",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "snow",
+        "timetable"
+      ],
+      "inner_score": 24.626217355543783
+    },
+    {
+      "prediction_time": "24h",
+      "outer_fold": 4,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.301877864687977
+    },
+    {
+      "prediction_time": "24h",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "network_state",
+        "recent_reliability",
+        "snow",
+        "timetable"
+      ],
+      "inner_score": 24.676271690603773
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 24.22590735388391
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "network_state",
+        "recent_reliability",
+        "snow",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 24.688610099926578
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "route",
+        "snow",
+        "temperature",
+        "timetable"
+      ],
+      "inner_score": 24.3766918210648
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 4,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.180397113783272
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "temperature",
+        "timetable"
+      ],
+      "inner_score": 24.510832398493584
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "delay",
+        "network_state",
+        "precipitation",
+        "recent_reliability",
+        "temperature",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 23.747237854287732
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "temperature",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 24.111405832802124
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "route",
+        "temperature",
+        "timetable"
+      ],
+      "inner_score": 23.864076576967207
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 4,
+      "groups": [
+        "delay",
+        "recent_reliability",
+        "route",
+        "snow",
+        "temperature",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 23.765387423232177
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "temperature",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 24.030657292481358
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 1,
+      "groups": [
+        "delay",
+        "recent_reliability",
+        "route",
+        "temperature",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 23.668381614278818
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 24.0820133657326
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 23.859746627730587
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 4,
+      "groups": [
+        "delay",
+        "network_state",
+        "recent_reliability",
+        "route",
+        "temperature",
+        "timetable"
+      ],
+      "inner_score": 23.649484325330288
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "temperature",
+        "timetable"
+      ],
+      "inner_score": 23.887225676899174
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 23.501029117442858
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "temperature",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 23.868089607221375
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "route",
+        "timetable",
+        "wind"
+      ],
+      "inner_score": 23.679856943091423
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 4,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "route",
+        "timetable"
+      ],
+      "inner_score": 23.450651086972655
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "temperature",
+        "timetable"
+      ],
+      "inner_score": 23.775195393037
+    }
+  ],
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-05T12:31:26"
+}
