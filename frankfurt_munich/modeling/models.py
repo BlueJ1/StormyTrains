@@ -35,6 +35,8 @@ from sklearn.svm import SVR
 
 SEED = 0
 RF_TREES = 300  # not tuned: more trees only cost time
+L1_LOGISTIC = {"C": 1.0, "l1_ratio": 1.0, "solver": "saga", "max_iter": 8000,
+               "tol": 0.0005, "random_state": SEED}
 
 
 def linear_preprocessing(numeric: list[str], categorical: list[str]) -> ColumnTransformer:
@@ -49,9 +51,7 @@ def linear_preprocessing(numeric: list[str], categorical: list[str]) -> ColumnTr
 
 def make_logistic_regression(numeric, categorical, *, l1=False) -> Pipeline:
     """Multinomial logistic regression, scikit-learn's default L2 penalty (C=1)."""
-    classifier = (LogisticRegression(C=1.0, l1_ratio=1.0, solver="saga", max_iter=4000,
-                                     random_state=SEED) if l1
-                  else LogisticRegression(C=1.0, max_iter=1000))
+    classifier = LogisticRegression(**L1_LOGISTIC) if l1 else LogisticRegression(C=1.0, max_iter=1000)
     return Pipeline([("preprocess", linear_preprocessing(numeric, categorical)),
                      ("model", classifier)])
 

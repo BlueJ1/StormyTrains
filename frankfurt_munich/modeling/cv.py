@@ -88,6 +88,10 @@ def fit_fold(train, validation, prediction_time, fold, task, make_model, numeric
     if hasattr(model, "n_parameters_"):
         metrics.update(parameters=model.n_parameters_, widths=json.dumps(model.widths),
                        fit_cpu_seconds=fit_cpu_seconds)
+    estimator = getattr(model, "named_steps", {}).get("model")
+    if getattr(estimator, "solver", None) == "saga":
+        iterations = int(np.max(estimator.n_iter_))
+        metrics.update(fit_iterations=iterations, converged=iterations < estimator.max_iter)
     return metrics, out
 
 

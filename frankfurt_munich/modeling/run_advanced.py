@@ -22,7 +22,7 @@ from experiment_specs import (AUTO_VARIANTS, DECOMPOSED, LATE_STEPS, LATE_VARIAN
                               Run, latest_run, nested_feature_variants, registered_runs, tuning_reference)
 from features import CURRENT_DELAY_TIMES, PHASE2_GROUPS, feature_columns, feature_groups
 from group_selection import ablations, columns_for, cv_importance, nested_groups
-from models import make_lightgbm_classifier
+from models import L1_LOGISTIC, make_lightgbm_classifier
 from network_transfer import NETWORK_FEATURE, inference_context, network_cv
 from representations import REPRESENTATIONS, route_representation
 from sequence_inputs import SEQUENCE_COLUMN
@@ -186,6 +186,10 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
         config["group_choices"] = group_choices
     if combinations:
         config["combination"] = combinations
+    if run.variant == "l1":
+        config["solver"] = L1_LOGISTIC
+        if not all(metrics["converged"].all() for metrics in all_metrics):
+            config["evaluation"] = "exploratory"
     if run.step in NEURAL:
         config["calendar"] = run.calendar or "native"
     if budgets:
