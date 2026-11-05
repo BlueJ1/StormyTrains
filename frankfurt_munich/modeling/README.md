@@ -102,6 +102,7 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-170745) | 20 | rmse | 24.544852 | 24.667386 | 24.154075 | 24.117928 | 23.947489 |
 | [xgboost](results/advanced_0_8_xgboost/20261105-170959) | 20 | rmse | 24.536433 | 24.568876 | 24.107252 | 24.096992 | 23.862371 |
 | [xgboost_classifier](results/advanced_0_8_xgboost_classifier/20261105-185949) | 20 | log_loss | 0.923019 | 0.914149 | 0.870932 | 0.851310 | 0.836797 |
+| [xgboost_classifier + weather](results/advanced_0_8_xgboost_classifier_weather/20261105-222105) | 20 | log_loss | 0.923900 | 0.917211 | 0.870635 | 0.851156 | 0.837468 |
 | [xgboost + weather](results/advanced_0_8_xgboost_weather/20261105-171041) | 20 | rmse | 24.548736 | 24.610447 | 24.123494 | 24.115664 | 23.883132 |
 
 #### Smallest paired differences by step, task and horizon
@@ -285,6 +286,11 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 5.1 | severity | exploratory | 20min | lightgbm_classifier | plus_linear | True |  | -0.001465 | 3 | False | [folds](results/advanced_5_1_lightgbm_classifier_weather_plus_linear/20261105-134208/paired_vs_base.csv) |
 | 5.1 | severity | exploratory | 24h | lightgbm_classifier | mean | True |  | -0.000810 | 3 | False | [folds](results/advanced_5_1_lightgbm_classifier_weather_mean/20261105-134208/paired_vs_base.csv) |
 | 5.1 | severity | exploratory | 6h | lightgbm_classifier | geometric | False |  | -0.000162 | 3 | False | [folds](results/advanced_5_1_lightgbm_classifier_geometric/20261105-134207/paired_vs_base.csv) |
+| 6.5 | delay | nested | 0min | ngboost |  | True |  | +0.050357 | 2 | False | [folds](results/advanced_6_5_ngboost_weather/20261105-221901/paired_vs_base.csv) |
+| 6.5 | delay | nested | 1h | ngboost |  | False |  | +0.048665 | 1 | False | [folds](results/advanced_6_5_ngboost/20261105-202458/paired_vs_base.csv) |
+| 6.5 | delay | nested | 20min | ngboost |  | False |  | +0.023902 | 1 | False | [folds](results/advanced_6_5_ngboost/20261105-202458/paired_vs_base.csv) |
+| 6.5 | delay | nested | 24h | ngboost |  | False |  | +0.038672 | 2 | False | [folds](results/advanced_6_5_ngboost/20261105-202458/paired_vs_base.csv) |
+| 6.5 | delay | nested | 6h | ngboost |  | True |  | +0.019298 | 2 | False | [folds](results/advanced_6_5_ngboost_weather/20261105-221901/paired_vs_base.csv) |
 
 #### Step 3.2 leading permutation groups and TreeSHAP features
 

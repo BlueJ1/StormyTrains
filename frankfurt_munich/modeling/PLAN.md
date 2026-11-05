@@ -77,7 +77,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** Seven of eight 20-configuration baselines and four of eight feature-policy arms have finished. Fifteen of 20 paired comparisons reached D12, all from LightGBM. Departure improvements were 0.01573 log loss for railway severity, 0.01483 for weather-arm severity, and 0.369 min RMSE for weather-arm delay, with all five folds improving. The XGBoost railway severity policy reproduced all 85,901 base predictions exactly. The six reconstructed 20-configuration controls passed independent audit of all 150 chosen IDs.
+- **0.8.** All eight 20-configuration baselines and five of eight feature-policy arms have finished. Eighteen of 25 paired comparisons reached D12. LightGBM departure gains were 0.01573 log loss for railway severity, 0.01483 for weather-arm severity, and 0.369 min RMSE for weather-arm delay, all with five improving folds. XGBoost weather-arm delay reached D12 at three horizons, while its railway severity policy reproduced all 85,901 base predictions exactly. All 150 chosen IDs for the reconstructed controls passed independent audit.
 
 - **0.6.** The clean main environment passed 174 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. The budget tests cover the CLI, paired arms, eight-configuration neural searches, and the 20-configuration final-registration cap. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly across both main environments.
 
@@ -168,7 +168,7 @@ Question: does splitting the problem into parts that are easier to learn help? B
 | ID | Experiment | Method | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
 | 4.1 | **Cancellation, then delay class** | binary model for P(cancelled) on all journeys, 3-class model on completed journeys; P(class k) = (1 − P(cancelled)) · P(k \| completed). Compare with the direct 4-class model by the same log loss | M | low–medium | todo |
-| 4.2 | **Cancellation, then delay distribution** | as 4.1, but stage two is a predicted delay distribution (from 6.5); the class probabilities follow from it at 20 and 60 min. The severity and delay tasks then come from one model | M | medium | todo |
+| 4.2 | **Cancellation, then delay distribution** | as 4.1, but stage two is a predicted delay distribution (from 6.5); the class probabilities follow from it at 20 and 60 min. The severity and delay tasks then come from one model | M | medium | running |
 | 4.3 | **Ordinal stage two** | the 3 delay classes as two binary models, P(delay ≥ 20) and P(delay ≥ 60), forced to be ordered | S | low | todo |
 | 4.4 | **Mixture of experts for delay** | a classifier routes each journey; one regressor per delay class; predicted delay = Σ P(k) · E[delay \| k]. Aimed at the 60+ min journeys that dominate RMSE | M | medium for RMSE | todo |
 | 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (11,068 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | todo |
@@ -181,7 +181,7 @@ Question: does splitting the problem into parts that are easier to learn help? B
 
 - **4.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **4.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **4.2.** The six cancellation and delay-distribution comparisons are running in the pinned distribution environment, after completing 6.5.
 
 ## Phase 5. Ensembles
 
@@ -210,16 +210,16 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 |---|---|---|---|---|
 | 6.1 | **CatBoost** classifier and regressor, 20-configuration nested search (revised D13) | ordered target statistics for categoricals; often the strongest booster on small tabular data and among the best tuned GBDTs in TabArena | M | running |
 | 6.2 | **Calibration** of every finalist: temperature scaling and isotonic regression, fitted on inner folds, with calibration plots | log loss judges the probabilities; the random forest is expected to be too cautious (`classification_models.md`) | S | todo |
-| 6.3 | **Explainable boosting machine** (`interpret`) | a GAM with pairwise interactions; close to boosting in accuracy on many datasets and readable per feature, useful for the report | M | todo |
+| 6.3 | **Explainable boosting machine** (`interpret`) | a GAM with pairwise interactions; close to boosting in accuracy on many datasets and readable per feature, useful for the report | M | running |
 | 6.4 | Random effects for train number (GPBoost) | would use `train_number` as a grouping | — | dropped (D7) |
-| 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | running |
+| 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | done |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | todo |
 
 - **6.1.** The classifier searches are scheduled as independent single-core horizon jobs at the approved 20-configuration budget. Both regression arms use the same nested budget. The four inner week folds are shared with the baseline protocol.
 
-- **6.5.** The distributional-model sequence started in its separate pinned environment. The first NGBoost railway arm has finished. Runs are scheduled within the active CPU limit.
+- **6.5.** All six distributional arms finished in the separate pinned environment. All 30 paired mean RMSE differences favored the nested LightGBM baseline. The closest result was NGBoost with weather at +0.019 min. The mixture result describes the specified LightGBMLSS adapter.
 
-- **6.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **6.3.** The four pre-specified EBM arms are running. The library's multiclass global visualization omits pairwise terms even when they are fitted.
 
 - **6.6.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
