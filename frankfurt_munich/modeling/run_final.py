@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import shutil
@@ -17,7 +18,7 @@ from threadpoolctl import threadpool_limits
 
 from advanced_data import ADVANCED, load_advanced_rows, read_inputs
 from cv import PROBA_COLUMNS, RESULTS, TARGETS, class_probabilities, cross_validate, score_fold
-from data import HERE, PREDICTION_TIMES, ROW_KEY, TIME_COLUMN, merge_inputs
+from data import DATA, HERE, PREDICTION_TIMES, ROW_KEY, TIME_COLUMN, merge_inputs
 from ensembles import FittedAverage, apply_isotonic, apply_temperature, fit_isotonic, fit_temperature
 from experiment_models import DISTRIBUTION_CLASSIFIERS, DISTRIBUTIONS, MODELS
 from experiment_specs import AUTO_VARIANTS, Run, nested_feature_variants
@@ -293,6 +294,9 @@ def score_registered_arm(registry, inputs_dir, output, index):
     manifest = (output / "registration.json").read_bytes()
     if manifest != registry.read_bytes() or json.loads(manifest) != registration:
         raise PermissionError("evaluation directory has a different registration")
+    provenance = json.loads((output / "provenance.json").read_text())
+    if provenance != evaluation_fingerprints(registration, inputs_dir):
+        raise PermissionError("evaluation code or inputs changed")
     if not 0 <= index < len(registration["finalists"]):
         raise ValueError("registered arm index is out of range")
     spec = registration["finalists"][index]
@@ -329,6 +333,27 @@ def score_registered_arm(registry, inputs_dir, output, index):
     temporary.replace(arm / "score.json")
 
 
+def evaluation_fingerprints(registration, inputs_dir):
+    """Bind every resumed arm to the same source files and generated model inputs."""
+    required = {"timetable", "history", "weather"}
+    features = {c for spec in registration["finalists"] for names in spec["features"].values() for c in names}
+    for group, filename in FEATURE_FILES.items():
+        if features & group:
+            required.add(filename)
+    sources = [*HERE.glob("*.py"), *HERE.parent.glob("*.py"), *HERE.glob("requirements*.txt")]
+    paths = {f"source/{path.relative_to(HERE.parent)}": path for path in sources}
+    for split in ("cv", "holdout"):
+        for name in ("journeys", "prediction_rows"):
+            paths[f"data/{name}_{split}.parquet"] = DATA / f"{name}_{split}.parquet"
+        for name in required:
+            paths[f"advanced/{name}_{split}.parquet"] = inputs_dir / f"{name}_{split}.parquet"
+    fingerprints = {}
+    for name, path in sorted(paths.items()):
+        with path.open("rb") as file:
+            fingerprints[name] = hashlib.file_digest(file, "sha256").hexdigest()
+    return fingerprints
+
+
 def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None):
     registration = committed_registry(registry)
     registry_bytes = registry.read_bytes()
@@ -338,14 +363,6 @@ def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None
     if any(spec["model"] in dist_models for spec in registration["finalists"]):
         if distribution_python is None or not distribution_python.is_file():
             raise ValueError("set --distribution-python to the pinned distribution-model interpreter")
-    required = {"timetable", "history", "weather"}
-    features = {c for spec in registration["finalists"] for names in spec["features"].values() for c in names}
-    for group, filename in FEATURE_FILES.items():
-        if features & group:
-            required.add(filename)
-    for name in required:
-        if not (inputs_dir / f"{name}_holdout.parquet").is_file():
-            raise FileNotFoundError(f"missing preregistered hold-out inputs: {name}")
     output = results_dir / "advanced_holdout"
     output.mkdir(parents=True, exist_ok=True)
     if (output / "completed.txt").exists():
@@ -360,6 +377,13 @@ def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None
         if manifest.exists() and manifest.read_bytes() != registry_bytes:
             raise PermissionError("evaluation directory has a different registration")
         manifest.write_bytes(registry_bytes)
+        provenance = output / "provenance.json"
+        fingerprints = evaluation_fingerprints(registration, inputs_dir)
+        if provenance.exists() and json.loads(provenance.read_text()) != fingerprints:
+            raise PermissionError("evaluation code or inputs changed")
+        temporary = output / "provenance.tmp"
+        temporary.write_text(json.dumps(fingerprints, indent=2) + "\n")
+        temporary.replace(provenance)
         run_final_arms(registration, registry, inputs_dir, output, distribution_python)
     finally:
         lock.unlink()

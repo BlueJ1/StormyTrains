@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import json
 import sys
 from pathlib import Path
 
@@ -188,3 +189,58 @@ def test_worker_rejects_missing_lock_or_mismatched_manifest(tmp_path, monkeypatc
     (output / "registration.json").write_text('{"finalists":[{"different":true}]}')
     with pytest.raises(PermissionError, match="different registration"):
         run_final.score_registered_arm(registry, tmp_path, output, 0)
+
+
+def test_failed_final_evaluation_rejects_changed_provenance_on_resume(tmp_path, monkeypatch):
+    import run_final
+
+    registration = {"finalists": [{"model": "lightgbm"}]}
+    registry = tmp_path / "finalists.json"
+    registry.write_text(json.dumps(registration))
+    monkeypatch.setattr(run_final, "committed_registry", lambda path: registration)
+    fingerprint = {"source/run_final.py": "original"}
+    monkeypatch.setattr(run_final, "evaluation_fingerprints", lambda *args: dict(fingerprint))
+    calls = []
+
+    def fail(*args):
+        calls.append(True)
+        raise RuntimeError("interrupted arm")
+
+    monkeypatch.setattr(run_final, "run_final_arms", fail)
+    with pytest.raises(RuntimeError, match="interrupted arm"):
+        run_final.final_evaluation(registry, tmp_path, tmp_path)
+    output = tmp_path / "advanced_holdout"
+    assert not (output / ".evaluation.lock").exists()
+    assert json.loads((output / "provenance.json").read_text()) == fingerprint
+    fingerprint["source/run_final.py"] = "changed"
+    with pytest.raises(PermissionError, match="code or inputs changed"):
+        run_final.final_evaluation(registry, tmp_path, tmp_path)
+    assert len(calls) == 1
+
+
+def test_evaluation_fingerprints_cover_source_and_both_data_splits(tmp_path, monkeypatch):
+    import run_final
+
+    source = tmp_path / "modeling"
+    source.mkdir()
+    (source / "pipeline.py").write_text("original source")
+    data = tmp_path / "data"
+    inputs = data / "advanced"
+    inputs.mkdir(parents=True)
+    for split in ("cv", "holdout"):
+        for name in ("journeys", "prediction_rows"):
+            (data / f"{name}_{split}.parquet").write_bytes(b"canonical rows")
+        for name in ("timetable", "history", "weather", "reliability"):
+            (inputs / f"{name}_{split}.parquet").write_bytes(b"derived inputs")
+    monkeypatch.setattr(run_final, "HERE", source)
+    monkeypatch.setattr(run_final, "DATA", data)
+    reliability = next(iter(run_final.FEATURE_FILES))
+    registration = {"finalists": [{"features": {"numeric": list(reliability), "categorical": []}}]}
+    original = run_final.evaluation_fingerprints(registration, inputs)
+    assert "advanced/reliability_holdout.parquet" in original
+    (source / "pipeline.py").write_text("updated source")
+    (data / "prediction_rows_cv.parquet").write_bytes(b"updated rows")
+    changed = run_final.evaluation_fingerprints(registration, inputs)
+    assert {key for key in original if original[key] != changed[key]} == {
+        "source/modeling/pipeline.py", "data/prediction_rows_cv.parquet",
+    }

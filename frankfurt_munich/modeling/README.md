@@ -52,6 +52,8 @@ Step 8.3 uses railway inputs from the three auxiliary corridors. The builder dro
 
 ### Holdout evaluation
 
+The evaluation fingerprints the pipeline source and both splits of its generated inputs. An interrupted run resumes completed arms only when those fingerprints and the committed registration match.
+
 After the CV steps are complete, `run_final.py register` ranks eligible pipelines by the railway-only CV score and writes one matched pair per task and horizon to `finalists.json`. Commit that file with the preregistration entry in the plan before generating holdout inputs.
 
 ```bash
