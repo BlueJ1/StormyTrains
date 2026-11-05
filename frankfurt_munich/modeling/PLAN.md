@@ -233,8 +233,8 @@ Question: does a neural network match or beat the boosters here, and does it add
 |---|---|---|---|---|
 | 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | done |
 | 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | done |
-| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | running |
-| 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | todo |
+| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | done |
+| 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | running |
 | 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | todo |
 
 **About TabGNS.** The paper compares only with other architecture-search methods (TabNAS, AgE) and a large fixed MLP, on datasets of 31,000 to 940,000 rows. Its main results are smaller networks (51–82% fewer parameters) and faster search, with accuracy about equal to a large MLP. It has no comparison with gradient-boosted trees. So we should expect TabGNS to find a compact MLP about as good as 7.1, not to beat the boosters. The comparison is still worth making, and the method is a reasonable "advanced neural model" for the report.
@@ -243,7 +243,9 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 - **7.2.** All four arms finished. Four of 20 comparisons reached D12 against the single-task MLP: weather delay at 24 h/6 h, railway severity at departure and weather severity at 24 h. All 20 multi-task scores remained worse than matched nested LightGBM.
 
-- **7.3.** TabGNS is running with the matching MLP calendar and per-outer-fold CPU allowance. The railway delay arm finished; the remaining arms are in progress.
+- **7.3.** All four TabGNS arms finished with the matching MLP calendar and per-outer-fold CPU allowances. None of 20 comparisons reached D12 against the MLP. Actual fitted widths, parameter counts and CPU time are saved per fold.
+
+- **7.4.** RealMLP and TabM are running both tasks and weather arms with week-held validation and cyclic calendar inputs. RealMLP refits on all supplied training rows; PyTabKit 1.8 TabM has no full-refit support and is excluded from final registration.
 
 ## Phase 8. Transfer learning and pretraining
 

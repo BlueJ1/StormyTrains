@@ -123,7 +123,10 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 0.8 | delay | nested | 20min | lightgbm | auto_groups | True |  | -0.142128 | 5 | True | [folds](results/advanced_0_8_lightgbm_weather_auto_groups/20261105-023226/paired_vs_base.csv) |
 | 0.8 | delay | nested | 24h | lightgbm | auto_groups | False |  | -0.054125 | 3 | False | [folds](results/advanced_0_8_lightgbm_auto_groups/20261105-021356/paired_vs_base.csv) |
 | 0.8 | delay | nested | 6h | lightgbm | auto_groups | False |  | +0.013244 | 2 | False | [folds](results/advanced_0_8_lightgbm_auto_groups/20261105-021356/paired_vs_base.csv) |
-| 0.8 | severity | nested | 24h | xgboost_classifier | auto_representations | False |  | +0.000665 | 3 | False | [folds](results/advanced_0_8_xgboost_classifier_auto_representations/20261105-045042/paired_vs_base.csv) |
+| 0.8 | severity | nested | 0min | lightgbm_classifier | auto_groups | False |  | -0.002206 | 4 | False | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-080804/paired_vs_base.csv) |
+| 0.8 | severity | nested | 1h | lightgbm_classifier | auto_groups | False |  | -0.002493 | 4 | False | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-080804/paired_vs_base.csv) |
+| 0.8 | severity | nested | 20min | lightgbm_classifier | auto_groups | False |  | -0.001786 | 4 | False | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-080804/paired_vs_base.csv) |
+| 0.8 | severity | nested | 24h | lightgbm_classifier | auto_groups | False |  | +0.000492 | 1 | False | [folds](results/advanced_0_8_lightgbm_classifier_auto_groups/20261105-080804/paired_vs_base.csv) |
 | 0.8 | severity | nested | 6h | xgboost_classifier | auto_representations | False |  | +0.000455 | 2 | False | [folds](results/advanced_0_8_xgboost_classifier_auto_representations/20261105-045042/paired_vs_base.csv) |
 | 1.1 | delay | exploratory | 0min | lightgbm | calendar_combined | False |  | -0.011592 | 4 | False | [folds](results/advanced_1_1_lightgbm_calendar_combined/20261104-224805/paired_vs_base.csv) |
 | 1.1 | delay | exploratory | 1h | lightgbm | calendar_cyclic | False |  | -0.042352 | 4 | False | [folds](results/advanced_1_1_lightgbm_calendar_cyclic/20261104-224558/paired_vs_base.csv) |
@@ -395,6 +398,16 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 7.2 | severity | nested | 20min | multitask_classifier |  | False |  | -0.002175 | 4 | False | [folds](results/advanced_7_2_multitask_classifier_calendar_cyclic/20261105-073716/paired_vs_base.csv) |
 | 7.2 | severity | nested | 24h | multitask_classifier |  | True |  | -0.003565 | 4 | True | [folds](results/advanced_7_2_multitask_classifier_weather_calendar_cyclic/20261105-073834/paired_vs_base.csv) |
 | 7.2 | severity | nested | 6h | multitask_classifier |  | True |  | -0.002259 | 3 | False | [folds](results/advanced_7_2_multitask_classifier_weather_calendar_cyclic/20261105-073834/paired_vs_base.csv) |
+| 7.3 | delay | nested | 0min | tabgns |  | False |  | +3.561847 | 0 | False | [folds](results/advanced_7_3_tabgns_calendar_cyclic/20261105-075055/paired_vs_base.csv) |
+| 7.3 | delay | nested | 1h | tabgns |  | False |  | +3.083890 | 0 | False | [folds](results/advanced_7_3_tabgns_calendar_cyclic/20261105-075055/paired_vs_base.csv) |
+| 7.3 | delay | nested | 20min | tabgns |  | False |  | +3.513676 | 0 | False | [folds](results/advanced_7_3_tabgns_calendar_cyclic/20261105-075055/paired_vs_base.csv) |
+| 7.3 | delay | nested | 24h | tabgns |  | False |  | +2.895096 | 0 | False | [folds](results/advanced_7_3_tabgns_calendar_cyclic/20261105-075055/paired_vs_base.csv) |
+| 7.3 | delay | nested | 6h | tabgns |  | False |  | +2.922605 | 0 | False | [folds](results/advanced_7_3_tabgns_calendar_cyclic/20261105-075055/paired_vs_base.csv) |
+| 7.3 | severity | nested | 0min | tabgns_classifier |  | False |  | +0.677827 | 0 | False | [folds](results/advanced_7_3_tabgns_classifier_calendar_cyclic/20261105-080433/paired_vs_base.csv) |
+| 7.3 | severity | nested | 1h | tabgns_classifier |  | False |  | +0.463310 | 0 | False | [folds](results/advanced_7_3_tabgns_classifier_calendar_cyclic/20261105-080433/paired_vs_base.csv) |
+| 7.3 | severity | nested | 20min | tabgns_classifier |  | False |  | +0.295849 | 0 | False | [folds](results/advanced_7_3_tabgns_classifier_calendar_cyclic/20261105-080433/paired_vs_base.csv) |
+| 7.3 | severity | nested | 24h | tabgns_classifier |  | False |  | +0.229212 | 0 | False | [folds](results/advanced_7_3_tabgns_classifier_calendar_cyclic/20261105-080433/paired_vs_base.csv) |
+| 7.3 | severity | nested | 6h | tabgns_classifier |  | False |  | +0.060607 | 0 | False | [folds](results/advanced_7_3_tabgns_classifier_calendar_cyclic/20261105-080433/paired_vs_base.csv) |
 
 #### Step 3.2 leading permutation groups and TreeSHAP features
 
