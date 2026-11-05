@@ -79,7 +79,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
 - **0.8.** Four of eight 50-configuration baseline arms have finished. The remaining baseline and feature-group confirmation searches are running or queued with the same four inner week folds and full configuration budget.
 
-- **0.6.** The clean main environment passed 161 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly across both main environments.
+- **0.6.** The clean main environment passed 166 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. New CLI regression checks prevent restricted builders from replacing full feature artifacts and verify custom data-directory output. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly across both main environments.
 
 ## Phase 1. Feature representations
 

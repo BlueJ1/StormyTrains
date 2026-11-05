@@ -5,9 +5,9 @@ https://huggingface.co/datasets/piebro/deutsche-bahn-data/tree/d27b9c413536bb5fe
 and documents ``snapshot_timestamp`` as the API request time.  There is an
 important historical exception: the upstream pre-refactor fetch code writes
 plan XML as ``{eva}_plan_{hour}.xml``, where ``hour`` is the requested plan
-hour, not the fetch time.  The archived rows before the exact-request regime
-are therefore not cutoff evidence.  They are retained in an optional audit
-mode, but receive no availability timestamp by default.
+hour, not the fetch time.  Following the user decision on 5 November 2026,
+the earliest legacy plan per stop is accepted as its static schedule,
+regardless of fetch time.  Exact-request updates remain cutoff-bound.
 
 The default builder reads only CV journeys and their stop IDs.  The optional
 holdout builder calls the committed-registration gate before its first holdout
@@ -715,6 +715,8 @@ def main() -> None:
     parser.add_argument("--split", choices=("cv", "holdout"), default="cv")
     parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
     args = parser.parse_args()
+    if args.sample_journeys is not None and args.output_dir.resolve() == ADVANCED.resolve():
+        parser.error("--sample-journeys requires a separate --output-dir")
     _, audit = build_timetable_split(
         split=args.split,
         plan_dir=args.plan_dir, change_dir=args.change_dir,

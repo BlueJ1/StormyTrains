@@ -405,6 +405,10 @@ def main() -> None:
     parser.add_argument("--output", type=Path)
     parser.add_argument("--sample-month", help="build only rows for one planned-departure month")
     args = parser.parse_args()
+    default_output = args.data_dir / "advanced" / f"network_{args.split}.parquet"
+    path = args.output or default_output
+    if args.sample_month and path.resolve() == default_output.resolve():
+        parser.error("--sample-month requires --output pointing to a separate sample file")
     if args.split == "holdout":
         from holdout_gate import REGISTRY, committed_registration
         committed_registration(REGISTRY)
@@ -419,7 +423,6 @@ def main() -> None:
         rows, change_dir=args.change_dir, plan_dir=args.plan_dir,
         source_months=source_months, split=args.split,
     )
-    path = args.output or DATA / "advanced" / f"network_{args.split}.parquet"
     audit.update({"split": args.split, "source_months": list(map(str, source_months)) if source_months else "all"})
     _write_output(path, output, audit)
     print(json.dumps(audit, indent=2, ensure_ascii=False, default=str), flush=True)

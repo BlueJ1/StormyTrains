@@ -212,6 +212,8 @@ def main():
     parser.add_argument("--month", nargs="+", help="restrict extraction for a local data check")
     parser.add_argument("--output", type=Path, default=DATA / "advanced" / "network_training_cv.parquet")
     args = parser.parse_args()
+    if args.month and args.output.resolve() == (DATA / "advanced" / "network_training_cv.parquet").resolve():
+        parser.error("--month requires --output pointing to a separate sample file")
     assignment = read_assignment()
     weeks = assignment.loc[assignment["split"].eq("cv"), "week_start"]
     output = []
