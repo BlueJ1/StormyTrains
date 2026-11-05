@@ -10,7 +10,8 @@ import pandas as pd
 from history_features import (CHANGE_DIR, DATA_DIR, PLAN_DIR, PLAN_EXACT_UTC_FROM,
                               RECENT_RELIABILITY_COLUMNS, ROW_KEY, _cancellation_in_force,
                               _journey_run_start_utc, _read_snapshot_ids_in_months, cutoff_instants,
-                              latest_snapshot_asof, local_clock_to_utc)
+                              latest_plan_asof, latest_snapshot_asof, local_clock_to_utc,
+                              prepare_plan_snapshots)
 
 
 def build_recent_reliability(rows: pd.DataFrame,
@@ -191,11 +192,9 @@ def _candidate_outcomes_asof(pairs: pd.DataFrame, candidates: pd.DataFrame,
         endpoint_frames.append(frame)
     queries = pd.concat(endpoint_frames, ignore_index=True)
     queries["_query_id"] = np.arange(len(queries), dtype=np.int64)
-    plans = plan_snapshots.copy()
-    if not plans.empty:
-        plans = plans.loc[pd.to_datetime(plans["snapshot_timestamp"], utc=True)
-                          .ge(PLAN_EXACT_UTC_FROM)].copy()
-    asof_plan = latest_snapshot_asof(queries, plans, request_bound=False)
+    plans = (plan_snapshots if "available_at_utc" in plan_snapshots
+             else prepare_plan_snapshots(plan_snapshots))
+    asof_plan = latest_plan_asof(queries, plans)
     asof_change = latest_snapshot_asof(queries, change_snapshots, request_bound=True)
     plan_columns = [column for column in (
         "_query_id", "arrival_planned_time", "departure_planned_time",
@@ -288,8 +287,8 @@ def build_reliability_file(
     The source candidates come from the selected split roster, but only stop IDs
     and scheduled-service metadata are used. Candidate pairs are bounded to 32 days,
     and only same-service candidates plus the corridor's prior 24-hour window
-    are materialized. Legacy plan snapshots are excluded because their request
-    availability is not evidenced.
+    are materialized. The shared plan policy treats the earliest legacy snapshot
+    per stop as a static schedule and applies exact-era plan updates as-of cutoff.
     """
     if split not in {"cv", "holdout"}:
         raise ValueError("split must be 'cv' or 'holdout'")
@@ -360,17 +359,10 @@ def build_reliability_file(
     candidates = candidates.drop_duplicates("journey_id").reset_index(drop=True)
 
     outputs = []
-    exact = rows.loc[rows["_cutoff_utc"].ge(PLAN_EXACT_UTC_FROM)].copy()
-    unavailable = rows.loc[~rows["_cutoff_utc"].ge(PLAN_EXACT_UTC_FROM), ROW_KEY].copy()
-    if len(unavailable):
-        empty = unavailable.copy()
-        for column in RECENT_RELIABILITY_COLUMNS:
-            empty[column] = np.nan
-        outputs.append(empty)
-
     processed_months: list[str] = []
-    exact["_cutoff_month"] = exact["_cutoff_utc"].dt.tz_localize(None).dt.to_period("M")
-    for month, month_targets in exact.groupby("_cutoff_month", sort=True):
+    target_rows = rows.copy()
+    target_rows["_cutoff_month"] = target_rows["_cutoff_utc"].dt.tz_localize(None).dt.to_period("M")
+    for month, month_targets in target_rows.groupby("_cutoff_month", sort=True):
         print(f"reliability CV {month}: {len(month_targets)} target rows", flush=True)
         month_targets = month_targets.reset_index(drop=True)
         lower_bound = month_targets["_cutoff_utc"].min() - pd.Timedelta(days=32)
@@ -393,10 +385,10 @@ def build_reliability_file(
         event_ids = set(month_candidates["origin_id"].astype(str)) | set(
             month_candidates["destination_id"].astype(str)
         )
-        plans = _read_snapshot_ids_in_months(
+        plans = prepare_plan_snapshots(_read_snapshot_ids_in_months(
             event_ids, kind="plan", months=source_months,
             change_dir=change_dir, plan_dir=plan_dir,
-        )
+        ))
         changes = _read_snapshot_ids_in_months(
             event_ids, kind="change", months=source_months,
             change_dir=change_dir, plan_dir=plan_dir,
@@ -467,12 +459,17 @@ def build_reliability_file(
         "cv_only": split == "cv",
         "holdout_gate_passed": gate_passed,
         "holdout_target_columns_read": False,
-        "strict_plan_availability_from_utc": str(PLAN_EXACT_UTC_FROM),
-        "legacy_plan_policy": "exclude; legacy plan labels have no verified request-time bound",
+        "plan_snapshot_policy": (
+            "earliest legacy snapshot per stop treated as a static schedule available at "
+            "1900-01-01 UTC; exact-era snapshots are available at their request timestamp"
+        ),
+        "legacy_plan_policy": "earliest legacy snapshot per stop is static from 1900-01-01 UTC",
         "candidate_policy": "same-service candidates within 28d, corridor outcomes within 24h/3h; 32d service and 48h corridor run-ID prefilters",
         "candidate_source": "split journey roster; only stop IDs and replacement context used",
         "prediction_rows": int(len(result)),
-        "rows_with_cutoff_before_plan_provenance": int(len(unavailable)),
+        "rows_with_legacy_static_plan_policy": int(
+            rows["_cutoff_utc"].lt(PLAN_EXACT_UTC_FROM).sum()
+        ),
         "source_months_read": sorted(set(processed_months)),
         "coverage_by_prediction_time": coverage,
     }

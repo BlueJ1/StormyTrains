@@ -12,8 +12,9 @@ import pyarrow.parquet as pq
 from cv import fit_fold
 from data import DATA, ROW_KEY, TIME_COLUMN
 from folds import cv_folds, inner_folds, read_assignment, week_of
-from history_features import (CHANGE_DIR, PLAN_DIR, PLAN_EXACT_UTC_FROM, _cancellation_in_force,
-                              latest_snapshot_asof, local_clock_to_utc, request_upper_bound_utc)
+from history_features import (CHANGE_DIR, PLAN_DIR, _cancellation_in_force, latest_plan_asof,
+                              latest_snapshot_asof, local_clock_to_utc, prepare_plan_snapshots,
+                              request_upper_bound_utc)
 
 NETWORK_FEATURE = "network_delay_prediction"
 CONTEXT = ["last_stop_delay", "remaining_planned_min", "remaining_planned_stops"]
@@ -94,10 +95,9 @@ def paired_month(path, plan_dir, change_dir, allowed_weeks):
         return pd.DataFrame(columns=PAIR_COLUMNS)
     plans = archive_rows(plan_dir, month, pd.concat([pairs["id"], pairs["target_id"]]),
                          ["id", "snapshot_timestamp", "arrival_planned_time"])
-    plans = plans.loc[pd.to_datetime(plans["snapshot_timestamp"], utc=True).ge(PLAN_EXACT_UTC_FROM)]
     plans = plans[plans["arrival_planned_time"].notna()].copy()
-    plans["plan_seen_at"] = pd.to_datetime(plans["snapshot_timestamp"], utc=True)
-    first_plan = plans.groupby("id")["plan_seen_at"].min()
+    plans = prepare_plan_snapshots(plans)
+    first_plan = plans.groupby("id")["available_at_utc"].min()
     seen = pairs["target_id"].map(first_plan)
     # Start the training forecast once both the upstream report and target
     # timetable have been observed, while the target arrival is still ahead.
@@ -111,7 +111,7 @@ def paired_month(path, plan_dir, change_dir, allowed_weeks):
     for key in ("id", "target_id"):
         queries = pd.DataFrame({"id": pairs[key].to_numpy(), "cutoff_utc": cutoff,
                                 "_query_id": range(len(pairs))})
-        asof = latest_snapshot_asof(queries, plans, request_bound=False)
+        asof = latest_plan_asof(queries, plans)
         if "arrival_planned_time" not in asof:
             return pd.DataFrame(columns=PAIR_COLUMNS)
         scheduled.append(asof["arrival_planned_time"].set_axis(pairs.index))
@@ -217,7 +217,7 @@ def main():
     output = []
     for path in sorted(SOURCE.glob("data-????-??.parquet")):
         month = path.stem.removeprefix("data-")
-        if month < "2025-11" or (args.month and month not in args.month):
+        if args.month and month not in args.month:
             continue
         frame = paired_month(path, args.plan_dir, args.change_dir, weeks)
         print(path.name, len(frame), flush=True)

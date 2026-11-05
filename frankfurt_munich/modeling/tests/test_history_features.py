@@ -234,7 +234,10 @@ def test_strict_events_exclude_legacy_plan_but_keep_visible_change_reports():
                           "arrival_planned_time": [pd.Timestamp("2025-01-01 08:10")],
                           "departure_planned_time": [pd.Timestamp("2025-01-01 08:30")]})
 
-    events = build_upstream_events_asof(rows, stops, changes, plans)
+    default_events = build_upstream_events_asof(rows, stops, changes, plans)
+    default_arrival = default_events.loc[default_events.event_kind.eq("arrival")].iloc[0]
+    assert default_arrival["event_delay_min"] == pytest.approx(10.0)
+    events = build_upstream_events_asof(rows, stops, changes, plans, plan_legacy_policy="exclude")
     arrival = events.loc[events.event_kind.eq("arrival")].iloc[0]
 
     assert pd.isna(arrival["planned_time"])
@@ -440,3 +443,21 @@ def test_holdout_reliability_builder_gates_before_reading_any_input(tmp_path, mo
             plan_dir=tmp_path / "plan", change_dir=tmp_path / "change",
             registry_path=tmp_path / "finalists.json",
         )
+
+
+def test_legacy_plan_is_static_before_its_label_and_exact_updates_stay_asof():
+    from history_features import latest_plan_asof
+
+    queries = pd.DataFrame({
+        "_query_id": [0, 1], "id": ["j-1", "j-1"],
+        "cutoff_utc": pd.to_datetime(["2025-01-01", "2025-12-01"], utc=True),
+    })
+    plans = pd.DataFrame({
+        "id": ["j-1"] * 3,
+        "snapshot_timestamp": pd.to_datetime(["2025-01-03", "2025-12-01", "2025-01-02"], utc=True),
+        "marker": [20, 30, 10],
+    })
+    selected = latest_plan_asof(queries, plans)
+    assert selected.marker.tolist() == [10, 30]
+    assert selected.loc[0, "snapshot_timestamp"] > selected.loc[0, "cutoff_utc"]
+    assert selected.loc[0, "_observed_utc"] == pd.Timestamp("1900-01-01", tz="UTC")

@@ -21,7 +21,7 @@ from scheduled_timetable import (
 )
 
 
-def test_plan_availability_masks_legacy_hour_labels_by_default():
+def test_plan_availability_uses_legacy_static_schedule_by_default():
     stamps = pd.Series(pd.to_datetime([
         "2025-11-02 23:00:00",
         "2025-11-03 03:32:22.619260",
@@ -29,7 +29,7 @@ def test_plan_availability_masks_legacy_hour_labels_by_default():
 
     available = plan_availability_utc(stamps)
 
-    assert pd.isna(available.iloc[0])
+    assert available.iloc[0] == pd.Timestamp("1900-01-01", tz="UTC")
     assert available.iloc[1] == EXACT_PLAN_REQUESTS_FROM_UTC
     sensitivity = plan_availability_utc(stamps, legacy_hour_label_offset=pd.Timedelta(minutes=45))
     assert sensitivity.iloc[0] == pd.Timestamp("2025-11-02 23:45:00", tz="UTC")
@@ -85,7 +85,7 @@ def test_timetable_features_use_latest_asof_snapshot_and_numpy_path():
     assert result.loc[0, "upstream_planned_min"] == 89.0
 
 
-def test_timetable_features_mask_when_no_exact_snapshot_is_available():
+def test_timetable_features_mask_when_no_availability_is_supplied():
     rows = pd.DataFrame({
         "journey_id": ["j1"], "prediction_time": ["24h"],
         "predicted_at": [pd.Timestamp("2025-11-03 10:00")],
@@ -266,3 +266,14 @@ def test_gated_synthetic_holdout_build_projects_only_metadata(monkeypatch, tmp_p
     assert audit["holdout_inputs_projected_without_targets"] is True
     assert (tmp_path / "timetable_holdout.parquet").is_file()
     assert (tmp_path / "replacement_announcements_holdout.parquet").is_file()
+
+
+def test_plan_file_selection_includes_service_month_after_early_cutoff(tmp_path):
+    from scheduled_timetable import _month_files_for_rows
+
+    for month in ("2024-12", "2025-01", "2025-02", "2025-03"):
+        (tmp_path / f"data-{month}.parquet").touch()
+    selected = _month_files_for_rows(tmp_path, pd.Series([pd.Timestamp("2025-01-31")]))
+    assert [path.name for path in selected] == [
+        "data-2024-12.parquet", "data-2025-01.parquet", "data-2025-02.parquet",
+    ]

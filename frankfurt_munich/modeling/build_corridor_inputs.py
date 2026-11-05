@@ -15,10 +15,11 @@ from corridors import CORRIDORS
 from data import ROW_KEY, TIME_COLUMN, merge_inputs
 from features import CURRENT_DELAY_TIMES
 from folds import read_assignment, week_of
-from history_features import (CHANGE_DIR, PLAN_DIR, PLAN_EXACT_UTC_FROM,
+from history_features import (CHANGE_DIR, PLAN_DIR,
                               _cancellation_in_force, _journey_run_start_utc, _read_snapshot_ids_in_months,
                               build_upstream_events_asof, cutoff_instants,
-                              delay_dynamics_from_events, latest_snapshot_asof)
+                              delay_dynamics_from_events, latest_plan_asof, latest_snapshot_asof,
+                              prepare_plan_snapshots)
 
 SOURCE_CORRIDORS = ("berlin", "hamburg", "hamburg_frankfurt")
 DESTINATION = "destination_arrival_planned_local"
@@ -93,8 +94,7 @@ def prediction_rows(journeys, upstream, changes, plans):
                        planned_travel_min=(rows[DESTINATION] - rows[TIME_COLUMN]).dt.total_seconds() / 60)
     queries = rows[["id_origin", "id_destination"]].assign(
         _query_id=np.arange(len(rows)), cutoff_utc=cutoff_instants(rows.predicted_at))
-    planned = latest_snapshot_asof(queries.rename(columns={"id_origin": "id"}), plans,
-                                   request_bound=False)
+    planned = latest_plan_asof(queries.rename(columns={"id_origin": "id"}), plans)
     known = planned.get("_observed_utc", pd.Series(pd.NaT, index=rows.index)).notna()
     rows["train_type"] = planned.get("train_type", pd.Series(pd.NA, index=rows.index))
     rows["starts_at_origin"] = queries.id_origin.str.rsplit("-", n=1).str[-1].eq("1").where(known)
@@ -120,10 +120,8 @@ def build(output, plan_dir, change_dir, monthly_dir):
     paths = sorted(monthly_dir.glob("data-????-??.parquet"))
     if not paths:
         raise FileNotFoundError(f"no monthly railway files in {monthly_dir}")
-    first_exact_month = PLAN_EXACT_UTC_FROM.tz_localize(None).to_period("M")
     for path in paths:
-        month = pd.Period(path.stem.removeprefix("data-"), freq="M")
-        for directory in ((change_dir, plan_dir) if month >= first_exact_month else (change_dir,)):
+        for directory in (change_dir, plan_dir):
             if not (directory / path.name).is_file():
                 raise FileNotFoundError(f"missing auxiliary snapshot archive {directory / path.name}")
     weeks = read_assignment().query("split == 'cv'").week_start
@@ -136,10 +134,7 @@ def build(output, plan_dir, change_dir, monthly_dir):
         ids |= set(month_rows.id_origin) | set(month_rows.id_destination)
         options = {"months": (month - 1, month, month + 1), "plan_dir": plan_dir, "change_dir": change_dir}
         changes = _read_snapshot_ids_in_months(ids, kind="change", **options)
-        plans = (_read_snapshot_ids_in_months(ids, kind="plan", **options) if month >= first_exact_month
-                 else pd.DataFrame())
-        if not plans.empty:
-            plans = plans.loc[pd.to_datetime(plans.snapshot_timestamp, utc=True).ge(PLAN_EXACT_UTC_FROM)]
+        plans = prepare_plan_snapshots(_read_snapshot_ids_in_months(ids, kind="plan", **options))
         for _, segment in month_rows.groupby("corridor", sort=False):
             stops = upstream.loc[upstream.journey_id.isin(segment.journey_id)]
             origins = segment.set_index("journey_id").origin_sequence

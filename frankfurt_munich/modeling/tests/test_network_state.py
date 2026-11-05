@@ -123,7 +123,7 @@ def test_cancellation_counts_until_a_withdrawal_snapshot():
     assert pd.isna(result.loc[1, frankfurt])
 
 
-def test_legacy_plan_hours_do_not_establish_delay_and_run_is_deduplicated():
+def test_plan_only_row_does_not_establish_outcome_and_run_is_deduplicated():
     ids = ["run-a-2511041000-1", "run-a-2511041000-2", "run-b-2511041000-1"]
     changes = [
         change_row(ids[0], "Hanau Hbf", timestamp="2025-11-04 08:30:00",
@@ -150,7 +150,7 @@ def test_legacy_plan_hours_do_not_establish_delay_and_run_is_deduplicated():
     assert pd.isna(result.loc[0, NETWORK_STATE_COLUMNS[2]])
 
 
-def test_exact_plan_is_required_for_delay_but_not_for_cancellation():
+def test_legacy_plan_is_static_and_can_establish_delay():
     stop = "run-old-2511041000-1"
     changes = [change_row(stop, "Hanau Hbf", timestamp="2025-11-04 08:30:00",
                           arrival="2025-11-04 10:25:00")]
@@ -159,7 +159,29 @@ def test_exact_plan_is_required_for_delay_but_not_for_cancellation():
 
     result = features(rows, changes, legacy)
 
-    assert pd.isna(result.loc[0, NETWORK_STATE_COLUMNS[0]])
+    assert result.loc[0, NETWORK_STATE_COLUMNS[0]] == 1.0
+
+
+def test_earliest_legacy_plan_is_static_until_an_exact_update_arrives():
+    stop = "run-old-2511041000-1"
+    changes = [change_row(stop, "Hanau Hbf", timestamp="2025-11-04 08:30:00",
+                          arrival="2025-11-04 10:25:00")]
+    plans = [
+        plan_row(stop, "Hanau Hbf", timestamp="2025-11-02 08:00:00",
+                 arrival="2025-11-04 10:00:00"),
+        # Later legacy target-hour labels do not replace the earliest static plan.
+        plan_row(stop, "Hanau Hbf", timestamp="2025-11-02 09:00:00",
+                 arrival="2025-11-04 10:20:00"),
+        plan_row(stop, "Hanau Hbf", timestamp="2025-11-04 09:40:00",
+                 arrival="2025-11-04 10:20:00"),
+    ]
+    rows = rows_at("2025-11-04 10:39", "2025-11-04 10:40")
+
+    result = features(rows, changes, plans)
+
+    share = NETWORK_STATE_COLUMNS[0]
+    assert result.loc[0, share] == 1.0
+    assert result.loc[1, share] == 0.0
 
 
 def test_no_unintended_prediction_columns_and_unique_row_alignment():

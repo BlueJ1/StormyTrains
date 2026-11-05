@@ -31,13 +31,13 @@ import pyarrow.parquet as pq
 
 if __package__:
     from .history_features import (
-        CHANGE_DIR, PLAN_DIR, PLAN_COLUMNS, ROW_KEY, cutoff_instants,
-        request_upper_bound_utc,
+        CHANGE_DIR, PLAN_DIR, PLAN_COLUMNS, PLAN_EXACT_UTC_FROM, ROW_KEY, cutoff_instants,
+        request_upper_bound_utc, plan_availability_utc, prepare_plan_snapshots,
     )
 else:
     from history_features import (
-        CHANGE_DIR, PLAN_DIR, PLAN_COLUMNS, ROW_KEY, cutoff_instants,
-        request_upper_bound_utc,
+        CHANGE_DIR, PLAN_DIR, PLAN_COLUMNS, PLAN_EXACT_UTC_FROM, ROW_KEY, cutoff_instants,
+        request_upper_bound_utc, plan_availability_utc, prepare_plan_snapshots,
     )
 
 HERE = Path(__file__).resolve().parent
@@ -61,7 +61,7 @@ LEGACY_FETCH_URL = (
 )
 # First exact request timestamp observed in the pinned plan archive.  Earlier
 # whole-hour stamps are target plan-hour labels according to the old fetcher.
-EXACT_PLAN_REQUESTS_FROM_UTC = pd.Timestamp("2025-11-03 03:32:22.619260", tz="UTC")
+EXACT_PLAN_REQUESTS_FROM_UTC = PLAN_EXACT_UTC_FROM
 
 STOP_COLUMNS = [
     "id", "journey_id", "station_name", "train_type", "train_number",
@@ -76,29 +76,8 @@ TIMETABLE_COLUMNS = [
 ]
 
 
-def plan_availability_utc(
-    snapshot_timestamp: pd.Series,
-    *,
-    legacy_hour_label_offset: pd.Timedelta | None = None,
-) -> pd.Series:
-    """Return conservative plan availability timestamps.
-
-    The default masks legacy plan-hour labels.  An explicit offset can be
-    supplied for sensitivity analysis only; there is no source evidence for a
-    plan-specific maximum lag, so the caller must not treat it as established
-    provenance.
-    """
-    stamps = pd.to_datetime(snapshot_timestamp, utc=True)
-    exact = stamps.ge(EXACT_PLAN_REQUESTS_FROM_UTC)
-    available = stamps.where(exact)
-    if legacy_hour_label_offset is not None:
-        legacy = stamps.lt(EXACT_PLAN_REQUESTS_FROM_UTC)
-        available = available.where(~legacy, stamps + legacy_hour_label_offset)
-    return available
-
-
 def _asof_by_id(queries: pd.DataFrame, snapshots: pd.DataFrame) -> pd.DataFrame:
-    """Attach the latest exact plan request available by each UTC cutoff."""
+    """Attach the latest plan state under the static-legacy timetable policy."""
     if queries.empty:
         return queries.copy()
     if snapshots.empty:
@@ -106,9 +85,9 @@ def _asof_by_id(queries: pd.DataFrame, snapshots: pd.DataFrame) -> pd.DataFrame:
     right = snapshots[snapshots["available_at_utc"].notna()].copy()
     if right.empty:
         return queries.copy()
-    right["available_at_utc"] = pd.to_datetime(right["available_at_utc"], utc=True)
+    right["available_at_utc"] = pd.to_datetime(right["available_at_utc"], utc=True).dt.as_unit("ns")
     left = queries.copy()
-    left["cutoff_utc"] = pd.to_datetime(left["cutoff_utc"], utc=True)
+    left["cutoff_utc"] = pd.to_datetime(left["cutoff_utc"], utc=True).dt.as_unit("ns")
     left = left.sort_values(["cutoff_utc", "id"])
     right = right.sort_values(["available_at_utc", "id"])
     merged = pd.merge_asof(
@@ -174,7 +153,7 @@ def build_timetable_features(
     replacement_context: pd.DataFrame,
     plan_snapshots: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Build one strict as-of timetable row per prediction key.
+    """Build one timetable row per prediction key under the registered plan policy.
 
     ``replacement_context`` has one row per journey and carries
     ``scheduled_origin_id``.  For ordinary trains this is the current origin
@@ -493,9 +472,9 @@ def _read_plan_ids(
         out = pd.DataFrame(columns=PLAN_COLUMNS)
     else:
         out = pd.concat(rows, ignore_index=True).drop_duplicates(["id", "snapshot_timestamp"], keep="last")
-    out["available_at_utc"] = plan_availability_utc(out["snapshot_timestamp"])
+    out = prepare_plan_snapshots(out)
     if not include_legacy:
-        out = out[out["available_at_utc"].notna()].copy()
+        out = out[pd.to_datetime(out["snapshot_timestamp"], utc=True).ge(EXACT_PLAN_REQUESTS_FROM_UTC)].copy()
     return out.sort_values(["id", "snapshot_timestamp"]).reset_index(drop=True)
 
 
@@ -586,6 +565,7 @@ def _month_files_for_rows(plan_dir: Path, timestamps: pd.Series) -> list[Path]:
         period = pd.Period(month, freq="M")
         wanted.add(str(period))
         wanted.add(str(period - 1))
+        wanted.add(str(period + 1))
     return [path for path in sorted(plan_dir.glob("data-????-??.parquet"))
             if path.stem.removeprefix("data-") in wanted]
 
@@ -635,11 +615,7 @@ def build_timetable_split(
         "replaced_train_type": "scheduled_train_type",
         "replaced_train_number": "scheduled_train_number",
     })
-    eligible_rows = rows[cutoff_instants(rows.predicted_at).ge(EXACT_PLAN_REQUESTS_FROM_UTC)]
-    eligible_journeys = set(eligible_rows.journey_id)
-    candidate = _find_replacement_origin_ids(
-        keys[keys.journey_id.isin(eligible_journeys)], plan_dir=plan_dir
-    )
+    candidate = _find_replacement_origin_ids(keys, plan_dir=plan_dir)
     context = build_replacement_context(stops, journeys, candidate)
 
     plan_ids = set(stops.id.dropna().astype(str)) | set(upstream_runs.id.dropna().astype(str))
@@ -652,9 +628,9 @@ def build_timetable_split(
         except ValueError:
             pass
     plan_ids |= set(first_ids)
-    source_files = _month_files_for_rows(plan_dir, eligible_rows.predicted_at)
+    source_files = _month_files_for_rows(plan_dir, rows.predicted_at)
     snapshots = (_read_plan_ids(plan_ids, plan_dir=plan_dir, files=source_files,
-                                include_legacy=False)
+                                include_legacy=True)
                  if source_files else
                  pd.DataFrame(columns=PLAN_COLUMNS + ["available_at_utc"]))
 
@@ -694,9 +670,9 @@ def build_timetable_split(
                 "first_non_hour_archive_stamp_utc": str(EXACT_PLAN_REQUESTS_FROM_UTC),
                 "legacy_plan_maximum_fetch_lag": None,
             },
-            "legacy_plan_policy": "exclude; plan-specific maximum fetch lag is not evidenced",
+            "legacy_plan_policy": "earliest legacy snapshot per stop is a static schedule, regardless of fetch time, by user instruction",
             "change_source_bound": "+45 minutes remains specific to legacy change snapshots only",
-            "feature_policy": "Use the latest exact-request plan snapshot whose request timestamp is <= predicted_at converted to UTC; otherwise missing.",
+            "feature_policy": "Use the earliest legacy plan per stop as a static schedule; exact-request updates remain bounded by predicted_at in UTC.",
         },
         "split": split,
         "cv_only": split == "cv",
@@ -709,7 +685,7 @@ def build_timetable_split(
         "pinned_archive_total_bytes": sum(path.stat().st_size for path in archive_files),
         "plan_snapshot_rows_saved": int(len(snapshots)),
         "plan_snapshot_ids_saved": int(snapshots.id.nunique()) if len(snapshots) else 0,
-        "plan_snapshot_exact_rows_saved": int(snapshots.available_at_utc.notna().sum()) if len(snapshots) else 0,
+        "plan_snapshot_exact_rows_saved": int(pd.to_datetime(snapshots.snapshot_timestamp, utc=True).ge(EXACT_PLAN_REQUESTS_FROM_UTC).sum()) if len(snapshots) else 0,
         "replacement_journeys": int(len(replacements)),
         "replacement_candidate_resolution": {
             "eligible_replacement_journeys": int(keys.journey_id.nunique()),

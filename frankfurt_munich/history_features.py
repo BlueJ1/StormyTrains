@@ -51,6 +51,7 @@ FEATURE_COLUMNS_BY_GROUP = {
 SNAPSHOT_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:27:54.653106", tz="UTC")
 PLAN_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:32:22.619260", tz="UTC")
 LEGACY_REQUEST_UPPER_BOUND = pd.Timedelta(minutes=45)
+LEGACY_PLAN_AVAILABLE_UTC = pd.Timestamp("1900-01-01", tz="UTC")
 
 CHANGE_COLUMNS = [
     "id", "station_name", "snapshot_timestamp", "train_type", "train_number",
@@ -78,6 +79,36 @@ def request_upper_bound_utc(snapshot_timestamp: pd.Series) -> pd.Series:
                    & stamps.dt.microsecond.eq(0))
     legacy = stamps.lt(SNAPSHOT_EXACT_UTC_FROM) & block_start
     return stamps + legacy.astype("int64") * LEGACY_REQUEST_UPPER_BOUND
+
+
+def plan_availability_utc(snapshot_timestamp: pd.Series, *,
+                          legacy_hour_label_offset: pd.Timedelta | None = None) -> pd.Series:
+    """Use legacy plans as static schedules under the user-approved policy.
+
+    Exact request timestamps remain cutoff-bound. The optional legacy offset
+    preserves the earlier sensitivity calculation for reproducibility.
+    """
+    stamps = pd.to_datetime(snapshot_timestamp, utc=True).dt.as_unit("ns")
+    legacy = stamps.lt(PLAN_EXACT_UTC_FROM)
+    availability = (stamps + legacy_hour_label_offset if legacy_hour_label_offset is not None
+                    else LEGACY_PLAN_AVAILABLE_UTC)
+    return stamps.where(~legacy, availability)
+
+
+def prepare_plan_snapshots(snapshots: pd.DataFrame) -> pd.DataFrame:
+    """Select the earliest legacy schedule per stop and retain exact updates."""
+    plans = snapshots.copy()
+    if plans.empty:
+        return plans.assign(available_at_utc=pd.Series(dtype="datetime64[ns, UTC]"))
+    plans["snapshot_timestamp"] = pd.to_datetime(plans["snapshot_timestamp"], utc=True)
+    plans["available_at_utc"] = plan_availability_utc(plans["snapshot_timestamp"])
+    return (plans.sort_values("snapshot_timestamp", kind="stable")
+            .drop_duplicates(["id", "available_at_utc"], keep="first"))
+
+
+def latest_plan_asof(queries: pd.DataFrame, snapshots: pd.DataFrame) -> pd.DataFrame:
+    plans = snapshots if "available_at_utc" in snapshots else prepare_plan_snapshots(snapshots)
+    return latest_snapshot_asof(queries, plans, observed_col="available_at_utc", request_bound=False)
 
 
 def local_clock_to_utc(values: pd.Series, *, ambiguous: bool) -> pd.Series:
@@ -188,7 +219,7 @@ def _cancellation_in_force(issue_time: pd.Series, status: pd.Series,
 def build_upstream_events_asof(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
                                change_snapshots: pd.DataFrame,
                                plan_snapshots: pd.DataFrame, *,
-                               plan_legacy_policy: str = "exclude") -> pd.DataFrame:
+                               plan_legacy_policy: str = "static") -> pd.DataFrame:
     """Return per-target upstream stop events visible from snapshots at cutoff.
 
     The output has one row per prediction key, stop ID, and event kind.  It
@@ -228,7 +259,9 @@ def build_upstream_events_asof(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
     expanded["_query_id"] = np.arange(len(expanded), dtype=np.int64)
     query = expanded[["_query_id", "id", "cutoff_utc"]]
     changes = latest_snapshot_asof(query, change_snapshots, request_bound=True)
-    if plan_legacy_policy == "exclude":
+    if plan_legacy_policy == "static":
+        plans = latest_plan_asof(query, plan_snapshots)
+    elif plan_legacy_policy == "exclude":
         plan_source = plan_snapshots.copy()
         if not plan_source.empty:
             stamps = pd.to_datetime(plan_source["snapshot_timestamp"], utc=True)
@@ -240,9 +273,9 @@ def build_upstream_events_asof(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
         plan_source = plan_snapshots
         plan_request_bound = True
     else:
-        raise ValueError("plan_legacy_policy must be 'exclude' or 'bounded_sensitivity'")
-    plans = latest_snapshot_asof(query, plan_source,
-                                 request_bound=plan_request_bound)
+        raise ValueError("unknown legacy plan policy")
+    if plan_legacy_policy != "static":
+        plans = latest_snapshot_asof(query, plan_source, request_bound=plan_request_bound)
     change_cols = [c for c in (
         "_query_id", "id", "station_name", "train_type", "train_number",
         "snapshot_timestamp", "_observed_utc", "arrival_change_time",
@@ -453,7 +486,7 @@ def mask_unlinked_replacement_rows(dynamics: pd.DataFrame,
 def build_delay_dynamics(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
                          change_snapshots: pd.DataFrame,
                          plan_snapshots: pd.DataFrame, *,
-                         plan_legacy_policy: str = "exclude") -> pd.DataFrame:
+                         plan_legacy_policy: str = "static") -> pd.DataFrame:
     """Build cutoff-safe Phase 2.4 dynamics from as-of plan/change snapshots."""
     events = build_upstream_events_asof(
         rows, upstream_stops, change_snapshots, plan_snapshots,
@@ -566,7 +599,7 @@ def build_history_dynamics_split(
         stop_ids, kind="plan", change_dir=change_dir, plan_dir=plan_dir,
     )
     events = build_upstream_events_asof(rows, upstream, changes, plans,
-                                        plan_legacy_policy="exclude")
+                                        plan_legacy_policy="static")
     dynamics = delay_dynamics_from_events(rows, events)
     dynamics, events = mask_unlinked_replacement_rows(dynamics, events, announcements)
     expected_keys = rows[ROW_KEY].reset_index(drop=True)
@@ -591,6 +624,7 @@ def build_history_dynamics_split(
         "holdout_target_columns_read": False,
         "prediction_rows": int(len(dynamics)),
         "upstream_events": int(len(persisted_events)),
+        "legacy_plan_policy": "earliest legacy plan per stop used as a static schedule by user instruction",
         "replacement_rows_masked_until_link": int(
             (announcements["is_replacement"].fillna(False)
              & ~announcements["replacement_announced"].fillna(False)).sum()

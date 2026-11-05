@@ -1,4 +1,4 @@
-"""Build cutoff-safe network-state features from live change and exact plan snapshots.
+"""Build cutoff-safe network-state features from live changes and plan snapshots.
 
 Only CV rows are read by default. The feature is the share of unique ICE/IC
 runs with an observed arrival/departure event in the trailing hour that was
@@ -30,11 +30,12 @@ HORIZON = pd.Timedelta(hours=1)
 sys.path.insert(0, str(HERE))
 from history_features import (  # noqa: E402
     NETWORK_STATE_COLUMNS,
-    PLAN_EXACT_UTC_FROM,
     ROW_KEY,
     cutoff_instants,
+    latest_plan_asof,
     latest_snapshot_asof,
     local_clock_to_utc,
+    prepare_plan_snapshots,
     request_upper_bound_utc,
 )
 
@@ -81,7 +82,7 @@ def _read_month(path: Path, *, kind: str, stations: list[str]) -> pd.DataFrame:
 
 
 def _timeline_states(changes: pd.DataFrame, plans: pd.DataFrame) -> pd.DataFrame:
-    """Join each stop update to the latest change and exact plan state."""
+    """Join each stop update to its latest change and policy-compliant plan state."""
     if changes.empty and plans.empty:
         return pd.DataFrame()
     changes = changes.copy()
@@ -90,9 +91,7 @@ def _timeline_states(changes: pd.DataFrame, plans: pd.DataFrame) -> pd.DataFrame
         changes["snapshot_timestamp"] = pd.to_datetime(changes["snapshot_timestamp"], utc=True)
         changes["available_at_utc"] = request_upper_bound_utc(changes["snapshot_timestamp"])
     if not plans.empty:
-        plans["snapshot_timestamp"] = pd.to_datetime(plans["snapshot_timestamp"], utc=True)
-        plans = plans.loc[plans["snapshot_timestamp"].ge(PLAN_EXACT_UTC_FROM)].copy()
-        plans["available_at_utc"] = plans["snapshot_timestamp"]
+        plans = prepare_plan_snapshots(plans)
     updates = pd.concat([
         changes[["id", "available_at_utc"]] if not changes.empty else pd.DataFrame(columns=["id", "available_at_utc"]),
         plans[["id", "available_at_utc"]] if not plans.empty else pd.DataFrame(columns=["id", "available_at_utc"]),
@@ -125,7 +124,7 @@ def _timeline_states(changes: pd.DataFrame, plans: pd.DataFrame) -> pd.DataFrame
         for column in plan_values:
             plan_state[column] = pd.NaT if column.endswith("time") else pd.NA
     else:
-        plan_state = latest_snapshot_asof(queries, plans, request_bound=False)
+        plan_state = latest_plan_asof(queries, plans)
         plan_state = plan_state[["_query_id", *plan_values]]
     change_state = change_state.rename(columns={column: f"change_{column}" for column in change_values if column != "train_number"})
     plan_state = plan_state.rename(columns={column: f"plan_{column}" for column in plan_values if column != "train_number"})
@@ -300,7 +299,7 @@ def build_network_features(
 
     pending: dict[pd.Period, dict[str, list[pd.DataFrame]]] = defaultdict(lambda: {"change": [], "plan": []})
     segment_parts: list[pd.DataFrame] = []
-    stats = {"change_rows_read": 0, "exact_plan_rows_read": 0,
+    stats = {"change_rows_read": 0, "plan_rows_read": 0,
              "unparseable_run_ids": 0, "run_months_processed": 0,
              "event_intervals": 0, "run_scope_segments": 0}
 
@@ -331,12 +330,10 @@ def build_network_features(
                 stats["unparseable_run_ids"] += int(changes["_run_month"].isna().sum())
                 for run_month, frame in changes.dropna(subset=["_run_month"]).groupby("_run_month", sort=False):
                     pending[run_month]["change"].append(frame)
-        if month in plan_files and month >= pd.Period("2025-11", freq="M"):
+        if month in plan_files:
             plans = _read_month(plan_files[month], kind="plan", stations=sorted(panel))
             if not plans.empty:
-                plans["snapshot_timestamp"] = pd.to_datetime(plans["snapshot_timestamp"], utc=True)
-                plans = plans.loc[plans["snapshot_timestamp"].ge(PLAN_EXACT_UTC_FROM)].copy()
-                stats["exact_plan_rows_read"] += len(plans)
+                stats["plan_rows_read"] += len(plans)
                 for run_month, frame in plans.dropna(subset=["_run_month"]).groupby("_run_month", sort=False):
                     pending[run_month]["plan"].append(frame)
         # A service's snapshots can be in the month before or after its run month.
@@ -354,10 +351,13 @@ def build_network_features(
     stats["source_policy"] = {
         "stable_panel_path": str(PANEL_PATH),
         "stable_panel_station_count": len(panel),
-        "plan_exact_from_utc": str(PLAN_EXACT_UTC_FROM),
-        "legacy_plan_snapshots_used": False,
+        "plan_snapshot_policy": (
+            "earliest legacy snapshot per stop treated as a static schedule available at "
+            "1900-01-01 UTC; exact-era snapshots are available at their request timestamp"
+        ),
+        "legacy_plan_policy": "earliest legacy snapshot per stop is static from 1900-01-01 UTC",
         "change_snapshot_bound": "legacy whole-hour labels receive +45 minutes; exact request timestamps are unchanged",
-        "denominator": "unique ICE/IC runs with a visible arrival/departure report and exact plan, or an in-force cancellation, in the trailing hour",
+        "denominator": "unique ICE/IC runs with a visible arrival/departure report and a plan available under the shared legacy-static/exact-as-of policy, or an in-force cancellation, in the trailing hour",
         "cancellation_event_clock": "cancellation issue time",
         "interval_policy": "activate at max(snapshot request time, event time); expire at the next change/plan update or event time + 1 hour",
         "scopes": {

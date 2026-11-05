@@ -1,8 +1,8 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 5 November 2026. **The cutoff audit and reference runs are complete. Nested tuning and feature screens are in progress.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 5 November 2026. **Rebuilding inputs and rerunning CV after the 5 November decision to use legacy timetable fields regardless of fetch time.**
 
-**Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact.
+**Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact. The user waived external artifact updates for this run.
 
 Status values: `todo`, `running`, `done`, `dropped`. Cost: S (under 1 CPU hour), M (1–10 h), L (over 10 h or a new dataset). Expected gain is our guess before running, so that we can check it afterwards.
 
@@ -46,7 +46,7 @@ Where an experiment or phase depends on a decision, it names it (for example D2)
 ## Rules for every experiment
 
 1. **Same evaluation as now:** CV set only, the 5 committed week folds, log loss for severity and RMSE for delay as the choosing metrics, macro-F1 reported. The hold-out set is opened once, in Phase 9.
-2. **Inputs known at the cutoff:** every feature must be known at `predicted_at`. State of other journeys (delays, cancellations, outcomes) is reconstructed from the live-update snapshots as of `predicted_at`, never taken from the monthly files' final values (see Phase 2). Service keys use the scheduled train, not a replacement that was announced later. Route and stop features come from the plan, not from the recorded stops.
+2. **Inputs known at the cutoff:** every live feature must be known at `predicted_at`. By the user decision on 5 November, legacy timetable fields are accepted regardless of fetch time. The earliest legacy plan per stop is treated as its static schedule. Exact-request plan updates remain cutoff-bound. State of other journeys (delays, cancellations, outcomes) is reconstructed from the live-update snapshots as of `predicted_at`, never taken from the monthly files' final values (see Phase 2). Service keys use the scheduled train, not a replacement that was announced later. Route and stop features come from the plan, not from the recorded stops.
 3. **Fold comparisons are descriptive:** report the five paired fold differences, their mean, and how many folds improve. No t-tests or p-values: the folds share training weeks, so their differences are not independent (Bengio & Grandvalet 2004). A gain counts only if its mean reaches the threshold of D12, which is fixed before screening. A smaller difference is reported as no meaningful gain, not as the models being equal. Uncertainty on the hold-out set comes from the paired week bootstrap in 9.2.
 4. **Exploratory and confirmed results:** a result with configurations reused from the flat search (D2), or with anything else chosen on all five folds, is exploratory, because each outer fold helped choose the configuration it is scored with. A comparison reported as a finding is nested: baseline and candidate both choose their configuration, feature subset, weights and early stopping using only the outer fold's training weeks.
 5. **Weather is the research question:** every finalist is run railway-only and with weather on the same rows. 9.1 fixes matched pairs for the final comparison.
@@ -63,23 +63,23 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 
 | ID | Step | Cost | Status |
 |---|---|---|---|
-| 0.7 | **Inputs known at the cutoff** (D8). Remove `recorded_route`, `observed_stops` and `unobserved_sequence_positions` from the base set. In the 216 CV departures where `drop_shared_departures()` keeps a replacement train, check which base inputs come from the replacement (`train_type`, `starts_at_origin`, the weather branch chosen by train number) and take them from the scheduled train instead. Rerun class shares, logistic and linear regression, and LightGBM and XGBoost at their saved configurations (exploratory); these become the reference scores. The removed fields are used afterwards only to measure how much they leaked | S–M | done |
+| 0.7 | **Inputs known at the cutoff** (D8). Remove `recorded_route`, `observed_stops` and `unobserved_sequence_positions` from the base set. In the 216 CV departures where `drop_shared_departures()` keeps a replacement train, check which base inputs come from the replacement (`train_type`, `starts_at_origin`, the weather branch chosen by train number) and take them from the scheduled train instead. Rerun class shares, logistic and linear regression, and LightGBM and XGBoost at their saved configurations (exploratory); these become the reference scores. The removed fields are used afterwards only to measure how much they leaked | S–M | running |
 | 0.1 | **Named feature sets** in `features.py` (`feature_columns(pt, feature_set="base")`), and representation options (encodings, transforms) applied inside each model's pipeline | S | done |
 | 0.2 | **`compare.py`**: the five paired fold differences between two runs, their mean, folds improved, and whether the mean reaches the D12 threshold; no t-tests (rule 3). Writes the tables for `README.md` | S | done |
 | 0.3 | **Inner week folds** inside each training set (grouped by ISO week, stratified like `folds.py`) for nested selection, tuning, stacking, cross-fitting, calibration and neural-network early stopping | S | done |
 | 0.4 | **Fixed-configuration runner:** refit a tuned model with the configuration chosen per prediction time in an earlier run's `config.json` (D2). Its results are marked exploratory | S | done |
-| 0.8 | **Nested tuning** in `tuning.py`: each outer fold chooses its configuration on the inner folds of its training weeks only (D3). Used for finalists; the budget is D13 | S to build, M–L to run | running |
+| 0.8 | **Nested tuning** in `tuning.py`: each outer fold chooses its configuration on the inner folds of its training weeks only (D3). Used for finalists; the budget is D13 | S to build, M–L to run | todo |
 | 0.5 | Extra metrics | — | dropped (D9) |
 | 0.6 | **Tests** for each of the above, in the style of `tests/` (answer-as-feature, shuffled labels, no hold-out access, no outer-fold rows in nested choices) | S | done |
 
-- **0.7.** All 26 runs finished on the five committed folds. The best railway-only booster scored 0.9256 log loss at 24 h and 0.8465 at departure. The best delay RMSE was 24.58 and 24.26 min at those times. Adding recorded-route fields reduced 24 h LightGBM log loss by 0.0254 and RMSE by 0.196 min in the exploratory diagnostic, with all five folds improving. See the README for the paired results.
+- **0.7.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 - **0.1.** Base and recorded-route diagnostic sets defined. Phase 1 transformations run inside the fitted pipeline.
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** All eight baseline booster arms finished with 50 configurations in each outer training set. Weather reached D12 only for LightGBM delay at 6 h (−0.122 min, four folds). Early nested representation selection reached D12 in none of eight comparisons. Nested feature-group selection is still running; the completed LightGBM delay policy reduced departure RMSE by 0.114 min railway-only and 0.212 min with weather.
+- **0.8.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **0.6.** A clean install from the main pins passed 150 tests with five skips. All four optional distribution tests passed in their pinned environment. Fresh departure LightGBM runs reproduced all 16,947 CV probability vectors per arm for both cutoff-safe references and both recorded-route diagnostics.
+- **0.6.** The clean pinned environment passed 158 tests with five skips after the legacy timetable change. Regression checks cover the static legacy default, exact-update cutoffs, month-boundary extraction, inner/outer separation, recovery provenance and parallel registration. Prediction parity will be rechecked on the regenerated references.
 
 ## Phase 1. Feature representations
 
@@ -89,21 +89,21 @@ Expectation: trees split on the categories natively, so they should barely react
 
 | ID | Experiment | Variants | Models | Cost | Expected gain | Status |
 |---|---|---|---|---|---|---|
-| 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | done |
-| 1.2 | **Finer time** | departure minute of day instead of hour; day of year (cyclic) instead of month; hour × weekday interaction for LR | LR, LightGBM | S | low | done |
-| 1.3 | **Route encodings** (run after 2.2) | the planned `route_id` from 2.2: one-hot / native / frequency / target encoding fitted on inner folds. `train_number` stays out (D7) | LR, LightGBM | S | low | done |
-| 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | done |
-| 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | done |
+| 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | todo |
+| 1.2 | **Finer time** | departure minute of day instead of hour; day of year (cyclic) instead of month; hour × weekday interaction for LR | LR, LightGBM | S | low | todo |
+| 1.3 | **Route encodings** (run after 2.2) | the planned `route_id` from 2.2: one-hot / native / frequency / target encoding fitted on inner folds. `train_number` stays out (D7) | LR, LightGBM | S | low | todo |
+| 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | todo |
+| 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | todo |
 
-- **1.1.** Six of 80 exploratory comparisons reached D12, all for severity. Cyclic calendar gave LightGBM the largest reduction, 0.0188 log loss at 24 h with five folds improving. The best delay reduction was 0.093 min, below D12.
+- **1.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **1.2.** Day-of-year encoding reduced exploratory LightGBM log loss at 24 h and 6 h by 0.0050 and 0.0053, with four folds improving at each time. No delay variant reached D12.
+- **1.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **1.4.** None of the 42 paired horizon comparisons reached D12. The largest exploratory reductions were 0.00037 log loss and 0.004 min RMSE, both for an explicit LightGBM missing-value indicator at departure.
+- **1.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **1.5.** None of the 20 paired comparisons reached D12. The best severity change was −0.00127 log loss. Every delay comparison had higher mean RMSE than raw weather.
+- **1.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **1.3.** None of 50 paired comparisons reached D12. The best reductions were 0.00037 log loss and 0.034 min RMSE. Missing routes carry no target-encoded value. No routes were visible at 24 h or 6 h.
+- **1.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
 ## Phase 2. New features
 
@@ -119,21 +119,21 @@ Each feature group is added to the base set on its own and then all together, wi
 
 | ID | Experiment | Content | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 2.1 | **Recent reliability** (`ProjectInstructions.md` feature group; allowed to use hold-out journeys, see `STATUS.md`) | past journeys of the same scheduled service: share severe or cancelled and mean delay over the last 7 and 28 days; for the whole corridor: the same over the last 24 h and last 3 h. Outcomes as known at `predicted_at` from the snapshots. The key is the scheduled train number: for a retained replacement, the number of the train it replaced, switching to the replacement only from a timestamped announcement in the snapshots. The number is a lookup key, not a feature (D7) | M | **high** | done |
-| 2.2 | **Planned-timetable features** (D8) | `planned_stops`, a planned `route_id` and `upstream_planned_min` (time the run has been travelling before Frankfurt), all from the plan of the scheduled train; they replace the fields removed in 0.7 | M | medium | done |
-| 2.3 | **Holidays** | public holidays in Hesse, Baden-Württemberg and Bavaria, school holidays, bridge days, day before and after a holiday | S | low–medium | done |
-| 2.4 | **Delay dynamics** (1 h on) | change of `current_delay` between prediction times, number of upstream stops reported, minutes since the last report, planned minutes still to run before Frankfurt; all as known at `predicted_at` | S | medium at 1 h–0 min | done |
-| 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf | M | medium | done |
+| 2.1 | **Recent reliability** (`ProjectInstructions.md` feature group; allowed to use hold-out journeys, see `STATUS.md`) | past journeys of the same scheduled service: share severe or cancelled and mean delay over the last 7 and 28 days; for the whole corridor: the same over the last 24 h and last 3 h. Outcomes as known at `predicted_at` from the snapshots. The key is the scheduled train number: for a retained replacement, the number of the train it replaced, switching to the replacement only from a timestamped announcement in the snapshots. The number is a lookup key, not a feature (D7) | M | **high** | todo |
+| 2.2 | **Planned-timetable features** (D8) | `planned_stops`, a planned `route_id` and `upstream_planned_min` (time the run has been travelling before Frankfurt), all from the plan of the scheduled train; they replace the fields removed in 0.7 | M | medium | todo |
+| 2.3 | **Holidays** | public holidays in Hesse, Baden-Württemberg and Bavaria, school holidays, bridge days, day before and after a holiday | S | low–medium | todo |
+| 2.4 | **Delay dynamics** (1 h on) | change of `current_delay` between prediction times, number of upstream stops reported, minutes since the last report, planned minutes still to run before Frankfurt; all as known at `predicted_at` | S | medium at 1 h–0 min | todo |
+| 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf | M | medium | todo |
 
-- **2.3.** Holidays reached D12 in the exploratory LightGBM runs at 24 h and 6 h for both tasks. At 24 h the mean reductions were 0.0224 log loss and 0.122 min RMSE. All five folds improved on both scores. Confirmation uses nested feature selection.
+- **2.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **2.2.** The timetable screen found no meaningful gain in 20 paired comparisons. The archived plan supplied route information for 728, 1,151 and 1,368 rows at the three late horizons and none at 24 h or 6 h.
+- **2.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **2.4.** LightGBM delay dynamics reached D12 for severity at 1 h and departure, and for delay at departure. The departure reductions were 0.0053 log loss and 0.105 min RMSE. All five folds improved in each of these three comparisons.
+- **2.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **2.1.** Recent reliability reached D12 in 11 of 20 exploratory comparisons. At 6 h, LightGBM log loss fell by 0.0197 (five folds) and RMSE by 0.134 min (four folds). At least one reliability feature was available on 34,850 of 85,901 CV rows. The rebuild and score rerun reproduced the results exactly.
+- **2.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **2.5.** The network-state group reached D12 for both LightGBM tasks at 24 h and 6 h. At 24 h, log loss fell by 0.0224 (five folds) and RMSE by 0.146 min (four folds). Network coverage was 23.7% of CV rows. The shares describe runs with visible event states.
+- **2.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
 - **Combined groups.** Combining all five groups reached D12 in 11 of 20 exploratory comparisons. LightGBM reduced departure RMSE by 0.210 min with five folds improving. At 6 h, mean LightGBM log loss fell by 0.0205 with five folds improving.
 
@@ -145,21 +145,21 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
-| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | done |
-| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | done |
-| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | done |
-| 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | done |
-| 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | done |
+| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | todo |
+| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | todo |
+| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | todo |
+| 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | todo |
+| 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | todo |
 
-- **3.1.** All 84 runs finished. Adding a group to timetable alone reached D12 in 70 of 172 comparisons. Calendar gave the largest reductions, 0.0250 LightGBM log loss at 24 h and 0.631 min linear-model RMSE at departure, both in all five folds. None of 192 removals from the full set reached D12.
+- **3.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **3.2.** Calendar was the leading permutation group for both tasks at all five horizons. Permuting it at 24 h raised log loss by 0.0594 and RMSE by 1.212 min on average. Departure hour led mean absolute TreeSHAP at 24 h and departure in both models. The importance runs reproduced the full-group ablation fold scores exactly.
+- **3.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **3.3.** None of 40 nested forward or backward comparisons reached D12. The best reductions were 0.00144 log loss and 0.056 min RMSE. All 50 revised L1 fits converged, and none of the 10 L1 comparisons reached D12. The largest L1 reduction was 0.00239 log loss.
+- **3.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **3.4.** None of the 40 weather-subset comparisons reached D12. Temperature alone gave the largest reductions, 0.00053 log loss and 0.0034 min RMSE, both at 1 h.
+- **3.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **3.5.** Across 40 selections per horizon, calendar appeared 36 times at 24 h and 40 at departure. Recent reliability appeared 29 times at 24 h and 38 at departure. The delay group appeared in all 40 departure selections. The README breaks down the counts by task, direction and weather arm.
+- **3.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
 ## Phase 4. Two-stage and decomposed models
 
@@ -167,21 +167,21 @@ Question: does splitting the problem into parts that are easier to learn help? B
 
 | ID | Experiment | Method | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 4.1 | **Cancellation, then delay class** | binary model for P(cancelled) on all journeys, 3-class model on completed journeys; P(class k) = (1 − P(cancelled)) · P(k \| completed). Compare with the direct 4-class model by the same log loss | M | low–medium | done |
-| 4.2 | **Cancellation, then delay distribution** | as 4.1, but stage two is a predicted delay distribution (from 6.5); the class probabilities follow from it at 20 and 60 min. The severity and delay tasks then come from one model | M | medium | done |
-| 4.3 | **Ordinal stage two** | the 3 delay classes as two binary models, P(delay ≥ 20) and P(delay ≥ 60), forced to be ordered | S | low | done |
-| 4.4 | **Mixture of experts for delay** | a classifier routes each journey; one regressor per delay class; predicted delay = Σ P(k) · E[delay \| k]. Aimed at the 60+ min journeys that dominate RMSE | M | medium for RMSE | done |
-| 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (14,813 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | done |
+| 4.1 | **Cancellation, then delay class** | binary model for P(cancelled) on all journeys, 3-class model on completed journeys; P(class k) = (1 − P(cancelled)) · P(k \| completed). Compare with the direct 4-class model by the same log loss | M | low–medium | todo |
+| 4.2 | **Cancellation, then delay distribution** | as 4.1, but stage two is a predicted delay distribution (from 6.5); the class probabilities follow from it at 20 and 60 min. The severity and delay tasks then come from one model | M | medium | todo |
+| 4.3 | **Ordinal stage two** | the 3 delay classes as two binary models, P(delay ≥ 20) and P(delay ≥ 60), forced to be ordered | S | low | todo |
+| 4.4 | **Mixture of experts for delay** | a classifier routes each journey; one regressor per delay class; predicted delay = Σ P(k) · E[delay \| k]. Aimed at the 60+ min journeys that dominate RMSE | M | medium for RMSE | todo |
+| 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (14,813 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | todo |
 
-- **4.1.** The railway-only two-stage model reduced log loss by 0.0160 at 24 h and 0.0151 at 6 h against the fixed direct reference. All five folds improved in both exploratory comparisons.
+- **4.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **4.3.** The railway-only ordinal version reduced exploratory log loss by 0.0153 at 24 h and 0.0143 at 6 h against the fixed direct reference. All five folds improved in both comparisons.
+- **4.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **4.4.** None of ten exploratory mixture-of-experts comparisons reached D12. The largest gain was 0.048 min RMSE at 1 h in the railway arm, with five folds improving.
+- **4.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **4.5.** None of six exploratory change-target comparisons reached D12. The largest reduction was 0.007 min RMSE at departure. Rows without a verified current delay used the matched level model.
+- **4.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **4.2.** All six two-stage distributional arms finished. All 30 comparisons had higher log loss than the fixed direct LightGBM reference. The closest result was the weather quantile forest at 20 min, 0.0286 higher, with no folds improving.
+- **4.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
 ## Phase 5. Ensembles
 
@@ -189,18 +189,18 @@ Question: do combinations of models beat the best single model? Boosters that ti
 
 | ID | Experiment | Method | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | running |
-| 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | done |
-| 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
-| 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | done |
+| 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | todo |
+| 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | todo |
+| 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | todo |
+| 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | todo |
 
-- **5.1.** The ten booster and booster-plus-linear averages finished. None of their 50 paired horizon comparisons reached D12 against the strongest included single model. The largest reductions were 0.00188 log loss and 0.080 min RMSE. CatBoost and full-horizon neural additions are pending.
+- **5.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **5.2.** All 24 runs finished. Seven exploratory seed/flat-top-five comparisons reached D12. Among 40 nested-top-five comparisons, only weather LightGBM severity at 20 min reached D12 (−0.00327 log loss, five folds). No nested delay ensemble reached the RMSE threshold.
+- **5.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **5.3.** None of 20 exploratory greedy-weight comparisons reached D12 against the strongest included single model. The best RMSE reduction was 0.049 min with weather at 1 h, with four folds improving.
+- **5.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **5.4.** None of the 20 exploratory stacking comparisons reached D12 against the strongest included single model. The largest reduction was 0.065 min RMSE with weather at 1 h, with four folds improving.
+- **5.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
 ## Phase 6. Further model families
 
@@ -208,22 +208,22 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 
 | ID | Experiment | Why | Cost | Status |
 |---|---|---|---|---|
-| 6.1 | **CatBoost** classifier and regressor, same 50-configuration search | ordered target statistics for categoricals; often the strongest booster on small tabular data and among the best tuned GBDTs in TabArena | M | running |
-| 6.2 | **Calibration** of every finalist: temperature scaling and isotonic regression, fitted on inner folds, with calibration plots | log loss judges the probabilities; the random forest is expected to be too cautious (`classification_models.md`) | S | running |
-| 6.3 | **Explainable boosting machine** (`interpret`) | a GAM with pairwise interactions; close to boosting in accuracy on many datasets and readable per feature, useful for the report | M | done |
+| 6.1 | **CatBoost** classifier and regressor, same 50-configuration search | ordered target statistics for categoricals; often the strongest booster on small tabular data and among the best tuned GBDTs in TabArena | M | todo |
+| 6.2 | **Calibration** of every finalist: temperature scaling and isotonic regression, fitted on inner folds, with calibration plots | log loss judges the probabilities; the random forest is expected to be too cautious (`classification_models.md`) | S | todo |
+| 6.3 | **Explainable boosting machine** (`interpret`) | a GAM with pairwise interactions; close to boosting in accuracy on many datasets and readable per feature, useful for the report | M | todo |
 | 6.4 | Random effects for train number (GPBoost) | would use `train_number` as a grouping | — | dropped (D7) |
-| 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | done |
-| 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | done |
+| 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | todo |
+| 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | todo |
 
-- **6.1.** The railway delay arm finished its nested search. All five RMSE comparisons were 0.067–0.093 min worse than nested LightGBM. The weather delay and both severity arms are still running.
+- **6.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **6.5.** All six distributional runs finished. All 30 conditional-mean comparisons had higher RMSE than nested LightGBM. The smallest increases were 0.071 min for NGBoost, 0.318 min for quantile forest and 6.072 min for LightGBMLSS. Training-fold standardization repaired the mixture's initial constant fit. Step 4.2 tests the CDFs for severity.
+- **6.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **6.3.** All four EBM arms finished. All 20 paired comparisons had higher mean error than nested LightGBM. The closest severity comparison was 0.0106 log loss higher at 6 h. The built-in multiclass global visualization covers main effects; the fitted model includes interactions.
+- **6.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **6.6.** All 20 Huber and shifted-log comparisons had higher mean RMSE than the matched fixed LightGBM references. The smallest increase was 0.121 min for the weather shifted-log arm at 1 h.
+- **6.6.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **6.2.** All eight LightGBM/XGBoost temperature and isotonic runs finished with reliability plots. None of 40 comparisons reached D12. The largest log-loss reduction was 0.00054. CatBoost calibration follows its nested search.
+- **6.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
 ## Phase 7. Neural networks
 
@@ -231,21 +231,23 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
-| 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | done |
-| 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | done |
-| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | done |
-| 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | running |
+| 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | todo |
+| 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | todo |
+| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | todo |
+| 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | todo |
 | 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | todo |
 
 **About TabGNS.** The paper compares only with other architecture-search methods (TabNAS, AgE) and a large fixed MLP, on datasets of 31,000 to 940,000 rows. Its main results are smaller networks (51–82% fewer parameters) and faster search, with accuracy about equal to a large MLP. It has no comparison with gradient-boosted trees. So we should expect TabGNS to find a compact MLP about as good as 7.1, not to beat the boosters. The comparison is still worth making, and the method is a reasonable "advanced neural model" for the report.
 
-- **7.1.** All four eight-configuration MLP arms finished with cyclic calendar inputs. All 20 paired comparisons were worse than matched nested LightGBM. RMSE increased by 0.287–0.385 min and log loss by 0.0143–0.0208.
+- **7.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **7.2.** All four arms finished. Four of 20 comparisons reached D12 against the single-task MLP: weather delay at 24 h/6 h, railway severity at departure and weather severity at 24 h. All 20 multi-task scores remained worse than matched nested LightGBM.
+- **7.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **7.3.** All four TabGNS arms finished with the matching MLP calendar and per-outer-fold CPU allowances. None of 20 comparisons reached D12 against the MLP. Actual fitted widths, parameter counts and CPU time are saved per fold.
+- **7.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **7.4.** RealMLP and TabM are running both tasks and weather arms with week-held validation and cyclic calendar inputs. RealMLP refits on all supplied training rows; PyTabKit 1.8 TabM has no full-refit support and is excluded from final registration.
+- **7.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+
+- **7.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
 ## Phase 8. Transfer learning and pretraining
 
@@ -259,9 +261,11 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 | 8.4 | **Network-wide delay propagation** | pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. `arrival_delays/` has only delays and train type, so this needs a new extraction from `data/monthly_processed_data`. Same week restriction as 8.3 | L | medium at 1 h–0 min | todo |
 | 8.5 | Self-supervised pretraining (masked-feature reconstruction, SCARF) | every row is labelled and there are about ten features, so there is little to learn without labels | — | low | dropped |
 
-- **8.4.** The cutoff audit yielded 191,653 distinct training pairs from 39 CV weeks. Every planned, reported and cutoff week is eligible. Arrival-based inference has 2,146, 2,579 and 2,931 usable Frankfurt–München contexts at the late horizons. Cross-fitted model runs are pending.
+- **8.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **8.3.** The cutoff-safe source build produced 265,684 prediction rows across the three auxiliary corridors. On the same stable station panel as the target corridor, 358, 617 and 1,505 rows have verified current delay at 1 h, 20 min and departure. All three railway-only transfer comparisons are pending.
+- **8.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+
+- **8.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
 ## Phase 9. Final evaluation and analysis
 
@@ -299,3 +303,5 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 - 4 November 2026: plan drafted.
 - 4 November 2026: decisions D1–D10 made. Revised after the review of PR #11: inputs known at the cutoff as a first step (0.7), nested tuning (0.8), exploratory vs confirmed results, descriptive fold comparisons, historical state from the snapshots, the scheduled service as key, a fallback for 4.5, pinned foundation-model checkpoints, cross-fitting of transferred features, matched weather pairs. New open decisions D11–D13.
 - 4 November 2026: decisions D11–D13 made: nothing runs off this laptop, so 8.1 is dropped and its checkpoint list removed; minimum gain 0.003 log loss and 0.1 min RMSE; nested re-tuning with 50 configurations for LightGBM and XGBoost, railway-only and with weather.
+
+- 5 November 2026: the user approved using legacy timetable fields regardless of fetch time and all three railway-only corridor-transfer methods. Earlier strict-plan outputs were removed from the primary result tree and retained locally outside the repository. All affected features and CV experiments are being rebuilt.
