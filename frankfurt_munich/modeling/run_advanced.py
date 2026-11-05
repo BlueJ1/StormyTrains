@@ -49,7 +49,7 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
     chosen = dict(flat_choices(source_model, run.weather)) if source else {}
     evaluation = "exploratory" if source else "prespecified"
     if run.nested:
-        configs = sample_configs(space, n=8) if run.step in NEURAL else sample_configs(space)
+        configs = sample_configs(space, n=8 if run.step in NEURAL else run.n_configs)
         evaluation = "nested"
     if run.step.startswith(("1.", "2.")) or run.step == "3.1" or run.diagnostic:
         evaluation = "exploratory"
@@ -348,6 +348,7 @@ def main():
     parser.add_argument("--results-dir", type=Path, default=RESULTS)
     parser.add_argument("--prediction-time", nargs="+", choices=PREDICTION_TIMES, default=PREDICTION_TIMES)
     parser.add_argument("--jobs", type=int, default=1)
+    parser.add_argument("--n-configs", type=int, help="configuration count for steps 0.8 and 6.1 (default 20)")
     parser.add_argument("--model", nargs="+", choices=MODELS)
     parser.add_argument("--weather-arm", choices=("railway", "weather"), help="run one arm of a comparison")
     parser.add_argument("--variant", nargs="+", help="run only these registered variants")
@@ -356,9 +357,13 @@ def main():
     parser.add_argument("--nested-variant", choices=(*AUTO_VARIANTS, *PHASE2_GROUPS, "all_groups", *REPRESENTATIONS,
                                                       "route_target"))
     args = parser.parse_args()
+    if args.n_configs is not None and (args.n_configs < 1 or args.step not in ("0.8", "6.1")):
+        parser.error("--n-configs must be positive and applies only to steps 0.8 and 6.1")
     if args.step in LATE_STEPS and not set(args.prediction_time) & CURRENT_DELAY_TIMES:
         parser.error(f"step {args.step} needs at least one of 1h, 20min or 0min")
     runs = list(registered_runs(args.step))
+    if args.n_configs is not None:
+        runs = [replace(run, n_configs=args.n_configs) for run in runs]
     if not args.variant:
         runs = [run for run in runs if run.variant != "plus_neural"]
     if args.model:

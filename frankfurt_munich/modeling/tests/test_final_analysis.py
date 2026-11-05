@@ -314,3 +314,28 @@ def test_registered_tuning_retains_shared_feature_policy(monkeypatch):
     assert result["tuning_policy"] == {
         "method": "five CV week folds", "feature_selection": "auto_groups on the railway CV arm",
     }
+
+
+@pytest.mark.parametrize("source_budget,expected", [(50, 20), (20, 20), (8, 8)])
+def test_final_tuning_respects_reduced_budget(monkeypatch, source_budget, expected):
+    import run_final
+
+    counts = []
+
+    def configs(space, n):
+        counts.append(n)
+        return [{"choice": i} for i in range(n)]
+
+    monkeypatch.setattr(run_final, "sample_configs", configs)
+    monkeypatch.setattr(run_final, "load_advanced_rows", lambda *args, **kwargs: pd.DataFrame())
+    monkeypatch.setattr(run_final, "registered_factory", lambda spec: (None, [], []))
+    monkeypatch.setattr(run_final, "search", lambda *args: (
+        pd.DataFrame({"config_id": [2], "chosen": [True]}), None, None))
+    spec = {"task": "delay", "prediction_time": "24h", "weather": False,
+            "step": "0.8", "model": "lightgbm"}
+
+    result = run_final.tune_finalist(spec, {"search": {"n_configs": source_budget}}, Path("unused"))
+
+    assert counts == [expected]
+    assert result["tuning_policy"]["n_configs"] == expected
+    assert result["params"] == {"choice": 2}

@@ -13,6 +13,7 @@ DECOMPOSED = {"4.1": (LIGHTGBM[1], "cancellation_then_class"),
               "4.3": (LIGHTGBM[1], "cancellation_then_ordinal"),
               "4.4": (LIGHTGBM[0], "mixture_of_experts"),
               "4.5": (LIGHTGBM[0], "change_then_level")}
+SEARCH_CONFIGS = 20
 
 
 @dataclass(frozen=True)
@@ -24,6 +25,7 @@ class Run:
     diagnostic: bool = False
     nested: bool = False
     calendar: str = ""
+    n_configs: int = SEARCH_CONFIGS
 
     @property
     def name(self):

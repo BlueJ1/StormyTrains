@@ -23,7 +23,7 @@ from cv import (PROBA_COLUMNS, RESULTS, TARGETS, class_probabilities, cross_vali
 from data import DATA, HERE, PREDICTION_TIMES, ROW_KEY, TIME_COLUMN, merge_inputs
 from ensembles import FittedAverage, apply_isotonic, apply_temperature, fit_isotonic, fit_temperature
 from experiment_models import DISTRIBUTION_CLASSIFIERS, DISTRIBUTIONS, MODELS
-from experiment_specs import AUTO_VARIANTS, Run, nested_feature_variants
+from experiment_specs import AUTO_VARIANTS, SEARCH_CONFIGS, Run, nested_feature_variants
 from features import PHASE2_GROUPS, WEATHER, feature_groups
 from folds import cv_folds
 from final_analysis import (calibration_reliability, example_risk_trajectories,
@@ -33,7 +33,7 @@ from holdout_gate import REGISTRY, committed_registration
 from report_cv import run_index
 from representations import REPRESENTATIONS, extreme_weather, route_representation
 from sequence_inputs import SEQUENCE_COLUMN
-from tuning import N_CONFIGS, SCORE, sample_configs, search, select_feature_variant
+from tuning import SCORE, sample_configs, search, select_feature_variant
 
 REFIT_STEPS = {"0.8", "3.3", "5.2", "6.1", "6.2", "6.3", "6.5", "7.1", "7.2", "7.3", "7.4", "7.5"}
 FEATURE_FILES = {
@@ -114,8 +114,9 @@ def final_group_selection(config, prediction_time, task, inputs_dir):
 
 def tune_finalist(spec, config, inputs_dir):
     task, pt, weather, step = (spec[key] for key in ("task", "prediction_time", "weather", "step"))
-    n_configs = N_CONFIGS if step in ("5.2", "6.2") else config.get("search", {}).get("n_configs")
+    n_configs = SEARCH_CONFIGS if step in ("5.2", "6.2") else config.get("search", {}).get("n_configs")
     if n_configs:
+        n_configs = min(n_configs, SEARCH_CONFIGS)
         factory, numeric, categorical = registered_factory(spec)
         configs = sample_configs(MODELS[spec["model"]][2], n=n_configs)
         rows = load_advanced_rows(pt, weather=weather, inputs_dir=inputs_dir, extra_inputs=tuple(numeric + categorical))

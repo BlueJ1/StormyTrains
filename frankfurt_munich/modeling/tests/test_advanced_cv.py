@@ -90,6 +90,42 @@ def test_neural_reference_names_distinguish_calendar_choices():
         "7.1", "mlp", calendar="calendar_integer").name
 
 
+@pytest.mark.parametrize("run,expected", [
+    (Run("0.8", "lightgbm", nested=True), 20),
+    (Run("6.1", "catboost", nested=True, n_configs=7), 7),
+    (Run("7.1", "mlp", nested=True), 8),
+])
+def test_nested_runner_uses_registered_configuration_budget(monkeypatch, tmp_path, run, expected):
+    import run_advanced
+
+    counts = []
+
+    def configs(space, n):
+        counts.append(n)
+        return []
+
+    monkeypatch.setattr(run_advanced, "sample_configs", configs)
+    monkeypatch.setattr(run_advanced, "git_commit", lambda: "test-revision")
+    run_advanced.evaluate_run(run, inputs_dir=tmp_path, results_dir=tmp_path, prediction_times=())
+
+    assert counts == [expected]
+
+
+@pytest.mark.parametrize("arguments,expected", [([], 20), (["--n-configs", "7"], 7)])
+def test_search_cli_passes_same_budget_to_both_weather_arms(monkeypatch, arguments, expected):
+    import sys
+    import run_advanced
+
+    budgets = []
+    monkeypatch.setattr(sys, "argv", ["run_advanced", "0.8", "--model", "lightgbm", *arguments])
+    monkeypatch.setattr(run_advanced, "evaluate_run", lambda run, **kwargs: budgets.append(run.n_configs))
+    monkeypatch.setattr(run_advanced, "compare_to_base", lambda *args: None)
+
+    run_advanced.main()
+
+    assert budgets == [expected, expected]
+
+
 def test_differences_align_by_fold_and_use_the_registered_threshold():
     reference = pd.DataFrame({"prediction_time": "1h", "fold": range(1, 6),
                               "validation_rows": range(30, 35), "log_loss": 1.0})

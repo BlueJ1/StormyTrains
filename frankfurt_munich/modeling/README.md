@@ -35,7 +35,7 @@ Recent-reliability candidates come from the CV roster during development. The ho
 .venv/bin/python frankfurt_munich/modeling/report_cv.py --write-readme
 ```
 
-`run_advanced.py --help` lists the CV steps and filters. Fixed configurations come from the committed flat searches. Step 0.8 uses 50 configurations inside each outer training set. The `auto_groups` and `auto_representations` options to `--nested-variant` also select features inside each outer training set. A variant fixed after seeing the exploratory results retains that label even when its parameters are tuned again.
+`run_advanced.py --help` lists the CV steps and filters. Fixed configurations come from the committed flat searches. Following the user decision on 5 November, remaining booster and CatBoost searches use 20 configurations inside each outer training set. Six completed baseline arms retain their 50-configuration results. The reference table and each run configuration record the actual count. Final registration uses at most 20 configurations. Neural searches use eight. The `auto_groups` and `auto_representations` options to `--nested-variant` also select features inside each outer training set. A variant fixed after seeing the exploratory results retains that label even when its parameters are tuned again.
 
 The model-family screens use the cutoff-safe base columns for their learner comparisons. The nested booster feature-group policy evaluates the expanded Phase 2 inputs separately.
 
@@ -75,33 +75,33 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 
 #### Step 0.7 reference scores
 
-| Model | Score | 24h | 6h | 1h | 20min | 0min |
-| --- | --- | --- | --- | --- | --- | --- |
-| [class_shares](results/advanced_0_7_class_shares/20261105-094255) | log_loss | 0.968037 | 0.958148 | 0.923149 | 0.904638 | 0.896917 |
-| [lightgbm](results/advanced_0_7_lightgbm/20261105-094317) | rmse | 24.475782 | 24.475782 | 24.061917 | 24.110516 | 23.871876 |
-| [lightgbm_classifier](results/advanced_0_7_lightgbm_classifier/20261105-094449) | log_loss | 0.920441 | 0.911750 | 0.867040 | 0.848649 | 0.833305 |
-| [lightgbm_classifier + weather](results/advanced_0_7_lightgbm_classifier_weather/20261105-094543) | log_loss | 0.926648 | 0.920599 | 0.870853 | 0.852692 | 0.837792 |
-| [lightgbm + weather](results/advanced_0_7_lightgbm_weather/20261105-094320) | rmse | 24.596359 | 24.636556 | 24.162988 | 24.118915 | 23.886333 |
-| [linear_regression](results/advanced_0_7_linear_regression/20261105-094255) | rmse | 24.725467 | 24.725467 | 24.306489 | 24.287113 | 24.075382 |
-| [linear_regression + weather](results/advanced_0_7_linear_regression_weather/20261105-094257) | rmse | 24.741384 | 24.745659 | 24.329880 | 24.303906 | 24.091288 |
-| [logistic_regression](results/advanced_0_7_logistic_regression/20261105-094300) | log_loss | 0.934693 | 0.925578 | 0.881563 | 0.862618 | 0.848278 |
-| [logistic_regression + weather](results/advanced_0_7_logistic_regression_weather/20261105-094306) | log_loss | 0.936857 | 0.926824 | 0.881350 | 0.862513 | 0.849384 |
-| [training_mean](results/advanced_0_7_training_mean/20261105-094254) | rmse | 25.427529 | 25.427529 | 25.427529 | 25.427529 | 25.427529 |
-| [xgboost](results/advanced_0_7_xgboost/20261105-094512) | rmse | 24.511355 | 24.511355 | 24.085740 | 24.059483 | 23.813927 |
-| [xgboost_classifier](results/advanced_0_7_xgboost_classifier/20261105-094634) | log_loss | 0.921781 | 0.912863 | 0.867956 | 0.851121 | 0.836399 |
-| [xgboost_classifier + weather](results/advanced_0_7_xgboost_classifier_weather/20261105-094757) | log_loss | 0.923900 | 0.916941 | 0.869718 | 0.850681 | 0.839115 |
-| [xgboost + weather](results/advanced_0_7_xgboost_weather/20261105-094544) | rmse | 24.516292 | 24.541405 | 24.131985 | 24.115664 | 23.883132 |
+| Model | Search configs | Score | 24h | 6h | 1h | 20min | 0min |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [class_shares](results/advanced_0_7_class_shares/20261105-094255) | fixed | log_loss | 0.968037 | 0.958148 | 0.923149 | 0.904638 | 0.896917 |
+| [lightgbm](results/advanced_0_7_lightgbm/20261105-094317) | fixed | rmse | 24.475782 | 24.475782 | 24.061917 | 24.110516 | 23.871876 |
+| [lightgbm_classifier](results/advanced_0_7_lightgbm_classifier/20261105-094449) | fixed | log_loss | 0.920441 | 0.911750 | 0.867040 | 0.848649 | 0.833305 |
+| [lightgbm_classifier + weather](results/advanced_0_7_lightgbm_classifier_weather/20261105-094543) | fixed | log_loss | 0.926648 | 0.920599 | 0.870853 | 0.852692 | 0.837792 |
+| [lightgbm + weather](results/advanced_0_7_lightgbm_weather/20261105-094320) | fixed | rmse | 24.596359 | 24.636556 | 24.162988 | 24.118915 | 23.886333 |
+| [linear_regression](results/advanced_0_7_linear_regression/20261105-094255) | fixed | rmse | 24.725467 | 24.725467 | 24.306489 | 24.287113 | 24.075382 |
+| [linear_regression + weather](results/advanced_0_7_linear_regression_weather/20261105-094257) | fixed | rmse | 24.741384 | 24.745659 | 24.329880 | 24.303906 | 24.091288 |
+| [logistic_regression](results/advanced_0_7_logistic_regression/20261105-094300) | fixed | log_loss | 0.934693 | 0.925578 | 0.881563 | 0.862618 | 0.848278 |
+| [logistic_regression + weather](results/advanced_0_7_logistic_regression_weather/20261105-094306) | fixed | log_loss | 0.936857 | 0.926824 | 0.881350 | 0.862513 | 0.849384 |
+| [training_mean](results/advanced_0_7_training_mean/20261105-094254) | fixed | rmse | 25.427529 | 25.427529 | 25.427529 | 25.427529 | 25.427529 |
+| [xgboost](results/advanced_0_7_xgboost/20261105-094512) | fixed | rmse | 24.511355 | 24.511355 | 24.085740 | 24.059483 | 23.813927 |
+| [xgboost_classifier](results/advanced_0_7_xgboost_classifier/20261105-094634) | fixed | log_loss | 0.921781 | 0.912863 | 0.867956 | 0.851121 | 0.836399 |
+| [xgboost_classifier + weather](results/advanced_0_7_xgboost_classifier_weather/20261105-094757) | fixed | log_loss | 0.923900 | 0.916941 | 0.869718 | 0.850681 | 0.839115 |
+| [xgboost + weather](results/advanced_0_7_xgboost_weather/20261105-094544) | fixed | rmse | 24.516292 | 24.541405 | 24.131985 | 24.115664 | 23.883132 |
 
 #### Step 0.8 nested reference scores
 
-| Model | Score | 24h | 6h | 1h | 20min | 0min |
-| --- | --- | --- | --- | --- | --- | --- |
-| [lightgbm](results/advanced_0_8_lightgbm/20261105-104427) | rmse | 24.476322 | 24.498823 | 24.104596 | 24.050366 | 23.814612 |
-| [lightgbm_classifier](results/advanced_0_8_lightgbm_classifier/20261105-132343) | log_loss | 0.920292 | 0.911456 | 0.867854 | 0.847832 | 0.833265 |
-| [lightgbm_classifier + weather](results/advanced_0_8_lightgbm_classifier_weather/20261105-163232) | log_loss | 0.925748 | 0.919832 | 0.874306 | 0.853488 | 0.837990 |
-| [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-114530) | rmse | 24.557345 | 24.615389 | 24.168186 | 24.073497 | 23.859808 |
-| [xgboost](results/advanced_0_8_xgboost/20261105-120428) | rmse | 24.534369 | 24.568876 | 24.107252 | 24.096992 | 23.862371 |
-| [xgboost + weather](results/advanced_0_8_xgboost_weather/20261105-143116) | rmse | 24.559085 | 24.624093 | 24.129380 | 24.125515 | 23.893265 |
+| Model | Search configs | Score | 24h | 6h | 1h | 20min | 0min |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| [lightgbm](results/advanced_0_8_lightgbm/20261105-104427) | 50 | rmse | 24.476322 | 24.498823 | 24.104596 | 24.050366 | 23.814612 |
+| [lightgbm_classifier](results/advanced_0_8_lightgbm_classifier/20261105-132343) | 50 | log_loss | 0.920292 | 0.911456 | 0.867854 | 0.847832 | 0.833265 |
+| [lightgbm_classifier + weather](results/advanced_0_8_lightgbm_classifier_weather/20261105-163232) | 50 | log_loss | 0.925748 | 0.919832 | 0.874306 | 0.853488 | 0.837990 |
+| [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-114530) | 50 | rmse | 24.557345 | 24.615389 | 24.168186 | 24.073497 | 23.859808 |
+| [xgboost](results/advanced_0_8_xgboost/20261105-120428) | 50 | rmse | 24.534369 | 24.568876 | 24.107252 | 24.096992 | 23.862371 |
+| [xgboost + weather](results/advanced_0_8_xgboost_weather/20261105-143116) | 50 | rmse | 24.559085 | 24.624093 | 24.129380 | 24.125515 | 23.893265 |
 
 #### Smallest paired differences by step, task and horizon
 

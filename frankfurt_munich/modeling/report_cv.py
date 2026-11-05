@@ -37,6 +37,7 @@ def reference_table(runs, step):
         scores = summary.set_index("prediction_time")[f"{score}_mean"]
         model = config["model"] + (" + weather" if config["weather"] else "")
         records.append({"Model": f"[{model}](results/{path.parent.name}/{path.name})",
+                        "Search configs": config.get("search", {}).get("n_configs", "fixed"),
                         "Score": score, **{time: scores.get(time, float("nan"))
                                            for time in PREDICTION_TIMES}})
     return pd.DataFrame(records)
