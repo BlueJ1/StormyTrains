@@ -167,11 +167,21 @@ Question: does splitting the problem into parts that are easier to learn help? B
 
 | ID | Experiment | Method | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 4.1 | **Cancellation, then delay class** | binary model for P(cancelled) on all journeys, 3-class model on completed journeys; P(class k) = (1 − P(cancelled)) · P(k \| completed). Compare with the direct 4-class model by the same log loss | M | low–medium | todo |
-| 4.2 | **Cancellation, then delay distribution** | as 4.1, but stage two is a predicted delay distribution (from 6.5); the class probabilities follow from it at 20 and 60 min. The severity and delay tasks then come from one model | M | medium | todo |
-| 4.3 | **Ordinal stage two** | the 3 delay classes as two binary models, P(delay ≥ 20) and P(delay ≥ 60), forced to be ordered | S | low | todo |
-| 4.4 | **Mixture of experts for delay** | a classifier routes each journey; one regressor per delay class; predicted delay = Σ P(k) · E[delay \| k]. Aimed at the 60+ min journeys that dominate RMSE | M | medium for RMSE | todo |
-| 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (14,813 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | todo |
+| 4.1 | **Cancellation, then delay class** | binary model for P(cancelled) on all journeys, 3-class model on completed journeys; P(class k) = (1 − P(cancelled)) · P(k \| completed). Compare with the direct 4-class model by the same log loss | M | low–medium | done |
+| 4.2 | **Cancellation, then delay distribution** | as 4.1, but stage two is a predicted delay distribution (from 6.5); the class probabilities follow from it at 20 and 60 min. The severity and delay tasks then come from one model | M | medium | done |
+| 4.3 | **Ordinal stage two** | the 3 delay classes as two binary models, P(delay ≥ 20) and P(delay ≥ 60), forced to be ordered | S | low | done |
+| 4.4 | **Mixture of experts for delay** | a classifier routes each journey; one regressor per delay class; predicted delay = Σ P(k) · E[delay \| k]. Aimed at the 60+ min journeys that dominate RMSE | M | medium for RMSE | done |
+| 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (14,813 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | done |
+
+- **4.1.** The railway-only two-stage model reduced log loss by 0.0160 at 24 h and 0.0151 at 6 h against the fixed direct reference. All five folds improved in both exploratory comparisons.
+
+- **4.3.** The railway-only ordinal version reduced exploratory log loss by 0.0153 at 24 h and 0.0143 at 6 h against the fixed direct reference. All five folds improved in both comparisons.
+
+- **4.4.** None of ten exploratory mixture-of-experts comparisons reached D12. The largest gain was 0.048 min RMSE at 1 h in the railway arm, with five folds improving.
+
+- **4.5.** None of six exploratory change-target comparisons reached D12. The largest reduction was 0.007 min RMSE at departure. Rows without a verified current delay used the matched level model.
+
+- **4.2.** All six two-stage distributional arms finished. All 30 comparisons had higher log loss than the fixed direct LightGBM reference. The closest result was the weather quantile forest at 20 min, 0.0286 higher, with no folds improving.
 
 ## Phase 5. Ensembles
 
@@ -182,15 +192,15 @@ Question: do combinations of models beat the best single model? Boosters that ti
 | 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | running |
 | 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | running |
 | 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
-| 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | running |
+| 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | done |
 
 - **5.1.** The ten booster and booster-plus-linear averages finished. None of their 50 paired horizon comparisons reached D12 against the strongest included single model. The largest reductions were 0.00188 log loss and 0.080 min RMSE. CatBoost and full-horizon neural additions are pending.
 
-- **5.2.** The 16 seed and flat top-five runs and four nested delay runs finished. Seven exploratory horizon comparisons reached D12. The nested delay runs had no threshold-reaching gain. Nested severity awaits its baseline searches.
+- **5.2.** The 16 seed and flat top-five runs, all nested delay runs and both nested LightGBM severity arms finished. Weather LightGBM top-five severity reduced 20 min log loss by 0.00327 in all five folds. Nested XGBoost severity follows its baseline searches.
 
 - **5.3.** None of 20 exploratory greedy-weight comparisons reached D12 against the strongest included single model. The best RMSE reduction was 0.049 min with weather at 1 h, with four folds improving.
 
-- **5.4.** The logistic and linear stackers use week-cross-fitted predictions inside each outer training set. The base model configurations come from the flat searches.
+- **5.4.** None of the 20 exploratory stacking comparisons reached D12 against the strongest included single model. The largest reduction was 0.065 min RMSE with weather at 1 h, with four folds improving.
 
 ## Phase 6. Further model families
 
@@ -199,7 +209,7 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 | ID | Experiment | Why | Cost | Status |
 |---|---|---|---|---|
 | 6.1 | **CatBoost** classifier and regressor, same 50-configuration search | ordered target statistics for categoricals; often the strongest booster on small tabular data and among the best tuned GBDTs in TabArena | M | running |
-| 6.2 | **Calibration** of every finalist: temperature scaling and isotonic regression, fitted on inner folds, with calibration plots | log loss judges the probabilities; the random forest is expected to be too cautious (`classification_models.md`) | S | todo |
+| 6.2 | **Calibration** of every finalist: temperature scaling and isotonic regression, fitted on inner folds, with calibration plots | log loss judges the probabilities; the random forest is expected to be too cautious (`classification_models.md`) | S | running |
 | 6.3 | **Explainable boosting machine** (`interpret`) | a GAM with pairwise interactions; close to boosting in accuracy on many datasets and readable per feature, useful for the report | M | done |
 | 6.4 | Random effects for train number (GPBoost) | would use `train_number` as a grouping | — | dropped (D7) |
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | done |
@@ -213,19 +223,23 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 
 - **6.6.** All 20 Huber and shifted-log comparisons had higher mean RMSE than the matched fixed LightGBM references. The smallest increase was 0.121 min for the weather shifted-log arm at 1 h.
 
+- **6.2.** LightGBM temperature and isotonic runs finished with reliability plots. None of 20 comparisons reached D12. Temperature's largest reduction was 0.00054 log loss. XGBoost and CatBoost calibration follow their nested searches.
+
 ## Phase 7. Neural networks
 
 Question: does a neural network match or beat the boosters here, and does it add to an ensemble? Grinsztajn et al. (2022) found trees usually ahead on data of this size; recent tabular networks (RealMLP, TabM) close the gap on benchmarks. Inputs: standardised numeric columns, the best calendar encoding from 1.1, embeddings or one-hot for categoricals, `current_delay` as 0 plus a missing indicator. Early stopping and architecture search use inner week folds (0.3), never the outer validation fold. These run on this laptop (D6).
 
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
-| 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | todo |
+| 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | running |
 | 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | todo |
 | 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | todo |
 | 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | todo |
 | 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | todo |
 
 **About TabGNS.** The paper compares only with other architecture-search methods (TabNAS, AgE) and a large fixed MLP, on datasets of 31,000 to 940,000 rows. Its main results are smaller networks (51–82% fewer parameters) and faster search, with accuracy about equal to a large MLP. It has no comparison with gradient-boosted trees. So we should expect TabGNS to find a compact MLP about as good as 7.1, not to beat the boosters. The comparison is still worth making, and the method is a reasonable "advanced neural model" for the report.
+
+- **7.1.** Both eight-configuration MLP delay arms finished. All ten comparisons had RMSE 0.287–0.385 min higher than the matched nested LightGBM references. The severity arms are running with cyclic calendar inputs.
 
 ## Phase 8. Transfer learning and pretraining
 

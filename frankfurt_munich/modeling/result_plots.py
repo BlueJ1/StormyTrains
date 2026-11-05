@@ -1,6 +1,8 @@
 """Static calibration and journey-risk plots for the results directory."""
 from __future__ import annotations
 
+from pathlib import Path
+
 import matplotlib
 
 matplotlib.use("Agg")
@@ -10,6 +12,15 @@ from data import PREDICTION_TIMES
 from metrics import CLASSES
 
 matplotlib.rcParams["svg.hashsalt"] = "stormytrains"
+
+
+def save_plot(fig, path):
+    path = Path(path)
+    metadata = {"Date": None} if path.suffix == ".svg" else None
+    fig.savefig(path, metadata=metadata)
+    if path.suffix == ".svg":
+        path.write_text("\n".join(line.rstrip() for line in path.read_text().splitlines()) + "\n")
+    plt.close(fig)
 
 
 def calibration_plot(tables, path):
@@ -35,8 +46,7 @@ def calibration_plot(tables, path):
     fig.supxlabel("Mean predicted probability")
     fig.supylabel("Observed frequency")
     fig.tight_layout()
-    fig.savefig(path, metadata={"Date": None})
-    plt.close(fig)
+    save_plot(fig, path)
 
 
 def risk_plot(tables, path):
@@ -54,5 +64,4 @@ def risk_plot(tables, path):
     axes[0].set_ylabel("Severe or cancelled probability")
     axes[-1].legend(loc="best", fontsize=7)
     fig.tight_layout()
-    fig.savefig(path, metadata={"Date": None})
-    plt.close(fig)
+    save_plot(fig, path)
