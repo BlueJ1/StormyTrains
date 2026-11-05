@@ -8,11 +8,15 @@ Only the CV set is used (`../data/prediction_rows_cv.parquet`). The weather mode
 
 The earlier scores below use recorded-route inputs. `run_advanced.py` runs the CV experiments in [PLAN.md](PLAN.md) with the new cutoff-specific inputs. It keeps the same prediction rows and week folds. The recorded route fields are available only in the step 0.7 leakage comparison and the historical reproduction commands.
 
-The advanced runner reads generated CV inputs in `../data/advanced/`. It requires the timestamped timetable and live data and checks that they cover the same prediction keys. It does not fall back to the monthly file's latest delay. Railway-only runs do not read the advanced weather file.
+The advanced runner reads generated CV inputs in `../data/advanced/`. It requires the timestamped timetable and reconstructed live-delay data and checks that they cover the same prediction keys. It reads advanced weather only for the weather arm.
 
-Download the 27 `monthly_processed_data_plan` files for July 2024 through September 2026 from the [pinned plan archive](https://huggingface.co/datasets/piebro/deutsche-bahn-data/tree/d27b9c413536bb5fe393954371f572050e55176b/monthly_processed_data_plan). The default input directory is `data/monthly_processed_data_plan/`. The [legacy fetcher](https://github.com/piebro/deutsche-bahn-data/blob/f19888b770a68d5f9010adac33af70e400e2395d/fetch_data.py) used the requested timetable hour in plan filenames. The primary build leaves those values missing and accepts exact request stamps from 3 November 2025. The 45-minute bound in the plan applies to the separate change archive.
+Download the 27 `monthly_processed_data_plan` files for July 2024 through September 2026 into `data/monthly_processed_data_plan/`. [Pinned plan archive](https://huggingface.co/datasets/piebro/deutsche-bahn-data/tree/d27b9c413536bb5fe393954371f572050e55176b/monthly_processed_data_plan)
+
+The legacy fetcher used the requested timetable hour in plan filenames. The primary build leaves those values missing and accepts exact request stamps from 3 November 2025. The 45-minute bound applies to the separate change archive. [Legacy fetcher](https://github.com/piebro/deutsche-bahn-data/blob/f19888b770a68d5f9010adac33af70e400e2395d/fetch_data.py)
 
 The prediction cohort supplies the planned Frankfurt departure and München arrival. The additional timetable fields come from the scheduled train's plan available at the cutoff. If the branch is unavailable, the weather pipeline retains the two endpoint temperatures and leaves the route aggregates missing. The live delay requires both a visible change report and a visible plan. For retained replacement trains it also requires a visible link to the scheduled service.
+
+Recent-reliability candidates come from the CV roster during development. The holdout feature build adds its roster for the historical lookup. Both builds reconstruct past outcomes from snapshots available at each cutoff.
 
 | Input coverage | 24 h | 6 h | 1 h | 20 min | 0 min |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -41,6 +45,20 @@ Step 8.3 uses railway inputs from the three auxiliary corridors. The builder dro
 .venv/bin/python frankfurt_munich/modeling/network_transfer.py
 .venv/bin/python frankfurt_munich/modeling/sequence_inputs.py
 ```
+
+### Holdout evaluation
+
+After the CV steps are complete, `run_final.py register` ranks eligible pipelines by the railway-only CV score and writes one matched pair per task and horizon to `finalists.json`. Commit that file with the preregistration entry in the plan before generating holdout inputs.
+
+```bash
+.venv/bin/python frankfurt_munich/modeling/run_final.py register
+# After committing the registry and the preregistration entry
+.venv/bin/python frankfurt_munich/scheduled_timetable.py --split holdout
+.venv/bin/python frankfurt_munich/history_features.py --split holdout
+.venv/bin/python frankfurt_munich/modeling/build_advanced_weather.py --split holdout
+```
+
+Build any additional inputs named by the finalists with `--split holdout`. Use `history_features.py --feature reliability` for recent reliability, `network_state.py` for network state, and `sequence_inputs.py` for upstream sequences. Then run `run_final.py evaluate` once. If a distributional learner is registered, supply its pinned interpreter via `--distribution-python`. The evaluation saves scores, paired week-bootstrap intervals, subgroup errors, calibration, risk trajectories, and SHAP summaries in `results/advanced_holdout/`.
 
 <!-- BEGIN ADVANCED CV -->
 
@@ -211,6 +229,80 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 3.1 | severity | exploratory | 24h | lightgbm_classifier | add_calendar | True | timetable-only | -0.024978 | 5 | True | [folds](results/advanced_3_1_lightgbm_classifier_weather_add_calendar/20261104-235233/paired_vs_base.csv) |
 | 3.1 | severity | exploratory | 6h | logistic_regression | drop_network_state | True | full | -0.000558 | 3 | False | [folds](results/advanced_3_1_logistic_regression_weather_drop_network_state/20261104-234426/paired_vs_base.csv) |
 | 3.1 | severity | exploratory | 6h | logistic_regression | add_calendar | True | timetable-only | -0.024782 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_calendar/20261104-234332/paired_vs_base.csv) |
+
+#### Step 3.2 leading permutation groups and TreeSHAP features
+
+| task | prediction_time | group | score_increase | feature | mean_abs_shap | details |
+| --- | --- | --- | --- | --- | --- | --- |
+| severity | 0min | calendar | 0.050562 | hour | 0.224723 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-005218) |
+| severity | 1h | calendar | 0.052943 | hour | 0.193765 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-005218) |
+| severity | 20min | calendar | 0.051917 | hour | 0.223194 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-005218) |
+| severity | 24h | calendar | 0.059421 | hour | 0.217924 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-005218) |
+| severity | 6h | calendar | 0.037328 | hour | 0.156771 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-005218) |
+| delay | 0min | calendar | 1.098138 | hour | 3.489834 | [folds](results/advanced_3_2_lightgbm_weather/20261105-001627) |
+| delay | 1h | calendar | 1.132529 | hour | 3.541500 | [folds](results/advanced_3_2_lightgbm_weather/20261105-001627) |
+| delay | 20min | calendar | 1.093416 | hour | 3.534970 | [folds](results/advanced_3_2_lightgbm_weather/20261105-001627) |
+| delay | 24h | calendar | 1.211728 | hour | 3.697072 | [folds](results/advanced_3_2_lightgbm_weather/20261105-001627) |
+| delay | 6h | calendar | 0.776538 | hour | 2.844521 | [folds](results/advanced_3_2_lightgbm_weather/20261105-001627) |
+
+#### Step 3.5 group choices at 24 h and 0 min
+
+| task | weather | direction | prediction_time | group | folds_selected |
+| --- | --- | --- | --- | --- | --- |
+| delay | False | backward | 24h | calendar | 5 |
+| delay | False | backward | 24h | recent_reliability | 4 |
+| delay | False | backward | 24h | timetable | 5 |
+| delay | False | backward | 24h | network_state | 2 |
+| delay | False | backward | 24h | route | 4 |
+| delay | False | backward | 0min | calendar | 5 |
+| delay | False | backward | 0min | delay | 5 |
+| delay | False | backward | 0min | network_state | 1 |
+| delay | False | backward | 0min | recent_reliability | 5 |
+| delay | False | backward | 0min | timetable | 5 |
+| delay | False | backward | 0min | route | 1 |
+| delay | False | forward | 24h | calendar | 5 |
+| delay | False | forward | 24h | recent_reliability | 4 |
+| delay | False | forward | 24h | timetable | 5 |
+| delay | False | forward | 24h | network_state | 2 |
+| delay | False | forward | 24h | route | 1 |
+| delay | False | forward | 0min | calendar | 5 |
+| delay | False | forward | 0min | delay | 5 |
+| delay | False | forward | 0min | network_state | 1 |
+| delay | False | forward | 0min | recent_reliability | 5 |
+| delay | False | forward | 0min | timetable | 5 |
+| delay | False | forward | 0min | route | 1 |
+| delay | True | backward | 24h | calendar | 5 |
+| delay | True | backward | 24h | precipitation | 5 |
+| delay | True | backward | 24h | recent_reliability | 3 |
+| delay | True | backward | 24h | route | 4 |
+| delay | True | backward | 24h | snow | 5 |
+| delay | True | backward | 24h | timetable | 5 |
+| delay | True | backward | 24h | wind | 5 |
+| delay | True | backward | 24h | network_state | 2 |
+| delay | True | backward | 24h | temperature | 2 |
+| delay | True | backward | 0min | calendar | 5 |
+| delay | True | backward | 0min | delay | 5 |
+| delay | True | backward | 0min | network_state | 1 |
+| delay | True | backward | 0min | recent_reliability | 5 |
+| delay | True | backward | 0min | timetable | 5 |
+| delay | True | backward | 0min | route | 1 |
+| delay | True | backward | 0min | temperature | 4 |
+| delay | True | backward | 0min | precipitation | 1 |
+| delay | True | forward | 24h | calendar | 5 |
+| delay | True | forward | 24h | recent_reliability | 3 |
+| delay | True | forward | 24h | timetable | 5 |
+| delay | True | forward | 24h | network_state | 2 |
+| delay | True | forward | 24h | route | 1 |
+| delay | True | forward | 24h | temperature | 2 |
+| delay | True | forward | 24h | wind | 1 |
+| delay | True | forward | 0min | calendar | 5 |
+| delay | True | forward | 0min | delay | 5 |
+| delay | True | forward | 0min | network_state | 1 |
+| delay | True | forward | 0min | recent_reliability | 5 |
+| delay | True | forward | 0min | timetable | 5 |
+| delay | True | forward | 0min | route | 1 |
+| delay | True | forward | 0min | temperature | 4 |
+| delay | True | forward | 0min | precipitation | 1 |
 
 <!-- END ADVANCED CV -->
 

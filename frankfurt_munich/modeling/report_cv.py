@@ -81,6 +81,24 @@ def selection_table(runs):
     return pd.DataFrame(rows).value_counts(sort=False).rename("folds_selected").reset_index()
 
 
+def importance_table(runs):
+    tables = []
+    for path, config, _ in runs:
+        if config["step"] != "3.2" or not (path / "shap.csv").is_file():
+            continue
+        group = pd.read_csv(path / "permutation.csv").groupby(
+            ["prediction_time", "group"], as_index=False)["score_increase"].mean()
+        shap = pd.read_csv(path / "shap.csv").groupby(
+            ["prediction_time", "feature"], as_index=False)["mean_abs_shap"].mean()
+        top_group = group.loc[group.groupby("prediction_time")["score_increase"].idxmax()]
+        top_shap = shap.loc[shap.groupby("prediction_time")["mean_abs_shap"].idxmax()]
+        table = top_group.merge(top_shap, on="prediction_time").assign(task=config["task"])
+        table["details"] = f"[folds](results/{path.parent.name}/{path.name})"
+        tables.append(table[["task", "prediction_time", "group", "score_increase",
+                             "feature", "mean_abs_shap", "details"]])
+    return pd.concat(tables, ignore_index=True) if tables else pd.DataFrame()
+
+
 def render(results_dir):
     runs = list(run_index(results_dir))
     output = ["### Advanced CV results", "",
@@ -88,6 +106,7 @@ def render(results_dir):
     tables = [("Step 0.7 reference scores", reference_table(runs, "0.7"), False),
               ("Step 0.8 nested reference scores", reference_table(runs, "0.8"), False),
               ("Smallest paired differences by step, task and horizon", comparison_table(runs), True),
+              ("Step 3.2 leading permutation groups and TreeSHAP features", importance_table(runs), False),
               ("Step 3.5 group choices at 24 h and 0 min", selection_table(runs), False)]
     for title, table, signed in tables:
         if not table.empty:

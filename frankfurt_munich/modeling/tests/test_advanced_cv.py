@@ -146,3 +146,22 @@ def test_advanced_loader_does_not_open_holdout_by_default(monkeypatch):
     monkeypatch.setattr(pd, "read_parquet", deny)
     with pytest.raises(PermissionError):
         load_advanced_rows("1h", split="holdout")
+
+
+def test_network_training_excludes_validation_run_and_report_week(tmp_path, monkeypatch):
+    import network_transfer as transfer
+
+    train_week, validation_week = pd.to_datetime(["2025-11-03", "2025-11-10"])
+    assignment = pd.DataFrame({"week_start": [train_week, validation_week], "split": "cv"})
+    monkeypatch.setattr(transfer, "read_assignment", lambda: assignment)
+    pairs = pd.DataFrame({"id": ["allowed-1", "validation-run-1", "late-outcome-1"],
+                          "delay_target": [5.0, 100.0, 200.0]})
+    pairs[transfer.CONTEXT] = 1.0
+    pairs[transfer.WEEKS] = train_week
+    pairs.loc[2, "target_report_week"] = validation_week
+    path = tmp_path / "pairs.parquet"
+    pairs.to_parquet(path)
+
+    model = transfer.fit_network(path, (train_week,), ("validation-run",))
+
+    np.testing.assert_allclose(model.predict(pairs[transfer.CONTEXT]), 5.0)

@@ -77,9 +77,9 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** The railway-only LightGBM and XGBoost delay arms finished all five horizons with 50 configurations per outer fold. The remaining baseline arms and the early-horizon representation confirmation are running.
+- **0.8.** Three baseline delay arms have finished all five horizons with 50 configurations per outer fold. The other baseline arms, early-horizon representation confirmation and feature-group confirmation are running.
 
-- **0.6.** The local suite passed 122 tests. Five tests were skipped in the main environment, including the optional distribution packages. All four distribution tests passed in their pinned environment.
+- **0.6.** A clean install from the main pins passed 146 tests with five skips. All four optional distribution tests passed in their pinned environment. Fresh departure LightGBM runs reproduced all 16,947 CV probability vectors per arm for both cutoff-safe references and both recorded-route diagnostics.
 
 ## Phase 1. Feature representations
 
@@ -146,14 +146,16 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
 | 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | done |
-| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | running |
-| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | todo |
+| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | done |
+| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | running |
 | 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | todo |
 | 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | todo |
 
 - **3.1.** All 84 runs finished. Adding a group to timetable alone reached D12 in 70 of 172 comparisons. Calendar gave the largest reductions, 0.0250 LightGBM log loss at 24 h and 0.631 min linear-model RMSE at departure, both in all five folds. None of 192 removals from the full set reached D12.
 
-- **3.2.** Computing grouped permutation importance and LightGBM TreeSHAP on the validation folds.
+- **3.2.** Calendar was the leading permutation group for both tasks at all five horizons. Permuting it at 24 h raised log loss by 0.0594 and RMSE by 1.212 min on average. Departure hour led mean absolute TreeSHAP at 24 h and departure in both models. The importance runs reproduced the full-group ablation fold scores exactly.
+
+- **3.3.** The forward, backward and L1 comparisons are running on the fixed outer folds. Forward and backward choices use only inner training weeks.
 
 ## Phase 4. Two-stage and decomposed models
 
