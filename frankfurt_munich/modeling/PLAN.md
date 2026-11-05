@@ -1,6 +1,6 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 5 November 2026. **Rebuilding inputs and rerunning CV after the 5 November decision to use legacy timetable fields regardless of fetch time.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 5 November 2026. **Inputs and reference runs are rebuilt. Feature selection and full-budget nested tuning are running under the user-approved legacy timetable policy.**
 
 **Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact. The user waived external artifact updates for this run.
 
@@ -145,17 +145,17 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
-| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | running |
-| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | todo |
-| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | todo |
+| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | done |
+| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | done |
+| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | running |
 | 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | todo |
 | 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | todo |
 
-- **3.1.** All 84 pre-listed add-one/drop-one ablations are being evaluated on the regenerated full feature groups. The LightGBM classifier variants are finishing.
+- **3.1.** All 84 pre-listed ablation runs finished. Add-one screens reached D12 in 93 of 172 comparisons against timetable-only inputs. None of 192 drop-one comparisons reached D12 against the full groups. All are exploratory.
 
-- **3.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **3.2.** Both importance runs finished and reproduced the full-group ablation predictions exactly. Permutation importance favored calendar at 24 h, reliability at 6 h and delay dynamics near departure. Hour had the largest mean absolute TreeSHAP value in eight of ten task/horizon panels.
 
-- **3.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **3.3.** Nested forward/backward group selection and L1 logistic regression are running on the regenerated feature groups. Per-fold solver convergence is recorded for L1.
 
 - **3.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 

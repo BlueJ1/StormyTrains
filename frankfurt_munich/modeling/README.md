@@ -98,6 +98,7 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | --- | --- | --- | --- | --- | --- | --- |
 | [lightgbm](results/advanced_0_8_lightgbm/20261105-104427) | rmse | 24.476322 | 24.498823 | 24.104596 | 24.050366 | 23.814612 |
 | [lightgbm + weather](results/advanced_0_8_lightgbm_weather/20261105-114530) | rmse | 24.557345 | 24.615389 | 24.168186 | 24.073497 | 23.859808 |
+| [xgboost](results/advanced_0_8_xgboost/20261105-120428) | rmse | 24.534369 | 24.568876 | 24.107252 | 24.096992 | 23.862371 |
 
 #### Smallest paired differences by step, task and horizon
 
@@ -235,6 +236,88 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 3.1 | severity | exploratory | 24h | logistic_regression | add_recent_reliability | True | timetable-only | -0.022537 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
 | 3.1 | severity | exploratory | 6h | logistic_regression | drop_temperature | True | full | -0.001105 | 4 | False | [folds](results/advanced_3_1_logistic_regression_weather_drop_temperature/20261105-110721/paired_vs_base.csv) |
 | 3.1 | severity | exploratory | 6h | logistic_regression | add_recent_reliability | True | timetable-only | -0.031509 | 5 | True | [folds](results/advanced_3_1_logistic_regression_weather_add_recent_reliability/20261105-110548/paired_vs_base.csv) |
+
+#### Step 3.2 leading permutation groups and TreeSHAP features
+
+| task | prediction_time | group | score_increase | feature | mean_abs_shap | details |
+| --- | --- | --- | --- | --- | --- | --- |
+| severity | 0min | delay | 0.048200 | hour | 0.156726 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-122204) |
+| severity | 1h | recent_reliability | 0.026980 | hour | 0.130055 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-122204) |
+| severity | 20min | delay | 0.031857 | hour | 0.158093 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-122204) |
+| severity | 24h | calendar | 0.032462 | hour | 0.162615 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-122204) |
+| severity | 6h | recent_reliability | 0.037865 | hour | 0.116254 | [folds](results/advanced_3_2_lightgbm_classifier_weather/20261105-122204) |
+| delay | 0min | delay | 1.545032 | current_delay | 2.177658 | [folds](results/advanced_3_2_lightgbm_weather/20261105-115000) |
+| delay | 1h | delay | 0.942864 | hour | 2.122867 | [folds](results/advanced_3_2_lightgbm_weather/20261105-115000) |
+| delay | 20min | delay | 1.066422 | hour | 2.076959 | [folds](results/advanced_3_2_lightgbm_weather/20261105-115000) |
+| delay | 24h | calendar | 0.632294 | hour | 2.543951 | [folds](results/advanced_3_2_lightgbm_weather/20261105-115000) |
+| delay | 6h | recent_reliability | 0.917606 | service_mean_delay_min_28d | 1.891442 | [folds](results/advanced_3_2_lightgbm_weather/20261105-115000) |
+
+#### Step 3.5 group choices at 24 h and 0 min
+
+| task | weather | direction | prediction_time | group | folds_selected |
+| --- | --- | --- | --- | --- | --- |
+| delay | False | backward | 24h | calendar | 5 |
+| delay | False | backward | 24h | recent_reliability | 5 |
+| delay | False | backward | 24h | timetable | 5 |
+| delay | False | backward | 24h | network_state | 1 |
+| delay | False | backward | 0min | calendar | 5 |
+| delay | False | backward | 0min | delay | 5 |
+| delay | False | backward | 0min | recent_reliability | 5 |
+| delay | False | backward | 0min | timetable | 5 |
+| delay | False | backward | 0min | route | 2 |
+| delay | False | forward | 24h | calendar | 5 |
+| delay | False | forward | 24h | recent_reliability | 5 |
+| delay | False | forward | 24h | timetable | 5 |
+| delay | False | forward | 24h | network_state | 1 |
+| delay | False | forward | 0min | calendar | 5 |
+| delay | False | forward | 0min | delay | 5 |
+| delay | False | forward | 0min | recent_reliability | 5 |
+| delay | False | forward | 0min | timetable | 5 |
+| delay | False | forward | 0min | route | 2 |
+| delay | True | backward | 24h | calendar | 5 |
+| delay | True | backward | 24h | recent_reliability | 5 |
+| delay | True | backward | 24h | timetable | 5 |
+| delay | True | backward | 24h | wind | 1 |
+| delay | True | backward | 24h | snow | 2 |
+| delay | True | backward | 24h | network_state | 1 |
+| delay | True | backward | 0min | calendar | 5 |
+| delay | True | backward | 0min | delay | 5 |
+| delay | True | backward | 0min | recent_reliability | 5 |
+| delay | True | backward | 0min | timetable | 5 |
+| delay | True | backward | 0min | wind | 3 |
+| delay | True | backward | 0min | temperature | 2 |
+| delay | True | backward | 0min | route | 2 |
+| delay | True | forward | 24h | calendar | 5 |
+| delay | True | forward | 24h | recent_reliability | 5 |
+| delay | True | forward | 24h | timetable | 5 |
+| delay | True | forward | 24h | wind | 1 |
+| delay | True | forward | 24h | snow | 2 |
+| delay | True | forward | 24h | network_state | 1 |
+| delay | True | forward | 0min | calendar | 5 |
+| delay | True | forward | 0min | delay | 5 |
+| delay | True | forward | 0min | recent_reliability | 5 |
+| delay | True | forward | 0min | timetable | 5 |
+| delay | True | forward | 0min | wind | 3 |
+| delay | True | forward | 0min | temperature | 2 |
+| delay | True | forward | 0min | route | 2 |
+| severity | False | backward | 24h | recent_reliability | 5 |
+| severity | False | backward | 24h | timetable | 5 |
+| severity | False | backward | 24h | calendar | 2 |
+| severity | False | backward | 24h | route | 3 |
+| severity | False | backward | 0min | calendar | 3 |
+| severity | False | backward | 0min | delay | 5 |
+| severity | False | backward | 0min | recent_reliability | 5 |
+| severity | False | backward | 0min | timetable | 5 |
+| severity | False | backward | 0min | route | 4 |
+| severity | False | forward | 24h | recent_reliability | 5 |
+| severity | False | forward | 24h | timetable | 5 |
+| severity | False | forward | 24h | calendar | 2 |
+| severity | False | forward | 24h | route | 3 |
+| severity | False | forward | 0min | calendar | 3 |
+| severity | False | forward | 0min | delay | 5 |
+| severity | False | forward | 0min | recent_reliability | 5 |
+| severity | False | forward | 0min | timetable | 5 |
+| severity | False | forward | 0min | route | 4 |
 
 <!-- END ADVANCED CV -->
 
