@@ -92,6 +92,12 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | [xgboost_classifier + weather](results/advanced_0_7_xgboost_classifier_weather/20261105-094757) | log_loss | 0.923900 | 0.916941 | 0.869718 | 0.850681 | 0.839115 |
 | [xgboost + weather](results/advanced_0_7_xgboost_weather/20261105-094544) | rmse | 24.516292 | 24.541405 | 24.131985 | 24.115664 | 23.883132 |
 
+#### Step 0.8 nested reference scores
+
+| Model | Score | 24h | 6h | 1h | 20min | 0min |
+| --- | --- | --- | --- | --- | --- | --- |
+| [lightgbm](results/advanced_0_8_lightgbm/20261105-104427) | rmse | 24.476322 | 24.498823 | 24.104596 | 24.050366 | 23.814612 |
+
 #### Smallest paired differences by step, task and horizon
 
 | step | task | evaluation | prediction_time | method | variant | weather | contrast | mean | folds_improved | reaches_minimum_gain | result |
@@ -126,6 +132,16 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 1.2 | severity | exploratory | 20min | logistic_regression | day_of_year | False |  | -0.002459 | 3 | False | [folds](results/advanced_1_2_logistic_regression_day_of_year/20261105-095512/paired_vs_base.csv) |
 | 1.2 | severity | exploratory | 24h | lightgbm_classifier | minute_of_day | False |  | -0.001847 | 3 | False | [folds](results/advanced_1_2_lightgbm_classifier_minute_of_day/20261105-095626/paired_vs_base.csv) |
 | 1.2 | severity | exploratory | 6h | lightgbm_classifier | minute_of_day | False |  | -0.001775 | 4 | False | [folds](results/advanced_1_2_lightgbm_classifier_minute_of_day/20261105-095626/paired_vs_base.csv) |
+| 1.3 | delay | exploratory | 0min | lightgbm | route_onehot | False |  | +0.007323 | 3 | False | [folds](results/advanced_1_3_lightgbm_route_onehot/20261105-103821/paired_vs_base.csv) |
+| 1.3 | delay | exploratory | 1h | lightgbm | route_onehot | False |  | +0.005672 | 2 | False | [folds](results/advanced_1_3_lightgbm_route_onehot/20261105-103821/paired_vs_base.csv) |
+| 1.3 | delay | exploratory | 20min | lightgbm | route_onehot | False |  | +0.025017 | 1 | False | [folds](results/advanced_1_3_lightgbm_route_onehot/20261105-103821/paired_vs_base.csv) |
+| 1.3 | delay | exploratory | 24h | lightgbm | route_onehot | False |  | -0.062585 | 5 | False | [folds](results/advanced_1_3_lightgbm_route_onehot/20261105-103821/paired_vs_base.csv) |
+| 1.3 | delay | exploratory | 6h | lightgbm | route_onehot | False |  | -0.062585 | 5 | False | [folds](results/advanced_1_3_lightgbm_route_onehot/20261105-103821/paired_vs_base.csv) |
+| 1.3 | severity | exploratory | 0min | lightgbm_classifier | route_onehot | False |  | -0.001082 | 3 | False | [folds](results/advanced_1_3_lightgbm_classifier_route_onehot/20261105-104006/paired_vs_base.csv) |
+| 1.3 | severity | exploratory | 1h | lightgbm_classifier | route_onehot | False |  | -0.001114 | 4 | False | [folds](results/advanced_1_3_lightgbm_classifier_route_onehot/20261105-104006/paired_vs_base.csv) |
+| 1.3 | severity | exploratory | 20min | lightgbm_classifier | route_onehot | False |  | -0.001276 | 5 | False | [folds](results/advanced_1_3_lightgbm_classifier_route_onehot/20261105-104006/paired_vs_base.csv) |
+| 1.3 | severity | exploratory | 24h | lightgbm_classifier | route_onehot | False |  | -0.001732 | 4 | False | [folds](results/advanced_1_3_lightgbm_classifier_route_onehot/20261105-104006/paired_vs_base.csv) |
+| 1.3 | severity | exploratory | 6h | lightgbm_classifier | route_onehot | False |  | -0.001492 | 4 | False | [folds](results/advanced_1_3_lightgbm_classifier_route_onehot/20261105-104006/paired_vs_base.csv) |
 | 1.4 | delay | exploratory | 0min | linear_regression | delay_clipped | False |  | -0.000096 | 4 | False | [folds](results/advanced_1_4_linear_regression_delay_clipped/20261105-095727/paired_vs_base.csv) |
 | 1.4 | delay | exploratory | 1h | linear_regression | delay_clipped | False |  | -0.001293 | 3 | False | [folds](results/advanced_1_4_linear_regression_delay_clipped/20261105-095727/paired_vs_base.csv) |
 | 1.4 | delay | exploratory | 20min | linear_regression | delay_clipped | False |  | -0.002367 | 3 | False | [folds](results/advanced_1_4_linear_regression_delay_clipped/20261105-095727/paired_vs_base.csv) |
@@ -142,6 +158,42 @@ Scores use the five committed CV week folds. Positive paired differences favor t
 | 1.5 | severity | exploratory | 20min | lightgbm_classifier | weather_extremes | True |  | -0.002106 | 3 | False | [folds](results/advanced_1_5_lightgbm_classifier_weather_weather_extremes/20261105-100506/paired_vs_base.csv) |
 | 1.5 | severity | exploratory | 24h | lightgbm_classifier | weather_extremes | True |  | -0.003114 | 4 | True | [folds](results/advanced_1_5_lightgbm_classifier_weather_weather_extremes/20261105-100506/paired_vs_base.csv) |
 | 1.5 | severity | exploratory | 6h | lightgbm_classifier | weather_extremes | True |  | -0.000532 | 3 | False | [folds](results/advanced_1_5_lightgbm_classifier_weather_weather_extremes/20261105-100506/paired_vs_base.csv) |
+| 2.2 | delay | exploratory | 0min | lightgbm | planned_timetable | False |  | -0.102172 | 4 | True | [folds](results/advanced_2_2_lightgbm_planned_timetable/20261105-102639/paired_vs_base.csv) |
+| 2.2 | delay | exploratory | 1h | lightgbm | planned_timetable | False |  | -0.075283 | 4 | False | [folds](results/advanced_2_2_lightgbm_planned_timetable/20261105-102639/paired_vs_base.csv) |
+| 2.2 | delay | exploratory | 20min | lightgbm | planned_timetable | False |  | -0.111171 | 4 | True | [folds](results/advanced_2_2_lightgbm_planned_timetable/20261105-102639/paired_vs_base.csv) |
+| 2.2 | delay | exploratory | 24h | lightgbm | planned_timetable | False |  | -0.087388 | 4 | False | [folds](results/advanced_2_2_lightgbm_planned_timetable/20261105-102639/paired_vs_base.csv) |
+| 2.2 | delay | exploratory | 6h | lightgbm | planned_timetable | False |  | -0.087388 | 4 | False | [folds](results/advanced_2_2_lightgbm_planned_timetable/20261105-102639/paired_vs_base.csv) |
+| 2.2 | severity | exploratory | 0min | logistic_regression | planned_timetable | False |  | -0.002867 | 3 | False | [folds](results/advanced_2_2_logistic_regression_planned_timetable/20261105-102627/paired_vs_base.csv) |
+| 2.2 | severity | exploratory | 1h | logistic_regression | planned_timetable | False |  | -0.002954 | 3 | False | [folds](results/advanced_2_2_logistic_regression_planned_timetable/20261105-102627/paired_vs_base.csv) |
+| 2.2 | severity | exploratory | 20min | logistic_regression | planned_timetable | False |  | -0.002134 | 3 | False | [folds](results/advanced_2_2_logistic_regression_planned_timetable/20261105-102627/paired_vs_base.csv) |
+| 2.2 | severity | exploratory | 24h | lightgbm_classifier | planned_timetable | False |  | -0.002021 | 3 | False | [folds](results/advanced_2_2_lightgbm_classifier_planned_timetable/20261105-102814/paired_vs_base.csv) |
+| 2.2 | severity | exploratory | 6h | lightgbm_classifier | planned_timetable | False |  | -0.001653 | 3 | False | [folds](results/advanced_2_2_lightgbm_classifier_planned_timetable/20261105-102814/paired_vs_base.csv) |
+| 2.3 | delay | exploratory | 0min | linear_regression | holidays | False |  | -0.004916 | 3 | False | [folds](results/advanced_2_3_linear_regression_holidays/20261105-102820/paired_vs_base.csv) |
+| 2.3 | delay | exploratory | 1h | linear_regression | holidays | False |  | -0.010927 | 3 | False | [folds](results/advanced_2_3_linear_regression_holidays/20261105-102820/paired_vs_base.csv) |
+| 2.3 | delay | exploratory | 20min | linear_regression | holidays | False |  | -0.008203 | 3 | False | [folds](results/advanced_2_3_linear_regression_holidays/20261105-102820/paired_vs_base.csv) |
+| 2.3 | delay | exploratory | 24h | linear_regression | holidays | False |  | -0.014001 | 3 | False | [folds](results/advanced_2_3_linear_regression_holidays/20261105-102820/paired_vs_base.csv) |
+| 2.3 | delay | exploratory | 6h | linear_regression | holidays | False |  | -0.014001 | 3 | False | [folds](results/advanced_2_3_linear_regression_holidays/20261105-102820/paired_vs_base.csv) |
+| 2.3 | severity | exploratory | 0min | lightgbm_classifier | holidays | False |  | +0.000686 | 3 | False | [folds](results/advanced_2_3_lightgbm_classifier_holidays/20261105-103009/paired_vs_base.csv) |
+| 2.3 | severity | exploratory | 1h | lightgbm_classifier | holidays | False |  | +0.000846 | 2 | False | [folds](results/advanced_2_3_lightgbm_classifier_holidays/20261105-103009/paired_vs_base.csv) |
+| 2.3 | severity | exploratory | 20min | lightgbm_classifier | holidays | False |  | +0.001192 | 2 | False | [folds](results/advanced_2_3_lightgbm_classifier_holidays/20261105-103009/paired_vs_base.csv) |
+| 2.3 | severity | exploratory | 24h | lightgbm_classifier | holidays | False |  | -0.000439 | 3 | False | [folds](results/advanced_2_3_lightgbm_classifier_holidays/20261105-103009/paired_vs_base.csv) |
+| 2.3 | severity | exploratory | 6h | lightgbm_classifier | holidays | False |  | -0.000075 | 3 | False | [folds](results/advanced_2_3_lightgbm_classifier_holidays/20261105-103009/paired_vs_base.csv) |
+| 2.4 | delay | exploratory | 0min | linear_regression | delay_dynamics | False |  | -0.082550 | 5 | False | [folds](results/advanced_2_4_linear_regression_delay_dynamics/20261105-103015/paired_vs_base.csv) |
+| 2.4 | delay | exploratory | 1h | linear_regression | delay_dynamics | False |  | -0.066089 | 5 | False | [folds](results/advanced_2_4_linear_regression_delay_dynamics/20261105-103015/paired_vs_base.csv) |
+| 2.4 | delay | exploratory | 20min | linear_regression | delay_dynamics | False |  | -0.105360 | 5 | True | [folds](results/advanced_2_4_linear_regression_delay_dynamics/20261105-103015/paired_vs_base.csv) |
+| 2.4 | severity | exploratory | 0min | logistic_regression | delay_dynamics | False |  | -0.003210 | 5 | True | [folds](results/advanced_2_4_logistic_regression_delay_dynamics/20261105-103018/paired_vs_base.csv) |
+| 2.4 | severity | exploratory | 1h | lightgbm_classifier | delay_dynamics | False |  | -0.001912 | 4 | False | [folds](results/advanced_2_4_lightgbm_classifier_delay_dynamics/20261105-103126/paired_vs_base.csv) |
+| 2.4 | severity | exploratory | 20min | logistic_regression | delay_dynamics | False |  | -0.002928 | 5 | False | [folds](results/advanced_2_4_logistic_regression_delay_dynamics/20261105-103018/paired_vs_base.csv) |
+| 2.5 | delay | exploratory | 0min | lightgbm | network_state | False |  | +0.005480 | 2 | False | [folds](results/advanced_2_5_lightgbm_network_state/20261105-103149/paired_vs_base.csv) |
+| 2.5 | delay | exploratory | 1h | lightgbm | network_state | False |  | +0.003928 | 2 | False | [folds](results/advanced_2_5_lightgbm_network_state/20261105-103149/paired_vs_base.csv) |
+| 2.5 | delay | exploratory | 20min | lightgbm | network_state | False |  | -0.013078 | 5 | False | [folds](results/advanced_2_5_lightgbm_network_state/20261105-103149/paired_vs_base.csv) |
+| 2.5 | delay | exploratory | 24h | lightgbm | network_state | False |  | -0.026592 | 2 | False | [folds](results/advanced_2_5_lightgbm_network_state/20261105-103149/paired_vs_base.csv) |
+| 2.5 | delay | exploratory | 6h | lightgbm | network_state | False |  | -0.025880 | 3 | False | [folds](results/advanced_2_5_lightgbm_network_state/20261105-103149/paired_vs_base.csv) |
+| 2.5 | severity | exploratory | 0min | lightgbm_classifier | network_state | False |  | -0.000077 | 3 | False | [folds](results/advanced_2_5_lightgbm_classifier_network_state/20261105-103313/paired_vs_base.csv) |
+| 2.5 | severity | exploratory | 1h | lightgbm_classifier | network_state | False |  | +0.000151 | 2 | False | [folds](results/advanced_2_5_lightgbm_classifier_network_state/20261105-103313/paired_vs_base.csv) |
+| 2.5 | severity | exploratory | 20min | lightgbm_classifier | network_state | False |  | -0.000030 | 3 | False | [folds](results/advanced_2_5_lightgbm_classifier_network_state/20261105-103313/paired_vs_base.csv) |
+| 2.5 | severity | exploratory | 24h | logistic_regression | network_state | False |  | +0.000365 | 3 | False | [folds](results/advanced_2_5_logistic_regression_network_state/20261105-103136/paired_vs_base.csv) |
+| 2.5 | severity | exploratory | 6h | logistic_regression | network_state | False |  | +0.000370 | 3 | False | [folds](results/advanced_2_5_logistic_regression_network_state/20261105-103136/paired_vs_base.csv) |
 
 <!-- END ADVANCED CV -->
 

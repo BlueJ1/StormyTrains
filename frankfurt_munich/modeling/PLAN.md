@@ -79,7 +79,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
 - **0.8.** All eight baseline booster arms are running with 50 configurations per outer training set under the regenerated inputs. Feature-policy confirmations follow the new representation and feature screens.
 
-- **0.6.** The clean pinned environment passed 159 tests with five skips. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly in the original environment as well. Tests include static legacy plans, exact-update cutoffs, month-boundary extraction, inner/outer separation, recovery provenance and parallel registration.
+- **0.6.** The clean pinned environment passed 161 tests with five skips, including replacement-service attribution and the actual builder announcement join. All four regenerated departure LightGBM classifier arms reproduced 16,947 probability vectors exactly in the original environment as well.
 
 ## Phase 1. Feature representations
 
@@ -91,7 +91,7 @@ Expectation: trees split on the categories natively, so they should barely react
 |---|---|---|---|---|---|---|
 | 1.1 | **Cyclic calendar** | month, hour, weekday as (a) one-hot / native categories (now), (b) integers, (c) sin + cos, (d) periodic splines (`SplineTransformer(extrapolation="periodic")`), (e) one-hot + sin/cos | LR, LightGBM | S | low for trees; low–medium for LR | done |
 | 1.2 | **Finer time** | departure minute of day instead of hour; day of year (cyclic) instead of month; hour × weekday interaction for LR | LR, LightGBM | S | low | done |
-| 1.3 | **Route encodings** (run after 2.2) | the planned `route_id` from 2.2: one-hot / native / frequency / target encoding fitted on inner folds. `train_number` stays out (D7) | LR, LightGBM | S | low | todo |
+| 1.3 | **Route encodings** (run after 2.2) | the planned `route_id` from 2.2: one-hot / native / frequency / target encoding fitted on inner folds. `train_number` stays out (D7) | LR, LightGBM | S | low | done |
 | 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | done |
 | 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | done |
 
@@ -103,7 +103,7 @@ Expectation: trees split on the categories natively, so they should barely react
 
 - **1.5.** One of 20 exploratory comparisons reached D12: weather-extreme indicators reduced LightGBM severity log loss at 24 h by 0.00311, with four folds improving. No delay comparison reached the RMSE threshold.
 
-- **1.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **1.3.** All 14 route-encoding runs finished. None of 50 exploratory paired comparisons against native planned-route encoding reached D12. Missing routes carry no target-encoded value.
 
 ## Phase 2. New features
 
@@ -119,21 +119,21 @@ Each feature group is added to the base set on its own and then all together, wi
 
 | ID | Experiment | Content | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 2.1 | **Recent reliability** (`ProjectInstructions.md` feature group; allowed to use hold-out journeys, see `STATUS.md`) | past journeys of the same scheduled service: share severe or cancelled and mean delay over the last 7 and 28 days; for the whole corridor: the same over the last 24 h and last 3 h. Outcomes as known at `predicted_at` from the snapshots. The key is the scheduled train number: for a retained replacement, the number of the train it replaced, switching to the replacement only from a timestamped announcement in the snapshots. The number is a lookup key, not a feature (D7) | M | **high** | todo |
-| 2.2 | **Planned-timetable features** (D8) | `planned_stops`, a planned `route_id` and `upstream_planned_min` (time the run has been travelling before Frankfurt), all from the plan of the scheduled train; they replace the fields removed in 0.7 | M | medium | todo |
-| 2.3 | **Holidays** | public holidays in Hesse, Baden-Württemberg and Bavaria, school holidays, bridge days, day before and after a holiday | S | low–medium | todo |
-| 2.4 | **Delay dynamics** (1 h on) | change of `current_delay` between prediction times, number of upstream stops reported, minutes since the last report, planned minutes still to run before Frankfurt; all as known at `predicted_at` | S | medium at 1 h–0 min | todo |
-| 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf | M | medium | todo |
+| 2.1 | **Recent reliability** (`ProjectInstructions.md` feature group; allowed to use hold-out journeys, see `STATUS.md`) | past journeys of the same scheduled service: share severe or cancelled and mean delay over the last 7 and 28 days; for the whole corridor: the same over the last 24 h and last 3 h. Outcomes as known at `predicted_at` from the snapshots. The key is the scheduled train number: for a retained replacement, the number of the train it replaced, switching to the replacement only from a timestamped announcement in the snapshots. The number is a lookup key, not a feature (D7) | M | **high** | running |
+| 2.2 | **Planned-timetable features** (D8) | `planned_stops`, a planned `route_id` and `upstream_planned_min` (time the run has been travelling before Frankfurt), all from the plan of the scheduled train; they replace the fields removed in 0.7 | M | medium | done |
+| 2.3 | **Holidays** | public holidays in Hesse, Baden-Württemberg and Bavaria, school holidays, bridge days, day before and after a holiday | S | low–medium | done |
+| 2.4 | **Delay dynamics** (1 h on) | change of `current_delay` between prediction times, number of upstream stops reported, minutes since the last report, planned minutes still to run before Frankfurt; all as known at `predicted_at` | S | medium at 1 h–0 min | done |
+| 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf | M | medium | done |
 
-- **2.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **2.3.** All four holiday arms finished. None of 20 exploratory paired comparisons reached D12.
 
-- **2.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **2.2.** All four timetable-feature arms finished. Two of 20 exploratory comparisons reached D12: LightGBM delay improved by 0.111 min at 20 min and 0.102 min at departure, with four folds improving at each horizon.
 
-- **2.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **2.4.** All four delay-dynamics arms finished. Two of 12 exploratory comparisons reached D12: linear RMSE at 20 min fell by 0.105 min, and logistic departure log loss fell by 0.00321. All five folds improved in both cases.
 
-- **2.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **2.1.** A verified attribution bug was fixed: replacement outcomes enter same-service history only after a cutoff-visible announcement links the services. Independently observed corridor outcomes remain eligible. The reliability cache and affected comparisons are being regenerated.
 
-- **2.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **2.5.** All four network-state arms finished. None of 20 exploratory paired comparisons reached D12. These shares use runs with snapshot-visible reports as their denominator.
 
 - **Combined groups.** Combining all five groups reached D12 in 11 of 20 exploratory comparisons. LightGBM reduced departure RMSE by 0.210 min with five folds improving. At 6 h, mean LightGBM log loss fell by 0.0205 with five folds improving.
 
