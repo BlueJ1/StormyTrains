@@ -148,7 +148,7 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 | 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | done |
 | 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | done |
 | 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | done |
-| 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | todo |
+| 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | done |
 | 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | done |
 
 - **3.1.** All 84 pre-listed ablation runs finished. Add-one screens reached D12 in 93 of 172 comparisons against timetable-only inputs. None of 192 drop-one comparisons reached D12 against the full groups. All are exploratory.
@@ -157,7 +157,7 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 
 - **3.3.** All 14 group-selection arms finished. Three of 50 comparisons reached D12, each from weather-arm L1 logistic regression versus its full-group counterpart, with all five folds improving. All 50 L1 outer fits converged. Forward and backward selection reached no D12 gains.
 
-- **3.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **3.4.** All ten pre-listed weather-subset runs finished. None of 40 exploratory paired comparisons reached D12 against the full-weather feature set.
 
 - **3.5.** Across 40 outer-fold selections per horizon, timetable and recent reliability were retained in all 40 at 24 h and departure. Delay features were retained in all 40 departure selections. Calendar was chosen in 28/40 at 24 h and 31/40 at departure, while route rose from 12/40 to 24/40. These counts describe the pre-listed forward/backward linear-model selections.
 
@@ -189,12 +189,12 @@ Question: do combinations of models beat the best single model? Boosters that ti
 
 | ID | Experiment | Method | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | todo |
+| 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | running |
 | 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | todo |
 | 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | todo |
 | 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | todo |
 
-- **5.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **5.1.** The first ten arithmetic, geometric and linear-inclusive averages finished. None of 50 exploratory comparisons reached D12 against the strongest included single model at each horizon. CatBoost and neural-inclusive averages follow their source runs.
 
 - **5.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
@@ -208,14 +208,14 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 
 | ID | Experiment | Why | Cost | Status |
 |---|---|---|---|---|
-| 6.1 | **CatBoost** classifier and regressor, same 50-configuration search | ordered target statistics for categoricals; often the strongest booster on small tabular data and among the best tuned GBDTs in TabArena | M | todo |
+| 6.1 | **CatBoost** classifier and regressor, same 50-configuration search | ordered target statistics for categoricals; often the strongest booster on small tabular data and among the best tuned GBDTs in TabArena | M | running |
 | 6.2 | **Calibration** of every finalist: temperature scaling and isotonic regression, fitted on inner folds, with calibration plots | log loss judges the probabilities; the random forest is expected to be too cautious (`classification_models.md`) | S | todo |
 | 6.3 | **Explainable boosting machine** (`interpret`) | a GAM with pairwise interactions; close to boosting in accuracy on many datasets and readable per feature, useful for the report | M | todo |
 | 6.4 | Random effects for train number (GPBoost) | would use `train_number` as a grouping | — | dropped (D7) |
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | todo |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | todo |
 
-- **6.1.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **6.1.** Both CatBoost classifier arms have started their full 50-configuration nested searches. The regression arms are queued within the laptop CPU budget.
 
 - **6.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
