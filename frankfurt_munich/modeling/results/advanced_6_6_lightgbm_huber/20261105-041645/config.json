@@ -1,0 +1,166 @@
+{
+  "name": "advanced_6_6_lightgbm_huber",
+  "step": "6.6",
+  "task": "delay",
+  "model": "lightgbm",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "huber",
+  "evaluation": "exploratory",
+  "git_commit": "00c39ad9afb6963143c0abf0bdd90f738ee0c2da (uncommitted changes)",
+  "chosen": {
+    "24h": {
+      "config_id": 23,
+      "params": {
+        "cat_smooth": 21.23261760236048,
+        "colsample_bytree": 0.30354310869235307,
+        "learning_rate": 0.009658530198821904,
+        "min_child_samples": 38,
+        "n_estimators": 795,
+        "num_leaves": 60,
+        "reg_alpha": 0.007890004262668575,
+        "reg_lambda": 3.638279896646448,
+        "subsample": 0.6186245437484
+      }
+    },
+    "6h": {
+      "config_id": 23,
+      "params": {
+        "cat_smooth": 21.23261760236048,
+        "colsample_bytree": 0.30354310869235307,
+        "learning_rate": 0.009658530198821904,
+        "min_child_samples": 38,
+        "n_estimators": 795,
+        "num_leaves": 60,
+        "reg_alpha": 0.007890004262668575,
+        "reg_lambda": 3.638279896646448,
+        "subsample": 0.6186245437484
+      }
+    },
+    "1h": {
+      "config_id": 32,
+      "params": {
+        "cat_smooth": 3.741816659607169,
+        "colsample_bytree": 0.7135832823983075,
+        "learning_rate": 0.0056650541034924205,
+        "min_child_samples": 6,
+        "n_estimators": 1176,
+        "num_leaves": 18,
+        "reg_alpha": 0.003222864528968034,
+        "reg_lambda": 0.4085228003668622,
+        "subsample": 0.8849967765493054
+      }
+    },
+    "20min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "0min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    }
+  },
+  "configuration_source": "lightgbm/20261026-092616/config.json",
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-05T04:16:45"
+}
