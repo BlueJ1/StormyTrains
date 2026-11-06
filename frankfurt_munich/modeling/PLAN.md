@@ -243,7 +243,7 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 - **7.2.** All four native-calendar joint-target arms finished. Seven of 20 nested comparisons reached D12 against the MLP baseline. Railway 1 h delay RMSE fell by 0.1453 min in all five folds. The weather-arm 1 h gain was 0.1977 min with four improving folds.
 
-- **7.3.** The four native-calendar TabGNS arms use the measured MLP CPU budgets for their corresponding horizon and outer fold.
+- **7.3.** The adapter review corrected the reference width mask and added inner-week epoch selection before the dense refit from scratch. The four replacement runs use the original MLP CPU caps. Preliminary outputs were archived locally as implementation diagnostics.
 
 - **7.4.** All four RealMLP arms finished. TabM follows in the same native-calendar sequence. The library models use week-held validation and a 64-epoch cap.
 
