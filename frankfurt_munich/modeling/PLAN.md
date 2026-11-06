@@ -192,7 +192,7 @@ Question: do combinations of models beat the best single model? Boosters that ti
 | 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | running |
 | 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | done |
 | 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
-| 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | running |
+| 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | done |
 
 - **5.1.** The first ten arithmetic, geometric and linear-inclusive averages finished. None of 50 exploratory comparisons reached D12 against the strongest included single model at each horizon. CatBoost and neural-inclusive averages follow their source runs.
 
@@ -200,7 +200,7 @@ Question: do combinations of models beat the best single model? Boosters that ti
 
 - **5.3.** All four greedy-weight arms finished. None of 20 exploratory comparisons reached D12 against the strongest included single model at each horizon.
 
-- **5.4.** The cross-fitted stacking sequence has started for both tasks and feature arms. Member configurations are fixed from the flat searches, so the comparisons remain exploratory.
+- **5.4.** All four cross-fitted stacking arms finished. None of 20 exploratory comparisons reached D12 against the strongest included single model at each horizon.
 
 ## Phase 6. Further model families
 
@@ -256,16 +256,16 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 | ID | Experiment | What is transferred | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
 | 8.1 | Tabular foundation models: TabPFN, TabICL | networks pretrained on millions of synthetic tables, which predict our rows from the training rows given as context. Not run on this laptop (D6), and nothing runs elsewhere (D11) | — | medium | dropped (D6, D11) |
-| 8.2 | **Pooling the prediction times** (D4) | one model on all five prediction times (about 86,000 rows), with the prediction time as a feature; the 24 h model learns from the 0 min rows' calendar effects and vice versa. Rows of one journey stay in one fold | S | low–medium | todo |
-| 8.3 | **Other corridors** (D10) | Hamburg Hbf → München (26,526 journeys), Berlin Hbf → München (27,412) and Hamburg Hbf → Frankfurt (21,557) from `corridor_analysis/`. (a) pooled training with a corridor feature; (b) pretrain on the other corridors, then continue training on ours (LightGBM `init_model`, or fine-tune the network from 7.1); (c) the other-corridor model's prediction as a feature, cross-fitted (rule 7). Needs prediction rows (`current_delay`) for those corridors. Runs can belong to several corridors and share disruptions on the same days, so other-corridor journeys are used only from the training weeks of each fold | L | medium | todo |
-| 8.4 | **Network-wide delay propagation** | pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. `arrival_delays/` has only delays and train type, so this needs a new extraction from `data/monthly_processed_data`. Same week restriction as 8.3 | L | medium at 1 h–0 min | todo |
+| 8.2 | **Pooling the prediction times** (D4) | one model on all five prediction times (about 86,000 rows), with the prediction time as a feature; the 24 h model learns from the 0 min rows' calendar effects and vice versa. Rows of one journey stay in one fold | S | low–medium | done |
+| 8.3 | **Other corridors** (D10) | Hamburg Hbf → München (26,526 journeys), Berlin Hbf → München (27,412) and Hamburg Hbf → Frankfurt (21,557) from `corridor_analysis/`. (a) pooled training with a corridor feature; (b) pretrain on the other corridors, then continue training on ours (LightGBM `init_model`, or fine-tune the network from 7.1); (c) the other-corridor model's prediction as a feature, cross-fitted (rule 7). Needs prediction rows (`current_delay`) for those corridors. Runs can belong to several corridors and share disruptions on the same days, so other-corridor journeys are used only from the training weeks of each fold | L | medium | done |
+| 8.4 | **Network-wide delay propagation** | pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. `arrival_delays/` has only delays and train type, so this needs a new extraction from `data/monthly_processed_data`. Same week restriction as 8.3 | L | medium at 1 h–0 min | done |
 | 8.5 | Self-supervised pretraining (masked-feature reconstruction, SCARF) | every row is labelled and there are about ten features, so there is little to learn without labels | — | low | dropped |
 
-- **8.4.** The regenerated network build has 783,935 unique training pairs covering all 95 CV weeks. All six planned, reported and cutoff week fields are CV-only. Cross-fitted model comparisons are queued.
+- **8.4.** All four cross-fitted late-horizon arms finished with 783,935 source pairs. All six source week fields are CV-only, with further training-week and validation-run exclusions during fitting. None of 12 exploratory comparisons reached D12.
 
-- **8.3.** The regenerated auxiliary build has 265,684 rows across the three corridors and verified current delay for 2,134/3,344/6,267 rows at the late horizons. All three railway-only model comparisons are queued.
+- **8.3.** All three railway-only transfer methods finished for both tasks on the three source corridors. The source cache contains 265,684 prediction rows. Fits used eligible training weeks and excluded validation run IDs. None of 30 exploratory comparisons reached D12.
 
-- **8.2.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **8.2.** All four pooling arms finished. Six of 20 exploratory comparisons reached D12, all in the weather arms. Pooled weather severity improved at all five horizons. Its largest log-loss reduction was 0.00623 at 6 h, with all five folds improving. The weather delay arm gained 0.1399 min at 6 h.
 
 ## Phase 9. Final evaluation and analysis
 

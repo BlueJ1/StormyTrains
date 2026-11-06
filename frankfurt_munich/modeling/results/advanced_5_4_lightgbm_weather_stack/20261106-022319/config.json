@@ -1,0 +1,483 @@
+{
+  "name": "advanced_5_4_lightgbm_weather_stack",
+  "step": "5.4",
+  "task": "delay",
+  "model": "lightgbm",
+  "target": "arrival_delay_min",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "stack",
+  "evaluation": "exploratory",
+  "git_commit": "fb7f5a21e08455f33a0858da0725bdfc37e11297",
+  "chosen": {
+    "24h": {
+      "config_id": 38,
+      "params": {
+        "cat_smooth": 2.2202595144810537,
+        "colsample_bytree": 0.6036961544665811,
+        "learning_rate": 0.02556063837470779,
+        "min_child_samples": 48,
+        "n_estimators": 670,
+        "num_leaves": 5,
+        "reg_alpha": 0.0315101491238403,
+        "reg_lambda": 1.3467890557370734,
+        "subsample": 0.7515681292900438
+      }
+    },
+    "6h": {
+      "config_id": 41,
+      "params": {
+        "cat_smooth": 1.3763300805327483,
+        "colsample_bytree": 0.3705446009641986,
+        "learning_rate": 0.00538730007236937,
+        "min_child_samples": 7,
+        "n_estimators": 774,
+        "num_leaves": 5,
+        "reg_alpha": 0.01887567630782228,
+        "reg_lambda": 16.76395764312379,
+        "subsample": 0.511635967867913
+      }
+    },
+    "1h": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "20min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "0min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    }
+  },
+  "configuration_source": "lightgbm_weather/20261026-093239/config.json",
+  "combination": {
+    "24h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            -0.21649483489432014,
+            1.151598015285813,
+            0.024266562856593017
+          ],
+          "intercept": 0.7471898380927406
+        },
+        "2": {
+          "weights": [
+            -0.4119655075878378,
+            1.121234801476631,
+            0.21584642529046674
+          ],
+          "intercept": 1.449122162815737
+        },
+        "3": {
+          "weights": [
+            -0.2438183342085661,
+            0.843152648373548,
+            0.3261973929560577
+          ],
+          "intercept": 1.288755291060717
+        },
+        "4": {
+          "weights": [
+            -0.09390903623938089,
+            1.2048794449835452,
+            -0.08118517834239519
+          ],
+          "intercept": -0.6624525039465965
+        },
+        "5": {
+          "weights": [
+            -0.43457779416078457,
+            1.2556690592512585,
+            0.19066296856845746
+          ],
+          "intercept": -0.13988413198591232
+        }
+      }
+    },
+    "6h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.15508163990113105,
+            0.6824206470386855,
+            0.07548266480810206
+          ],
+          "intercept": 1.504656991649
+        },
+        "2": {
+          "weights": [
+            -0.4290970457846537,
+            0.9319461303237775,
+            0.2561429908225146
+          ],
+          "intercept": 4.2567734573628595
+        },
+        "3": {
+          "weights": [
+            -0.3951623816553765,
+            1.0243119719862894,
+            0.2628190215054452
+          ],
+          "intercept": 1.931242016933755
+        },
+        "4": {
+          "weights": [
+            -0.8140623836755693,
+            1.6100758127354755,
+            0.01801408855647923
+          ],
+          "intercept": 3.153163494244115
+        },
+        "5": {
+          "weights": [
+            -0.3376695601185214,
+            1.0101717162550663,
+            0.22157808470503945
+          ],
+          "intercept": 1.8722695768108721
+        }
+      }
+    },
+    "1h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.2707279502626671,
+            0.4593810650303709,
+            0.20513004510322266
+          ],
+          "intercept": 1.101139965812795
+        },
+        "2": {
+          "weights": [
+            0.290956613956944,
+            0.37183883141332796,
+            0.2687938221714838
+          ],
+          "intercept": 1.177154652946136
+        },
+        "3": {
+          "weights": [
+            0.16468542303967199,
+            0.364936026905999,
+            0.3523343534177445
+          ],
+          "intercept": 1.974315344333867
+        },
+        "4": {
+          "weights": [
+            0.3816747999464093,
+            0.41140366670784334,
+            0.1233210160061427
+          ],
+          "intercept": 1.5070433451119172
+        },
+        "5": {
+          "weights": [
+            0.14298929641602534,
+            0.5432577718554606,
+            0.2680833871747635
+          ],
+          "intercept": 0.8616844280373179
+        }
+      }
+    },
+    "20min": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.21684520098069932,
+            0.8072518058118581,
+            0.00970456867359101
+          ],
+          "intercept": -0.1727100559899597
+        },
+        "2": {
+          "weights": [
+            0.29379448567533956,
+            0.6476765348618586,
+            0.029882765434301024
+          ],
+          "intercept": 0.34021421312545996
+        },
+        "3": {
+          "weights": [
+            0.2687532327030198,
+            0.6792964171644755,
+            0.024334852225285485
+          ],
+          "intercept": 0.36953598497619566
+        },
+        "4": {
+          "weights": [
+            0.27917986364925423,
+            0.6291033828000877,
+            0.10484415900658083
+          ],
+          "intercept": 0.005721188956805179
+        },
+        "5": {
+          "weights": [
+            0.3345501200439601,
+            0.57447584088641,
+            0.11988136416625256
+          ],
+          "intercept": -0.3526921509542831
+        }
+      }
+    },
+    "0min": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            -0.13570574662368357,
+            1.1069259981385702,
+            0.08681328877816853
+          ],
+          "intercept": -0.8664287586013657
+        },
+        "2": {
+          "weights": [
+            0.34886130162054035,
+            0.6765046376731357,
+            -0.030539845196517604
+          ],
+          "intercept": -0.025277168533218486
+        },
+        "3": {
+          "weights": [
+            0.3022371149389966,
+            0.541961040317981,
+            0.1551638050619595
+          ],
+          "intercept": 0.0010407340923705988
+        },
+        "4": {
+          "weights": [
+            0.402506817375574,
+            0.6189159649627193,
+            0.005671080229834833
+          ],
+          "intercept": -0.4445375804075482
+        },
+        "5": {
+          "weights": [
+            0.30652717982278066,
+            0.5609781254353444,
+            0.13355278249279162
+          ],
+          "intercept": -0.10802500907039558
+        }
+      }
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-06T02:23:19"
+}
