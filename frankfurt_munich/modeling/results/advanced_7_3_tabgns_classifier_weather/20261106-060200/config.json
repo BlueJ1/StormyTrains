@@ -1,0 +1,207 @@
+{
+  "name": "advanced_7_3_tabgns_classifier_weather",
+  "step": "7.3",
+  "task": "severity",
+  "model": "tabgns_classifier",
+  "target": "severity_class",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "",
+  "evaluation": "nested",
+  "git_commit": "3456701f4aed5e71017dc8db4cb461d0861f14a5",
+  "chosen": {},
+  "calendar": "native",
+  "cpu_budgets": {
+    "24h": {
+      "1": 71.43548699999883,
+      "2": 72.20018699999946,
+      "3": 72.52820100000099,
+      "4": 73.41313399999945,
+      "5": 72.66124899999886
+    },
+    "6h": {
+      "1": 70.3610400000016,
+      "2": 71.7739750000037,
+      "3": 71.99128199999996,
+      "4": 72.53305200000068,
+      "5": 72.43539499999952
+    },
+    "1h": {
+      "1": 71.25198499999806,
+      "2": 71.81391900000017,
+      "3": 70.11767400000099,
+      "4": 73.0980529999988,
+      "5": 73.55831999999918
+    },
+    "20min": {
+      "1": 72.50242300000082,
+      "2": 71.38350600000012,
+      "3": 68.6906370000006,
+      "4": 68.85444700000153,
+      "5": 71.26500500000293
+    },
+    "0min": {
+      "1": 69.94699499999933,
+      "2": 71.2168099999999,
+      "3": 68.51196900000105,
+      "4": 69.52383800000189,
+      "5": 68.86680800000158
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-06T06:02:00"
+}

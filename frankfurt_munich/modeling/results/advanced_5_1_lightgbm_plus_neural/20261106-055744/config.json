@@ -1,0 +1,37 @@
+{
+  "name": "advanced_5_1_lightgbm_plus_neural",
+  "step": "5.1",
+  "task": "delay",
+  "model": "lightgbm",
+  "weather": false,
+  "evaluation": "exploratory",
+  "variant": "plus_neural",
+  "members": [
+    "advanced_0_7_lightgbm/20261105-094317",
+    "advanced_0_7_xgboost/20261105-094512",
+    "advanced_0_7_linear_regression/20261105-094255",
+    "advanced_6_1_catboost/20261105-233457",
+    "advanced_7_1_mlp/20261106-000818",
+    "advanced_7_2_multitask/20261106-002552",
+    "advanced_7_3_tabgns/20261106-053850",
+    "advanced_7_4_realmlp/20261106-001937",
+    "advanced_7_4_tabm/20261106-014948"
+  ],
+  "git_commit": "3456701f4aed5e71017dc8db4cb461d0861f14a5",
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-06T05:57:44"
+}

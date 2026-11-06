@@ -79,7 +79,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
 - **0.8.** All eight baselines and eight feature-policy arms finished with 20 configurations and four inner week folds. The feature policy reached D12 in 20/20 LightGBM comparisons and 5/20 XGBoost comparisons. LightGBM railway departure log loss fell by 0.01573. Railway delay RMSE fell by 0.3705 min at 20 min. All five folds improved in both cases. The XGBoost railway severity policy reproduced all 85,901 base predictions exactly. All 150 chosen IDs from the reconstructed controls passed independent audit.
 
-- **0.6.** The clean main environment passed 174 tests with five skips. All four distribution tests passed in their separate pinned environment. The remaining skip is the deliberately duplicated linear one-hot comparison. The budget tests cover paired CLI arms, neural searches and the final-registration cap. A fresh 24 h LightGBM delay search reproduced all 16,551 predictions of its reconstructed 20-configuration control exactly. All four departure reference classifier arms reproduced 16,947 probability vectors exactly across both main environments.
+- **0.6.** The final main suite passed 176 tests with five skips. All four distribution tests passed separately. The remaining skip is the deliberately duplicated linear one-hot comparison. Targeted tests cover the TabGNS mask and inner refit epochs. A fresh 24 h LightGBM delay search reproduced all 16,551 predictions of its reconstructed 20-configuration control exactly. All four departure reference classifier arms reproduced 16,947 probability vectors exactly across the two main environments.
 
 ## Phase 1. Feature representations
 
@@ -194,7 +194,7 @@ Question: do combinations of models beat the best single model? Boosters that ti
 | 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
 | 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | done |
 
-- **5.1.** The first ten arithmetic, geometric and linear-inclusive averages finished. None of 50 exploratory comparisons reached D12 against the strongest included single model at each horizon. CatBoost and neural-inclusive averages follow their source runs.
+- **5.1.** Fourteen of 18 averages finished, including both tasks' initial averages and both delay pairs with CatBoost and neural members. None of 70 exploratory comparisons reached D12. The four severity averages follow CatBoost classifier completion. Neural members span all five horizons in steps 7.1–7.4.
 
 - **5.2.** All 24 LightGBM and XGBoost arms finished. Five of 40 nested and four of 80 exploratory comparisons reached D12. The nested LightGBM railway average reduced 24 h severity log loss by 0.00461, and the nested weather delay average reduced departure RMSE by 0.1225 min. All five folds improved in both cases.
 
@@ -233,9 +233,9 @@ Question: does a neural network match or beat the boosters here, and does it add
 |---|---|---|---|---|
 | 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | done |
 | 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | done |
-| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | running |
-| 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | running |
-| 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | running |
+| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | done |
+| 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | done |
+| 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | done |
 
 **About TabGNS.** The paper compares only with other architecture-search methods (TabNAS, AgE) and a large fixed MLP, on datasets of 31,000 to 940,000 rows. Its main results are smaller networks (51–82% fewer parameters) and faster search, with accuracy about equal to a large MLP. It has no comparison with gradient-boosted trees. So we should expect TabGNS to find a compact MLP about as good as 7.1, not to beat the boosters. The comparison is still worth making, and the method is a reasonable "advanced neural model" for the report.
 
@@ -243,11 +243,11 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 - **7.2.** All four native-calendar joint-target arms finished. Seven of 20 nested comparisons reached D12 against the MLP baseline. Railway 1 h delay RMSE fell by 0.1453 min in all five folds. The weather-arm 1 h gain was 0.1977 min with four improving folds.
 
-- **7.3.** The adapter review corrected the reference width mask and added inner-week epoch selection before the dense refit from scratch. The four replacement runs use the original MLP CPU caps. Preliminary outputs were archived locally as implementation diagnostics.
+- **7.3.** All four corrected native-calendar arms finished. Thirteen of 20 nested comparisons reached D12 against the MLP. The median paired parameter count was 78.2% of the MLP's, and the fits used 29.34 of 113.48 available CPU minutes. The reference sigmoid mask selects widths, and an inner validation split selects dense refit epochs before the full-training refit from scratch.
 
-- **7.4.** All four RealMLP arms finished. TabM follows in the same native-calendar sequence. The library models use week-held validation and a 64-epoch cap.
+- **7.4.** All eight RealMLP and TabM arms finished with a 64-epoch cap and week-held validation. Twenty-one of 40 comparisons reached D12 against the MLP. TabM with weather reduced 24 h RMSE by 0.5000 min in all five folds. The holdout registry requires a full-training refit path, which PyTabKit 1.8 provides for RealMLP.
 
-- **7.5.** The native-calendar GRU sequence has started. All four task and weather arms use the three late horizons and the same eight-configuration budget as the MLP.
+- **7.5.** All four GRU arms finished on the laptop with eight configurations at the three late horizons. One of 12 nested comparisons reached D12 against the MLP. The weather severity arm reduced 20 min log loss by 0.01001, with three improving folds.
 
 ## Phase 8. Transfer learning and pretraining
 
