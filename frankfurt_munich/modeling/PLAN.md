@@ -2,7 +2,7 @@
 
 Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Cross-validation and hold-out evaluation are complete. See the modelling README for the matched weather comparison and error analysis.** These results are in PR #12, which is not merged yet; its review raised findings that may change some of them (see the log).
 
-**Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact.
+**Two versions.** Keep the experiment statuses and results in sync between this file and the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
 
 Status values: `todo`, `running`, `done`, `dropped`. Cost: S (under 1 CPU hour), M (1–10 h), L (over 10 h or a new dataset). Expected gain is our guess before running, so that we can check it afterwards.
 
