@@ -189,12 +189,12 @@ Question: do combinations of models beat the best single model? Boosters that ti
 
 | ID | Experiment | Method | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
-| 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | running |
+| 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | done |
 | 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | done |
 | 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
 | 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | done |
 
-- **5.1.** Fourteen of 18 averages finished, including both tasks' initial averages and both delay pairs with CatBoost and neural members. None of 70 exploratory comparisons reached D12. The four severity averages follow CatBoost classifier completion. Neural members span all five horizons in steps 7.1–7.4.
+- **5.1.** All 18 fixed averages finished. One of 90 exploratory comparisons met D12 against the strongest included single model. The weather severity average with neural models lowered departure log loss by 0.00315, with four improving folds.
 
 - **5.2.** All 24 LightGBM and XGBoost arms finished. Five of 40 nested and four of 80 exploratory comparisons reached D12. The nested LightGBM railway average reduced 24 h severity log loss by 0.00461, and the nested weather delay average reduced departure RMSE by 0.1225 min. All five folds improved in both cases.
 
@@ -208,14 +208,14 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 
 | ID | Experiment | Why | Cost | Status |
 |---|---|---|---|---|
-| 6.1 | **CatBoost** classifier and regressor, 20-configuration nested search (revised D13) | ordered target statistics for categoricals; often the strongest booster on small tabular data and among the best tuned GBDTs in TabArena | M | running |
-| 6.2 | **Calibration** of every finalist: temperature scaling and isotonic regression, fitted on inner folds, with calibration plots | log loss judges the probabilities; the random forest is expected to be too cautious (`classification_models.md`) | S | running |
+| 6.1 | **CatBoost** classifier and regressor, 20-configuration nested search (revised D13) | ordered target statistics for categoricals; often the strongest booster on small tabular data and among the best tuned GBDTs in TabArena | M | done |
+| 6.2 | **Calibration** of every finalist: temperature scaling and isotonic regression, fitted on inner folds, with calibration plots | log loss judges the probabilities; the random forest is expected to be too cautious (`classification_models.md`) | S | done |
 | 6.3 | **Explainable boosting machine** (`interpret`) | a GAM with pairwise interactions; close to boosting in accuracy on many datasets and readable per feature, useful for the report | M | done |
 | 6.4 | Random effects for train number (GPBoost) | would use `train_number` as a grouping | — | dropped (D7) |
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | done |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | done |
 
-- **6.1.** Both 20-configuration delay arms finished, with zero D12 gains in ten paired comparisons. Five of ten classifier horizon jobs have finished. The remaining jobs use the same 20 configurations and four inner week folds.
+- **6.1.** All four CatBoost arms finished at the 20-configuration budget. None of the 20 paired comparisons against the matched LightGBM baselines met D12.
 
 - **6.5.** All six distributional arms finished in the separate pinned environment. All 30 paired mean RMSE differences favored the nested LightGBM baseline. The closest result was NGBoost with weather at +0.019 min. The mixture result describes the specified LightGBMLSS adapter.
 
@@ -223,7 +223,7 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 
 - **6.6.** Both losses finished in both feature arms. All 20 exploratory paired mean RMSE differences favored the original squared-error baseline.
 
-- **6.2.** All eight LightGBM and XGBoost calibration arms finished. None of 40 paired comparisons reached D12. The four CatBoost calibration arms follow the classifier searches.
+- **6.2.** All 12 cross-fitted isotonic and temperature calibration arms finished. None of the 60 comparisons against the corresponding uncalibrated classifier met D12.
 
 ## Phase 7. Neural networks
 
@@ -271,11 +271,13 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 
 | ID | Step | Status |
 |---|---|---|
-| 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | todo |
+| 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | running |
 | 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | todo |
 | 9.3 | **Railway only vs with weather** with the matched pairs of 9.1, on the hold-out set: the project's research question | todo |
 | 9.4 | **Error analysis:** by class, by period (before / from October 2025), by branch (Nürnberg / Stuttgart), on extreme-weather days; calibration plots; SHAP explanations of the final model | todo |
 | 9.5 | **Risk over the prediction times:** how a journey's predicted probabilities change from 24 h to 0 min, with example journeys (the "how risk updates during travel" focus) | todo |
+
+- **9.1.** All 366 registered CV arms passed the saved-output audit. Finalist selection and tuning use the 95 CV weeks. The exact matched pairs will be committed before hold-out inputs are built.
 
 ## Not planned
 
