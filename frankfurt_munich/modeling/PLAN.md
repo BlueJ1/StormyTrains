@@ -1,6 +1,6 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Corrected cross-validation is complete. Finalist registration is underway.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Corrected cross-validation and finalist registration are complete. Hold-out evaluation is underway.**
 
 **Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
 
@@ -271,15 +271,15 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 
 | ID | Step | Status |
 |---|---|---|
-| 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | running |
-| 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | todo |
+| 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | done |
+| 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | running |
 | 9.3 | **Railway only vs with weather** with the matched pairs of 9.1, on the hold-out set: the project's research question | todo |
 | 9.4 | **Error analysis:** by class, by period (before / from October 2025), by branch (Nürnberg / Stuttgart), on extreme-weather days; calibration plots; SHAP explanations of the final model | todo |
 | 9.5 | **Risk over the prediction times:** how a journey's predicted probabilities change from 24 h to 0 min, with example journeys (the "how risk updates during travel" focus) | todo |
 
-- **9.1.** All 366 CV arms passed audit after the network-state correction. The replacement registration uses the eligible nested and prespecified runs. The fixed-configuration all-group severity screen improved 1 h railway log loss by 0.00314 over the nested leader in four folds. It remains exploratory, and all groups were already among the nested feature candidates.
+- **9.1.** The replacement registry fixes one pair per task and horizon after correcting the network input. LightGBM is used for all severity horizons and for delay at 24 h and departure. Full-group linear regression is used for delay at 6 h, 1 h, and 20 min. Both arms share railway features and tuning budgets, and the registry freezes the development source and inputs.
 
-- **9.2.** Target-free feature builds started before the input audit found the missing network plan archive. No hold-out labels were opened or scored. Rebuild the affected input after the replacement registry is committed.
+- **9.2.** Rebuild the network input after committing the replacement registry. Verify keys and coverage for all target-free feature tables, then refit on the 95 CV weeks and score the 20 registered arms once on the 23 hold-out weeks.
 
 ## Not planned
 
