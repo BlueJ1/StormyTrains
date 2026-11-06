@@ -191,16 +191,16 @@ Question: do combinations of models beat the best single model? Boosters that ti
 |---|---|---|---|---|---|
 | 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | running |
 | 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | done |
-| 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | running |
-| 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | todo |
+| 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
+| 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | running |
 
 - **5.1.** The first ten arithmetic, geometric and linear-inclusive averages finished. None of 50 exploratory comparisons reached D12 against the strongest included single model at each horizon. CatBoost and neural-inclusive averages follow their source runs.
 
 - **5.2.** All 24 LightGBM and XGBoost arms finished. Five of 40 nested and four of 80 exploratory comparisons reached D12. The nested LightGBM railway average reduced 24 h severity log loss by 0.00461, and the nested weather delay average reduced departure RMSE by 0.1225 min. All five folds improved in both cases.
 
-- **5.3.** Greedy weights are being fitted on inner week predictions. Fixed member configurations come from the flat searches, so the comparisons remain exploratory.
+- **5.3.** All four greedy-weight arms finished. None of 20 exploratory comparisons reached D12 against the strongest included single model at each horizon.
 
-- **5.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **5.4.** The cross-fitted stacking sequence has started for both tasks and feature arms. Member configurations are fixed from the flat searches, so the comparisons remain exploratory.
 
 ## Phase 6. Further model families
 
@@ -215,7 +215,7 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | done |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | done |
 
-- **6.1.** Both 20-configuration delay arms finished. None of ten paired comparisons reached D12. The classifier searches run as independent single-core horizon jobs, using the same 20 configurations and four inner week folds.
+- **6.1.** Both 20-configuration delay arms finished, with zero D12 gains in ten paired comparisons. The first two of ten classifier horizon jobs completed. Classifier jobs use the same 20 configurations and four inner week folds.
 
 - **6.5.** All six distributional arms finished in the separate pinned environment. All 30 paired mean RMSE differences favored the nested LightGBM baseline. The closest result was NGBoost with weather at +0.019 min. The mixture result describes the specified LightGBMLSS adapter.
 
@@ -231,23 +231,23 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
-| 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | running |
-| 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | running |
-| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | todo |
+| 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | done |
+| 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | done |
+| 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | running |
 | 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | running |
-| 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | todo |
+| 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | running |
 
 **About TabGNS.** The paper compares only with other architecture-search methods (TabNAS, AgE) and a large fixed MLP, on datasets of 31,000 to 940,000 rows. Its main results are smaller networks (51–82% fewer parameters) and faster search, with accuracy about equal to a large MLP. It has no comparison with gradient-boosted trees. So we should expect TabGNS to find a compact MLP about as good as 7.1, not to beat the boosters. The comparison is still worth making, and the method is a reasonable "advanced neural model" for the report.
 
-- **7.1.** The native-calendar MLP search has started for both tasks and both feature arms. Epoch counts are chosen within the inner week folds.
+- **7.1.** All four eight-configuration native-calendar MLP arms finished. None of 20 paired means reached D12 against the nested LightGBM baselines. The measured search and refit CPU times supply the TabGNS budgets.
 
-- **7.2.** The eight-configuration joint-target search has started. It covers four native-calendar arms with week-nested selection.
+- **7.2.** All four native-calendar joint-target arms finished. Seven of 20 nested comparisons reached D12 against the MLP baseline. Railway 1 h delay RMSE fell by 0.1453 min in all five folds. The weather-arm 1 h gain was 0.1977 min with four improving folds.
 
-- **7.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **7.3.** The four native-calendar TabGNS arms use the measured MLP CPU budgets for their corresponding horizon and outer fold.
 
 - **7.4.** All four RealMLP arms finished. TabM follows in the same native-calendar sequence. The library models use week-held validation and a 64-epoch cap.
 
-- **7.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **7.5.** The native-calendar GRU sequence has started. All four task and weather arms use the three late horizons and the same eight-configuration budget as the MLP.
 
 ## Phase 8. Transfer learning and pretraining
 
