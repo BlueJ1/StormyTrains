@@ -21,7 +21,6 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 DATA = HERE / "data"
 DEFAULT_CHANGE_DIR = ROOT / "data" / "monthly_processed_data_change"
-DEFAULT_PLAN_DIR = Path("/private/tmp/plan_archive_d27b9c")
 PANEL_PATH = ROOT / "data" / "stations_present_in_all_months.csv"
 ORIGIN = "Frankfurt (Main) Hbf"
 DESTINATION = "München Hbf"
@@ -30,6 +29,7 @@ HORIZON = pd.Timedelta(hours=1)
 sys.path.insert(0, str(HERE))
 from history_features import (  # noqa: E402
     NETWORK_STATE_COLUMNS,
+    PLAN_DIR,
     ROW_KEY,
     cutoff_instants,
     latest_plan_asof,
@@ -271,7 +271,7 @@ def build_network_features(
     rows: pd.DataFrame,
     *,
     change_dir: Path = DEFAULT_CHANGE_DIR,
-    plan_dir: Path = DEFAULT_PLAN_DIR,
+    plan_dir: Path = PLAN_DIR,
     stations: list[str] | None = None,
     source_months: list[pd.Period] | None = None,
     split: str = "cv",
@@ -289,6 +289,8 @@ def build_network_features(
     change_files, plan_files = _month_files(change_dir), _month_files(plan_dir)
     if not change_files:
         raise FileNotFoundError(f"no monthly change snapshots in {change_dir}")
+    if not plan_files:
+        raise FileNotFoundError(f"no monthly plan snapshots in {plan_dir}")
     available_months = sorted(set(change_files) | set(plan_files))
     if source_months is not None:
         wanted = set(source_months)
@@ -342,6 +344,8 @@ def build_network_features(
     for run_month in sorted(pending):
         process(run_month)
 
+    if not stats["plan_rows_read"]:
+        raise ValueError(f"no ICE/IC plan snapshots for the network stations in {plan_dir}")
     deltas = _scope_deltas(segment_parts)
     output = _shares_at_cutoffs(rows, deltas)
     if not output[ROW_KEY].reset_index(drop=True).equals(rows[ROW_KEY].reset_index(drop=True)):
@@ -400,7 +404,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--split", choices=("cv", "holdout"), default="cv")
     parser.add_argument("--change-dir", type=Path, default=DEFAULT_CHANGE_DIR)
-    parser.add_argument("--plan-dir", type=Path, default=DEFAULT_PLAN_DIR)
+    parser.add_argument("--plan-dir", type=Path, default=PLAN_DIR)
     parser.add_argument("--data-dir", type=Path, default=DATA)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--sample-month", help="build only rows for one planned-departure month")

@@ -1,6 +1,6 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Cross-validation and finalist registration are complete. Hold-out evaluation is underway.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Network-state inputs are being corrected. The affected cross-validation runs are being repeated before hold-out scoring.**
 
 **Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
 
@@ -68,7 +68,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 | 0.2 | **`compare.py`**: the five paired fold differences between two runs, their mean, folds improved, and whether the mean reaches the D12 threshold; no t-tests (rule 3). Writes the tables for `README.md` | S | done |
 | 0.3 | **Inner week folds** inside each training set (grouped by ISO week, stratified like `folds.py`) for nested selection, tuning, stacking, cross-fitting, calibration and neural-network early stopping | S | done |
 | 0.4 | **Fixed-configuration runner:** refit a tuned model with the configuration chosen per prediction time in an earlier run's `config.json` (D2). Its results are marked exploratory | S | done |
-| 0.8 | **Nested tuning** in `tuning.py`: each outer fold chooses its configuration on the inner folds of its training weeks only (D3). Used for finalists; the budget is D13 | S to build, M–L to run | done |
+| 0.8 | **Nested tuning** in `tuning.py`: each outer fold chooses its configuration on the inner folds of its training weeks only (D3). Used for finalists; the budget is D13 | S to build, M–L to run | running |
 | 0.5 | Extra metrics | — | dropped (D9) |
 | 0.6 | **Tests** for each of the above, in the style of `tests/` (answer-as-feature, shuffled labels, no hold-out access, no outer-fold rows in nested choices) | S | done |
 
@@ -77,7 +77,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** All eight baselines and eight feature-policy arms finished with 20 configurations and four inner week folds. The feature policy reached D12 in 20/20 LightGBM comparisons and 5/20 XGBoost comparisons. LightGBM railway departure log loss fell by 0.01573. Railway delay RMSE fell by 0.3705 min at 20 min. All five folds improved in both cases. The XGBoost railway severity policy reproduced all 85,901 base predictions exactly. All 150 chosen IDs from the reconstructed controls passed independent audit.
+- **0.8.** All eight base searches passed audit. The eight nested feature-policy arms are being repeated after correcting the network-state input.
 
 - **0.6.** The main suite passed 178 tests with five skips. Four distribution tests passed separately, leaving one deliberately duplicated linear one-hot test skipped. Gate regressions verify rejection of source and CV input changes after registration. A fresh 24 h LightGBM delay search reproduced all 16,551 predictions of the reconstructed 20-configuration control exactly. All four departure reference classifier arms reproduced 16,947 probability vectors exactly across the two main environments.
 
@@ -123,7 +123,7 @@ Each feature group is added to the base set on its own and then all together, wi
 | 2.2 | **Planned-timetable features** (D8) | `planned_stops`, a planned `route_id` and `upstream_planned_min` (time the run has been travelling before Frankfurt), all from the plan of the scheduled train; they replace the fields removed in 0.7 | M | medium | done |
 | 2.3 | **Holidays** | public holidays in Hesse, Baden-Württemberg and Bavaria, school holidays, bridge days, day before and after a holiday | S | low–medium | done |
 | 2.4 | **Delay dynamics** (1 h on) | change of `current_delay` between prediction times, number of upstream stops reported, minutes since the last report, planned minutes still to run before Frankfurt; all as known at `predicted_at` | S | medium at 1 h–0 min | done |
-| 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf | M | medium | done |
+| 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf | M | medium | running |
 
 - **2.3.** All four holiday arms finished. None of 20 exploratory paired comparisons reached D12.
 
@@ -133,9 +133,9 @@ Each feature group is added to the base set on its own and then all together, wi
 
 - **2.1.** The corrected cache and all four model arms finished. All 85,901 feature rows reproduced exactly after adding the replacement-service guard. Seventeen of 20 exploratory comparisons reached D12. LightGBM departure log loss fell by 0.00679 and RMSE by 0.257 min.
 
-- **2.5.** All four network-state arms finished. None of 20 exploratory paired comparisons reached D12. These shares use runs with snapshot-visible reports as their denominator.
+- **2.5.** The final input audit found that the network-state builder used a temporary plan archive path. The shared project archive and missing-input checks now replace that default. Rebuild the network inputs and comparisons.
 
-- **Combined groups.** All four combined-feature arms finished with the corrected cache. Eighteen of 20 exploratory comparisons reached D12. LightGBM departure log loss fell by 0.01107 and RMSE by 0.375 min, with all five folds improving for both.
+- **Combined groups.** Repeat the four combined-feature arms with the corrected network-state inputs.
 
 ## Phase 3. Feature subsets and importance
 
@@ -145,21 +145,21 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 
 | ID | Experiment | Method | Cost | Status |
 |---|---|---|---|---|
-| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | done |
-| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | done |
-| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | done |
-| 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | done |
-| 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | done |
+| 3.1 | **Group ablation** | drop one group at a time from the full set, and add one group at a time to a timetable-only set; LR and fixed-configuration LightGBM (exploratory) | S | running |
+| 3.2 | **Importance** | permutation importance by group on the validation folds; SHAP values from LightGBM (`pred_contrib=True`, no new package) | S | running |
+| 3.3 | **Nested group selection** | forward and backward selection over groups, chosen on inner folds, scored on the outer fold; compare with the full set. Also L1 logistic regression as an embedded selection | M | running |
+| 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | running |
+| 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | todo |
 
-- **3.1.** All 84 pre-listed ablation runs finished. Add-one screens reached D12 in 93 of 172 comparisons against timetable-only inputs. None of 192 drop-one comparisons reached D12 against the full groups. All are exploratory.
+- **3.1.** Repeat the ablations that use network-state inputs and refresh paired comparisons against the full group reference.
 
-- **3.2.** Both importance runs finished and reproduced the full-group ablation predictions exactly. Permutation importance favored calendar at 24 h, reliability at 6 h and delay dynamics near departure. Hour had the largest mean absolute TreeSHAP value in eight of ten task/horizon panels.
+- **3.2.** Repeat importance calculations on the corrected full-group inputs.
 
-- **3.3.** All 14 group-selection arms finished. Three of 50 comparisons reached D12, each from weather-arm L1 logistic regression versus its full-group counterpart, with all five folds improving. All 50 L1 outer fits converged. Forward and backward selection reached no D12 gains.
+- **3.3.** Repeat group selection and full-group fits with the corrected network-state inputs.
 
-- **3.4.** All ten pre-listed weather-subset runs finished. None of 40 exploratory paired comparisons reached D12 against the full-weather feature set.
+- **3.4.** Repeat the weather subset comparisons with the corrected network-state inputs.
 
-- **3.5.** Across 40 outer-fold selections per horizon, timetable and recent reliability were retained in all 40 at 24 h and departure. Delay features were retained in all 40 departure selections. Calendar was chosen in 28/40 at 24 h and 31/40 at departure, while route rose from 12/40 to 24/40. These counts describe the pre-listed forward/backward linear-model selections.
+- **3.5.** Summarize the corrected outer-fold group selections by horizon.
 
 ## Phase 4. Two-stage and decomposed models
 
@@ -271,15 +271,15 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 
 | ID | Step | Status |
 |---|---|---|
-| 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | done |
-| 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | running |
+| 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | todo |
+| 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | todo |
 | 9.3 | **Railway only vs with weather** with the matched pairs of 9.1, on the hold-out set: the project's research question | todo |
 | 9.4 | **Error analysis:** by class, by period (before / from October 2025), by branch (Nürnberg / Stuttgart), on extreme-weather days; calibration plots; SHAP explanations of the final model | todo |
 | 9.5 | **Risk over the prediction times:** how a journey's predicted probabilities change from 24 h to 0 min, with example journeys (the "how risk updates during travel" focus) | todo |
 
-- **9.1.** Registered one railway/weather pair per task and horizon in finalists.json. Nine pairs use LightGBM and 1 h delay uses full-group linear regression. The 24 h severity pair uses the planned timetable inputs. Both arms share the railway features and search budget. The registry records each configuration and freezes the development code and input fingerprints.
+- **9.1.** The first registry was superseded after the target-free input audit found the missing network plan archive. Register again after repeating the affected CV comparisons.
 
-- **9.2.** Refit the 20 registered arms on all CV weeks after building the gated hold-out inputs. Score the exact registered pairs on the 23 held-out weeks.
+- **9.2.** Target-free feature builds started before the input audit found the missing network plan archive. No hold-out labels were opened or scored. Rebuild the affected input after the replacement registry is committed.
 
 ## Not planned
 

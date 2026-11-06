@@ -15,6 +15,7 @@ from network_state import (  # noqa: E402
     _scope_deltas,
     _shares_at_cutoffs,
     _timeline_states,
+    build_network_features,
 )
 from history_features import NETWORK_STATE_COLUMNS, ROW_KEY  # noqa: E402
 
@@ -193,6 +194,17 @@ def test_no_unintended_prediction_columns_and_unique_row_alignment():
     assert result[ROW_KEY].equals(rows[ROW_KEY])
     assert list(result.columns) == [*ROW_KEY, *NETWORK_STATE_COLUMNS]
     assert result[NETWORK_STATE_COLUMNS].isna().all().all()
+
+
+def test_missing_plan_archive_fails_instead_of_building_cancellation_only_features(tmp_path):
+    change_dir = tmp_path / "change"
+    change_dir.mkdir()
+    (change_dir / "data-2025-11.parquet").touch()
+    rows = rows_at("2025-11-04 10:45")
+
+    with pytest.raises(FileNotFoundError, match="no monthly plan snapshots"):
+        build_network_features(rows, change_dir=change_dir, plan_dir=tmp_path / "missing",
+                               stations=sorted(PANEL))
 
 
 def test_holdout_registration_gate_runs_before_any_prediction_file_read(monkeypatch, tmp_path):
