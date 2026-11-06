@@ -144,8 +144,8 @@ footer { color: var(--muted); font-size: 0.85rem; }
     <h1>Advanced modelling plan</h1>
     <p>Experiments after the tuned boosters of 31 October 2026: feature representations, new features, feature subsets, two-stage models, ensembles, neural networks and transfer learning, then one final hold-out evaluation.</p>
     <div class="banner">
-      <div><strong>Cross-validation and hold-out evaluation are complete.</strong> See the modelling README for the matched weather comparison and error analysis. Drafted 4 November 2026; last updated <span id="updated"></span>.</div>
-      <div style="color:var(--muted);font-size:.88rem">Same plan as <code>frankfurt_munich/modeling/PLAN.md</code>. When the plan changes or a step is completed, both are updated: the status and result line in the markdown, and the matching entry in this page's data. The user waived external artifact updates for this run.</div>
+      <div><strong>Cross-validation and hold-out evaluation are complete.</strong> See the modelling README for the matched weather comparison and error analysis. These results are in PR #12, which is not merged yet; its review raised findings that may change some of them (see the log). Drafted 4 November 2026; last updated <span id="updated"></span>.</div>
+      <div style="color:var(--muted);font-size:.88rem">Same plan as <code>frankfurt_munich/modeling/PLAN.md</code>. When the plan changes or a step is completed, both are updated: the status and result line in the markdown, and the matching entry in this page's data, then the artifact is republished.</div>
     </div>
   </header>
 
@@ -356,7 +356,9 @@ const LOG = [
   "4 November 2026: plan drafted.",
   "4 November 2026: decisions D1–D10 made. Revised after the review of PR #11: inputs known at the cutoff as a first step (0.7), nested tuning (0.8), exploratory vs confirmed results, descriptive fold comparisons, historical state from the snapshots, the scheduled service as key, a fallback for 4.5, pinned foundation-model checkpoints, cross-fitting of transferred features, matched weather pairs. New open decisions D11–D13.",
   "4 November 2026: decisions D11–D13 made: nothing runs off this laptop, so 8.1 is dropped and its checkpoint list removed; minimum gain 0.003 log loss and 0.1 min RMSE; nested re-tuning with 50 configurations for LightGBM and XGBoost, railway-only and with weather.",
+  "5 November 2026: the user approved using legacy timetable fields regardless of fetch time and all three railway-only corridor-transfer methods. Earlier strict-plan outputs were removed from the primary result tree and retained locally outside the repository. All affected features and CV experiments are being rebuilt.",
   "5 November 2026: the user chose to keep all phases and use 20 configurations for remaining searches. Unfinished 50-configuration searches were restarted at 20. Completed 50-configuration results are retained and their actual budgets are reported. Final registration uses at most 20 configurations, with eight for the neural searches.",
+  "6 November 2026: code review of PR #12 (not merged yet): 9 inline findings. Three may change results: the recent-reliability features (2.1) draw past journeys from the CV weeks only for CV rows but from all weeks for hold-out rows; for replacement trains, current_delay and the delay dynamics (2.4) are left missing in a way that depends on the outcome; and punctual past arrivals may not count in the reliability windows. The first two would also affect the hold-out scores of 9.2 and 9.3.",
 ];
 
 const REFS = [

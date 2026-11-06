@@ -1,8 +1,8 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Cross-validation and hold-out evaluation are complete. See the modelling README for the matched weather comparison and error analysis.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Cross-validation and hold-out evaluation are complete. See the modelling README for the matched weather comparison and error analysis.** These results are in PR #12, which is not merged yet; its review raised findings that may change some of them (see the log).
 
-**Two versions.** Keep the experiment statuses and results in sync between this file and the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
+**Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact.
 
 Status values: `todo`, `running`, `done`, `dropped`. Cost: S (under 1 CPU hour), M (1–10 h), L (over 10 h or a new dataset). Expected gain is our guess before running, so that we can check it afterwards.
 
@@ -317,3 +317,5 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 - 5 November 2026: the user approved using legacy timetable fields regardless of fetch time and all three railway-only corridor-transfer methods. Earlier strict-plan outputs were removed from the primary result tree and retained locally outside the repository. All affected features and CV experiments are being rebuilt.
 
 - 5 November 2026: the user chose to keep all phases and use 20 configurations for remaining searches. Unfinished 50-configuration searches were restarted at 20. Completed 50-configuration results are retained and their actual budgets are reported. Final registration uses at most 20 configurations, with eight for the neural searches.
+
+- 6 November 2026: code review of PR #12 (not merged yet): 9 inline findings. Three may change results: the recent-reliability features (2.1) draw past journeys from the CV weeks only for CV rows but from all weeks for hold-out rows; for replacement trains, current_delay and the delay dynamics (2.4) are left missing in a way that depends on the outcome; and punctual past arrivals may not count in the reliability windows. The first two would also affect the hold-out scores of 9.2 and 9.3.
