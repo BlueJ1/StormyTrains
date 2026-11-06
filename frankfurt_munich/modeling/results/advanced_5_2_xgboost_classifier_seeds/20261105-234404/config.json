@@ -1,0 +1,213 @@
+{
+  "name": "advanced_5_2_xgboost_classifier_seeds",
+  "step": "5.2",
+  "task": "severity",
+  "model": "xgboost_classifier",
+  "target": "severity_class",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "seeds",
+  "evaluation": "exploratory",
+  "git_commit": "dc621163e020552f54db93a06858fff96089971a",
+  "chosen": {
+    "24h": {
+      "config_id": 15,
+      "params": {
+        "colsample_bytree": 0.4529083060517835,
+        "learning_rate": 0.027516151309380524,
+        "max_depth": 8,
+        "min_child_weight": 61.970157488091445,
+        "n_estimators": 259,
+        "reg_alpha": 0.002755546207779663,
+        "reg_lambda": 0.01379354235277247,
+        "subsample": 0.7135538943131281
+      }
+    },
+    "6h": {
+      "config_id": 14,
+      "params": {
+        "colsample_bytree": 0.35388593688015507,
+        "learning_rate": 0.016375399825825587,
+        "max_depth": 7,
+        "min_child_weight": 57.668104667790054,
+        "n_estimators": 649,
+        "reg_alpha": 0.015224209209544584,
+        "reg_lambda": 0.0033687695210631446,
+        "subsample": 0.7282672852414551
+      }
+    },
+    "1h": {
+      "config_id": 41,
+      "params": {
+        "colsample_bytree": 0.6096465608117732,
+        "learning_rate": 0.013345910155142493,
+        "max_depth": 7,
+        "min_child_weight": 26.865309327169083,
+        "n_estimators": 723,
+        "reg_alpha": 0.013174543864342761,
+        "reg_lambda": 59.473897949884034,
+        "subsample": 0.8689484583478843
+      }
+    },
+    "20min": {
+      "config_id": 25,
+      "params": {
+        "colsample_bytree": 0.5444467022288626,
+        "learning_rate": 0.09768525228034856,
+        "max_depth": 4,
+        "min_child_weight": 51.59986718212382,
+        "n_estimators": 336,
+        "reg_alpha": 3.5569715786267535,
+        "reg_lambda": 17.973896801942455,
+        "subsample": 0.9678174971104738
+      }
+    },
+    "0min": {
+      "config_id": 25,
+      "params": {
+        "colsample_bytree": 0.5444467022288626,
+        "learning_rate": 0.09768525228034856,
+        "max_depth": 4,
+        "min_child_weight": 51.59986718212382,
+        "n_estimators": 336,
+        "reg_alpha": 3.5569715786267535,
+        "reg_lambda": 17.973896801942455,
+        "subsample": 0.9678174971104738
+      }
+    }
+  },
+  "configuration_source": "xgboost_classifier/20261031-123804/config.json",
+  "combination": {
+    "24h": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    },
+    "6h": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    },
+    "1h": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    },
+    "20min": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    },
+    "0min": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-05T23:44:04"
+}

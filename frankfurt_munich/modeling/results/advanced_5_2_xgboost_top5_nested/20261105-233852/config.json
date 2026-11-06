@@ -1,0 +1,301 @@
+{
+  "name": "advanced_5_2_xgboost_top5_nested",
+  "step": "5.2",
+  "task": "delay",
+  "model": "xgboost",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "top5_nested",
+  "evaluation": "nested",
+  "git_commit": "dc621163e020552f54db93a06858fff96089971a",
+  "chosen": {},
+  "combination": {
+    "24h": {
+      "source": "advanced_0_8_xgboost/20261105-170959",
+      "config_ids": {
+        "1": [
+          15,
+          9,
+          17,
+          11,
+          4
+        ],
+        "2": [
+          9,
+          11,
+          17,
+          15,
+          18
+        ],
+        "3": [
+          11,
+          9,
+          17,
+          18,
+          15
+        ],
+        "4": [
+          9,
+          15,
+          4,
+          13,
+          14
+        ],
+        "5": [
+          17,
+          9,
+          11,
+          18,
+          15
+        ]
+      },
+      "fitted": {}
+    },
+    "6h": {
+      "source": "advanced_0_8_xgboost/20261105-170959",
+      "config_ids": {
+        "1": [
+          17,
+          11,
+          15,
+          9,
+          18
+        ],
+        "2": [
+          9,
+          17,
+          11,
+          18,
+          15
+        ],
+        "3": [
+          9,
+          15,
+          11,
+          4,
+          17
+        ],
+        "4": [
+          15,
+          9,
+          4,
+          14,
+          13
+        ],
+        "5": [
+          11,
+          17,
+          18,
+          9,
+          15
+        ]
+      },
+      "fitted": {}
+    },
+    "1h": {
+      "source": "advanced_0_8_xgboost/20261105-170959",
+      "config_ids": {
+        "1": [
+          9,
+          14,
+          13,
+          4,
+          11
+        ],
+        "2": [
+          9,
+          14,
+          15,
+          19,
+          4
+        ],
+        "3": [
+          9,
+          14,
+          4,
+          13,
+          15
+        ],
+        "4": [
+          9,
+          14,
+          15,
+          19,
+          4
+        ],
+        "5": [
+          9,
+          11,
+          18,
+          14,
+          17
+        ]
+      },
+      "fitted": {}
+    },
+    "20min": {
+      "source": "advanced_0_8_xgboost/20261105-170959",
+      "config_ids": {
+        "1": [
+          9,
+          14,
+          4,
+          15,
+          13
+        ],
+        "2": [
+          9,
+          11,
+          18,
+          4,
+          14
+        ],
+        "3": [
+          9,
+          14,
+          15,
+          13,
+          11
+        ],
+        "4": [
+          9,
+          14,
+          15,
+          4,
+          13
+        ],
+        "5": [
+          9,
+          18,
+          17,
+          11,
+          14
+        ]
+      },
+      "fitted": {}
+    },
+    "0min": {
+      "source": "advanced_0_8_xgboost/20261105-170959",
+      "config_ids": {
+        "1": [
+          9,
+          4,
+          13,
+          14,
+          15
+        ],
+        "2": [
+          9,
+          4,
+          14,
+          11,
+          18
+        ],
+        "3": [
+          9,
+          4,
+          14,
+          13,
+          15
+        ],
+        "4": [
+          9,
+          14,
+          4,
+          15,
+          13
+        ],
+        "5": [
+          9,
+          14,
+          15,
+          13,
+          11
+        ]
+      },
+      "fitted": {}
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-05T23:38:52"
+}

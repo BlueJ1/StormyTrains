@@ -190,15 +190,15 @@ Question: do combinations of models beat the best single model? Boosters that ti
 | ID | Experiment | Method | Cost | Expected gain | Status |
 |---|---|---|---|---|---|
 | 5.1 | **Plain average** | average the probabilities (arithmetic and geometric mean) or delays of XGBoost + LightGBM, then adding LR, CatBoost (6.1) and the neural networks (Phase 7). No weights are fitted | S | low–medium | running |
-| 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | running |
-| 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | todo |
+| 5.2 | **Seed and configuration bagging** | each booster with 5–10 seeds; the average of the top 5 configurations of a search. With the existing `search_results.csv` this is exploratory (chosen on all folds); for a reported result the top 5 are chosen on inner folds | S–M | low | done |
+| 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | running |
 | 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | todo |
 
 - **5.1.** The first ten arithmetic, geometric and linear-inclusive averages finished. None of 50 exploratory comparisons reached D12 against the strongest included single model at each horizon. CatBoost and neural-inclusive averages follow their source runs.
 
-- **5.2.** The 24 seed and configuration ensembles for LightGBM and XGBoost are running. Nested averages select five configurations from the 20 inner scores of each outer training set.
+- **5.2.** All 24 LightGBM and XGBoost arms finished. Five of 40 nested and four of 80 exploratory comparisons reached D12. The nested LightGBM railway average reduced 24 h severity log loss by 0.00461, and the nested weather delay average reduced departure RMSE by 0.1225 min. All five folds improved in both cases.
 
-- **5.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **5.3.** Greedy weights are being fitted on inner week predictions. Fixed member configurations come from the flat searches, so the comparisons remain exploratory.
 
 - **5.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
@@ -234,7 +234,7 @@ Question: does a neural network match or beat the boosters here, and does it add
 | 7.1 | **MLP baseline** (PyTorch) | 2–4 layers, dropout, weight decay, softmax for severity and squared error for delay; small random search. This is the reference for 7.3 and 7.4 | M | running |
 | 7.2 | **Multi-task MLP** | one shared body with two heads (4 classes and delay), trained together: the two targets describe the same arrival | M | running |
 | 7.3 | **TabGNS** (Orucu et al. 2026, arXiv:2602.10854) | gradient-based architecture search for MLPs: a gate per neuron chooses each layer's width (up to 5 layers of 512). Code: github.com/EricssonResearch/tabgns (MIT, 2 commits). Needs adapting to our log loss and folds; its gates are trained on a validation split, which must be an inner fold. Compare with 7.1 at the same compute | M | todo |
-| 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | todo |
+| 7.4 | **RealMLP and TabM** (`pytabkit`) | the two strongest tabular networks in TabArena v0.1; scikit-learn interface | M | running |
 | 7.5 | **Sequence model** over the upstream stops (1 h on) | GRU or small Transformer over the stops of the run before Frankfurt that were reported by `predicted_at` (`stops.parquet`, `upstream_runs.parquet`); stage 3 of the roadmap. Probably fits on this laptop; check before running, and drop it if it does not (D11) | L | todo |
 
 **About TabGNS.** The paper compares only with other architecture-search methods (TabNAS, AgE) and a large fixed MLP, on datasets of 31,000 to 940,000 rows. Its main results are smaller networks (51–82% fewer parameters) and faster search, with accuracy about equal to a large MLP. It has no comparison with gradient-boosted trees. So we should expect TabGNS to find a compact MLP about as good as 7.1, not to beat the boosters. The comparison is still worth making, and the method is a reasonable "advanced neural model" for the report.
@@ -245,7 +245,7 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 - **7.3.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
-- **7.4.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
+- **7.4.** All four RealMLP arms finished. TabM follows in the same native-calendar sequence. The library models use week-held validation and a 64-epoch cap.
 
 - **7.5.** Pending rebuild and rerun with legacy timetable fields accepted regardless of fetch time, following the user decision on 5 November 2026.
 
