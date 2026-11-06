@@ -1,8 +1,8 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 5 November 2026. **Inputs and reference runs are rebuilt. Feature selection and full-budget nested tuning are running under the user-approved legacy timetable policy.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Cross-validation and finalist registration are complete. Hold-out evaluation is underway.**
 
-**Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact. The user waived external artifact updates for this run.
+**Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
 
 Status values: `todo`, `running`, `done`, `dropped`. Cost: S (under 1 CPU hour), M (1–10 h), L (over 10 h or a new dataset). Expected gain is our guess before running, so that we can check it afterwards.
 
@@ -271,13 +271,15 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 
 | ID | Step | Status |
 |---|---|---|
-| 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | running |
-| 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | todo |
+| 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | done |
+| 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | running |
 | 9.3 | **Railway only vs with weather** with the matched pairs of 9.1, on the hold-out set: the project's research question | todo |
 | 9.4 | **Error analysis:** by class, by period (before / from October 2025), by branch (Nürnberg / Stuttgart), on extreme-weather days; calibration plots; SHAP explanations of the final model | todo |
 | 9.5 | **Risk over the prediction times:** how a journey's predicted probabilities change from 24 h to 0 min, with example journeys (the "how risk updates during travel" focus) | todo |
 
-- **9.1.** All 366 registered CV arms passed the saved-output audit. Finalist selection and tuning use the 95 CV weeks. The exact matched pairs will be committed before hold-out inputs are built.
+- **9.1.** Registered one railway/weather pair per task and horizon in finalists.json. Nine pairs use LightGBM and 1 h delay uses full-group linear regression. The 24 h severity pair uses the planned timetable inputs. Both arms share the railway features and search budget. The registry records each configuration and freezes the development code and input fingerprints.
+
+- **9.2.** Refit the 20 registered arms on all CV weeks after building the gated hold-out inputs. Score the exact registered pairs on the 23 held-out weeks.
 
 ## Not planned
 

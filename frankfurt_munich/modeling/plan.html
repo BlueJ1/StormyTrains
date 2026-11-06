@@ -144,8 +144,8 @@ footer { color: var(--muted); font-size: 0.85rem; }
     <h1>Advanced modelling plan</h1>
     <p>Experiments after the tuned boosters of 31 October 2026: feature representations, new features, feature subsets, two-stage models, ensembles, neural networks and transfer learning, then one final hold-out evaluation.</p>
     <div class="banner">
-      <div><strong>Inputs and reference runs are rebuilt.</strong> Feature selection and full-budget nested tuning are running under the user-approved legacy timetable policy. Drafted 4 November 2026; last updated <span id="updated"></span>.</div>
-      <div style="color:var(--muted);font-size:.88rem">Same plan as <code>frankfurt_munich/modeling/PLAN.md</code>. When the plan changes or a step is completed, both are updated: the status and result line in the markdown, and the matching entry in this page's data, The user waived external artifact updates for this run.</div>
+      <div><strong>Cross-validation and finalist registration are complete.</strong> Hold-out evaluation is underway. Drafted 4 November 2026; last updated <span id="updated"></span>.</div>
+      <div style="color:var(--muted);font-size:.88rem">Same plan as <code>frankfurt_munich/modeling/PLAN.md</code>. When the plan changes or a step is completed, both are updated: the status and result line in the markdown, and the matching entry in this page's data. The user waived external artifact updates for this run.</div>
     </div>
   </header>
 
@@ -235,7 +235,7 @@ footer { color: var(--muted); font-size: 0.85rem; }
 
 <script>
 /* ===== DATA: keep in sync with PLAN.md ===== */
-const UPDATED = "5 November 2026 (feature ablations and nested tuning running)";
+const UPDATED = "6 November 2026";
 
 /* state: decided | open | later */
 const DECISIONS = [
@@ -345,8 +345,8 @@ const EXPERIMENTS = [
   { id: "8.4", phase: "8", title: "Network-wide delay propagation", detail: "Pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. arrival_delays/ has only delays and train type, so this needs a new extraction from data/monthly_processed_data. Same week restriction as 8.3.", cost: "L", gain: "medium at 1 h–0 min", status: "done", result: "All four cross-fitted late-horizon arms finished with 783,935 source pairs. All six source week fields are CV-only, with further training-week and validation-run exclusions during fitting. None of 12 exploratory comparisons reached D12." },
   { id: "8.5", phase: "8", title: "Self-supervised pretraining (masked features, SCARF)", detail: "Every row is labelled and there are about ten features, so there is little to learn without labels.", gain: "low", status: "dropped", result: "Dropped." },
   // Phase 9
-  { id: "9.1", phase: "9", title: "Pre-register finalists", detail: "At most three per task and prediction time, with their configurations, feature sets and tuning policy, written into the plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines.", status: "running", result: "All 366 registered CV arms passed the saved-output audit. Finalist selection and tuning use the 95 CV weeks. The exact matched pairs will be committed before hold-out inputs are built." },
-  { id: "9.2", phase: "9", title: "Hold-out evaluation", detail: "Refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks.", status: "todo" },
+  { id: "9.1", phase: "9", title: "Pre-register finalists", detail: "At most three per task and prediction time, with their configurations, feature sets and tuning policy, written into the plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines.", status: "done", result: "Registered one railway/weather pair per task and horizon in finalists.json. Nine pairs use LightGBM and 1 h delay uses full-group linear regression. The 24 h severity pair uses the planned timetable inputs. Both arms share the railway features and search budget. The registry records each configuration and freezes the development code and input fingerprints." },
+  { id: "9.2", phase: "9", title: "Hold-out evaluation", detail: "Refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks.", status: "running", result: "Refit the 20 registered arms on all CV weeks after building the gated hold-out inputs. Score the exact registered pairs on the 23 held-out weeks." },
   { id: "9.3", phase: "9", title: "Railway only vs with weather", detail: "With the matched pairs of 9.1, on the hold-out set: the project's research question.", status: "todo" },
   { id: "9.4", phase: "9", title: "Error analysis", detail: "By class, by period (before / from October 2025), by branch (Nürnberg / Stuttgart), on extreme-weather days; calibration plots; SHAP explanations of the final model.", status: "todo" },
   { id: "9.5", phase: "9", title: "Risk over the prediction times", detail: "How a journey's predicted probabilities change from 24 h to 0 min, with example journeys (the “how risk updates during travel” focus).", status: "todo" },
