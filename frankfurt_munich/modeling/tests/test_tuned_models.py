@@ -90,6 +90,15 @@ def test_category_codes_use_training_levels():
     assert out["c"].isna().tolist() == [False, False, True]
 
 
+def test_category_codes_match_integral_levels_across_dtypes():
+    train = pd.DataFrame({"numeric": [12, 13], "route": ["12", "12.0"]})
+    test = pd.DataFrame({"numeric": [12.0, np.nan, 12.5], "route": ["12.0", "12", "12"]})
+    encoded = CategoryCodes(list(train)).fit(train).transform(test)
+
+    assert encoded["numeric"].cat.codes.tolist() == [0, -1, -1]
+    assert encoded["route"].cat.codes.tolist() == [1, 0, 0]
+
+
 @pytest.mark.parametrize("model", ["random_forest", "lightgbm", "xgboost"])
 def test_validation_predictions_line_up_with_their_rows(model):
     """With the answer given as a feature, the trees must be close to perfect."""

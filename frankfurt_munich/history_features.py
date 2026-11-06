@@ -434,53 +434,46 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
     return features.reset_index(drop=True)
 
 
-def mask_unlinked_replacement_rows(dynamics: pd.DataFrame,
-                                  upstream_events: pd.DataFrame,
-                                  replacement_announcements: pd.DataFrame
-                                  ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Mask live dynamics/events for replacement rows before link evidence.
+def _use_scheduled_run(rows: pd.DataFrame, announcements: pd.DataFrame) -> pd.Series:
+    aligned = rows[ROW_KEY].merge(announcements, on=ROW_KEY, how="left",
+                                  validate="one_to_one", indicator=True)
+    if not aligned["_merge"].eq("both").all():
+        raise ValueError("replacement announcement table does not cover prediction keys")
+    announced_at = pd.to_datetime(aligned["replacement_announced_at_utc"], utc=True)
+    known = (aligned["replacement_announced"].fillna(False)
+             & announced_at.le(cutoff_instants(aligned["predicted_at"])))
+    return aligned["is_replacement"].fillna(False) & ~known
 
-    The monthly `upstream_runs` table describes the operated replacement train.
-    Until an origin snapshot announces the scheduled-to-replacement link, those
-    IDs cannot safely be treated as the passenger's known run.  Ordinary rows
-    and replacement rows with a verified announcement at/before cutoff remain.
-    """
-    required = set(ROW_KEY) | {
-        "is_replacement", "replacement_announced", "replacement_announced_at_utc",
-    }
-    missing = required - set(replacement_announcements.columns)
-    if missing:
-        raise ValueError(f"replacement announcements missing {sorted(missing)}")
-    announcements = replacement_announcements[list(ROW_KEY) + [
-        "is_replacement", "replacement_announced", "replacement_announced_at_utc",
-    ]].copy()
-    if announcements.duplicated(ROW_KEY).any():
-        raise ValueError("replacement announcement keys must be unique")
-    announcement_index = announcements.set_index(ROW_KEY)
 
-    def attach(frame: pd.DataFrame, *, unique: bool) -> tuple[pd.DataFrame, pd.Series]:
-        if unique and frame.duplicated(ROW_KEY).any():
-            raise ValueError("feature/event keys must be unique before masking")
-        index = pd.MultiIndex.from_frame(frame[ROW_KEY])
-        if len(index.difference(announcement_index.index)):
-            raise ValueError("replacement announcement table does not cover all CV keys")
-        aligned = announcement_index.reindex(index).reset_index(drop=True)
-        out = frame.reset_index(drop=True).copy()
-        is_replacement = aligned["is_replacement"].astype("boolean").fillna(False)
-        announced = aligned["replacement_announced"].astype("boolean").fillna(False)
-        stamp = pd.to_datetime(aligned["replacement_announced_at_utc"], utc=True)
-        cutoff = cutoff_instants(out["predicted_at"])
-        known = announced & stamp.notna() & stamp.le(cutoff)
-        return out, is_replacement & ~known
+def _scheduled_upstream_stops(context: pd.DataFrame) -> pd.DataFrame:
+    """Enumerate stop IDs through the original service's Frankfurt origin."""
+    records = []
+    for journey_id, origin_id in context[["journey_id", "scheduled_origin_id"]].dropna().itertuples(index=False):
+        ride, _, sequence = origin_id.rpartition("-")
+        if not ride or not sequence.isdecimal():
+            continue
+        records.extend((journey_id, f"{ride}-{i}", i)
+                       for i in range(1, int(sequence) + 1))
+    return pd.DataFrame(records, columns=["journey_id", "id", "train_line_station_num"]).assign(
+        station_name=pd.NA
+    )
 
-    features, mask = attach(dynamics, unique=True)
-    for column in DELAY_DYNAMICS_COLUMNS:
-        if column in features:
-            features.loc[mask, column] = np.nan
 
-    events, event_mask = attach(upstream_events, unique=False)
-    events = events.loc[~event_mask].reset_index(drop=True)
-    return features, events
+def _journey_events(operated_rows, upstream, scheduled_rows, scheduled_stops, changes, plans):
+    operated = build_upstream_events_asof(operated_rows, upstream, changes, plans)
+    scheduled = build_upstream_events_asof(scheduled_rows, scheduled_stops, changes, plans)
+    if not scheduled.empty:
+        origins = scheduled_stops.groupby("journey_id", sort=False).tail(1)
+        origin_keys = origins[["journey_id", "id"]].rename(columns={"id": "event_id"})
+        visible = scheduled.loc[scheduled["plan_observed_at_utc"].notna()].merge(
+            origin_keys, on=["journey_id", "event_id"], validate="many_to_one"
+        )
+        scheduled = scheduled.merge(visible[ROW_KEY].drop_duplicates(), on=ROW_KEY,
+                                    validate="many_to_one")
+    parts = [events for events in (operated, scheduled) if not events.empty]
+    if not parts:
+        return operated
+    return pd.concat(parts, ignore_index=True).drop(columns="_row_id")
 
 
 def build_delay_dynamics(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
@@ -591,17 +584,23 @@ def build_history_dynamics_split(
         "journey_id", "id", "train_line_station_num", "station_name",
     ])
     upstream = upstream[upstream["journey_id"].isin(target_journeys)].copy()
-    stop_ids = set(upstream["id"].dropna().astype(str))
+    use_scheduled = _use_scheduled_run(rows, announcements)
+    scheduled_rows = rows.loc[use_scheduled.to_numpy()]
+    context = pd.read_parquet(output_dir / f"replacement_context_{split}.parquet",
+                              columns=["journey_id", "scheduled_origin_id"])
+    scheduled_stops = _scheduled_upstream_stops(
+        context[context["journey_id"].isin(scheduled_rows["journey_id"])]
+    )
+    stop_ids = set(upstream["id"].dropna().astype(str)) | set(scheduled_stops["id"])
     changes = read_snapshots_for_ids(
         stop_ids, kind="change", change_dir=change_dir, plan_dir=plan_dir,
     )
     plans = read_snapshots_for_ids(
         stop_ids, kind="plan", change_dir=change_dir, plan_dir=plan_dir,
     )
-    events = build_upstream_events_asof(rows, upstream, changes, plans,
-                                        plan_legacy_policy="static")
+    events = _journey_events(rows.loc[~use_scheduled.to_numpy()], upstream, scheduled_rows,
+                             scheduled_stops, changes, plans)
     dynamics = delay_dynamics_from_events(rows, events)
-    dynamics, events = mask_unlinked_replacement_rows(dynamics, events, announcements)
     expected_keys = rows[ROW_KEY].reset_index(drop=True)
     if not dynamics[ROW_KEY].reset_index(drop=True).equals(expected_keys):
         raise ValueError(f"{split} dynamics keys do not exactly match prediction_rows_{split}.parquet")
@@ -625,10 +624,7 @@ def build_history_dynamics_split(
         "prediction_rows": int(len(dynamics)),
         "upstream_events": int(len(persisted_events)),
         "legacy_plan_policy": "earliest legacy plan per stop used as a static schedule by user instruction",
-        "replacement_rows_masked_until_link": int(
-            (announcements["is_replacement"].fillna(False)
-             & ~announcements["replacement_announced"].fillna(False)).sum()
-        ),
+        "replacement_rows_using_scheduled_run": int(use_scheduled.sum()),
     }
     audit_path = output_dir / f"history_{split}_audit.json"
     audit_tmp = audit_path.with_name(audit_path.stem + ".tmp" + audit_path.suffix)

@@ -46,6 +46,16 @@ def test_school_break_ranges_are_inclusive_and_state_specific():
     assert result["school_holiday_by"].tolist() == [False, False, False, True, True, True]
 
 
+def test_bavarian_day_of_repentance_is_school_free_only():
+    rows = pd.DataFrame({
+        "origin_departure_planned_local": pd.to_datetime(["2024-11-20", "2025-11-19"]),
+    })
+    result = add_holiday_features(rows)
+    assert result["school_holiday_by"].all()
+    assert not result["public_holiday_by"].any()
+    assert not result["school_holiday_bw"].any()
+
+
 def test_holiday_adjacency_and_bridge_day_definitions():
     rows = pd.DataFrame({
         "origin_departure_planned_local": pd.to_datetime([

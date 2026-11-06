@@ -12,7 +12,10 @@ from history_features import (
     build_delay_dynamics,
     build_history_dynamics_split,
     build_upstream_events_asof,
-    mask_unlinked_replacement_rows,
+    _journey_events,
+    _scheduled_upstream_stops,
+    _use_scheduled_run,
+    delay_dynamics_from_events,
     cutoff_instants,
     latest_snapshot_asof,
     request_upper_bound_utc,
@@ -284,40 +287,37 @@ def test_strict_events_exclude_legacy_plan_but_keep_visible_change_reports():
     assert arrival["event_occurred_by_cutoff"]
 
 
-def test_replacement_dynamics_and_sequence_wait_for_timestamped_link():
-    rows = pd.DataFrame([
-        {"journey_id": "ordinary", "prediction_time": "1h",
-         "predicted_at": pd.Timestamp("2025-12-01 10:00:00")},
-        {"journey_id": "replacement-before", "prediction_time": "1h",
-         "predicted_at": pd.Timestamp("2025-12-01 10:00:00")},
-        {"journey_id": "replacement-after", "prediction_time": "1h",
-         "predicted_at": pd.Timestamp("2025-12-01 11:00:00")},
-    ])
-    features = rows.copy()
-    for column in ("current_delay", "current_delay_change_min", "upstream_stops_reported",
-                   "minutes_since_last_report", "planned_minutes_remaining_before_frankfurt"):
-        features[column] = 7.0
-    events = pd.concat([
-        rows.assign(event_id="event-a"), rows.assign(event_id="event-b"),
-    ], ignore_index=True)
-    announcements = rows.copy()
-    announcements["is_replacement"] = [False, True, True]
-    announcements["replacement_announced"] = [False, False, True]
-    announcements["replacement_announced_at_utc"] = [
-        pd.NaT, pd.NaT, pd.Timestamp("2025-12-01 09:30:00", tz="UTC"),
-    ]
+def test_replacement_uses_scheduled_reports_until_link_is_visible():
+    rows = pd.DataFrame({
+        "journey_id": ["replacement", "replacement"],
+        "prediction_time": ["1h", "0min"],
+        "predicted_at": pd.to_datetime(["2025-12-01 10:00", "2025-12-01 11:00"]),
+    })
+    announcements = rows.assign(is_replacement=True, replacement_announced=True)
+    announcements["replacement_announced_at_utc"] = pd.Timestamp("2025-12-01 09:30", tz="UTC")
+    use_scheduled = _use_scheduled_run(rows, announcements)
+    assert use_scheduled.tolist() == [True, False]
+    scheduled = _scheduled_upstream_stops(pd.DataFrame({
+        "journey_id": ["replacement"], "scheduled_origin_id": ["scheduled-1"],
+    }))
+    operated = scheduled.assign(id="operated-1")
+    plans = pd.DataFrame({
+        "id": ["scheduled-1", "operated-1"],
+        "snapshot_timestamp": pd.to_datetime(["2025-12-01 06:00", "2025-12-01 06:00"]),
+        "station_name": ["Frankfurt (Main) Hbf"] * 2,
+        "departure_planned_time": pd.to_datetime(["2025-12-01 08:00", "2025-12-01 09:00"]),
+    })
+    changes = pd.DataFrame({
+        "id": ["scheduled-1", "operated-1"],
+        "snapshot_timestamp": pd.to_datetime(["2025-12-01 07:15", "2025-12-01 08:15"]),
+        "departure_change_time": pd.to_datetime(["2025-12-01 08:07", "2025-12-01 09:23"]),
+    })
 
-    masked_features, masked_events = mask_unlinked_replacement_rows(
-        features, events, announcements)
-
-    before = masked_features.loc[masked_features.journey_id.eq("replacement-before")]
-    after = masked_features.loc[masked_features.journey_id.eq("replacement-after")]
-    assert before["current_delay"].isna().all()
-    assert after["current_delay"].eq(7.0).all()
-    assert masked_features.loc[masked_features.journey_id.eq("ordinary"),
-                               "current_delay"].eq(7.0).all()
-    assert not masked_events.journey_id.eq("replacement-before").any()
-    assert set(masked_events.journey_id) == {"ordinary", "replacement-after"}
+    events = _journey_events(rows[~use_scheduled], operated, rows[use_scheduled], scheduled,
+                             changes, plans)
+    features = delay_dynamics_from_events(rows, events)
+    assert features.current_delay.tolist() == [7.0, 23.0]
+    assert features.current_delay_change_min.iloc[1] == 16.0
 
 
 def test_reliability_candidate_pairs_are_limited_to_service_28d_and_corridor_24h():
@@ -515,6 +515,12 @@ def _stub_reliability_builder_inputs(
         {"id": f"{candidate_id}-1", "journey_id": candidate_id,
          "station_name": "München Hbf", "train_line_station_num": 1},
     ])
+
+    candidate_stops = candidate_stops.assign(
+        stop_index=[0, 1], train_type="ICE", train_number=replacement_train_number or scheduled_train_number,
+        is_replacement_train=is_replacement_train, replaced_train_type="ICE",
+        replaced_train_number=scheduled_train_number, departure_planned_time=pd.NaT,
+    )
 
     def read_parquet(path, columns=None):
         name = Path(path).name

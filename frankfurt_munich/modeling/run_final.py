@@ -168,8 +168,8 @@ def register(results_dir, inputs_dir, registry, jobs=1):
             candidates = nested_feature_variants(run, pt, task, factory)
             inputs = tuple(dict.fromkeys(c for _, num, cat in candidates.values() for c in num + cat))
             rows = load_advanced_rows(pt, inputs_dir=inputs_dir, extra_inputs=inputs)
-            selection = select_feature_variant(rows, pt, task, candidates, sample_configs(space)[0],
-                                               cv_folds)
+            selection = select_feature_variant(rows, pt, task, candidates,
+                                               sample_configs(space, n=SEARCH_CONFIGS), cv_folds)
         elif railway["step"] == "3.3" and variant in ("forward", "backward"):
             selected_groups = final_group_selection(railway, pt, task, inputs_dir)
         for weather in (False, True):

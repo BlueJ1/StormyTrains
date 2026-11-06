@@ -40,6 +40,7 @@ from features import feature_columns
 from folds import cv_folds, inner_folds
 
 N_CONFIGS = 50
+FEATURE_SCREEN_CONFIGS = 3
 SEED = 42
 SCORE = {"delay": "rmse", "severity": "log_loss"}  # lower is better
 
@@ -172,7 +173,7 @@ def nested_search(rows, prediction_time, task, factory, configs, numeric, catego
         model, num, cat = factory, numeric, categorical
         if variants:
             chosen_variant = select_feature_variant(outer_train, prediction_time, task,
-                                                    variants, configs[0], splits)
+                                                    variants, configs, splits)
             model, num, cat = variants[chosen_variant]
         table, _, _ = search(outer_train, prediction_time, task, model, configs,
                              num, cat, splits=splits)
@@ -188,13 +189,14 @@ def nested_search(rows, prediction_time, task, factory, configs, numeric, catego
         predictions, ignore_index=True)
 
 
-def select_feature_variant(rows, prediction_time, task, variants, params, splits):
-    """Choose among pre-listed representations or groups using one fixed configuration."""
+def select_feature_variant(rows, prediction_time, task, variants, configs, splits):
+    """Rank each variant by its best inner score over the same three configurations."""
+    screening_configs = configs[:FEATURE_SCREEN_CONFIGS]
     scores = {}
     for name, (factory, numeric, categorical) in variants.items():
-        metrics, _ = cross_validate(rows, prediction_time, task, partial(factory, **params),
-                                    numeric, categorical, splits=splits)
-        scores[name] = metrics[SCORE[task]].mean()
+        table, _, _ = search(rows, prediction_time, task, factory, screening_configs,
+                             numeric, categorical, splits=splits)
+        scores[name] = table[f"{SCORE[task]}_mean"].min()
     return min(scores, key=scores.__getitem__)
 
 

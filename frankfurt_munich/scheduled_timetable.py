@@ -103,37 +103,6 @@ def _branch_from_route(route: list[str] | None) -> str | pd.NA:
     return "nuernberg" if via_nuernberg else "stuttgart"
 
 
-def _plan_features(origin_plan: pd.Series, upstream_plan: pd.Series | None) -> dict:
-    route_tail = _path_to_destination(origin_plan.get("departure_planned_path"))
-    route = [ORIGIN, *route_tail] if route_tail else None
-    starts = pd.NA
-    source_id = origin_plan.get("id")
-    if isinstance(source_id, str):
-        try:
-            starts = int(source_id.rsplit("-", 1)[-1]) == 1
-        except ValueError:
-            starts = pd.NA
-
-    upstream_min: float = np.nan
-    arrival_at_origin = origin_plan.get("arrival_planned_time")
-    if starts is True or starts is np.bool_(True):
-        upstream_min = 0.0
-    elif upstream_plan is not None and pd.notna(arrival_at_origin):
-        first_departure = upstream_plan.get("departure_planned_time")
-        if pd.notna(first_departure):
-            delta = pd.Timestamp(arrival_at_origin) - pd.Timestamp(first_departure)
-            upstream_min = delta.total_seconds() / 60.0
-
-    return {
-        "scheduled_train_type": origin_plan.get("train_type", pd.NA),
-        "scheduled_starts_at_origin": starts,
-        "weather_branch": _branch_from_route(route),
-        "planned_stops": len(route) if route else pd.NA,
-        "route_id": " | ".join(route) if route else pd.NA,
-        "upstream_planned_min": upstream_min,
-    }
-
-
 def build_timetable_features(
     prediction_rows: pd.DataFrame,
     replacement_context: pd.DataFrame,
@@ -178,45 +147,40 @@ def build_timetable_features(
 
     # Upstream minutes need the first stop's planned departure at the same
     # cutoff.  The source stop ID sequence is stable within a ride ID.
-    origin_ids = origin.get("id")
-    upstream_ids: list[object] = []
-    for value in origin_ids if origin_ids is not None else []:
-        if pd.isna(value):
-            upstream_ids.append(pd.NA)
-            continue
-        try:
-            ride_id, _ = str(value).rsplit("-", 1)
-            upstream_ids.append(f"{ride_id}-1")
-        except ValueError:
-            upstream_ids.append(pd.NA)
+    origin = origin.set_index("_query_id").reindex(target["_query_id"])
+    origin_ids = origin["id"].astype("string")
+    ride_ids = origin_ids.str.rsplit("-", n=1).str[0].where(origin_ids.str.contains("-"))
     upstream_queries = pd.DataFrame({
-        "_query_id": origin["_query_id"], "id": upstream_ids,
+        "_query_id": origin.index,
+        "id": ride_ids + "-1",
         "cutoff_utc": origin["cutoff_utc"],
     })
-    upstream = _asof_by_id(upstream_queries, plan_snapshots)
-    upstream = upstream.set_index("_query_id")
+    upstream = _asof_by_id(upstream_queries, plan_snapshots).set_index("_query_id")
 
-    result_rows = []
-    for _, row in origin.iterrows():
-        if pd.isna(row.get("available_at_utc")):
-            feature = {column: pd.NA for column in TIMETABLE_COLUMNS}
-            feature["upstream_planned_min"] = np.nan
-        else:
-            prior = upstream.loc[row["_query_id"]]
-            prior = None if pd.isna(prior.get("available_at_utc")) else prior
-            feature = _plan_features(row, prior)
-        result_rows.append(feature)
-    result = target[ROW_KEY].copy().reset_index(drop=True)
-    for column in TIMETABLE_COLUMNS:
-        result[column] = [value.get(column, pd.NA) for value in result_rows]
-    result["scheduled_train_type"] = result["scheduled_train_type"].astype("string")
-    result["scheduled_starts_at_origin"] = result["scheduled_starts_at_origin"].astype("boolean")
-    result["weather_branch"] = result["weather_branch"].astype("string")
-    result["planned_stops"] = pd.to_numeric(result["planned_stops"], errors="coerce").astype("Int64")
-    result["route_id"] = result["route_id"].astype("string")
-    result["upstream_planned_min"] = pd.to_numeric(
-        result["upstream_planned_min"], errors="coerce"
-    ).astype("float64")
+    visible = origin.get("available_at_utc", pd.Series(pd.NaT, index=origin.index)).notna()
+    stop_number = origin_ids.str.rsplit("-", n=1).str[-1].str.strip()
+    starts = stop_number.str.fullmatch(r"[+]?0*1").astype("boolean")
+    starts = starts.where(visible & stop_number.str.fullmatch(r"[+-]?\d+"))
+
+    paths = origin.get("departure_planned_path", pd.Series(None, index=origin.index))
+    tails = paths.where(visible).map(_path_to_destination)
+    routes = tails.map(lambda tail: [ORIGIN, *tail] if tail else None)
+    arrival = pd.to_datetime(origin.get("arrival_planned_time", pd.Series(pd.NaT, index=origin.index)))
+    departure = pd.to_datetime(
+        upstream.get("departure_planned_time", pd.Series(pd.NaT, index=upstream.index))
+    )
+    minutes = (arrival - departure).dt.total_seconds().div(60)
+    minutes = minutes.mask(starts.fillna(False), 0.0).where(visible)
+
+    result = target[ROW_KEY].copy()
+    result["scheduled_train_type"] = (
+        origin.get("train_type", pd.Series(pd.NA, index=origin.index)).where(visible).astype("string")
+    )
+    result["scheduled_starts_at_origin"] = starts
+    result["weather_branch"] = routes.map(_branch_from_route).astype("string")
+    result["planned_stops"] = routes.str.len().astype("Int64")
+    result["route_id"] = routes.str.join(" | ").astype("string")
+    result["upstream_planned_min"] = minutes.astype("float64")
     return result
 
 

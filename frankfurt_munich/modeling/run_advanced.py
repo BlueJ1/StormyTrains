@@ -27,7 +27,7 @@ from models import L1_LOGISTIC, make_lightgbm_classifier
 from network_transfer import NETWORK_FEATURE, inference_context, network_cv
 from representations import REPRESENTATIONS, route_representation
 from sequence_inputs import SEQUENCE_COLUMN
-from tuning import SCORE, nested_search, sample_configs
+from tuning import FEATURE_SCREEN_CONFIGS, SCORE, nested_search, sample_configs
 
 def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_times):
     """Save one run using the same predictions and metrics format as the original CV."""
@@ -180,7 +180,8 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
     if run.nested:
         config["search"] = {"n_configs": len(configs), "selection": f"inner mean {SCORE[task]}"}
         if run.variant in AUTO_VARIANTS:
-            config["search"]["feature_selection"] = "inner mean using configuration 0"
+            count = min(FEATURE_SCREEN_CONFIGS, len(configs))
+            config["search"]["feature_selection"] = f"best inner mean over the first {count} configurations"
         elif run.step == "0.8" and run.variant:
             config["evaluation"] = "nested tuning, exploratory variant"
     if group_choices:

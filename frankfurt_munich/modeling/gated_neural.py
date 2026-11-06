@@ -32,13 +32,22 @@ class GatedLayer(nn.Module):
         self.strength = nn.Parameter(torch.full((width,), -3.0))
 
     def forward(self, features):
-        logits = torch.stack((self.strength, torch.full_like(self.strength, OFF_LOGIT)), dim=1)
-        gates = nn.functional.gumbel_softmax(logits, tau=1.0, hard=True)[:, 0]
+        if self.training:
+            logits = torch.stack((self.strength, torch.full_like(self.strength, OFF_LOGIT)), dim=1)
+            gates = nn.functional.gumbel_softmax(logits, tau=1.0, hard=True)[:, 0]
+        else:
+            gates = self.selected_mask()
         return self.linear(features).relu() * gates
+
+    def selected_mask(self):
+        mask = self.strength.sigmoid().round()
+        if not mask.any():
+            mask[self.strength.argmax()] = 1
+        return mask
 
     def selected_width(self):
         """Count the neurons selected by the reference rounded sigmoid mask."""
-        return max(1, int(self.strength.sigmoid().round().sum()))
+        return int(self.selected_mask().sum())
 
 
 class GatedMLP(TorchMLP):
@@ -74,6 +83,7 @@ class GatedMLP(TorchMLP):
         search_deadline = start + 0.75 * self.total_budget
         stale = 0
         for _ in range(MAX_EPOCHS):
+            model.train()
             gate_batches = valid[torch.randperm(len(valid))].split(256)
             for i, batch in enumerate(train[torch.randperm(len(train))].split(256)):
                 self._update(model, weight_optimizer, features, classes, delays, batch)
@@ -81,6 +91,7 @@ class GatedMLP(TorchMLP):
                              gate_batches[i % len(gate_batches)])
                 if process_time() >= search_deadline:
                     break
+            model.eval()
             with torch.inference_mode():
                 loss = float(self.loss(model(features[valid]), classes, delays, valid))
             if loss < best_loss:

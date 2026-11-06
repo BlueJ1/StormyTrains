@@ -14,9 +14,9 @@ Download the 27 `monthly_processed_data_plan` files for July 2024 through Septem
 
 The legacy fetcher used the requested timetable hour in plan filenames. Following the user decision on 5 November 2026, the primary build accepts these legacy fields regardless of fetch time, using the earliest plan per stop as its static schedule. Exact request stamps from 3 November 2025 remain cutoff-bound. The 45-minute bound applies to the separate change archive. [Legacy fetcher](https://github.com/piebro/deutsche-bahn-data/blob/f19888b770a68d5f9010adac33af70e400e2395d/fetch_data.py)
 
-The prediction cohort supplies the planned Frankfurt departure and München arrival. The additional timetable fields come from the scheduled train's plan available at the cutoff. If the branch is unavailable, the weather pipeline retains the two endpoint temperatures and leaves the route aggregates missing. The live delay requires both a visible change report and a visible plan. For retained replacement trains it also requires a visible link to the scheduled service.
+The prediction cohort supplies the planned Frankfurt departure and München arrival. The additional timetable fields come from the scheduled train's plan available at the cutoff. If the branch is unavailable, the weather pipeline retains the two endpoint temperatures and leaves the route aggregates missing. The live delay requires both a visible change report and a visible plan. For retained replacements, the scheduled service supplies live history until the link to the replacement becomes visible.
 
-Recent-reliability candidates come from the CV roster during development. The holdout feature build adds its roster for the historical lookup. Both builds reconstruct past outcomes from snapshots available at each cutoff.
+Recent-reliability candidates come from the same target-free stop roster for CV and holdout. Both builds reconstruct past outcomes from snapshots available at each cutoff. The resulting rates describe journeys with observed outcomes. A missing arrival report stays unknown. An archive check found a destination arrival report somewhere in the snapshots for 16,550 of 16,551 completed CV journeys. That check measures archive coverage. At an individual cutoff, the builder still requires a visible report and an arrival time at or before the cutoff.
 
 | Input coverage | 24 h | 6 h | 1 h | 20 min | 0 min |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -40,6 +40,7 @@ Recent-reliability candidates come from the CV roster during development. The ho
 When running a subset of horizons with `--prediction-time`, set a separate `--results-dir`. Reports and registration select the latest timestamp in each run directory, so a partial run in the main results directory can replace the complete run in those reports.
 
 The model-family screens use the cutoff-safe base columns for their learner comparisons. The nested booster feature-group policy evaluates the expanded Phase 2 inputs separately.
+The corrected policy ranks each feature variant by its best inner-fold score across the first three configurations in the same search. It then tunes the selected variant over the full 20 configurations. The extra screening fits reuse configurations from that budget.
 
 Steps 6.5 and 4.2 use a separate Python 3.13 environment with [requirements-distributions.txt](requirements-distributions.txt). NGBoost and LightGBMLSS constrain dependencies to older releases than the main environment uses.
 
@@ -55,7 +56,7 @@ Step 8.3 uses railway inputs from the three auxiliary corridors. The builder dro
 
 ### Holdout evaluation
 
-This branch contains the completed registry and evaluation. The commands below document the procedure used for that run. The registration command requires an unused registry path, and the evaluator refuses to overwrite the completed results.
+This branch preserves the registry and results of the original holdout evaluation at commit `065b077`. The PR review changed the development pipeline after that evaluation. The scores below belong to the original inputs and source, and the review reruns use CV only. For the original protocol and source fingerprints, use commit `065b077` and its recorded inputs. The evaluator refuses to overwrite the completed results.
 
 The registration can re-tune arms in parallel after shared feature selection. It records the tuning environment and freezes the source and selected CV input fingerprints. Holdout builders verify the registered source. Evaluation verifies the registered CV inputs before scoring and records each arm’s interpreter and package versions. On retry, the scorer reuses completed arms when the committed registration and both splits' fingerprints match.
 

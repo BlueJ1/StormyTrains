@@ -291,8 +291,7 @@ def build_reliability_file(
 ) -> Path:
     """Build split-specific recent-reliability features from visible snapshots.
 
-    The source candidates come from the selected split roster, but only stop IDs
-    and scheduled-service metadata are used. Candidate pairs are bounded to 32 days,
+    Both target splits use the same target-free stop roster. Candidate pairs are bounded to 32 days,
     and only same-service candidates plus the corridor's prior 24-hour window
     are materialized. The shared plan policy treats the earliest legacy snapshot
     per stop as a static schedule and applies exact-era plan updates as-of cutoff.
@@ -332,15 +331,9 @@ def build_reliability_file(
             f"run the {split} timetable builder before reliability extraction"
         )
     context = pd.read_parquet(context_path)
-    candidate_context = context
-    if split == "holdout":
-        cv_context = pd.read_parquet(
-            data_dir / "advanced" / "replacement_context_cv.parquet"
-        )
-        candidate_context = pd.concat([cv_context, context], ignore_index=True)
-        candidate_context = candidate_context.drop_duplicates("journey_id", keep="last")
     announcements = pd.read_parquet(announcements_path)
-    from scheduled_timetable import replacement_announcements_asof, service_keys_asof
+    from scheduled_timetable import (build_replacement_context, replacement_announcements_asof,
+                                     service_keys_asof)
     target_keys = service_keys_asof(rows, pd.DataFrame(), context, announcements)
     rows = rows.merge(target_keys[[*ROW_KEY, "history_train_type", "history_train_number"]],
                       on=ROW_KEY, how="left", validate="one_to_one")
@@ -348,6 +341,8 @@ def build_reliability_file(
 
     stops = pd.read_parquet(data_dir / "stops.parquet", columns=[
         "id", "journey_id", "station_name", "train_line_station_num",
+        "stop_index", "train_type", "train_number", "is_replacement_train",
+        "replaced_train_type", "replaced_train_number", "departure_planned_time",
     ])
     stops = stops.loc[stops["station_name"].isin(
         ["Frankfurt (Main) Hbf", "München Hbf"]
@@ -355,6 +350,7 @@ def build_reliability_file(
     stops = stops.sort_values(["journey_id", "train_line_station_num"])
     origin = (stops.loc[stops["station_name"].eq("Frankfurt (Main) Hbf")]
               .drop_duplicates("journey_id").rename(columns={"id": "origin_id"}))
+    candidate_context = build_replacement_context(stops, origin)
     destination = (stops.loc[stops["station_name"].eq("München Hbf")]
                    .drop_duplicates("journey_id").rename(columns={"id": "destination_id"}))
     candidates = origin[["journey_id", "origin_id"]].merge(
@@ -370,7 +366,7 @@ def build_reliability_file(
     target_rows = rows.copy()
     target_rows["_cutoff_month"] = target_rows["_cutoff_utc"].dt.tz_localize(None).dt.to_period("M")
     for month, month_targets in target_rows.groupby("_cutoff_month", sort=True):
-        print(f"reliability CV {month}: {len(month_targets)} target rows", flush=True)
+        print(f"reliability {split} {month}: {len(month_targets)} target rows", flush=True)
         month_targets = month_targets.reset_index(drop=True)
         lower_bound = month_targets["_cutoff_utc"].min() - pd.Timedelta(days=32)
         upper_bound = month_targets["_cutoff_utc"].max()
@@ -473,7 +469,8 @@ def build_reliability_file(
         ),
         "legacy_plan_policy": "earliest legacy snapshot per stop is static from 1900-01-01 UTC",
         "candidate_policy": "same-service candidates within 28d, corridor outcomes within 24h/3h; 32d service and 48h corridor run-ID prefilters",
-        "candidate_source": "split journey roster; only stop IDs and replacement context used",
+        "candidate_source": "shared target-free stop roster for both splits",
+        "candidate_journeys": int(len(candidates)),
         "prediction_rows": int(len(result)),
         "rows_with_legacy_static_plan_policy": int(
             rows["_cutoff_utc"].lt(PLAN_EXACT_UTC_FROM).sum()

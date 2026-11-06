@@ -19,6 +19,19 @@ def test_width_follows_rounded_sigmoid_mask():
     assert layer.selected_width() == 3
 
 
+def test_eval_gates_are_deterministic_with_one_neuron_fallback():
+    layer = GatedLayer(2, 3).eval()
+    with torch.no_grad():
+        layer.strength.copy_(torch.tensor([-3.0, -1.0, -2.0]))
+        layer.linear.weight.fill_(1)
+        layer.linear.bias.zero_()
+        features = torch.ones(1, 2)
+        expected = torch.tensor([[0.0, 2.0, 0.0]])
+        torch.testing.assert_close(layer(features), expected)
+        torch.testing.assert_close(layer(features), expected)
+    assert layer.selected_width() == 1
+
+
 def test_refit_epoch_is_selected_on_inner_weeks(monkeypatch):
     X = pd.DataFrame({"feature": np.arange(8, dtype=float)})
     y = np.arange(8, dtype=float)

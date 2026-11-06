@@ -67,11 +67,12 @@ def test_nested_variant_selection_is_independent_of_outer_labels():
         return DummyRegressor(strategy="constant", constant=value + offset)
 
     variants = {name: (partial(constant, value=value), [], ["hour"])
-                for name, value in [("zero", 0), ("hundred", 100)]}
-    table, metrics, _ = nested_search(frame, "1h", "delay", constant, [{"offset": 0}], [],
+                for name, value in [("first", 2), ("second", 7)]}
+    table, metrics, _ = nested_search(frame, "1h", "delay", constant, [{"offset": 0}, {"offset": -7}], [],
                                      ["hour"], variants=variants)
     chosen = table.loc[table["outer_fold"].eq(1) & table["chosen"]]
-    assert chosen["feature_variant"].item() == "zero"
+    assert chosen["feature_variant"].item() == "second"
+    assert chosen["config_id"].item() == 1
     assert metrics.loc[metrics["fold"].eq(1), "rmse"].item() == 100
 
 
@@ -83,6 +84,30 @@ def test_pooling_keeps_all_horizons_in_the_same_journey_fold():
     assert len(metrics) == 10
     assert len(oof) == frame["arrival_delay_min"].notna().sum()
     assert oof.groupby("journey_id")["fold"].nunique().eq(1).all()
+
+
+def test_network_transfer_uses_furthest_stop_after_earlier_stop_correction():
+    from network_transfer import inference_context
+
+    frame = pd.DataFrame({
+        "journey_id": ["one"], "prediction_time": ["1h"],
+        "predicted_at": pd.to_datetime(["2025-12-01 10:00"]),
+        "destination_arrival_planned_local": pd.to_datetime(["2025-12-01 12:00"]),
+        "planned_stops": [4],
+    })
+    keys = frame[["journey_id", "prediction_time", "predicted_at"]]
+    events = pd.concat([keys, keys], ignore_index=True).assign(
+        station_sequence=[2, 3], station_name=["Earlier", "Frankfurt (Main) Hbf"],
+        reported_time_utc=pd.to_datetime(["2025-12-01 08:55", "2025-12-01 08:50"], utc=True),
+        planned_time_utc=pd.to_datetime(["2025-12-01 08:20", "2025-12-01 08:45"], utc=True),
+        event_report_visible=True, event_occurred_by_cutoff=True,
+        event_kind="arrival", event_cancelled=False, event_delay_min=[35, 5],
+    )
+
+    result = inference_context(frame, events).iloc[0]
+    assert result.last_stop_delay == 5
+    assert result.remaining_planned_stops == 3
+    assert result.remaining_planned_min == 135
 
 
 def test_neural_reference_names_distinguish_calendar_choices():

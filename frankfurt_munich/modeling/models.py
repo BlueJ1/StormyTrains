@@ -117,21 +117,31 @@ def make_random_forest_classifier(numeric, categorical, *, max_features, min_sam
 class CategoryCodes(BaseEstimator, TransformerMixin):
     """Categorical columns as pandas categories with the training rows' levels.
 
-    Values are compared as strings; a level not seen in training becomes
-    missing. Other columns pass through unchanged.
+    Numeric levels compare consistently across integer and floating dtypes.
+    A level not seen in training becomes missing.
     """
 
     def __init__(self, categorical):
         self.categorical = categorical
 
+    @staticmethod
+    def _levels(values):
+        dtype = values.cat.categories.dtype if isinstance(values.dtype, pd.CategoricalDtype) else values.dtype
+        if pd.api.types.is_float_dtype(dtype):
+            return values.map(
+                lambda value: str(int(value)) if value.is_integer() else str(value),
+                na_action="ignore",
+            ).astype("string")
+        return values.astype("string")
+
     def fit(self, X, y=None):
-        self.levels_ = {c: sorted(X[c].astype("string").dropna().unique()) for c in self.categorical}
+        self.levels_ = {c: sorted(self._levels(X[c]).dropna().unique()) for c in self.categorical}
         return self
 
     def transform(self, X):
         X = X.copy()
         for c in self.categorical:
-            values = X[c].astype("string")
+            values = self._levels(X[c])
             X[c] = pd.Categorical(values.where(values.isin(self.levels_[c])),
                                   categories=self.levels_[c])
         return X

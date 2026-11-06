@@ -135,7 +135,8 @@ def inference_context(rows, events):
     event = events.loc[events["event_report_visible"] & events["event_occurred_by_cutoff"]
                        & events["event_kind"].eq("arrival") & ~events["event_cancelled"]
                        & events["event_delay_min"].notna()].copy()
-    event = (event.sort_values(["reported_time_utc", "station_sequence", "event_kind"])
+    event = (event.dropna(subset=["station_sequence"])
+             .sort_values(["station_sequence", "reported_time_utc"])
              .drop_duplicates(ROW_KEY, keep="last"))
     frankfurt = events.loc[events["station_name"].eq("Frankfurt (Main) Hbf"),
                            [*ROW_KEY, "station_sequence"]].drop_duplicates(ROW_KEY)
