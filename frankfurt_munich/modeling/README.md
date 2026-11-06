@@ -53,7 +53,9 @@ Step 8.3 uses railway inputs from the three auxiliary corridors. The builder dro
 
 ### Holdout evaluation
 
-The registration can re-tune arms in parallel after shared feature selection. It records the tuning environment, and the final report records each arm’s interpreter and package versions. The evaluation fingerprints the pipeline source and both splits of its generated inputs. An interrupted run resumes completed arms only when those fingerprints and the committed registration match.
+The registration can re-tune arms in parallel after shared feature selection. It records the tuning environment and freezes the source and selected CV input fingerprints. Holdout builders verify the registered source. Evaluation verifies the registered CV inputs before scoring and records each arm’s interpreter and package versions. On retry, the scorer reuses completed arms when the committed registration and both splits' fingerprints match.
+
+After a forced stop, resume with the same registry once the scorer and its arm workers have exited and the stale `.evaluation.lock` has been cleared.
 
 After the CV steps are complete, `run_final.py register` ranks eligible pipelines by the railway-only CV score and writes one matched pair per task and horizon to `finalists.json`. Commit that file with the preregistration entry in the plan before generating holdout inputs.
 

@@ -194,12 +194,14 @@ def test_worker_rejects_missing_lock_or_mismatched_manifest(tmp_path, monkeypatc
 def test_failed_final_evaluation_rejects_changed_provenance_on_resume(tmp_path, monkeypatch):
     import run_final
 
-    registration = {"finalists": [{"model": "lightgbm"}]}
+    development = {"source/modeling/run_final.py": "original"}
+    registration = {"finalists": [{"model": "lightgbm"}], "development_fingerprints": development}
     registry = tmp_path / "finalists.json"
     registry.write_text(json.dumps(registration))
     monkeypatch.setattr(run_final, "committed_registry", lambda path: registration)
-    fingerprint = {"source/run_final.py": "original"}
-    monkeypatch.setattr(run_final, "evaluation_fingerprints", lambda *args: dict(fingerprint))
+    fingerprint = {**development, "advanced/weather_holdout.parquet": "original"}
+    monkeypatch.setattr(run_final, "evaluation_fingerprints",
+                        lambda *args, splits=("cv", "holdout"): dict(development if splits == ("cv",) else fingerprint))
     calls = []
 
     def fail(*args):
@@ -212,7 +214,7 @@ def test_failed_final_evaluation_rejects_changed_provenance_on_resume(tmp_path, 
     output = tmp_path / "advanced_holdout"
     assert not (output / ".evaluation.lock").exists()
     assert json.loads((output / "provenance.json").read_text()) == fingerprint
-    fingerprint["source/run_final.py"] = "changed"
+    fingerprint["advanced/weather_holdout.parquet"] = "changed"
     with pytest.raises(PermissionError, match="code or inputs changed"):
         run_final.final_evaluation(registry, tmp_path, tmp_path)
     assert len(calls) == 1
@@ -221,6 +223,47 @@ def test_failed_final_evaluation_rejects_changed_provenance_on_resume(tmp_path, 
     with pytest.raises(PermissionError, match="arms have no provenance"):
         run_final.final_evaluation(registry, tmp_path, tmp_path)
     assert len(calls) == 1
+
+
+def test_holdout_gate_rejects_source_changes_after_registration(tmp_path, monkeypatch):
+    import holdout_gate
+
+    project = tmp_path / "frankfurt_munich"
+    modeling = project / "modeling"
+    modeling.mkdir(parents=True)
+    source = modeling / "pipeline.py"
+    source.write_text("registered source")
+    path = modeling / "finalists.json"
+    registration = {"finalists": [{}], "development_fingerprints": holdout_gate.source_fingerprints(project)}
+    path.write_text(json.dumps(registration))
+    committed = path.read_bytes()
+    monkeypatch.setattr(holdout_gate, "HERE", project)
+    monkeypatch.setattr(holdout_gate.subprocess, "run", lambda *args, **kwargs:
+                        holdout_gate.subprocess.CompletedProcess(args, 0, stdout=committed))
+
+    assert holdout_gate.committed_registration(path) == registration
+    source.write_text("changed source")
+    with pytest.raises(PermissionError, match="source changed after registration"):
+        holdout_gate.committed_registration(path)
+
+
+def test_first_final_evaluation_rejects_changed_cv_inputs(tmp_path, monkeypatch):
+    import run_final
+
+    key = "data/prediction_rows_cv.parquet"
+    registration = {"finalists": [{"model": "lightgbm"}], "development_fingerprints": {key: "original"}}
+    registry = tmp_path / "finalists.json"
+    registry.write_text(json.dumps(registration))
+    monkeypatch.setattr(run_final, "committed_registry", lambda path: registration)
+
+    def fingerprints(*args, splits=("cv", "holdout")):
+        assert splits == ("cv",)
+        return {key: "changed"}
+
+    monkeypatch.setattr(run_final, "evaluation_fingerprints", fingerprints)
+    with pytest.raises(PermissionError, match="development code or inputs changed after registration"):
+        run_final.final_evaluation(registry, tmp_path, tmp_path)
+    assert not (tmp_path / "advanced_holdout").exists()
 
 
 def test_evaluation_fingerprints_cover_source_and_both_data_splits(tmp_path, monkeypatch):
@@ -242,7 +285,9 @@ def test_evaluation_fingerprints_cover_source_and_both_data_splits(tmp_path, mon
     reliability = next(iter(run_final.FEATURE_FILES))
     registration = {"finalists": [{"features": {"numeric": list(reliability), "categorical": []}}]}
     original = run_final.evaluation_fingerprints(registration, inputs)
+    development = run_final.evaluation_fingerprints(registration, inputs, splits=("cv",))
     assert "advanced/reliability_holdout.parquet" in original
+    assert development == {key: value for key, value in original.items() if not key.endswith("_holdout.parquet")}
     (source / "pipeline.py").write_text("updated source")
     (data / "prediction_rows_cv.parquet").write_bytes(b"updated rows")
     changed = run_final.evaluation_fingerprints(registration, inputs)
@@ -258,6 +303,7 @@ def test_parallel_registration_preserves_arm_order_and_serial_result(tmp_path, m
     monkeypatch.setattr(run_final, "HERE", tmp_path)
     monkeypatch.setattr(run_final, "git_commit", lambda: "test-revision")
     monkeypatch.setattr(run_final, "runtime_versions", lambda: {"python": "test"})
+    monkeypatch.setattr(run_final, "evaluation_fingerprints", lambda *args, **kwargs: {"cv": "frozen"})
     results = tmp_path / "results"
     pairs = []
     for task, model, metric in (("delay", "lightgbm", "rmse_mean"),
@@ -298,7 +344,9 @@ def test_parallel_registration_preserves_arm_order_and_serial_result(tmp_path, m
     run_final.register(results, tmp_path, parallel, jobs=2)
     assert workers == [2]
     assert serial.read_bytes() == parallel.read_bytes()
-    finalists = json.loads(parallel.read_text())["finalists"]
+    registered = json.loads(parallel.read_text())
+    assert registered["development_fingerprints"] == {"cv": "frozen"}
+    finalists = registered["finalists"]
     assert [(spec["task"], spec["weather"]) for spec in finalists] == [
         ("delay", False), ("delay", True), ("severity", False), ("severity", True),
     ]

@@ -79,7 +79,7 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
 - **0.8.** All eight baselines and eight feature-policy arms finished with 20 configurations and four inner week folds. The feature policy reached D12 in 20/20 LightGBM comparisons and 5/20 XGBoost comparisons. LightGBM railway departure log loss fell by 0.01573. Railway delay RMSE fell by 0.3705 min at 20 min. All five folds improved in both cases. The XGBoost railway severity policy reproduced all 85,901 base predictions exactly. All 150 chosen IDs from the reconstructed controls passed independent audit.
 
-- **0.6.** The final main suite passed 176 tests with five skips. All four distribution tests passed separately. The remaining skip is the deliberately duplicated linear one-hot comparison. Targeted tests cover the TabGNS mask and inner refit epochs. A fresh 24 h LightGBM delay search reproduced all 16,551 predictions of its reconstructed 20-configuration control exactly. All four departure reference classifier arms reproduced 16,947 probability vectors exactly across the two main environments.
+- **0.6.** The main suite passed 178 tests with five skips. Four distribution tests passed separately, leaving one deliberately duplicated linear one-hot test skipped. Gate regressions verify rejection of source and CV input changes after registration. A fresh 24 h LightGBM delay search reproduced all 16,551 predictions of the reconstructed 20-configuration control exactly. All four departure reference classifier arms reproduced 16,947 probability vectors exactly across the two main environments.
 
 ## Phase 1. Feature representations
 
@@ -215,7 +215,7 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | done |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | done |
 
-- **6.1.** Both 20-configuration delay arms finished, with zero D12 gains in ten paired comparisons. The first two of ten classifier horizon jobs completed. Classifier jobs use the same 20 configurations and four inner week folds.
+- **6.1.** Both 20-configuration delay arms finished, with zero D12 gains in ten paired comparisons. Five of ten classifier horizon jobs have finished. The remaining jobs use the same 20 configurations and four inner week folds.
 
 - **6.5.** All six distributional arms finished in the separate pinned environment. All 30 paired mean RMSE differences favored the nested LightGBM baseline. The closest result was NGBoost with weather at +0.019 min. The mixture result describes the specified LightGBMLSS adapter.
 

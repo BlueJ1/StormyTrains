@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 import shutil
@@ -29,7 +28,7 @@ from folds import cv_folds
 from final_analysis import (calibration_reliability, example_risk_trajectories,
                             paired_bootstrap_ci, paired_error_table)
 from group_selection import columns_for, greedy_groups, lightgbm_contributions
-from holdout_gate import REGISTRY, committed_registration
+from holdout_gate import REGISTRY, committed_registration, fingerprint_files, source_fingerprints
 from report_cv import run_index
 from representations import REPRESENTATIONS, extreme_weather, route_representation
 from sequence_inputs import SEQUENCE_COLUMN
@@ -156,6 +155,7 @@ def register(results_dir, inputs_dir, registry, jobs=1):
     unfinished = re.findall(r"(?m)^\| ([0-8]\.\d+) \| .* \| (?:todo|running) \|$", plan)
     if unfinished:
         raise PermissionError(f"finish the CV plan before registering finalists: {', '.join(unfinished)}")
+    sources = source_fingerprints(HERE.parent)
     records = []
     for task, pt, pair in choose_finalists(results_dir):
         railway = pair[False][1]
@@ -191,6 +191,8 @@ def register(results_dir, inputs_dir, registry, jobs=1):
             feature_policy = (f"{variant} on the railway CV arm"
                               if selection is not None or selected_groups is not None else None)
             records.append((spec, config, feature_policy))
+    development = evaluation_fingerprints({"finalists": [spec for spec, _, _ in records]},
+                                          inputs_dir, splits=("cv",))
     tune = partial(tune_registered_finalist, inputs_dir=inputs_dir)
     if jobs == 1:
         finalists = list(map(tune, records))
@@ -202,7 +204,10 @@ def register(results_dir, inputs_dir, registry, jobs=1):
               "weather" if spec["weather"] else "railway", flush=True)
     registration = {"policy": "one matched pair ranked by railway-only CV score per task and horizon",
                     "git_commit": git_commit(), "runtime": runtime_versions(),
-                    "finalists": finalists}
+                    "development_fingerprints": development, "finalists": finalists}
+    if (source_fingerprints(HERE.parent) != sources
+            or evaluation_fingerprints(registration, inputs_dir, splits=("cv",)) != development):
+        raise PermissionError("development code or inputs changed during registration")
     with registry.open("x") as file:
         json.dump(registration, file, indent=2)
         file.write("\n")
@@ -355,25 +360,20 @@ def score_registered_arm(registry, inputs_dir, output, index):
     temporary.replace(arm / "score.json")
 
 
-def evaluation_fingerprints(registration, inputs_dir):
-    """Bind every resumed arm to the same source files and generated model inputs."""
+def evaluation_fingerprints(registration, inputs_dir, *, splits=("cv", "holdout")):
+    """Fingerprint the pipeline source and requested model-input splits."""
     required = {"timetable", "history", "weather"}
     features = {c for spec in registration["finalists"] for names in spec["features"].values() for c in names}
     for group, filename in FEATURE_FILES.items():
         if features & group:
             required.add(filename)
-    sources = [*HERE.glob("*.py"), *HERE.parent.glob("*.py"), *HERE.glob("requirements*.txt")]
-    paths = {f"source/{path.relative_to(HERE.parent)}": path for path in sources}
-    for split in ("cv", "holdout"):
+    paths = {}
+    for split in splits:
         for name in ("journeys", "prediction_rows"):
             paths[f"data/{name}_{split}.parquet"] = DATA / f"{name}_{split}.parquet"
         for name in required:
             paths[f"advanced/{name}_{split}.parquet"] = inputs_dir / f"{name}_{split}.parquet"
-    fingerprints = {}
-    for name, path in sorted(paths.items()):
-        with path.open("rb") as file:
-            fingerprints[name] = hashlib.file_digest(file, "sha256").hexdigest()
-    return fingerprints
+    return source_fingerprints(HERE.parent) | fingerprint_files(paths)
 
 
 def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None):
@@ -381,6 +381,9 @@ def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None
     registry_bytes = registry.read_bytes()
     if json.loads(registry_bytes) != registration:
         raise PermissionError("finalist registration changed during validation")
+    development = evaluation_fingerprints(registration, inputs_dir, splits=("cv",))
+    if development != registration["development_fingerprints"]:
+        raise PermissionError("development code or inputs changed after registration")
     dist_models = set(DISTRIBUTIONS) | set(DISTRIBUTION_CLASSIFIERS)
     if any(spec["model"] in dist_models for spec in registration["finalists"]):
         if distribution_python is None or not distribution_python.is_file():
@@ -403,6 +406,8 @@ def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None
         if not provenance.exists() and (output / "_arms").exists():
             raise PermissionError("existing evaluation arms have no provenance")
         fingerprints = evaluation_fingerprints(registration, inputs_dir)
+        if any(fingerprints.get(name) != digest for name, digest in development.items()):
+            raise PermissionError("development code or inputs changed during evaluation setup")
         if provenance.exists() and json.loads(provenance.read_text()) != fingerprints:
             raise PermissionError("evaluation code or inputs changed")
         temporary = output / "provenance.tmp"
