@@ -1,8 +1,8 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Corrected cross-validation and finalist registration are complete. Hold-out evaluation is underway.**
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Cross-validation and hold-out evaluation are complete. See the modelling README for the matched weather comparison and error analysis.**
 
-**Two versions.** This file and `plan.html` (published as an artifact, link in `STATUS.md`) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
+**Two versions.** Keep the experiment statuses and results in sync between this file and the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
 
 Status values: `todo`, `running`, `done`, `dropped`. Cost: S (under 1 CPU hour), M (1–10 h), L (over 10 h or a new dataset). Expected gain is our guess before running, so that we can check it afterwards.
 
@@ -272,14 +272,20 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 | ID | Step | Status |
 |---|---|---|
 | 9.1 | **Pre-register finalists:** at most three per task and prediction time, with their configurations, feature sets and tuning policy, written into this plan before the hold-out set is opened. For each reported weather comparison, register a matched pair: the same railway feature groups, model family and tuning policy, with and without weather. If the two arms are tuned separately, the result is reported as a comparison of tuned pipelines | done |
-| 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | running |
-| 9.3 | **Railway only vs with weather** with the matched pairs of 9.1, on the hold-out set: the project's research question | todo |
-| 9.4 | **Error analysis:** by class, by period (before / from October 2025), by branch (Nürnberg / Stuttgart), on extreme-weather days; calibration plots; SHAP explanations of the final model | todo |
-| 9.5 | **Risk over the prediction times:** how a journey's predicted probabilities change from 24 h to 0 min, with example journeys (the "how risk updates during travel" focus) | todo |
+| 9.2 | **Hold-out evaluation:** refit on all 95 CV weeks, score once on the 23 hold-out weeks; uncertainty by a paired bootstrap of whole weeks | done |
+| 9.3 | **Railway only vs with weather** with the matched pairs of 9.1, on the hold-out set: the project's research question | done |
+| 9.4 | **Error analysis:** by class, by period (before / from October 2025), by branch (Nürnberg / Stuttgart), on extreme-weather days; calibration plots; SHAP explanations of the final model | done |
+| 9.5 | **Risk over the prediction times:** how a journey's predicted probabilities change from 24 h to 0 min, with example journeys (the "how risk updates during travel" focus) | done |
 
 - **9.1.** The replacement registry fixes one pair per task and horizon after correcting the network input. LightGBM is used for all severity horizons and for delay at 24 h and departure. Full-group linear regression is used for delay at 6 h, 1 h, and 20 min. Both arms share railway features and tuning budgets, and the registry freezes the development source and inputs.
 
-- **9.2.** Rebuild the network input after committing the replacement registry. Verify keys and coverage for all target-free feature tables, then refit on the 95 CV weeks and score the 20 registered arms once on the 23 hold-out weeks.
+- **9.2.** All 20 registered arms refit on the 95 CV weeks and scored once on the 23 hold-out weeks. The two arms matched on 21,260 severity prediction rows and 20,450 delay prediction rows across horizons. All scores reproduced from saved predictions. Intervals use 2,000 paired whole-week resamples.
+
+- **9.3.** All ten paired 95% intervals include zero. Weather increased delay RMSE by 0.017 to 0.193 min across horizons. Severity log loss was nearly unchanged at departure, with the largest change at 24 h, an increase of 0.00486.
+
+- **9.4.** Saved paired errors by class, period, branch and extreme weather, plus calibration and SHAP summaries. At departure, weather raised severe-delay log loss by 0.02732 and severe-delay RMSE by 0.490 min. Rare extreme-weather groups and high-risk calibration bins are sparse.
+
+- **9.5.** Saved one predeparture risk trajectory per realized class with all five horizons. In the severe example, the railway severe-or-cancelled probability went from 10.4% at 24 h to 18.5% at 6 h and 10.1% at departure.
 
 ## Not planned
 

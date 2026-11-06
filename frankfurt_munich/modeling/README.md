@@ -2,7 +2,7 @@
 
 Every model for Frankfurt (Main) Hbf → München Hbf is trained and scored by the same procedure, so that models differ only in their features and estimator. A model is a function that returns a fresh, unfitted scikit-learn estimator; `cv.py` does the rest.
 
-Only the CV set is used (`../data/prediction_rows_cv.parquet`). The weather models merge on the route weather from `../data/prediction_rows_weather_cv.parquet`; the railway-only models never read that file. Loading the hold-out set needs `allow_holdout=True`.
+Development uses the CV set (`../data/prediction_rows_cv.parquet`). The original weather models merge route weather from `../data/prediction_rows_weather_cv.parquet`. Loading the hold-out set needs `allow_holdout=True`.
 
 ## Advanced modelling
 
@@ -68,6 +68,34 @@ After the CV steps are complete, `run_final.py register` ranks eligible pipeline
 ```
 
 Build any additional inputs named by the finalists with `--split holdout`. Use `history_features.py --feature reliability` for recent reliability, `network_state.py` for network state, and `sequence_inputs.py` for upstream sequences. Then run `run_final.py evaluate` once. If a distributional learner is registered, supply its pinned interpreter via `--distribution-python`. The evaluation saves scores, paired week-bootstrap intervals, subgroup errors, calibration, risk trajectories, and SHAP summaries in `results/advanced_holdout/`.
+
+#### Holdout results
+
+The registry fixed 20 arms before the holdout labels were read. Each model was refitted on the 95 CV weeks and scored on the same rows as its matched arm across 23 held-out ISO weeks. LightGBM was selected for all severity horizons and for delay at 24 h and departure. Full-group linear regression was selected for delay at 6 h, 1 h and 20 min. The LightGBM pairs share railway features, and each arm was tuned separately over the same 20 configurations. [Finalist registry](finalists.json)
+
+Weather minus railway is reported below, with negative deltas favoring weather. The pointwise 95% intervals use 2,000 paired resamples of whole ISO weeks. All ten intervals include zero. The weather arm had higher delay RMSE at all five horizons, by 0.017 to 0.193 min. Severity log loss changed most at 24 h, increasing by 0.00486. These results cover the held-out weeks on this corridor under the stratified week split. Route weather aggregates were available for 57–65% of severity rows across horizons. The models used observed weather available at the cutoff.
+
+| Horizon | Rows | Railway log loss | Weather log loss | Δ log loss | 95% interval | Railway macro-F1 | Weather macro-F1 |
+| --- | ---: | ---: | ---: | ---: | --- | ---: | ---: |
+| 24 h | 4,315 | 0.91979 | 0.92466 | +0.00486 | [−0.00144, +0.01119] | 0.2210 | 0.2149 |
+| 6 h | 4,298 | 0.90663 | 0.90572 | −0.00091 | [−0.00622, +0.00378] | 0.2535 | 0.2132 |
+| 1 h | 4,243 | 0.86349 | 0.86411 | +0.00062 | [−0.00279, +0.00386] | 0.2645 | 0.2551 |
+| 20 min | 4,210 | 0.83962 | 0.84073 | +0.00111 | [−0.00283, +0.00486] | 0.2650 | 0.2662 |
+| Departure | 4,194 | 0.82026 | 0.82025 | −0.00001 | [−0.00322, +0.00348] | 0.2852 | 0.2681 |
+
+| Horizon | Completed journeys | Railway RMSE (min) | Weather RMSE (min) | Δ RMSE (min) | 95% interval (min) |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 24 h | 4,090 | 25.147 | 25.340 | +0.193 | [−0.006, +0.401] |
+| 6 h | 4,090 | 25.027 | 25.103 | +0.076 | [−0.026, +0.173] |
+| 1 h | 4,090 | 24.614 | 24.689 | +0.076 | [−0.016, +0.179] |
+| 20 min | 4,090 | 24.486 | 24.597 | +0.111 | [−0.008, +0.238] |
+| Departure | 4,090 | 24.272 | 24.288 | +0.017 | [−0.132, +0.172] |
+
+At departure, weather lowered log loss for normal or minor delays by 0.00866 and raised it for severe delays by 0.02732 and cancellations by 0.01909. It raised RMSE for severe delays by 0.490 min. Departure severity log loss moved by less than 0.0006 in either period and in opposite directions on the Nürnberg and Stuttgart branches. The heavy-rain groups contain two to four rows per horizon, and 1,486 departure severity rows lack a branch assignment. These subgroup differences are descriptive. [Severity subgroup scores](results/advanced_holdout/severity_errors.csv), [delay subgroup scores](results/advanced_holdout/delay_errors.csv)
+
+For severe delays and cancellations, the calibration bins at or above 0.5 have at most five observations per nonempty bin. Departure hour led the SHAP rankings for all ten severity arms. Planned travel time and service reliability also ranked highly. The runner uses TreeSHAP for LightGBM and sampled permutation SHAP for linear regression. [Reliability plots](results/advanced_holdout/calibration.svg), [SHAP summaries](results/advanced_holdout/shap.csv)
+
+The risk trajectories show the earliest journey with all five horizons in each realized class. The railway arm's severe-or-cancelled probability for the severe example rose from 10.4% at 24 h to 18.5% at 6 h and was 10.1% at departure. The cancelled example stayed between 5.9% and 8.3% in the railway arm. [Risk trajectories](results/advanced_holdout/risk.svg)
 
 <!-- BEGIN ADVANCED CV -->
 
