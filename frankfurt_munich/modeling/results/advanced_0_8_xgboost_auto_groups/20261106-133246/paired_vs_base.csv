@@ -1,6 +1,0 @@
-reference,prediction_time,fold_1,fold_2,fold_3,fold_4,fold_5,mean,folds_improved,reaches_minimum_gain,evaluation
-advanced_0_8_xgboost/20261105-170959,24h,-0.04019571503924624,0.0,-0.29589019480138035,0.0,-0.09317465818623916,-0.08585211360537315,3,False,nested
-advanced_0_8_xgboost/20261105-170959,6h,-0.24244682351003988,-0.05123876981032183,0.0,0.0,-0.2441146507545362,-0.10756004881497958,3,True,nested
-advanced_0_8_xgboost/20261105-170959,1h,0.0,0.0,0.0,0.0,0.0,0.0,0,False,nested
-advanced_0_8_xgboost/20261105-170959,20min,0.0,0.0,0.0,0.0,0.0,0.0,0,False,nested
-advanced_0_8_xgboost/20261105-170959,0min,0.0,0.0,0.0,0.0,0.0,0.0,0,False,nested

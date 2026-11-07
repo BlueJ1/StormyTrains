@@ -1,6 +1,0 @@
-reference,prediction_time,fold_1,fold_2,fold_3,fold_4,fold_5,mean,folds_improved,reaches_minimum_gain,evaluation
-advanced_0_8_xgboost_classifier/20261105-185949,24h,0.0,0.0,0.0,0.0,0.0,0.0,0,False,nested
-advanced_0_8_xgboost_classifier/20261105-185949,6h,0.0,0.0,0.0,0.0,0.0,0.0,0,False,nested
-advanced_0_8_xgboost_classifier/20261105-185949,1h,0.0,0.0,0.0,0.0,0.0,0.0,0,False,nested
-advanced_0_8_xgboost_classifier/20261105-185949,20min,0.0,0.0,0.0,0.0,0.0,0.0,0,False,nested
-advanced_0_8_xgboost_classifier/20261105-185949,0min,0.0,0.0,0.0,0.0,0.0,0.0,0,False,nested

@@ -1,6 +1,6 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 6 November 2026. **Cross-validation and hold-out evaluation are complete. See the modelling README for the matched weather comparison and error analysis.** These results are in PR #12, which is not merged yet; its review raised findings that may change some of them (see the log).
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 7 November 2026. **The PR review corrections and affected CV reruns are complete. The original hold-out evaluation is preserved at commit 065b077.** These results are in PR #12, which is not merged yet; its review raised findings that may change some of them (see the log).
 
 **Two versions.** Keep the experiment statuses and results in sync between this file and the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
 
@@ -72,14 +72,14 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 | 0.5 | Extra metrics | — | dropped (D9) |
 | 0.6 | **Tests** for each of the above, in the style of `tests/` (answer-as-feature, shuffled labels, no hold-out access, no outer-fold rows in nested choices) | S | done |
 
-- **0.7.** All 26 reference and diagnostic runs finished under the user-approved legacy timetable policy. The best railway-only booster log loss was 0.9204 at 24 h and 0.8333 at departure. The best railway-only delay RMSE was 24.476 and 23.814 min. Fixed configurations retain their exploratory label.
+- **0.7.** All 26 reference and recorded-route diagnostic runs passed audit after the review corrections. Fixed-configuration comparisons remain exploratory.
 - **0.1.** Base and recorded-route diagnostic sets defined. Phase 1 transformations run inside the fitted pipeline.
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** All eight base searches and eight corrected feature-policy arms passed audit at 20 configurations. The policy reached D12 in 20 of 20 LightGBM and seven of 20 XGBoost comparisons. Railway LightGBM departure log loss fell by 0.01619 across all five folds, and 20 min RMSE fell by 0.3481 min across four folds. The XGBoost railway severity policy reproduced all 85,901 base predictions exactly.
+- **0.8.** All eight base searches and eight feature-policy arms passed audit at 20 configurations. Each feature variant was screened over the same first three configurations before tuning the selected variant. The policy reached D12 in 20 of 20 LightGBM and 13 of 20 XGBoost comparisons.
 
-- **0.6.** The main suite passed 178 tests with five skips. Four distribution tests passed separately, leaving one deliberately duplicated linear one-hot test skipped. Gate regressions verify rejection of source and CV input changes after registration. A fresh 24 h LightGBM delay search reproduced all 16,551 predictions of the reconstructed 20-configuration control exactly. All four departure reference classifier arms reproduced 16,947 probability vectors exactly across the two main environments.
+- **0.6.** The reviewed main suite passed 183 tests with five skips. Four distribution tests passed separately, leaving one intentional duplicate test skipped across the environments. All 366 CV arms passed the result audit. The 336 updated arms preserved the predictions of untouched horizons exactly.
 
 ## Phase 1. Feature representations
 
@@ -127,15 +127,15 @@ Each feature group is added to the base set on its own and then all together, wi
 
 - **2.3.** All four holiday arms finished. None of 20 exploratory paired comparisons reached D12.
 
-- **2.2.** All four timetable-feature arms finished. Two of 20 exploratory comparisons reached D12: LightGBM delay improved by 0.111 min at 20 min and 0.102 min at departure, with four folds improving at each horizon.
+- **2.2.** All four timetable-feature arms passed audit. One of 20 exploratory comparisons reached D12.
 
-- **2.4.** All four delay-dynamics arms finished. Two of 12 exploratory comparisons reached D12: linear RMSE at 20 min fell by 0.105 min, and logistic departure log loss fell by 0.00321. All five folds improved in both cases.
+- **2.4.** All four delay-dynamics arms passed audit after switching to scheduled-run history before replacement announcements. Two of 12 exploratory comparisons reached D12.
 
-- **2.1.** The corrected cache and all four model arms finished. All 85,901 feature rows reproduced exactly after adding the replacement-service guard. Seventeen of 20 exploratory comparisons reached D12. LightGBM departure log loss fell by 0.00679 and RMSE by 0.257 min.
+- **2.1.** Both splits now use the same full target-free stop roster. Snapshot visibility still controls whether a past outcome is known. The corrected CV cache and all four model arms passed audit. Seventeen of 20 exploratory comparisons reached D12.
 
 - **2.5.** The input audit found a temporary archive path that had omitted all plans. The builder now requires the project archive. The corrected CV build used 5,336,631 plan rows and had network-wide shares for 61,064 of 85,901 predictions. None of the 20 corrected exploratory paired comparisons reached D12.
 
-- **Combined groups.** Eighteen of 20 exploratory comparisons reached D12 after the network correction. LightGBM departure log loss fell by 0.01219 and RMSE by 0.4022 min, with all five folds improving for each task.
+- **Combined groups.** All four combined-feature arms passed audit with the revised reliability and replacement history. Nineteen of 20 exploratory comparisons reached D12.
 
 ## Phase 3. Feature subsets and importance
 
@@ -155,11 +155,11 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 
 - **3.2.** The corrected importance fits exactly reproduced 82,755 delay and 85,901 severity predictions from the full-group ablation. Permutation importance favored calendar at 24 h, reliability at 6 h, and delay near departure. Hour led mean absolute TreeSHAP in eight of ten task and horizon panels.
 
-- **3.3.** All 14 corrected group-selection arms finished. L1 logistic regression reached D12 at all five weather horizons and at 20 min with railway inputs, each across all five folds. All 50 L1 outer fits converged. Neither forward nor backward selection reached D12.
+- **3.3.** All 14 group-selection arms passed audit. L1 logistic regression reached D12 in seven of ten comparisons against its full-group counterpart. Neither forward nor backward selection reached D12 in its 20 comparisons.
 
 - **3.4.** All ten corrected weather-subset arms finished. None of 40 exploratory paired comparisons reached D12 against the full-weather feature set.
 
-- **3.5.** Across 40 outer-fold selections per horizon, timetable and recent reliability were retained in all 40 at 24 h and at departure. Delay features were retained in all 40 departure selections. From 24 h to departure, network state rose from 4 to 29 selections, route from 12 to 24, and calendar from 28 to 31.
+- **3.5.** Across 40 outer-fold selections per horizon, timetable and recent reliability were retained in all 40 at 24 h and at departure. Delay was retained in all 40 departure selections. Network state rose from 4 to 32 selections and route from 12 to 24. Calendar was retained in 27 at each of those horizons.
 
 ## Phase 4. Two-stage and decomposed models
 
@@ -173,15 +173,15 @@ Question: does splitting the problem into parts that are easier to learn help? B
 | 4.4 | **Mixture of experts for delay** | a classifier routes each journey; one regressor per delay class; predicted delay = Σ P(k) · E[delay \| k]. Aimed at the 60+ min journeys that dominate RMSE | M | medium for RMSE | done |
 | 4.5 | **Predict the change, not the level** (1 h on) | target = final delay − `current_delay`; prediction = `current_delay` + predicted change. Where `current_delay` is missing (11,068 of 17,114 CV rows at 1 h), the prediction comes from the level model, fitted on the same training rows. The combined predictor is scored on the same completed journeys as the baseline, so the comparison stays paired. Trees cannot predict beyond the training range, so this helps most for large current delays | S | medium for RMSE | done |
 
-- **4.1.** Both arms finished. None of 10 exploratory comparisons reached D12. The largest log-loss reduction was 0.00096 at 1 h with weather, with three improving folds.
+- **4.1.** Both cancellation-then-class arms passed audit. None of ten exploratory comparisons reached D12.
 
-- **4.3.** Both ordinal arms finished. None of 10 exploratory comparisons reached D12. The largest log-loss reduction was 0.00021 at 1 h with weather, with three improving folds.
+- **4.3.** Both ordinal arms passed audit. None of ten exploratory comparisons reached D12.
 
-- **4.4.** Both mixture-of-experts arms finished. None of 10 exploratory comparisons reached D12. Railway-only 1 h RMSE fell by 0.0444 min, with four improving folds.
+- **4.4.** Both mixture-of-experts arms passed audit. None of ten exploratory comparisons reached D12.
 
-- **4.5.** Both change-then-level arms finished. All six exploratory paired means favored the level baseline. The closest difference was +0.0201 min at 1 h railway-only.
+- **4.5.** Both change-then-level arms passed audit. None of six exploratory comparisons reached D12.
 
-- **4.2.** All six arms finished in the pinned distribution environment. All 30 exploratory paired means favored the direct classifier. The closest was the quantile-forest severity model with weather at 6 h, at +0.02205 log loss.
+- **4.2.** All six distribution-to-severity arms passed audit in the separate pinned environment. None of 30 exploratory comparisons reached D12.
 
 ## Phase 5. Ensembles
 
@@ -194,9 +194,9 @@ Question: do combinations of models beat the best single model? Boosters that ti
 | 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
 | 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | done |
 
-- **5.1.** All 18 fixed averages finished. One of 90 exploratory comparisons met D12 against the strongest included single model. The weather severity average with neural models lowered departure log loss by 0.00315, with four improving folds.
+- **5.1.** All 18 fixed averages passed audit. None of 90 exploratory comparisons reached D12 against the strongest included single model.
 
-- **5.2.** All 24 LightGBM and XGBoost arms finished. Five of 40 nested and four of 80 exploratory comparisons reached D12. The nested LightGBM railway average reduced 24 h severity log loss by 0.00461, and the nested weather delay average reduced departure RMSE by 0.1225 min. All five folds improved in both cases.
+- **5.2.** All 24 seed and configuration averages passed audit. Four of 40 nested and four of 80 exploratory comparisons reached D12.
 
 - **5.3.** All four greedy-weight arms finished. None of 20 exploratory comparisons reached D12 against the strongest included single model at each horizon.
 
@@ -217,11 +217,11 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 
 - **6.1.** All four CatBoost arms finished at the 20-configuration budget. None of the 20 paired comparisons against the matched LightGBM baselines met D12.
 
-- **6.5.** All six distributional arms finished in the separate pinned environment. All 30 paired mean RMSE differences favored the nested LightGBM baseline. The closest result was NGBoost with weather at +0.019 min. The mixture result describes the specified LightGBMLSS adapter.
+- **6.5.** All six distributional arms passed audit in the separate pinned environment. None of 30 comparisons reached D12 against the nested LightGBM baseline. The mixture result describes the specified LightGBMLSS adapter.
 
-- **6.3.** All four pre-specified EBM arms finished. All 20 paired means favored the nested LightGBM baseline. The library's multiclass global visualization omits fitted pairwise terms.
+- **6.3.** All four prespecified EBM arms passed audit. None of 20 comparisons reached D12 against the nested LightGBM baseline. The library's multiclass global visualization omits fitted pairwise terms.
 
-- **6.6.** Both losses finished in both feature arms. All 20 exploratory paired mean RMSE differences favored the original squared-error baseline.
+- **6.6.** Both losses in both feature arms passed audit. None of 20 exploratory comparisons reached D12 against the squared-error baseline.
 
 - **6.2.** All 12 cross-fitted isotonic and temperature calibration arms finished. None of the 60 comparisons against the corresponding uncalibrated classifier met D12.
 
@@ -241,13 +241,13 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 - **7.1.** All four eight-configuration native-calendar MLP arms finished. None of 20 paired means reached D12 against the nested LightGBM baselines. The measured search and refit CPU times supply the TabGNS budgets.
 
-- **7.2.** All four native-calendar joint-target arms finished. Seven of 20 nested comparisons reached D12 against the MLP baseline. Railway 1 h delay RMSE fell by 0.1453 min in all five folds. The weather-arm 1 h gain was 0.1977 min with four improving folds.
+- **7.2.** All four native-calendar joint-target arms passed audit. Seven of 20 nested comparisons reached D12 against the MLP.
 
-- **7.3.** All four corrected native-calendar arms finished. Thirteen of 20 nested comparisons reached D12 against the MLP. The median paired parameter count was 78.2% of the MLP's, and the fits used 29.34 of 113.48 available CPU minutes. The reference sigmoid mask selects widths, and an inner validation split selects dense refit epochs before the full-training refit from scratch.
+- **7.3.** All four native-calendar arms passed audit after deterministic checkpoint scoring was added. Thirteen of 20 nested comparisons reached D12 against the MLP. Training uses hard Gumbel gates, checkpoint selection uses the extraction mask, and inner validation selects dense refit epochs before the from-scratch full-training refit.
 
-- **7.4.** All eight RealMLP and TabM arms finished with a 64-epoch cap and week-held validation. Twenty-one of 40 comparisons reached D12 against the MLP. TabM with weather reduced 24 h RMSE by 0.5000 min in all five folds. The holdout registry requires a full-training refit path, which PyTabKit 1.8 provides for RealMLP.
+- **7.4.** All eight RealMLP and TabM arms passed audit with a 64-epoch cap and week-held validation. Twenty of 40 comparisons reached D12 against the MLP. The original holdout used models with full-training refit support.
 
-- **7.5.** All four GRU arms finished on the laptop with eight configurations at the three late horizons. One of 12 nested comparisons reached D12 against the MLP. The weather severity arm reduced 20 min log loss by 0.01001, with three improving folds.
+- **7.5.** All four GRU arms passed audit with eight configurations at the three late horizons. One of 12 nested comparisons reached D12 against the MLP.
 
 ## Phase 8. Transfer learning and pretraining
 
@@ -261,13 +261,13 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 | 8.4 | **Network-wide delay propagation** | pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. `arrival_delays/` has only delays and train type, so this needs a new extraction from `data/monthly_processed_data`. Same week restriction as 8.3 | L | medium at 1 h–0 min | done |
 | 8.5 | Self-supervised pretraining (masked-feature reconstruction, SCARF) | every row is labelled and there are about ten features, so there is little to learn without labels | — | low | dropped |
 
-- **8.4.** All four cross-fitted late-horizon arms finished with 783,935 source pairs. All six source week fields are CV-only, with further training-week and validation-run exclusions during fitting. None of 12 exploratory comparisons reached D12.
+- **8.4.** All four cross-fitted late-horizon arms passed audit using the furthest reported arrival for inference progress. The source cache has 783,935 pairs with CV-only week fields and training-week and validation-run exclusions. None of 12 exploratory comparisons reached D12.
 
 - **8.3.** All three railway-only transfer methods finished for both tasks on the three source corridors. The source cache contains 265,684 prediction rows. Fits used eligible training weeks and excluded validation run IDs. None of 30 exploratory comparisons reached D12.
 
-- **8.2.** All four pooling arms finished. Six of 20 exploratory comparisons reached D12, all in the weather arms. Pooled weather severity improved at all five horizons. Its largest log-loss reduction was 0.00623 at 6 h, with all five folds improving. The weather delay arm gained 0.1399 min at 6 h.
+- **8.2.** All four pooling arms passed audit. Six of 20 exploratory comparisons reached D12.
 
-## Phase 9. Final evaluation and analysis
+## Phase 9. Original final evaluation and analysis
 
 | ID | Step | Status |
 |---|---|---|
@@ -277,15 +277,15 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 | 9.4 | **Error analysis:** by class, by period (before / from October 2025), by branch (Nürnberg / Stuttgart), on extreme-weather days; calibration plots; SHAP explanations of the final model | done |
 | 9.5 | **Risk over the prediction times:** how a journey's predicted probabilities change from 24 h to 0 min, with example journeys (the "how risk updates during travel" focus) | done |
 
-- **9.1.** The replacement registry fixes one pair per task and horizon after correcting the network input. LightGBM is used for all severity horizons and for delay at 24 h and departure. Full-group linear regression is used for delay at 6 h, 1 h, and 20 min. Both arms share railway features and tuning budgets, and the registry freezes the development source and inputs.
+- **9.1.** Original evaluation. The replacement registry fixes one pair per task and horizon after correcting the network input. LightGBM is used for all severity horizons and for delay at 24 h and departure. Full-group linear regression is used for delay at 6 h, 1 h, and 20 min. Both arms share railway features and tuning budgets, and the registry freezes the development source and inputs.
 
-- **9.2.** All 20 registered arms refit on the 95 CV weeks and scored once on the 23 hold-out weeks. The two arms matched on 21,260 severity prediction rows and 20,450 delay prediction rows across horizons. All scores reproduced from saved predictions. Intervals use 2,000 paired whole-week resamples.
+- **9.2.** Original evaluation. All 20 registered arms refit on the 95 CV weeks and scored once on the 23 hold-out weeks. The two arms matched on 21,260 severity prediction rows and 20,450 delay prediction rows across horizons. All scores reproduced from saved predictions. Intervals use 2,000 paired whole-week resamples.
 
-- **9.3.** All ten paired 95% intervals include zero. Weather increased delay RMSE by 0.017 to 0.193 min across horizons. Severity log loss was nearly unchanged at departure, with the largest change at 24 h, an increase of 0.00486.
+- **9.3.** Original evaluation. All ten paired 95% intervals include zero. Weather increased delay RMSE by 0.017 to 0.193 min across horizons. Severity log loss was nearly unchanged at departure, with the largest change at 24 h, an increase of 0.00486.
 
-- **9.4.** Saved paired errors by class, period, branch and extreme weather, plus calibration and SHAP summaries. At departure, weather raised severe-delay log loss by 0.02732 and severe-delay RMSE by 0.490 min. Rare extreme-weather groups and high-risk calibration bins are sparse.
+- **9.4.** Original evaluation. Saved paired errors by class, period, branch and extreme weather, plus calibration and SHAP summaries. At departure, weather raised severe-delay log loss by 0.02732 and severe-delay RMSE by 0.490 min. Rare extreme-weather groups and high-risk calibration bins are sparse.
 
-- **9.5.** Saved one predeparture risk trajectory per realized class with all five horizons. In the severe example, the railway severe-or-cancelled probability went from 10.4% at 24 h to 18.5% at 6 h and 10.1% at departure.
+- **9.5.** Original evaluation. Saved one predeparture risk trajectory per realized class with all five horizons. In the severe example, the railway severe-or-cancelled probability went from 10.4% at 24 h to 18.5% at 6 h and 10.1% at departure.
 
 ## Not planned
 
@@ -321,3 +321,5 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 - 6 November 2026: code review of PR #12 (not merged yet): 9 inline findings. Three may change results: the recent-reliability features (2.1) draw past journeys from the CV weeks only for CV rows but from all weeks for hold-out rows; for replacement trains, current_delay and the delay dynamics (2.4) are left missing in a way that depends on the outcome; and punctual past arrivals may not count in the reliability windows. The first two would also affect the hold-out scores of 9.2 and 9.3.
 
 - 6 November 2026: the user approved one full target-free reliability roster for both splits. The review also prompted scheduled-run history before replacement announcements, a three-configuration inner feature screen, deterministic TabGNS checkpoint scoring, and fixes to stop ordering, category encoding, and Bavarian school-free dates. The timetable refactor reproduced every CV row. Repeat affected CV fits only. Preserve the original hold-out evaluation at 065b077.
+
+- 7 November 2026: all nine PR comments addressed. The 336 affected CV arms and 1,248 affected arm-horizon outputs were rebuilt. Untouched horizons reproduced exactly, and all 366 active arms passed audit. The main suite passed 183 tests and the pinned distribution suite passed four. The original hold-out registry and results are unchanged. The reviewed CV inputs replace the default development caches, and the original inputs are archived locally in data/advanced_original_065b077.

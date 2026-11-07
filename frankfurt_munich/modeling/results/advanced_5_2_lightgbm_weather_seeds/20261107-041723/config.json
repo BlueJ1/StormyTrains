@@ -1,0 +1,304 @@
+{
+  "name": "advanced_5_2_lightgbm_weather_seeds",
+  "step": "5.2",
+  "task": "delay",
+  "model": "lightgbm",
+  "target": "arrival_delay_min",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "seeds",
+  "evaluation": "exploratory",
+  "git_commit": "132a58889f681a739365065e22f615c0cd96a70f",
+  "chosen": {
+    "24h": {
+      "config_id": 38,
+      "params": {
+        "cat_smooth": 2.2202595144810537,
+        "colsample_bytree": 0.6036961544665811,
+        "learning_rate": 0.02556063837470779,
+        "min_child_samples": 48,
+        "n_estimators": 670,
+        "num_leaves": 5,
+        "reg_alpha": 0.0315101491238403,
+        "reg_lambda": 1.3467890557370734,
+        "subsample": 0.7515681292900438
+      }
+    },
+    "6h": {
+      "config_id": 41,
+      "params": {
+        "cat_smooth": 1.3763300805327483,
+        "colsample_bytree": 0.3705446009641986,
+        "learning_rate": 0.00538730007236937,
+        "min_child_samples": 7,
+        "n_estimators": 774,
+        "num_leaves": 5,
+        "reg_alpha": 0.01887567630782228,
+        "reg_lambda": 16.76395764312379,
+        "subsample": 0.511635967867913
+      }
+    },
+    "1h": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "20min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "0min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    }
+  },
+  "configuration_source": "lightgbm_weather/20261026-093239/config.json",
+  "combination": {
+    "24h": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    },
+    "6h": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    },
+    "1h": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    },
+    "20min": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    },
+    "0min": {
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "fitted": {}
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-07T04:17:23",
+  "review_rerun": {
+    "repeated_horizons": [
+      "1h",
+      "20min",
+      "0min"
+    ],
+    "original": "advanced_5_2_lightgbm_weather_seeds/20261106-000059",
+    "horizon_git_commits": {
+      "24h": "dc621163e020552f54db93a06858fff96089971a",
+      "6h": "dc621163e020552f54db93a06858fff96089971a",
+      "1h": "132a58889f681a739365065e22f615c0cd96a70f",
+      "20min": "132a58889f681a739365065e22f615c0cd96a70f",
+      "0min": "132a58889f681a739365065e22f615c0cd96a70f"
+    },
+    "original_results_commit": "6e0ad4cf106ceabe741599bcccf6cd272cbbde77"
+  }
+}
