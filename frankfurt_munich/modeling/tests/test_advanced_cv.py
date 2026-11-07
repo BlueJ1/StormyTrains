@@ -13,7 +13,7 @@ from data import ROW_KEY, TIME_COLUMN, load_rows, merge_inputs
 from features import RECORDED_ROUTE, feature_columns
 from experiment_specs import Run
 from folds import cv_folds, inner_folds, week_of
-from tuning import fixed_configurations, nested_search
+from tuning import fixed_configurations, nested_search, search
 
 
 @cache
@@ -74,6 +74,28 @@ def test_nested_variant_selection_is_independent_of_outer_labels():
     assert chosen["feature_variant"].item() == "second"
     assert chosen["config_id"].item() == 1
     assert metrics.loc[metrics["fold"].eq(1), "rmse"].item() == 100
+
+
+def test_search_reuses_screened_configurations_without_changing_the_result():
+    frame = rows().groupby("fold", group_keys=False).head(200)
+    fits = []
+
+    def constant(numeric, categorical, *, value):
+        fits.append(value)
+        return DummyRegressor(strategy="constant", constant=value)
+
+    configs = [{"value": value} for value in (30, 5, 12, 9, 0)]
+    full = search(frame, "1h", "delay", constant, configs, [], ["hour"])
+    fits.clear()
+    screen = search(frame, "1h", "delay", constant, configs[:3], [], ["hour"])
+    reused = search(frame, "1h", "delay", constant, configs, [], ["hour"], prior=screen)
+    assert fits.count(30) == fits.count(5) == fits.count(12) == len(set(frame["fold"]))
+    timing = ["seconds", "cpu_seconds"]
+    pd.testing.assert_frame_equal(full[0].drop(columns=timing), reused[0].drop(columns=timing))
+    pd.testing.assert_frame_equal(full[1], reused[1])
+    pd.testing.assert_frame_equal(full[2], reused[2])
+    with pytest.raises(ValueError, match="first configurations"):
+        search(frame, "1h", "delay", constant, configs[1:], [], ["hour"], prior=screen)
 
 
 def test_pooling_keeps_all_horizons_in_the_same_journey_fold():

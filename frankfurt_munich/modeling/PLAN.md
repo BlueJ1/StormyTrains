@@ -2,7 +2,7 @@
 
 Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026; revised the same day after the review of PR #11. Updated 7 November 2026. **The PR review corrections and affected CV reruns are complete. The original hold-out evaluation is preserved at commit 065b077.** These results are in PR #12, which is not merged yet. The CV results include the fixes from its review; the original hold-out results predate them (see the log).
 
-**Two versions.** Keep the experiment statuses and results in sync between this file and the data lists at the bottom of `plan.html`. The user waived external artifact updates for this run.
+**Two versions.** This file and `plan.html` (published at https://claude.ai/artifact/KAso5U9ubq5rFxMy7juUna) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact.
 
 Status values: `todo`, `running`, `done`, `dropped`. Cost: S (under 1 CPU hour), M (1–10 h), L (over 10 h or a new dataset). Expected gain is our guess before running, so that we can check it afterwards.
 
@@ -129,7 +129,7 @@ Each feature group is added to the base set on its own and then all together, wi
 
 - **2.2.** All four timetable-feature arms passed audit. One of 20 exploratory comparisons reached D12.
 
-- **2.4.** All four delay-dynamics arms passed audit after switching to scheduled-run history before replacement announcements. Two of 12 exploratory comparisons reached D12.
+- **2.4.** All four delay-dynamics arms passed audit after switching to scheduled-run history before replacement announcements. Two of 12 exploratory comparisons reached D12. After the second review, replacements without a recorded replaced train use their operated run; this changed two dynamics columns in 22 CV rows, and these arms were not rerun.
 
 - **2.1.** Both splits now use the same full target-free stop roster. Snapshot visibility still controls whether a past outcome is known. The corrected CV cache and all four model arms passed audit. Seventeen of 20 exploratory comparisons reached D12.
 
@@ -325,3 +325,5 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 - 7 November 2026: all nine PR comments addressed. The 336 affected CV arms and 1,248 affected arm-horizon outputs were rebuilt. Untouched horizons reproduced exactly, and all 366 active arms passed audit. The main suite passed 183 tests and the pinned distribution suite passed four. The original hold-out registry and results are unchanged. The reviewed CV inputs replace the default development caches, and the original inputs are archived locally in data/advanced_original_065b077.
 
 - 7 November 2026: second code review of PR #12. Of the nine earlier findings, eight are fixed; the punctual-arrival one needed no change, because every checked CV arrival has a change record in the snapshots. Four new findings: the README did not say which review fixes the original hold-out inputs predate (now added); this status line was out of date (now corrected); 108 of the 656 CV rows that use the scheduled run before a replacement announcement have no resolved scheduled origin, so their current_delay is missing for an outcome-dependent reason (about 45 rows at 1 h to 0 min, open); and the nested search refits the three screened configurations (open, runtime only).
+
+- 7 November 2026: the two open findings of the second review are fixed. The nested search now reuses the three screened configurations instead of fitting them again; results are unchanged, and a test checks that. The 17 CV replacements with no recorded replaced train now use their operated run, as an ordinary train would. Their runs have no plan snapshot, so current_delay stays missing; the rebuilt CV history changes only upstream_stops_reported and minutes_since_last_report in 22 rows. The 0.7 references read only current_delay from this file, so they were not rerun. Arms with the delay-dynamics group keep their results from the previous inputs. The 7 replacements whose replaced train no plan matched still have no history.

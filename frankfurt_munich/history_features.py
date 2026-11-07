@@ -434,15 +434,24 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
     return features.reset_index(drop=True)
 
 
-def _use_scheduled_run(rows: pd.DataFrame, announcements: pd.DataFrame) -> pd.Series:
+def _use_scheduled_run(rows: pd.DataFrame, announcements: pd.DataFrame,
+                       context: pd.DataFrame) -> pd.Series:
+    """Rows whose history comes from the scheduled train rather than the operated one.
+
+    A replacement uses the train it replaced until the replacement is announced.
+    When the monthly files record no replaced train, no other scheduled train is
+    known, so the row uses the operated run like an ordinary train.
+    """
     aligned = rows[ROW_KEY].merge(announcements, on=ROW_KEY, how="left",
                                   validate="one_to_one", indicator=True)
     if not aligned["_merge"].eq("both").all():
         raise ValueError("replacement announcement table does not cover prediction keys")
+    recorded = aligned["journey_id"].map(
+        context.set_index("journey_id")["scheduled_train_number"]).notna()
     announced_at = pd.to_datetime(aligned["replacement_announced_at_utc"], utc=True)
     known = (aligned["replacement_announced"].fillna(False)
              & announced_at.le(cutoff_instants(aligned["predicted_at"])))
-    return aligned["is_replacement"].fillna(False) & ~known
+    return aligned["is_replacement"].fillna(False) & recorded & ~known
 
 
 def _scheduled_upstream_stops(context: pd.DataFrame) -> pd.DataFrame:
@@ -584,10 +593,10 @@ def build_history_dynamics_split(
         "journey_id", "id", "train_line_station_num", "station_name",
     ])
     upstream = upstream[upstream["journey_id"].isin(target_journeys)].copy()
-    use_scheduled = _use_scheduled_run(rows, announcements)
-    scheduled_rows = rows.loc[use_scheduled.to_numpy()]
     context = pd.read_parquet(output_dir / f"replacement_context_{split}.parquet",
-                              columns=["journey_id", "scheduled_origin_id"])
+                              columns=["journey_id", "scheduled_origin_id", "scheduled_train_number"])
+    use_scheduled = _use_scheduled_run(rows, announcements, context)
+    scheduled_rows = rows.loc[use_scheduled.to_numpy()]
     scheduled_stops = _scheduled_upstream_stops(
         context[context["journey_id"].isin(scheduled_rows["journey_id"])]
     )

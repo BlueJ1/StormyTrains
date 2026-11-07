@@ -287,6 +287,19 @@ def test_strict_events_exclude_legacy_plan_but_keep_visible_change_reports():
     assert arrival["event_occurred_by_cutoff"]
 
 
+def test_replacement_without_recorded_scheduled_train_uses_operated_run():
+    rows = pd.DataFrame({
+        "journey_id": ["unrecorded", "recorded"],
+        "prediction_time": ["1h", "1h"],
+        "predicted_at": pd.to_datetime(["2025-12-01 10:00", "2025-12-01 10:00"]),
+    })
+    announcements = rows.assign(is_replacement=True, replacement_announced=False,
+                                replacement_announced_at_utc=pd.NaT)
+    context = pd.DataFrame({"journey_id": ["unrecorded", "recorded"],
+                            "scheduled_train_number": [None, "2939"]})
+    assert _use_scheduled_run(rows, announcements, context).tolist() == [False, True]
+
+
 def test_replacement_uses_scheduled_reports_until_link_is_visible():
     rows = pd.DataFrame({
         "journey_id": ["replacement", "replacement"],
@@ -295,7 +308,8 @@ def test_replacement_uses_scheduled_reports_until_link_is_visible():
     })
     announcements = rows.assign(is_replacement=True, replacement_announced=True)
     announcements["replacement_announced_at_utc"] = pd.Timestamp("2025-12-01 09:30", tz="UTC")
-    use_scheduled = _use_scheduled_run(rows, announcements)
+    context = pd.DataFrame({"journey_id": ["replacement"], "scheduled_train_number": ["2905"]})
+    use_scheduled = _use_scheduled_run(rows, announcements, context)
     assert use_scheduled.tolist() == [True, False]
     scheduled = _scheduled_upstream_stops(pd.DataFrame({
         "journey_id": ["replacement"], "scheduled_origin_id": ["scheduled-1"],

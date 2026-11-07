@@ -124,19 +124,30 @@ def sample_configs(space: dict, n: int = N_CONFIGS, seed: int = SEED) -> list[di
 
 
 def search(rows: pd.DataFrame, prediction_time: str, task: str, factory, configs: list[dict],
-           numeric: list[str], categorical: list[str], *, splits=cv_folds):
+           numeric: list[str], categorical: list[str], *, splits=cv_folds, prior=None):
     """Cross-validate every configuration at one prediction time.
 
     Return (search table, fold metrics of the chosen configuration, its
     validation predictions). The search table has one row per configuration:
     its parameters (JSON), the score of each fold, their mean and standard
     deviation, the seconds taken, and `chosen`.
+
+    `prior` is the result of an earlier search of the same rows, model, columns
+    and splits over the first configurations of `configs`; those are reused
+    instead of being fitted again.
     """
     score = SCORE[task]
     table = []
     folds_for_rows = tuple(splits(rows))
     best_score = np.inf
-    for config_id, params in enumerate(configs):
+    if prior is not None:
+        prior_table, best_metrics, best_predictions = prior
+        if prior_table["params"].tolist() != [json.dumps(c) for c in configs[:len(prior_table)]]:
+            raise ValueError("prior search must cover the first configurations of this search")
+        table = prior_table.drop(columns="chosen").to_dict("records")
+        best = int(prior_table.loc[prior_table["chosen"], "config_id"].item())
+        best_score = float(prior_table.loc[prior_table["chosen"], f"{score}_mean"].item())
+    for config_id, params in enumerate(configs[len(table):], start=len(table)):
         start = time.perf_counter()
         cpu_start = time.process_time()
         metrics, predictions = cross_validate(rows, prediction_time, task,
@@ -171,12 +182,15 @@ def nested_search(rows, prediction_time, task, factory, configs, numeric, catego
         splits = lambda _: inner
         chosen_variant = None
         model, num, cat = factory, numeric, categorical
+        screen = None
         if variants:
-            chosen_variant = select_feature_variant(outer_train, prediction_time, task,
-                                                    variants, configs, splits)
+            screens = screen_feature_variants(outer_train, prediction_time, task,
+                                              variants, configs, splits)
+            chosen_variant = best_variant(screens, task)
             model, num, cat = variants[chosen_variant]
+            screen = screens[chosen_variant]
         table, _, _ = search(outer_train, prediction_time, task, model, configs,
-                             num, cat, splits=splits)
+                             num, cat, splits=splits, prior=screen)
         best = int(table.loc[table["chosen"], "config_id"].item())
         scores, out = fit_fold(outer_train, rows.loc[validation], prediction_time, fold,
                                task, partial(model, **configs[best]), num, cat)
@@ -189,15 +203,23 @@ def nested_search(rows, prediction_time, task, factory, configs, numeric, catego
         predictions, ignore_index=True)
 
 
+def screen_feature_variants(rows, prediction_time, task, variants, configs, splits):
+    """Search each variant over the same first three configurations."""
+    screening_configs = configs[:FEATURE_SCREEN_CONFIGS]
+    return {name: search(rows, prediction_time, task, factory, screening_configs,
+                         numeric, categorical, splits=splits)
+            for name, (factory, numeric, categorical) in variants.items()}
+
+
+def best_variant(screens, task):
+    scores = {name: table[f"{SCORE[task]}_mean"].min() for name, (table, _, _) in screens.items()}
+    return min(scores, key=scores.__getitem__)
+
+
 def select_feature_variant(rows, prediction_time, task, variants, configs, splits):
     """Rank each variant by its best inner score over the same three configurations."""
-    screening_configs = configs[:FEATURE_SCREEN_CONFIGS]
-    scores = {}
-    for name, (factory, numeric, categorical) in variants.items():
-        table, _, _ = search(rows, prediction_time, task, factory, screening_configs,
-                             numeric, categorical, splits=splits)
-        scores[name] = table[f"{SCORE[task]}_mean"].min()
-    return min(scores, key=scores.__getitem__)
+    return best_variant(screen_feature_variants(rows, prediction_time, task, variants,
+                                                configs, splits), task)
 
 
 def run_search(name: str, task: str, factory, space: dict, *, weather: bool = False,
