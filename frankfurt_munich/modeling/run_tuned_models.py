@@ -8,6 +8,9 @@ Each model is tuned by a random search of tuning.N_CONFIGS configurations
 railway and weather features, on the same rows, folds and configurations.
 A classifier uses the same search space as its regressor.
 
+These historical runs use the recorded-route diagnostic feature set. For
+cutoff-audited models use run_advanced.py.
+
 Usage: run_tuned_models.py [model ...]   (default: all seven, delay first)
 """
 from __future__ import annotations
@@ -44,6 +47,7 @@ if __name__ == "__main__":
             name = model + ("_weather" if weather else "")
             start = time.perf_counter()
             print(f"\n{name} ({task})", flush=True)
-            summary = run_search(name, task, factory, space, weather=weather)
+            summary = run_search(name, task, factory, space, weather=weather,
+                                 feature_set="recorded_route_diagnostic")
             print(summary.round(4).to_string(index=False))
             print(f"  {(time.perf_counter() - start) / 60:.1f} min", flush=True)

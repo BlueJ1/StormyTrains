@@ -193,18 +193,23 @@ def utc(local: pd.Series) -> pd.Series:
 
 
 def features(rows: pd.DataFrame, route: pd.DataFrame, hourly: pd.DataFrame,
-             depth: pd.DataFrame) -> pd.DataFrame:
-    """The weather features of each prediction row (see FEATURES)."""
+             depth: pd.DataFrame, *, lag_hours: int = 0) -> pd.DataFrame:
+    """Weather as of the row's cutoff, optionally shifted back in real time."""
+    if lag_hours < 0:
+        raise ValueError("weather lag must be non-negative")
     rows = rows.reset_index(drop=True)
     departure = rows.origin_departure_planned_local
     real = utc(departure) - (departure - rows.predicted_at)  # departure minus the real lead
     at = utc(rows.predicted_at).where(lambda t: t.le(real), real)  # see PREDICTION TIME
+    at -= pd.Timedelta(hours=lag_hours)
     hour = at.dt.floor("h")
     snow_date = (at - pd.Timedelta(hours=6)).dt.floor("D").dt.tz_localize(None)
     # Nothing measured after the prediction time: the hour label and the 06 UTC snow measurement.
     assert hour.le(at).all() and (snow_date.dt.tz_localize("UTC") + pd.Timedelta(hours=6)).le(at).all()
-    pairs = pd.DataFrame({"row": rows.index, "journey_id": rows.journey_id, "weather_hour_utc": hour,
-                          "snow_date": snow_date}).merge(route, on="journey_id")
+    pairs = rows[["journey_id", "prediction_time"]].assign(
+        row=rows.index, weather_hour_utc=hour, snow_date=snow_date)
+    route_key = ["journey_id", "prediction_time"] if "prediction_time" in route else ["journey_id"]
+    pairs = pairs.merge(route, on=route_key)
     pairs = pairs.join(hourly, on=["weather_hour_utc", "eva"]).join(depth, on=["snow_date", "eva"])
     aggregates = pairs.groupby("row").agg(
         route_temp_max_c=("temp", "max"), route_temp_min_c=("temp", "min"),

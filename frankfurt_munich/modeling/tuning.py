@@ -27,17 +27,20 @@ from __future__ import annotations
 import json
 import time
 from functools import partial
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from scipy.stats import loguniform, uniform
 from sklearn.model_selection import ParameterSampler
 
-from cv import RESULTS, TARGETS, cross_validate, save_run
+from cv import RESULTS, TARGETS, cross_validate, fit_fold, save_run
 from data import PREDICTION_TIMES, load_rows
 from features import feature_columns
+from folds import cv_folds, inner_folds
 
 N_CONFIGS = 50
+FEATURE_SCREEN_CONFIGS = 3
 SEED = 42
 SCORE = {"delay": "rmse", "severity": "log_loss"}  # lower is better
 
@@ -61,6 +64,22 @@ def between(low: float, high: float):
 
 
 SPACES = {
+    "mlp": {
+        "depth": [2, 3, 4],
+        "width": [64, 128, 256],
+        "dropout": [0.0, 0.1, 0.2],
+        "weight_decay": loguniform(1e-6, 1e-2),
+        "learning_rate": loguniform(3e-4, 3e-3),
+        "epochs": [12, 24, 48],
+    },
+    "catboost": {
+        "iterations": LogUniformInt(100, 1500),
+        "depth": [4, 5, 6, 7, 8],
+        "learning_rate": loguniform(0.005, 0.3),
+        "l2_leaf_reg": loguniform(0.1, 100),
+        "random_strength": loguniform(0.01, 10),
+        "bagging_temperature": between(0, 2),
+    },
     "random_forest": {
         "max_features": between(0.1, 1.0),
         "min_samples_leaf": LogUniformInt(1, 50),
@@ -105,7 +124,7 @@ def sample_configs(space: dict, n: int = N_CONFIGS, seed: int = SEED) -> list[di
 
 
 def search(rows: pd.DataFrame, prediction_time: str, task: str, factory, configs: list[dict],
-           numeric: list[str], categorical: list[str]):
+           numeric: list[str], categorical: list[str], *, splits=cv_folds):
     """Cross-validate every configuration at one prediction time.
 
     Return (search table, fold metrics of the chosen configuration, its
@@ -114,29 +133,76 @@ def search(rows: pd.DataFrame, prediction_time: str, task: str, factory, configs
     deviation, the seconds taken, and `chosen`.
     """
     score = SCORE[task]
-    table, results = [], []
+    table = []
+    folds_for_rows = tuple(splits(rows))
+    best_score = np.inf
     for config_id, params in enumerate(configs):
         start = time.perf_counter()
+        cpu_start = time.process_time()
         metrics, predictions = cross_validate(rows, prediction_time, task,
-                                              partial(factory, **params), numeric, categorical)
+                                              partial(factory, **params), numeric, categorical,
+                                              splits=lambda _: folds_for_rows)
         seconds = time.perf_counter() - start
-        results.append((metrics, predictions))
         folds = metrics.set_index("fold")[score]
+        mean = folds.mean()
+        if mean < best_score:
+            best_score = mean
+            best = config_id
+            best_metrics, best_predictions = metrics, predictions
         table.append({"prediction_time": prediction_time, "config_id": config_id,
                       "params": json.dumps(configs[config_id]),
                       **{f"{score}_fold{f}": v for f, v in folds.items()},
-                      f"{score}_mean": folds.mean(), f"{score}_std": folds.std(),
-                      "seconds": round(seconds, 1)})
+                      f"{score}_mean": mean, f"{score}_std": folds.std(),
+                      "seconds": round(seconds, 1), "cpu_seconds": time.process_time() - cpu_start})
+    if not np.isfinite(best_score):
+        raise ValueError("search needs at least one configuration with a finite score")
     table = pd.DataFrame(table)
-    best = int(table.loc[table[f"{score}_mean"].idxmin(), "config_id"])
     table["chosen"] = table["config_id"] == best
-    metrics, predictions = results[best]
-    return table, metrics, predictions.assign(config_id=best)
+    return table, best_metrics, best_predictions.assign(config_id=best)
+
+
+def nested_search(rows, prediction_time, task, factory, configs, numeric, categorical, *,
+                  variants=None):
+    """Search features and configurations on inner weeks, then score the outer fold."""
+    tables, metrics, predictions = [], [], []
+    for fold, train, validation in cv_folds(rows):
+        outer_train = rows.loc[train]
+        inner = tuple(inner_folds(outer_train))
+        splits = lambda _: inner
+        chosen_variant = None
+        model, num, cat = factory, numeric, categorical
+        if variants:
+            chosen_variant = select_feature_variant(outer_train, prediction_time, task,
+                                                    variants, configs, splits)
+            model, num, cat = variants[chosen_variant]
+        table, _, _ = search(outer_train, prediction_time, task, model, configs,
+                             num, cat, splits=splits)
+        best = int(table.loc[table["chosen"], "config_id"].item())
+        scores, out = fit_fold(outer_train, rows.loc[validation], prediction_time, fold,
+                               task, partial(model, **configs[best]), num, cat)
+        if chosen_variant is not None:
+            table["feature_variant"] = chosen_variant
+        tables.append(table.assign(outer_fold=fold))
+        metrics.append(scores)
+        predictions.append(out.assign(config_id=best))
+    return pd.concat(tables, ignore_index=True), pd.DataFrame(metrics), pd.concat(
+        predictions, ignore_index=True)
+
+
+def select_feature_variant(rows, prediction_time, task, variants, configs, splits):
+    """Rank each variant by its best inner score over the same three configurations."""
+    screening_configs = configs[:FEATURE_SCREEN_CONFIGS]
+    scores = {}
+    for name, (factory, numeric, categorical) in variants.items():
+        table, _, _ = search(rows, prediction_time, task, factory, screening_configs,
+                             numeric, categorical, splits=splits)
+        scores[name] = table[f"{SCORE[task]}_mean"].min()
+    return min(scores, key=scores.__getitem__)
 
 
 def run_search(name: str, task: str, factory, space: dict, *, weather: bool = False,
                prediction_times=PREDICTION_TIMES, n_configs: int = N_CONFIGS,
-               results_dir=RESULTS) -> pd.DataFrame:
+               feature_set: str = "base", results_dir=RESULTS) -> pd.DataFrame:
     """Random search at every prediction time; save the chosen configurations' results.
 
     weather=True adds the weather features (features.WEATHER); it is keyword-only.
@@ -144,26 +210,39 @@ def run_search(name: str, task: str, factory, space: dict, *, weather: bool = Fa
     configs = sample_configs(space, n_configs)
     tables, all_metrics, all_predictions, chosen, config_features = [], [], [], {}, {}
     for prediction_time in prediction_times:
-        numeric, categorical = feature_columns(prediction_time, weather)
+        numeric, categorical = feature_columns(prediction_time, weather, feature_set=feature_set)
         config_features[prediction_time] = {"numeric": numeric, "categorical": categorical}
         rows = load_rows(prediction_time, weather=weather)
         table, metrics, predictions = search(rows, prediction_time, task, factory, configs,
                                              numeric, categorical)
-        best = int(table.loc[table["chosen"], "config_id"].iloc[0])
+        best = int(table.loc[table["chosen"], "config_id"].item())
         chosen[prediction_time] = {"config_id": best, "params": configs[best]}
         tables.append(table)
         all_metrics.append(metrics)
         all_predictions.append(predictions)
-        print(f"  {prediction_time}: config {best}, "
-              f"{SCORE[task]} {table[f'{SCORE[task]}_mean'].min():.3f}, "
-              f"{table['seconds'].sum() / 60:.1f} CPU-min", flush=True)
+        print(f"  {prediction_time}: {SCORE[task]} {metrics[SCORE[task]].mean():.3f}, "
+              f"{table['seconds'].sum() / 60:.1f} min searching", flush=True)
 
     config = {"name": name, "task": task, "target": TARGETS[task],
-              "model": factory.__name__, "weather": weather, "search": {"n_configs": n_configs, "seed": SEED,
+              "model": factory.__name__, "weather": weather, "feature_set": feature_set,
+              "evaluation": "exploratory",
+              "search": {"n_configs": n_configs, "seed": SEED,
                                              "space": {k: repr(v) for k, v in space.items()},
-                                             "selection": f"lowest mean {SCORE[task]} over the folds"},
+                         "selection": f"lowest mean {SCORE[task]} over the folds"},
               "chosen": chosen, "features": config_features}
     out, summary = save_run(results_dir, name, config, pd.concat(all_metrics, ignore_index=True),
                             pd.concat(all_predictions, ignore_index=True))
     pd.concat(tables, ignore_index=True).to_csv(out / "search_results.csv", index=False)
     return summary
+
+
+def fixed_configurations(path: Path, *, task: str, model: str, weather: bool) -> dict:
+    """Read the per-time configurations from a matching flat search."""
+    source = json.loads(path.read_text())
+    expected = {"task": task, "model": model, "weather": weather}
+    if any(source.get(key) != value for key, value in expected.items()):
+        raise ValueError(f"{path} does not match the model, task and weather arm")
+    chosen = source["chosen"]
+    if any("params" not in value for value in chosen.values()):
+        raise ValueError(f"{path} does not contain a flat search")
+    return chosen
