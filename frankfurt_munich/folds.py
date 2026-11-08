@@ -97,3 +97,16 @@ def cv_folds(journeys: pd.DataFrame):
     for number in range(1, N_FOLDS + 1):
         validation = journeys.fold.eq(number)
         yield number, ~validation, validation
+
+
+def inner_folds(outer_training: pd.DataFrame):
+    """Split only the outer training rows, keeping all rows of a week together."""
+    journeys = outer_training.drop_duplicates("journey_id")
+    parts = _week_parts(journeys, N_FOLDS - 1)
+    parts_by_week = parts.groupby(week_of(journeys[TIME_COLUMN])).first()
+    row_parts = week_of(outer_training[TIME_COLUMN]).map(parts_by_week)
+    for number in range(1, N_FOLDS):
+        validation = row_parts.eq(number)
+        if not validation.any() or validation.all():
+            raise ValueError(f"inner fold {number} has an empty training or validation set")
+        yield number, ~validation, validation

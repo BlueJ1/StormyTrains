@@ -4,6 +4,8 @@ Every model for Frankfurt (Main) Hbf → München Hbf is trained and scored by t
 
 Only the CV set is used (`../data/prediction_rows_cv.parquet`). The weather models merge on the route weather from `../data/prediction_rows_weather_cv.parquet`; the railway-only models never read that file. Loading the hold-out set needs `allow_holdout=True`.
 
+The cutoff-safe experiments of PR #12 (new input features, nested tuning, other model families, ensembles, neural networks, transfer learning and the hold-out evaluation) are in [`../advanced_modeling/`](../advanced_modeling/README.md). They reuse this folder's cross-validation and model code. For them, `features.py` names feature sets: its default `base` set leaves out `recorded_route`, `observed_stops` and `unobserved_sequence_positions`, which come from the recorded stops and can depend on the outcome. `run_linear_models.py` and `run_tuned_models.py` pass `feature_set="recorded_route_diagnostic"`, the original columns, so the results below keep their meaning.
+
 ## Run
 
 ```bash

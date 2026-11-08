@@ -76,7 +76,7 @@ def test_unseen_categories_and_missing_current_delay_give_predictions(model):
     rows = delay_rows()
     numeric, categorical = feature_columns("1h", weather=True)
     train, test = rows[rows["fold"] != 1], rows[rows["fold"] == 1].head(50).copy()
-    test.iloc[0, test.columns.get_loc("recorded_route")] = "a route never seen"
+    test.iloc[0, test.columns.get_loc("train_type")] = "a train type never seen"
     test.iloc[1, test.columns.get_loc("current_delay")] = np.nan
     fitted = SMALL[model](numeric, categorical).fit(train[numeric + categorical],
                                                     train["arrival_delay_min"])
@@ -88,6 +88,15 @@ def test_category_codes_use_training_levels():
     out = codes.transform(pd.DataFrame({"c": [False, True, None]}))
     assert list(out["c"].cat.categories) == ["False", "True"]
     assert out["c"].isna().tolist() == [False, False, True]
+
+
+def test_category_codes_match_integral_levels_across_dtypes():
+    train = pd.DataFrame({"numeric": [12, 13], "route": ["12", "12.0"]})
+    test = pd.DataFrame({"numeric": [12.0, np.nan, 12.5], "route": ["12.0", "12", "12"]})
+    encoded = CategoryCodes(list(train)).fit(train).transform(test)
+
+    assert encoded["numeric"].cat.codes.tolist() == [0, -1, -1]
+    assert encoded["route"].cat.codes.tolist() == [1, 0, 0]
 
 
 @pytest.mark.parametrize("model", ["random_forest", "lightgbm", "xgboost"])
@@ -130,11 +139,11 @@ def test_search_chooses_the_lowest_mean_rmse():
 
 @pytest.mark.parametrize("model", list(SMALL_CLASSIFIERS))
 def test_classifiers_give_probabilities_for_every_class(model):
-    """Also for an unseen route and a missing `current_delay`."""
+    """Also for an unseen train type and a missing `current_delay`."""
     rows = severity_rows()
     numeric, categorical = feature_columns("1h", weather=True)
     train, test = rows[rows["fold"] != 1], rows[rows["fold"] == 1].head(50).copy()
-    test.iloc[0, test.columns.get_loc("recorded_route")] = "a route never seen"
+    test.iloc[0, test.columns.get_loc("train_type")] = "a train type never seen"
     test.iloc[1, test.columns.get_loc("current_delay")] = np.nan
     fitted = SMALL_CLASSIFIERS[model](numeric, categorical).fit(train[numeric + categorical],
                                                                 train["severity_class"])

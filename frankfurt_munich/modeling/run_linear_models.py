@@ -4,8 +4,8 @@
   class shares;
 - arrival_delay_min: linear regression, against the training mean delay.
 
-Both models are run twice: with the railway features only and with the
-railway and weather features, on the same rows and folds.
+These historical runs use the recorded-route diagnostic feature set. For
+cutoff-audited models use run_advanced.py.
 """
 from __future__ import annotations
 
@@ -27,4 +27,6 @@ if __name__ == "__main__":
     pd.set_option("display.width", 200)
     for name, task, make_model, weather in RUNS:
         print(f"\n{name} ({task})")
-        print(run_cv(name, task, make_model, weather=weather).round(4).to_string(index=False))
+        summary = run_cv(name, task, make_model, weather=weather,
+                         feature_set="recorded_route_diagnostic")
+        print(summary.round(4).to_string(index=False))

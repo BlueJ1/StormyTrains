@@ -1,0 +1,37 @@
+{
+  "name": "advanced_5_1_lightgbm_classifier_plus_neural",
+  "step": "5.1",
+  "task": "severity",
+  "model": "lightgbm_classifier",
+  "weather": false,
+  "evaluation": "exploratory",
+  "variant": "plus_neural",
+  "members": [
+    "advanced_0_7_lightgbm_classifier/20261107-033350",
+    "advanced_0_7_xgboost_classifier/20261107-033502",
+    "advanced_0_7_logistic_regression/20261107-033140",
+    "advanced_6_1_catboost_classifier/20261106-220953",
+    "advanced_7_1_mlp_classifier/20261107-033219",
+    "advanced_7_2_multitask_classifier/20261107-031335",
+    "advanced_7_3_tabgns_classifier/20261107-054519",
+    "advanced_7_4_realmlp_classifier/20261107-044408",
+    "advanced_7_4_tabm_classifier/20261107-053528"
+  ],
+  "git_commit": "132a58889f681a739365065e22f615c0cd96a70f",
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-07T06:20:15"
+}

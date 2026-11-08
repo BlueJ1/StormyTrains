@@ -1,0 +1,86 @@
+{
+  "name": "advanced_3_1_linear_regression_weather_add_snow",
+  "step": "3.1",
+  "task": "delay",
+  "model": "linear_regression",
+  "target": "arrival_delay_min",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "add_snow",
+  "evaluation": "exploratory",
+  "git_commit": "e55b1fcfb4d11ad5e7b6ba5f905d9a5554c9a4ee",
+  "chosen": {},
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-05T11:04:26"
+}

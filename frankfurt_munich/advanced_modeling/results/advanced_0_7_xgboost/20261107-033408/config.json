@@ -1,0 +1,177 @@
+{
+  "name": "advanced_0_7_xgboost",
+  "step": "0.7",
+  "task": "delay",
+  "model": "xgboost",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "",
+  "evaluation": "exploratory",
+  "git_commit": "132a58889f681a739365065e22f615c0cd96a70f",
+  "chosen": {
+    "24h": {
+      "config_id": 9,
+      "params": {
+        "colsample_bytree": 0.5054417223026266,
+        "learning_rate": 0.00529670833106808,
+        "max_depth": 4,
+        "min_child_weight": 25.92475660475159,
+        "n_estimators": 888,
+        "reg_alpha": 1.2164139351417065,
+        "reg_lambda": 0.002345434227726052,
+        "subsample": 0.6792328642721364
+      }
+    },
+    "6h": {
+      "config_id": 9,
+      "params": {
+        "colsample_bytree": 0.5054417223026266,
+        "learning_rate": 0.00529670833106808,
+        "max_depth": 4,
+        "min_child_weight": 25.92475660475159,
+        "n_estimators": 888,
+        "reg_alpha": 1.2164139351417065,
+        "reg_lambda": 0.002345434227726052,
+        "subsample": 0.6792328642721364
+      }
+    },
+    "1h": {
+      "config_id": 41,
+      "params": {
+        "colsample_bytree": 0.6096465608117732,
+        "learning_rate": 0.013345910155142493,
+        "max_depth": 7,
+        "min_child_weight": 26.865309327169083,
+        "n_estimators": 723,
+        "reg_alpha": 0.013174543864342761,
+        "reg_lambda": 59.473897949884034,
+        "subsample": 0.8689484583478843
+      }
+    },
+    "20min": {
+      "config_id": 14,
+      "params": {
+        "colsample_bytree": 0.35388593688015507,
+        "learning_rate": 0.016375399825825587,
+        "max_depth": 7,
+        "min_child_weight": 57.668104667790054,
+        "n_estimators": 649,
+        "reg_alpha": 0.015224209209544584,
+        "reg_lambda": 0.0033687695210631446,
+        "subsample": 0.7282672852414551
+      }
+    },
+    "0min": {
+      "config_id": 41,
+      "params": {
+        "colsample_bytree": 0.6096465608117732,
+        "learning_rate": 0.013345910155142493,
+        "max_depth": 7,
+        "min_child_weight": 26.865309327169083,
+        "n_estimators": 723,
+        "reg_alpha": 0.013174543864342761,
+        "reg_lambda": 59.473897949884034,
+        "subsample": 0.8689484583478843
+      }
+    }
+  },
+  "configuration_source": "xgboost/20261026-093649/config.json",
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-07T03:34:08",
+  "review_rerun": {
+    "repeated_horizons": [
+      "1h",
+      "20min",
+      "0min"
+    ],
+    "original": "advanced_0_7_xgboost/20261105-094512",
+    "horizon_git_commits": {
+      "24h": "70fdcb443db35a86f734ad0d78c38f0901e226f4",
+      "6h": "70fdcb443db35a86f734ad0d78c38f0901e226f4",
+      "1h": "132a58889f681a739365065e22f615c0cd96a70f",
+      "20min": "132a58889f681a739365065e22f615c0cd96a70f",
+      "0min": "132a58889f681a739365065e22f615c0cd96a70f"
+    },
+    "original_results_commit": "6e0ad4cf106ceabe741599bcccf6cd272cbbde77"
+  }
+}
