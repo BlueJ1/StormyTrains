@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "advanced_modeling"))
 from history_features import FEATURE_COLUMNS_BY_GROUP  # noqa: E402
 from holiday_features import FEATURES as HOLIDAYS  # noqa: E402
 from weather_features import FEATURE_COLUMNS as WEATHER  # noqa: E402
