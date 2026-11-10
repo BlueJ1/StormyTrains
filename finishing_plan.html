@@ -1,0 +1,511 @@
+<title>Frankfurt–München Finishing Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column; deadlines as a line of stops; decisions, then work packages as
+   timetable-like rows; findings and claims as reference tables. Same visual system as the
+   modelling plan (frankfurt_munich/advanced_modeling/plan.html).
+   Keep in sync with FINISHING_PLAN.md: edit the data lists in the <script> at the bottom. */
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --fg: #17202c;
+  --muted: #5b6676;
+  --line: #d9dee6;
+  --accent: #1d4ed8;
+  --accent-soft: #e3eafc;
+  --todo: #6b7280;   --todo-bg: #eef0f3;
+  --run: #a15c00;    --run-bg: #fdf0dc;
+  --done: #11734b;   --done-bg: #dcf3e8;
+  --drop: #8a2c2c;   --drop-bg: #f7e3e3;
+  --open: #a15c00;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f141b; --surface: #161d27; --fg: #e6ebf2; --muted: #9aa6b6; --line: #2a3442;
+  --accent: #7aa2ff; --accent-soft: #1c2a47;
+  --todo: #a3acb9; --todo-bg: #232c38; --run: #f2b260; --run-bg: #3a2a12;
+  --done: #5fd3a0; --done-bg: #12322a; --drop: #f19a9a; --drop-bg: #3a1c1c; --open: #f2b260;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f141b; --surface: #161d27; --fg: #e6ebf2; --muted: #9aa6b6; --line: #2a3442;
+  --accent: #7aa2ff; --accent-soft: #1c2a47;
+  --todo: #a3acb9; --todo-bg: #232c38; --run: #f2b260; --run-bg: #3a2a12;
+  --done: #5fd3a0; --done-bg: #12322a; --drop: #f19a9a; --drop-bg: #3a1c1c; --open: #f2b260;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15.5px; line-height: 1.55; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); font-weight: 700; line-height: 1.1; }
+h2 { font-size: 1.45rem; font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: var(--accent-soft); padding: 0.05em 0.3em; border-radius: 4px; word-break: break-word; }
+section { display: grid; gap: 16px; min-width: 0; scroll-margin-top: 70px; }
+.sub { color: var(--muted); }
+
+header { display: grid; gap: 14px; }
+.route { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); }
+.route b { color: var(--fg); font-weight: 600; }
+.route .arrow { flex: 0 0 auto; width: 48px; height: 2px; background: var(--fg); position: relative; }
+.route .arrow::after { content: ""; position: absolute; right: -1px; top: -4px; border: 5px solid transparent; border-left: 7px solid var(--fg); border-right: 0; }
+.banner { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 14px 16px; display: grid; gap: 6px; }
+.banner strong { color: var(--open); }
+
+/* Deadlines: a line with stops, like a route diagram */
+.line { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+.stop { position: relative; padding: 22px 12px 0 0; display: grid; gap: 2px; align-content: start; min-width: 0; }
+.stop::before { content: ""; position: absolute; left: 0; right: 0; top: 6px; height: 2px; background: var(--fg); }
+.stop:last-child::before { right: auto; width: 13px; }
+.stop::after { content: ""; position: absolute; left: 0; top: 0; width: 13px; height: 13px; border-radius: 50%; background: var(--surface); border: 2px solid var(--fg); }
+.stop.past::after { background: var(--fg); }
+.stop .when { font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
+.stop .what { font-weight: 700; }
+.stop .left { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.stop .left small { font-family: var(--font-body); font-size: 0.8rem; font-weight: 400; color: var(--muted); }
+.stop .note { font-size: 0.82rem; color: var(--muted); }
+
+.progress { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.stat { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
+.stat .n { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat .l { font-size: 0.8rem; color: var(--muted); }
+
+.tablebox { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; white-space: nowrap; }
+td.num, td.id { font-variant-numeric: tabular-nums; font-family: var(--font-mono); font-size: 0.85rem; white-space: nowrap; }
+td.id { font-weight: 600; }
+td.wide { min-width: 240px; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; letter-spacing: 0.02em; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.s-todo { color: var(--todo); background: var(--todo-bg); }
+.s-running { color: var(--run); background: var(--run-bg); }
+.s-done { color: var(--done); background: var(--done-bg); }
+.s-dropped { color: var(--drop); background: var(--drop-bg); }
+.s-open { color: var(--open); background: var(--run-bg); }
+.s-decided { color: var(--done); background: var(--done-bg); }
+.sev-critical { color: var(--drop); background: var(--drop-bg); }
+.sev-major { color: var(--run); background: var(--run-bg); }
+.sev-minor { color: var(--todo); background: var(--todo-bg); }
+.tag { font-family: var(--font-mono); font-size: 0.72rem; padding: 1px 7px; border: 1px solid var(--line); border-radius: 5px; color: var(--muted); white-space: nowrap; }
+
+.toolbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); display: flex; gap: 6px; flex-wrap: wrap; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font: inherit; font-size: 0.82rem; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 4px 11px; cursor: pointer; text-decoration: none; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Decisions */
+.decs { display: grid; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.dec { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 4px 14px; padding: 13px 14px; border-top: 1px solid var(--line); }
+.dec:first-child { border-top: 0; }
+.dec .qid { font-family: var(--font-mono); font-weight: 600; }
+.dec .body { display: grid; gap: 5px; min-width: 0; }
+.dec .q { font-weight: 700; }
+.dec .detail { font-size: 0.9rem; max-width: 78ch; }
+.dec .sugg { font-size: 0.9rem; border-left: 3px solid var(--accent); padding-left: 10px; max-width: 78ch; }
+.dec .sugg b { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; display: block; }
+
+/* Work packages */
+.pkg { display: grid; gap: 10px; }
+.pkg-head { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.pkg-head .pnote { color: var(--muted); font-size: 0.9rem; }
+.steps { display: grid; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.step { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 4px 14px; padding: 11px 14px; border-top: 1px solid var(--line); }
+.step:first-child { border-top: 0; }
+.step .sid { font-family: var(--font-mono); font-weight: 600; }
+.step .text { font-size: 0.92rem; max-width: 78ch; min-width: 0; }
+.step .meta { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+.step .side { display: flex; align-items: flex-start; }
+.empty { padding: 14px; color: var(--muted); font-size: 0.9rem; }
+
+.cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.claim { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.claim h3 { font-size: 1rem; }
+.claim.can { border-top: 3px solid var(--done); }
+.claim.soften { border-top: 3px solid var(--run); }
+.claim.not { border-top: 3px solid var(--drop); }
+ul.plain { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; max-width: 78ch; font-size: 0.92rem; }
+footer { color: var(--muted); font-size: 0.85rem; }
+
+@media (max-width: 760px) {
+  .line { grid-template-columns: 1fr; }
+  .stop { padding: 0 0 18px 26px; }
+  .stop::before { left: 6px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; }
+  .stop:last-child::before { width: 2px; height: 13px; bottom: auto; }
+  .cols3 { grid-template-columns: 1fr; }
+  .dec, .step { grid-template-columns: 2.6rem minmax(0, 1fr); }
+  .dec .side, .step .side { grid-column: 2; }
+}
+@media (prefers-reduced-motion: no-preference) { .chip { transition: background .15s, border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="route"><b>10 November 2026</b><span class="arrow" aria-hidden="true"></span><b>14 January 2027</b><span>· Frankfurt (Main) Hbf → München Hbf · ICE/IC</span></div>
+    <h1>Plan for finishing the project</h1>
+    <p>What is left between the completed modelling work and the three final deliverables: the code, the five-page report and the presentation. Written after a review of everything in the repository.</p>
+    <div class="banner">
+      <div><strong>Nothing here is decided yet.</strong> The twelve questions below carry our suggestion; the group and the supervisor decide. Drafted 10 November 2026; last updated <span id="updated"></span>.</div>
+      <div style="color:var(--muted);font-size:.88rem">Same plan as <code>FINISHING_PLAN.md</code> in the repository. When a decision is taken or a step is completed, both are updated, then this page is republished. The modelling experiments have their own plan, <code>frankfurt_munich/advanced_modeling/PLAN.md</code>.</div>
+    </div>
+  </header>
+
+  <section aria-labelledby="dl-h">
+    <h2 id="dl-h">Deadlines</h2>
+    <ol class="line" id="deadlines"></ol>
+    <p class="sub">Weekly reports are due every Monday at 23:59: 16, 23 and 30 November, 7 and 14 December. The course has not yet published the times of the final deadlines, our presentation slot, or which group's report we review.</p>
+  </section>
+
+  <nav class="toolbar" aria-label="Sections">
+    <a class="chip" href="#stand">Where we stand</a>
+    <a class="chip" href="#decisions">Decisions</a>
+    <a class="chip" href="#work">Work packages</a>
+    <a class="chip" href="#timeline">Timeline</a>
+    <a class="chip" href="#claims">Claims</a>
+    <a class="chip" href="#findings">Review findings</a>
+    <a class="chip" href="#log">Log</a>
+  </nav>
+
+  <section id="stand" aria-labelledby="stand-h">
+    <h2 id="stand-h">Where we stand</h2>
+    <div class="progress" id="stats"></div>
+    <h3>Against the brief's minimum successful project</h3>
+    <div class="tablebox"><table>
+      <thead><tr><th>Requirement</th><th>State</th></tr></thead>
+      <tbody id="brief"></tbody>
+    </table></div>
+    <p>Optional extensions: an advanced neural model is covered. Risk updates exist only before departure (five prediction times up to 0 min); the brief's "during the journey" setting is not. Extreme-weather analysis is too sparse to report. Connections and a prototype are not started. Of the course deliverables, a first report draft exists in <code>report/</code>; there are no slides, no statement of who did what, and no root README.</p>
+    <h3>Headline results as they stand</h3>
+    <div class="tablebox"><table>
+      <thead><tr><th>CV, inputs known at the cutoff</th><th>24 h</th><th>6 h</th><th>1 h</th><th>20 min</th><th>0 min</th></tr></thead>
+      <tbody>
+        <tr><td>Severity log loss, class shares</td><td class="num">0.968</td><td class="num">0.958</td><td class="num">0.923</td><td class="num">0.905</td><td class="num">0.897</td></tr>
+        <tr><td>Severity log loss, LightGBM with selected groups</td><td class="num">0.920</td><td class="num">0.906</td><td class="num">0.860</td><td class="num">0.839</td><td class="num">0.819</td></tr>
+        <tr><td>Delay RMSE (min), training mean</td><td class="num">25.43</td><td class="num">25.43</td><td class="num">25.43</td><td class="num">25.43</td><td class="num">25.43</td></tr>
+        <tr><td>Delay RMSE (min), LightGBM with selected groups</td><td class="num">24.39</td><td class="num">24.30</td><td class="num">23.85</td><td class="num">23.77</td><td class="num">23.58</td></tr>
+        <tr><td>Hold-out: weather minus railway, log loss</td><td class="num">+0.0049</td><td class="num">−0.0009</td><td class="num">+0.0006</td><td class="num">+0.0011</td><td class="num">−0.0000</td></tr>
+        <tr><td>Hold-out: weather minus railway, RMSE (min)</td><td class="num">+0.19</td><td class="num">+0.08</td><td class="num">+0.08</td><td class="num">+0.11</td><td class="num">+0.02</td></tr>
+      </tbody>
+    </table></div>
+    <p class="sub">All ten paired 95% intervals on the hold-out weeks include zero. These numbers stand until the decisions Q1 and Q2 are taken.</p>
+    <h3>What the review confirmed</h3>
+    <ul class="plain" id="confirmed"></ul>
+    <h3>What shapes this plan</h3>
+    <ul class="plain" id="shaping"></ul>
+  </section>
+
+  <section id="decisions" aria-labelledby="dec-h">
+    <h2 id="dec-h">Decisions to take</h2>
+    <p>Suggested order: Q1 to Q4 in the group this week, then Q1, Q2 and Q8 with the supervisor.</p>
+    <div class="decs" id="decs"></div>
+  </section>
+
+  <section id="work" aria-labelledby="work-h">
+    <h2 id="work-h">Work packages</h2>
+    <p>Owners are left for the group to fill in. Cost: S under half a day, M up to two days, L more.</p>
+    <div class="chips" id="statusfilter" role="group" aria-label="Filter steps by status"></div>
+    <div id="packages" style="display:grid;gap:30px"></div>
+  </section>
+
+  <section id="timeline" aria-labelledby="tl-h">
+    <h2 id="tl-h">Timeline</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th>Week</th><th>Dates</th><th>Focus</th></tr></thead>
+      <tbody id="weeks"></tbody>
+    </table></div>
+    <h3>Risks</h3>
+    <div class="tablebox"><table>
+      <thead><tr><th>Risk</th><th>What we do</th></tr></thead>
+      <tbody id="risks"></tbody>
+    </table></div>
+  </section>
+
+  <section id="claims" aria-labelledby="claims-h">
+    <h2 id="claims-h">What the report can claim</h2>
+    <p>From the review of the experiments, reproduced from the result files. With hundreds of comparisons on the same five folds, only large and consistent effects hold.</p>
+    <div class="cols3" id="claimcols"></div>
+    <p class="sub">Three arms failed rather than "showed no gain" and should be reported as failed or left out: LightGBMLSS (CV RMSE 32–36 min, 119 min at 0 min), the explainable boosting machine with weather for delay at 24 h (25.67 min, worse than the training mean), and the TabM classifier at 24 h (0.976, worse than class shares).</p>
+  </section>
+
+  <section id="findings" aria-labelledby="find-h">
+    <h2 id="find-h">Review findings</h2>
+    <p>Severity as judged by the reviewers. "Checked" means the finding was reproduced with code on 10 November, not only read.</p>
+    <div class="tablebox"><table>
+      <thead><tr><th>#</th><th>Area</th><th>Finding</th><th>Severity</th><th>Checked</th><th>Step</th></tr></thead>
+      <tbody id="findrows"></tbody>
+    </table></div>
+  </section>
+
+  <section id="log" aria-labelledby="log-h">
+    <h2 id="log-h">Done and log</h2>
+    <ul class="plain" id="logrows"></ul>
+  </section>
+
+  <footer>Uppsala University · Project in Data Science (1DL507) · supervisor Qing He (Mid Sweden University)</footer>
+</div>
+
+<script>
+/* ===== DATA: keep in sync with FINISHING_PLAN.md ===== */
+const UPDATED = "10 November 2026";
+
+const DEADLINES = [
+  { date: "2027-01-08", when: "Fri 8 January 2027", what: "Code and scripts", note: "Repository link with the contribution statement" },
+  { date: "2027-01-11", when: "Mon 11 January 2027", what: "Report", note: "Five pages of text, course template" },
+  { date: "2027-01-13", when: "Wed 13 January 2027", what: "Slides", note: "As PDF, one submission" },
+  { date: "2027-01-14", when: "Thu 14 January 2027", what: "Presentation", note: "14 min + 1 min questions; under 11 or over 17 may fail" },
+];
+
+const BRIEF = [
+  ["Reproducible journey dataset with a clear severity target", "Done (`frankfurt_munich/`). The download source and revision of the two main data folders are not documented in one place"],
+  ["Baselines and standard ML models with temporal evaluation", "Done. The split is by stratified week, not chronological (agreed with the supervisor on 12 October); the report must justify it"],
+  ["Fair railway-only versus railway-plus-weather experiment", "Done: matched pairs, same rows and budget, one hold-out evaluation. Result: no gain from weather"],
+  ["Explanation of errors, useful features and limitations", "Partly: errors by class, period and branch, calibration and SHAP exist as files; they are not yet turned into findings"],
+];
+
+const CONFIRMED = [
+  "The week split is implemented as described: no week is shared between the hold-out set and the CV set or between folds, and nothing is fitted across the split.",
+  "Targets match their definitions; every dataset number checked in the READMEs is right.",
+  "Preprocessing is fitted inside the folds; metrics are correct; railway and weather arms use identical rows.",
+  "The as-of joins of the snapshot-based inputs, the reliability windows and the weather hours are correct. Nested tuning, stacking and calibration never see outer-fold rows.",
+  "Tests pass: 55 in `modeling/tests` (4 min), 130 passed and 5 skipped in `advanced_modeling/tests` (10 s).",
+  "Every headline score in `modeling/README.md` and every CV table cell in `advanced_modeling/README.md` matches its result file; all hold-out numbers reproduce from the saved predictions.",
+];
+
+const SHAPING = [
+  "The network-state inputs are built wrongly (R1). They count almost only disrupted trains, so the \"share of trains delayed or cancelled\" is 1.0 in 68% of the rows where it is known. Eight of the ten registered finalist pairs use them. Not leakage, but not what the plan and the report say it is.",
+  "From 3 November 2025 the timetable inputs are almost always missing (R2): 0% of rows have a planned route at 24 h and 6 h, against 99.8% before. For about 40% of the journeys the weather models had only the two endpoint temperatures.",
+  "The hold-out evaluation used inputs that the CV results no longer use (R3). Its models were trained with recent-reliability inputs built differently for training and test rows.",
+  "`current_delay` decides the level of every score from 1 h on (R4). From the final records it exists for 86–90% of rows (0.810 log loss, 22.6 min at 1 h); from the snapshots for 35–49% (0.868, 24.1 min). Where both exist they agree exactly in only 30% of rows, and we do not yet know why.",
+  "Most of the fall in severity log loss from 24 h to 0 min is a change of the rows (R18): announced cancellations leave the cohort. Against the class-share reference the best model gains 0.048 at 24 h and 0.078 at 0 min.",
+  "The hold-out set has no reference score (R19), and its delay error is 0.7 min above the registered CV score at every prediction time.",
+  "The brief names Bahn-Vorhersage; we used `piebro/deutsche-bahn-data` (R10), and no decision records why.",
+];
+
+// state: "open" | "decided"
+const DECISIONS = [
+  { id: "Q1", q: "How much do we correct and rerun?", detail: "(a) Nothing: report the existing results with caveats. (b) Targeted: fix or drop the network state (Q3), make the timetable static after 3 November 2025 (Q4), rerun the affected CV arms and the finalists. (c) Full: also change the dataset build (Q6) and rerun everything.", sugg: "(b). It removes the two defects a reader would object to and fits in two weeks on the laptop; (c) risks the deadlines.", state: "open" },
+  { id: "Q2", q: "Hold-out set after Q1", detail: "The set has been scored once. (a) Keep the first evaluation only. (b) Sensitivity rerun: the registry stays frozen (same arms, feature groups and parameters), the inputs are rebuilt with the corrected code, and the models are refitted and scored once more. (c) Register new finalists from the corrected CV results and evaluate those.", sugg: "(b). The first evaluation stays the primary result: it is the only blind one. The rerun is written into the modelling plan before it runs, both are reported whatever the outcome, and the rerun is labelled as not blind. (c) would choose models after the hold-out set has been seen. (b) needs our explicit approval, because the hold-out gate refuses the changed source.", state: "open" },
+  { id: "Q3", q: "Network state: fix or drop?", detail: "Fixing means taking the train type from the plan and selecting change rows by ID.", sugg: "Fix it if the fix and its test take under a day (step B2); otherwise drop the group and say so.", state: "open" },
+  { id: "Q4", q: "Timetable after 3 November 2025", detail: "Keep the strict rule (a plan counts only if the archive requested it before the prediction time), or treat the timetable as static, as already decided for the earlier period on 5 November?", sugg: "Static. A timetable is published long before the day of travel; the request time says when the archive fetched it, not when it was known.", state: "open" },
+  { id: "Q5", q: "`current_delay` in the report", detail: "Snapshot version only, or both versions as a lower and upper bound?", sugg: "First find out why the snapshot version is sparse (step B1), then decide. Report both only if we can say what each bound means.", state: "open" },
+  { id: "Q6", q: "Dataset selection effects (R5–R8)", detail: "Fix in `build_dataset.py`, which changes the dataset and every result, or document as limitations?", sugg: "Document. The advanced inputs already take the timetable and delay history from the scheduled train, which covers the largest of them.", state: "open" },
+  { id: "Q7", q: "Reference scores on the hold-out set", detail: "Class shares and training mean. They choose nothing, but they are new hold-out numbers.", sugg: "Yes, in the same run as Q2. Without them the report cannot say how much better than a constant the final models are on the hold-out weeks.", state: "open" },
+  { id: "Q8", q: "Scope freeze", detail: "No new model families or feature groups; predictions during the journey, connections and a prototype are named as future work.", sugg: "Yes, and confirm with the supervisor that leaving out the during-journey setting is acceptable.", state: "open" },
+  { id: "Q9", q: "Which earlier results appear in the report?", detail: "The first models (recorded route, final-record delay) are optimistic.", sugg: "Only as the comparison in \"What counts as known\", labelled as such.", state: "open" },
+  { id: "Q10", q: "Repository for submission", detail: "Root README and one environment file; what to do with `eda.ipynb` (empty since 8 October), `arrival_delays/` and `berlin_munich_weather/`; licence holder; attribution of the railway and DWD data.", sugg: "README and environment file: yes. Mark the early folders as historical and keep them; delete `eda.ipynb` unless someone needs the old version (commit d59d394). Licence and attribution: the group decides.", state: "open" },
+  { id: "Q11", q: "Who did what, and use of AI tools", detail: "The course requires each student's code and text contributions to be identifiable. The git history shows them poorly (squash merges under one account), and most commits carry an AI co-author line.", sugg: "Write a contribution table by folder and section into the root README and the report footnote. Ask the course staff how AI assistance should be declared.", state: "open" },
+  { id: "Q12", q: "Why not Bahn-Vorhersage?", detail: "Record the reason for using `piebro/deutsche-bahn-data` and tell the supervisor.", sugg: "The group knows the reason; one sentence in `STATUS.md` and in the report.", state: "open" },
+];
+
+const PACKAGES = [
+  { id: "A", title: "Decide", note: "Week 46" },
+  { id: "B", title: "Correct and rerun", note: "Weeks 46–48; depends on Q1–Q7. If Q1 is (a), only B1 and B7–B10 remain" },
+  { id: "C", title: "Analysis for the report", note: "Weeks 48–50; from saved predictions, no new model" },
+  { id: "D", title: "Report", note: "Deadline 11 January" },
+  { id: "E", title: "Code submission", note: "Deadline 8 January" },
+  { id: "F", title: "Presentation", note: "14 January" },
+  { id: "G", title: "Every week", note: "" },
+];
+
+// status: "todo" | "running" | "done" | "dropped"
+const STEPS = [
+  { id: "A1", text: "Group meeting on Q1–Q12; assign owners below", cost: "S", owner: "", due: "13 Nov", status: "todo" },
+  { id: "A2", text: "Supervisor meeting: Q1, Q2, Q8, Q12, and the report outline", cost: "S", owner: "", due: "20 Nov", status: "todo" },
+
+  { id: "B1", text: "Find out why the snapshot `current_delay` exists for only 35–49% of rows and disagrees with the final-record value: follow ten journeys through `upstream_events_cv.parquet` and the change snapshots. Outcome: one paragraph for the report and the answer to Q5", cost: "S", owner: "", due: "17 Nov", status: "todo" },
+  { id: "B2", text: "Fix `network_state.py` (Q3): select change rows by the IDs of ICE/IC plan rows instead of the change rows' own `train_type`; add a test with untyped change rows; check that the share is plausible (about 0.1–0.2)", cost: "S–M", owner: "", due: "18 Nov", status: "todo" },
+  { id: "B3", text: "Static timetable after 3 November 2025 (Q4) in `scheduled_timetable.py`; rebuild timetable, history, network and weather inputs for the CV set; record the new coverage table", cost: "M", owner: "", due: "20 Nov", status: "todo" },
+  { id: "B4", text: "Rerun the affected CV arms: the 0.7 references, 0.8 (nested, with group selection), 2.2, 2.4, 2.5, the combined groups, 3.1–3.5 and any arm that reads timetable, weather-branch or network inputs. Audit as before. Update `README.md`, `PLAN.md` and `plan.html`", cost: "L", owner: "", due: "27 Nov", status: "todo" },
+  { id: "B5", text: "Write the sensitivity rerun into `PLAN.md` before it runs (Q2): frozen registry, corrected inputs, both results reported. Also record there that a first registry was withdrawn and replaced on 6 November after a fix to the network input, before the evaluation ran", cost: "S", owner: "", due: "30 Nov", status: "todo" },
+  { id: "B6", text: "Build the hold-out inputs with the current code, refit the 20 registered arms on the corrected CV inputs and score them once (Q2), together with the two reference scores (Q7). Keep the first evaluation's files unchanged next to it", cost: "M", owner: "", due: "2 Dec", status: "todo" },
+  { id: "B7", text: "Decide on R5–R8 (Q6). If documented only: one paragraph each in `frankfurt_munich/README.md`", cost: "S", owner: "", due: "20 Nov", status: "todo" },
+  { id: "B8", text: "Bring `frankfurt_munich/README.md` up to date (the hold-out warning, \"Not built yet\", the 74 clock-change rows) and say in `modeling/README.md` that its results use final-record `current_delay`", cost: "S", owner: "", due: "20 Nov", status: "todo" },
+  { id: "B9", text: "Record the data source and its revision in one place: repository id, revision or download date, SHA-256 sums of the monthly files, how `stations_present_in_all_months.csv` was made", cost: "S", owner: "", due: "27 Nov", status: "todo" },
+  { id: "B10", text: "Back up what exists only on this laptop: the hold-out prediction files, `frankfurt_munich/data/advanced/` and `advanced_original_065b077/`", cost: "S", owner: "", due: "13 Nov", status: "todo" },
+
+  { id: "C1", text: "Risk over the prediction times for all hold-out journeys, on the journeys present at all five times: how the predicted probability of \"60+ min or cancelled\" moves from 24 h to 0 min for journeys that were and were not severely disrupted, and the scores against the class-share reference on that common set. Replaces the single example of 9.5; this is the brief's \"how risk updates\" question", cost: "S", owner: "", due: "4 Dec", status: "todo" },
+  { id: "C2", text: "Error analysis as findings: share of the squared error from 60+ min journeys, calibration figure, errors by period and branch", cost: "S", owner: "", due: "4 Dec", status: "todo" },
+  { id: "C3", text: "Weather on rare days: say what can and cannot be concluded (two to four heavy-rain journeys per prediction time on the hold-out set); a descriptive table of outcome shares on snow, gust and heat days in the CV set", cost: "S", owner: "", due: "4 Dec", status: "todo" },
+  { id: "C4", text: "Correct the wording of the results in `advanced_modeling/README.md` and `PLAN.md` where the review found it too strong (neural networks, pooling, the three failed arms), and update `plan.html`", cost: "S", owner: "", due: "27 Nov", status: "todo" },
+  { id: "C5", text: "Regenerate Fig. 1, Fig. 2 and all tables of the report from the final result files (`report/figures/make_figures.py`); consider a figure of feature-group importance by prediction time", cost: "S", owner: "", due: "7 Dec", status: "todo" },
+
+  { id: "D1", text: "Download the course LaTeX template (Canvas, Templates) and move `report/main.tex` into it; set up Overleaf or keep it in the repository", cost: "S", owner: "", due: "20 Nov", status: "todo" },
+  { id: "D2", text: "Related work: read the full texts of the weather studies named in `literature_review/regression_models.md` and `classification_models.md`, choose three or four, and check every `CHECK` entry in `report/references.bib`", cost: "M", owner: "", due: "27 Nov", status: "todo" },
+  { id: "D3", text: "Resolve every `\\todo` in `main.tex`, section by section; assign sections to authors", cost: "M", owner: "", due: "7 Dec", status: "todo" },
+  { id: "D4", text: "Complete draft to the supervisor", cost: "", owner: "", due: "7 Dec", status: "todo" },
+  { id: "D5", text: "Read the whole report together: terminology, figure and table references, five pages of text, formal style (the course returns reports with style problems)", cost: "S", owner: "", due: "16 Dec", status: "todo" },
+  { id: "D6", text: "Revise after the supervisor's comments; add the division of work", cost: "M", owner: "", due: "8 Jan", status: "todo" },
+  { id: "D7", text: "Submit, one submission for the group", cost: "", owner: "", due: "11 Jan", status: "todo" },
+
+  { id: "E1", text: "Root `README.md`: what the project is, folder map, data download, run order from raw files to the report's tables, who did what (Q11)", cost: "M", owner: "", due: "11 Dec", status: "todo" },
+  { id: "E2", text: "One environment file for the main pipeline that matches `.venv` (the pins in `modeling/requirements.txt` differ from the installed numpy and pyarrow), plus the existing separate file for the distributional models", cost: "S", owner: "", due: "11 Dec", status: "todo" },
+  { id: "E3", text: "Early folders (Q10): a header in each README saying it is historical and uses the files from before the source rebuild; complete the `arrival_delays` README; decide on `eda.ipynb`", cost: "S", owner: "", due: "11 Dec", status: "todo" },
+  { id: "E4", text: "Licence and data attribution (Q10): licence holder; a note on the railway data (CC BY 4.0) and DWD", cost: "S", owner: "", due: "11 Dec", status: "todo" },
+  { id: "E5", text: "Fresh-clone test: clone into an empty folder, create the environment, run both test suites and `report/figures/make_figures.py`", cost: "S", owner: "", due: "18 Dec", status: "todo" },
+  { id: "E6", text: "Submit the repository link (the repository is public) with the contribution statement", cost: "", owner: "", due: "8 Jan", status: "todo" },
+
+  { id: "F1", text: "Outline from the report's structure; every student presents a part", cost: "S", owner: "", due: "16 Dec", status: "todo" },
+  { id: "F2", text: "Slides", cost: "M", owner: "", due: "8 Jan", status: "todo" },
+  { id: "F3", text: "Two timed rehearsals (target 13–14 min)", cost: "S", owner: "", due: "12 Jan", status: "todo" },
+  { id: "F4", text: "Read the assigned group's report and prepare two questions (pairing not published yet)", cost: "S", owner: "", due: "13 Jan", status: "todo" },
+  { id: "F5", text: "Submit the slides as PDF", cost: "", owner: "", due: "13 Jan", status: "todo" },
+
+  { id: "G1", text: "Weekly report by Monday 23:59: achievements, problems, meetings, hours per member, plan, contact person; say whether we are ahead of, on or behind this plan", cost: "", owner: "", due: "Mondays", status: "running" },
+  { id: "G2", text: "Supervisor contact", cost: "", owner: "", due: "weekly", status: "running" },
+];
+
+const WEEKS = [
+  ["46", "9–15 Nov", "A1; B10; start B1, B2; D1"],
+  ["47", "16–22 Nov", "A2; B1–B3, B7, B8; D2"],
+  ["48", "23–29 Nov", "B4 (laptop runs), B9; C4; D2, D3"],
+  ["49", "30 Nov–6 Dec", "B5, B6; C1–C3; D3"],
+  ["50", "7–13 Dec", "D4 (draft to supervisor, Monday); C5; E1–E4"],
+  ["51", "14–20 Dec", "D5; E5; F1. Code submission if ready"],
+  ["52–53", "21 Dec–3 Jan", "Break; buffer"],
+  ["1", "4–10 Jan", "D6; F2; E6 (Friday 8 Jan)"],
+  ["2", "11–14 Jan", "D7 (Monday); F3, F4; F5 (Wednesday); presentation (Thursday)"],
+];
+
+const RISKS = [
+  ["The reruns of B4 take longer than a week on one laptop", "Start B2 and B3 this week. If B4 is not finished by 4 December, fall back to Q1 (a) for the parts that are missing and say so in the report"],
+  ["The sensitivity rerun on the hold-out set differs from the first evaluation", "Report both, whichever way they point; the rerun is written into the plan before the inputs are built"],
+  ["The supervisor's comments arrive late", "Draft to the supervisor on 7 December, a week before the course's writing week"],
+  ["The report exceeds five pages of text", "The draft is about five pages; anything new replaces something"],
+  ["Contributions cannot be shown from git", "Contribution table written by the group (Q11), early"],
+];
+
+const CLAIMS = [
+  { cls: "can", title: "Can say", items: [
+    "Recent reliability, and all new groups together, improve both tasks in CV (linear models on 5 of 5 folds; nested LightGBM group selection in 20 of 20 comparisons).",
+    "Boosted trees are the strongest learners; no other family beat nested LightGBM.",
+    "On the hold-out weeks weather gave no detectable improvement (ten intervals include zero; worse for delay at all five times). In CV, weather never reached the minimum gain for a stable learner.",
+  ] },
+  { cls: "soften", title: "Should soften", items: [
+    "\"Risk updates as departure approaches\": give it against the class-share reference or on a common set of journeys.",
+    "\"Weather does not help\": limit it to these observed-weather inputs; the hold-out set can rule out gains of about 0.003–0.006 log loss and 0.13 min, not smaller ones.",
+    "The XGBoost group selection (it chose the base inputs at 24 h and 6 h).",
+    "SHAP magnitudes across model families (TreeSHAP and sampled permutation SHAP are on different scales).",
+  ] },
+  { cls: "not", title: "Should not say", items: [
+    "That neural networks match the boosted trees: against nested LightGBM they lost all 112 comparisons, and they used the base inputs only.",
+    "That pooling the prediction times helps: railway-only pooling reached the minimum gain in 0 of 10 comparisons; the six hits are all in the weather arm.",
+    "Gains of the multi-task network, the gated search or RealMLP: they beat only the plain MLP.",
+    "That weather-extreme indicators help (one hit, within noise), or that the value of recent reliability is confirmed on the hold-out set (no such pair was registered).",
+  ] },
+];
+
+// sev: "critical" | "major" | "minor"
+const FINDINGS = [
+  ["R1", "Advanced inputs", "`network_state.py` keeps only change rows that carry a train type (4% of rows, almost all of disrupted trains). Shares are 1.0 in 68% of known rows; the tests always supply a train type and miss it", "critical", "yes", "B2"],
+  ["R2", "Advanced inputs", "Timetable inputs (planned route, stops, weather branch, scheduled train type) are missing for nearly all rows from 3 November 2025; route weather is missing for 33–41% of CV rows", "major", "yes", "B3"],
+  ["R3", "Hold-out", "The hold-out input files are those of the first evaluation; the CV files have changed since (reliability in up to 49,458 of 85,901 rows). The first evaluation's models were trained on reliability inputs built from a CV-only roster and tested on inputs built from all journeys; this affects 8 of the 10 pairs (not the two at 24 h). The CV tables in the README use the corrected inputs, so hold-out scores are comparable only with the CV scores in `finalists.json`", "major", "yes", "B5, B6"],
+  ["R4", "First models", "`current_delay` from final records is not checked for visibility at the prediction time, and a stop cancelled later drops out of it. It accounts for about 1.4 min RMSE and 0.05 log loss from 1 h on", "critical", "partly", "B1"],
+  ["R5", "Dataset", "For a departure whose scheduled train was cancelled and replaced, the kept journey is the replacement (265 of 298 groups), and its train type and `starts_at_origin` enter the base inputs", "major", "yes", "B7"],
+  ["R6", "Dataset", "Journeys whose cancellation was announced and later withdrawn stay in at every prediction time (up to 60 rows at 0 min), while other announced cancellations are dropped", "major", "yes", "B7"],
+  ["R7", "Dataset", "At 0 min, `current_delay` can be the Frankfurt departure itself (20.7% of values); for trains starting in Frankfurt a missing value means \"left late\"", "minor", "yes", "B7"],
+  ["R8", "Dataset", "`cancellation_announced` is the issue time in the latest snapshot; six journeys were first cancelled earlier", "minor", "yes", "B7"],
+  ["R9", "Experiments", "Hundreds of paired comparisons on the same five folds; exploratory screens precede the nested comparisons", "major", "read", "D3"],
+  ["R10", "Repository", "The railway source differs from the brief and is named in full only in `berlin_munich_weather/README.md` and the advanced README", "major", "yes", "B9, Q12"],
+  ["R11", "First models", "All 20 first result folders use the recorded-route inputs; the leak (0.13–0.16 min, 0.007 log loss) is as large as the gain of boosted trees over linear models at 24 h and 6 h", "major", "yes", "Q9"],
+  ["R12", "First models", "Paired t-values over folds in `modeling/README.md` overstate significance; several chosen booster configurations lie at the edge of the search space", "minor", "yes", "Q9"],
+  ["R13", "Repository", "No root README; three requirements files with different pins; `modeling/` imports `advanced_modeling/`", "major", "yes", "E1, E2"],
+  ["R14", "Repository", "Numbers in `berlin_munich_weather/`, `corridor_analysis/` and `arrival_delays/` come from source files that no longer exist locally; `eda.ipynb` is empty; the reasons for choosing Frankfurt–München are written nowhere", "minor", "yes", "E3"],
+  ["R15", "Weather", "The 24-hour snow flag uses the DWD precipitation-type code although its reference interval was never resolved; codes 7 and 8 include forms other than snow", "minor", "read", "D3"],
+  ["R16", "Advanced inputs", "Missing delay history depends on replacement status (6.7% of replacement rows have a `current_delay` against 42% of others); 7 CV replacements have no history at all", "minor", "yes", "D3"],
+  ["R17", "Literature", "`literature_review/references.bib` uses biblatex fields and lacks every later reference; three 2026 sources are preprints; several claims in the surveys were taken from abstracts", "minor", "yes", "D2"],
+  ["R18", "Experiments", "The severity cohort shrinks as cancellations are announced, so scores at different prediction times are not on the same journeys; most of the fall in log loss is the falling reference", "major", "yes", "C1"],
+  ["R19", "Hold-out", "No reference score (class shares, training mean) was computed on the hold-out set", "major", "yes", "B6"],
+  ["R20", "Experiments", "README and plan report neural networks and pooling against weak baselines; three arms failed and are listed as \"no gain\"", "major", "yes", "C4"],
+  ["R21", "Hold-out", "A first finalist registry was withdrawn and replaced on 6 November after the network input was fixed; three delay finalists changed; hold-out inputs without labels had been built by then. Must be disclosed", "minor", "read", "B5"],
+  ["R22", "Hold-out", "The bootstrap is correct (whole weeks, same draw for both arms, 2,000 resamples), but 23 weeks give narrow percentile intervals and the ten intervals are pointwise", "minor", "yes", "D3"],
+];
+
+const LOG = [
+  "10 November 2026: removed 10 clean worktrees and 15 local branches (all merged through PRs #6–#12, or superseded). The out-of-fold predictions of the first models existed only inside those worktrees; they were copied into `frankfurt_munich/modeling/results/` first. The remote branch `feature-engineering` (created 9 November) was left alone.",
+  "10 November 2026: `STATUS.md` rewritten to the current state; `.gitignore` now covers `.claude/`, `.pytest_cache/` and the LaTeX build files; three small errors in `modeling/README.md` corrected; the modelling plan no longer says that PR #12 is unmerged.",
+  "10 November 2026: first report draft in `report/` (LaTeX, two figures drawn from the result files, open points marked with `\\todo`).",
+  "10 November 2026: plan drafted after the project review.",
+];
+
+/* ===== RENDER ===== */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const rich = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+const el = id => document.getElementById(id);
+let statusFilter = "all";
+
+function renderDeadlines() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  el("deadlines").innerHTML = DEADLINES.map(d => {
+    const days = Math.round((new Date(d.date + "T00:00:00") - today) / 86400000);
+    const left = days > 0 ? `${days} <small>days left</small>` : days === 0 ? `today` : `<small>passed</small>`;
+    return `<li class="stop${days < 0 ? " past" : ""}"><span class="when">${esc(d.when)}</span><span class="what">${esc(d.what)}</span><span class="left">${left}</span><span class="note">${esc(d.note)}</span></li>`;
+  }).join("");
+}
+
+function renderStats() {
+  const open = DECISIONS.filter(d => d.state === "open").length;
+  const count = s => STEPS.filter(x => x.status === s).length;
+  const crit = FINDINGS.filter(f => f[3] === "critical").length, major = FINDINGS.filter(f => f[3] === "major").length;
+  const stats = [
+    [open, "decisions open"],
+    [count("todo"), "steps to do"],
+    [count("running"), "steps running"],
+    [count("done"), "steps done"],
+    [`${crit} + ${major}`, "critical + major findings"],
+  ];
+  el("stats").innerHTML = stats.map(([n, l]) => `<div class="stat"><span class="n">${n}</span><span class="l">${l}</span></div>`).join("");
+}
+
+function renderDecisions() {
+  el("decs").innerHTML = DECISIONS.map(d => `<div class="dec">
+    <div class="qid">${esc(d.id)}</div>
+    <div class="body"><div class="q">${rich(d.q)}</div><div class="detail">${rich(d.detail)}</div>
+      <div class="sugg"><b>${d.state === "open" ? "Our suggestion" : "Decision"}</b>${rich(d.sugg)}</div></div>
+    <div class="side"><span class="pill s-${d.state}">${d.state}</span></div></div>`).join("");
+}
+
+function renderFilter() {
+  const opts = ["all", "todo", "running", "done", "dropped"];
+  el("statusfilter").innerHTML = opts.map(o => `<button type="button" class="chip" id="f-${o}" aria-pressed="${o === statusFilter}">${o === "all" ? "All steps" : o}</button>`).join("");
+  opts.forEach(o => el("f-" + o).addEventListener("click", () => { statusFilter = o; renderFilter(); renderPackages(); }));
+}
+
+function renderPackages() {
+  el("packages").innerHTML = PACKAGES.map(p => {
+    const xs = STEPS.filter(s => s.id.startsWith(p.id) && (statusFilter === "all" || s.status === statusFilter));
+    const rows = xs.length ? xs.map(s => `<div class="step">
+      <div class="sid">${esc(s.id)}</div>
+      <div class="text">${rich(s.text)}<div class="meta">${s.cost ? `<span class="tag">cost ${esc(s.cost)}</span>` : ""}<span class="tag">due ${esc(s.due)}</span><span class="tag">owner ${s.owner ? esc(s.owner) : "—"}</span></div></div>
+      <div class="side"><span class="pill s-${s.status}">${s.status}</span></div></div>`).join("") : `<div class="empty">No steps with this status.</div>`;
+    return `<div class="pkg"><div class="pkg-head"><h3>${esc(p.id)}. ${esc(p.title)}</h3><span class="pnote">${rich(p.note)}</span></div><div class="steps">${rows}</div></div>`;
+  }).join("");
+}
+
+function renderRest() {
+  el("updated").textContent = UPDATED;
+  el("brief").innerHTML = BRIEF.map(([a, b]) => `<tr><td>${rich(a)}</td><td class="wide">${rich(b)}</td></tr>`).join("");
+  el("confirmed").innerHTML = CONFIRMED.map(x => `<li>${rich(x)}</li>`).join("");
+  el("shaping").innerHTML = SHAPING.map(x => `<li>${rich(x)}</li>`).join("");
+  el("weeks").innerHTML = WEEKS.map(([w, d, f]) => `<tr><td class="num">${esc(w)}</td><td class="num">${esc(d)}</td><td class="wide">${rich(f)}</td></tr>`).join("");
+  el("risks").innerHTML = RISKS.map(([a, b]) => `<tr><td class="wide">${rich(a)}</td><td class="wide">${rich(b)}</td></tr>`).join("");
+  el("claimcols").innerHTML = CLAIMS.map(c => `<div class="claim ${c.cls}"><h3>${esc(c.title)}</h3><ul class="plain">${c.items.map(i => `<li>${rich(i)}</li>`).join("")}</ul></div>`).join("");
+  el("findrows").innerHTML = FINDINGS.map(([id, area, text, sev, checked, step]) => `<tr><td class="id">${esc(id)}</td><td>${esc(area)}</td><td class="wide">${rich(text)}</td><td><span class="pill sev-${sev}">${sev}</span></td><td>${esc(checked)}</td><td class="num">${esc(step)}</td></tr>`).join("");
+  el("logrows").innerHTML = LOG.map(x => `<li>${rich(x)}</li>`).join("");
+}
+
+renderDeadlines(); renderStats(); renderDecisions(); renderFilter(); renderPackages(); renderRest();
+</script>
