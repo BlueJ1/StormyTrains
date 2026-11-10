@@ -1,0 +1,11 @@
+
+lightgbm_classifier (severity)
+prediction_time  log_loss_mean  log_loss_std  macro_f1_mean  macro_f1_std
+            24h         0.9181        0.0112         0.2219        0.0065
+             6h         0.9096        0.0117         0.2222        0.0069
+             1h         0.8103        0.0123         0.3502        0.0189
+          20min         0.7766        0.0115         0.3846        0.0185
+           0min         0.7588        0.0110         0.3901        0.0147
+  9.3 min
+
+lightgbm_classifier_weather (severity)

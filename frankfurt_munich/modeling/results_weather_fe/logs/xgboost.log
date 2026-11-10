@@ -1,0 +1,36 @@
+
+xgboost (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.4268    0.8545
+             6h    24.4268    0.8545
+             1h    22.6521    0.7635
+          20min    21.9703    0.8308
+           0min    21.6216    0.8264
+  2.0 min
+
+xgboost_weather (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.3821    0.8089
+             6h    24.3969    0.8342
+             1h    22.7247    0.8880
+          20min    22.0147    0.9583
+           0min    21.6797    1.0361
+  2.5 min
+
+xgboost_weather_fe_replace (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.4012    0.7935
+             6h    24.3941    0.8380
+             1h    22.7350    0.8666
+          20min    22.0164    0.9259
+           0min    21.6947    1.0062
+  3.3 min
+
+xgboost_weather_fe_add (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.3992    0.8101
+             6h    24.4372    0.8540
+             1h    22.7537    0.8978
+          20min    22.0354    0.9605
+           0min    21.7042    1.0317
+  3.7 min

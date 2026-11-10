@@ -9,6 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "advanced_modeling"
 from history_features import FEATURE_COLUMNS_BY_GROUP  # noqa: E402
 from holiday_features import FEATURES as HOLIDAYS  # noqa: E402
 from weather_features import FEATURE_COLUMNS as WEATHER  # noqa: E402
+from weather_engineered import FEATURE_COLUMNS as WEATHER_FE  # noqa: E402
+from weather_engineered import INTERACTION as WEATHER_FE_INTERACTION  # noqa: E402
 
 TIMETABLE = (("planned_travel_min",), ("train_type", "starts_at_origin"))
 CALENDAR = ((), ("hour", "weekday", "month"))
@@ -18,6 +20,35 @@ PLANNED_TIMETABLE = (("planned_stops", "upstream_planned_min"), ("route_id",))
 PHASE2_GROUPS = {"planned_timetable": PLANNED_TIMETABLE, "holidays": (tuple(HOLIDAYS), ())}
 PHASE2_GROUPS.update({group: (tuple(c for c in columns if c != "current_delay"), ())
                       for group, columns in FEATURE_COLUMNS_BY_GROUP.items()})
+
+# Weather arms. weather=True is "base" and weather=False (or None) is railway only.
+# fe_replace: the two endpoint temperatures plus the engineered columns;
+# fe_add: the 14 base columns plus the engineered columns.
+WEATHER_VERSIONS = ("base", "fe_replace", "fe_add")
+ENDPOINT_TEMPERATURES = ("origin_temperature_c", "destination_temperature_c")
+
+
+def weather_version(weather) -> str | None:
+    """The weather arm named by `weather`: None (railway only) or one of WEATHER_VERSIONS."""
+    if weather is None or weather is False:
+        return None
+    if weather is True:
+        return "base"
+    if weather in WEATHER_VERSIONS:
+        return weather
+    raise ValueError(f"unknown weather arm {weather!r}; use False, True or one of {WEATHER_VERSIONS}")
+
+
+def weather_columns(prediction_time: str, weather) -> list[str]:
+    """The weather feature columns of an arm. Interactions with current_delay only from 1 h."""
+    version = weather_version(weather)
+    if version is None:
+        return []
+    engineered = [c for c in WEATHER_FE
+                  if c not in WEATHER_FE_INTERACTION or prediction_time in CURRENT_DELAY_TIMES]
+    return {"base": list(WEATHER),
+            "fe_replace": [*ENDPOINT_TEMPERATURES, *engineered],
+            "fe_add": [*WEATHER, *engineered]}[version]
 
 
 def feature_groups(prediction_time: str, weather: bool = False):
@@ -53,8 +84,7 @@ def feature_columns(prediction_time: str, weather: bool = False, *,
     categorical.extend(CALENDAR[1])
     if prediction_time in CURRENT_DELAY_TIMES:
         numeric.append("current_delay")
-    if weather:
-        numeric.extend(WEATHER)
+    numeric.extend(weather_columns(prediction_time, weather))
     added = PHASE2_GROUPS if feature_set == "all_groups" else (feature_set,)
     for group in added:
         if group == "delay_dynamics" and prediction_time not in CURRENT_DELAY_TIMES:

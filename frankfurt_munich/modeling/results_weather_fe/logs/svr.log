@@ -1,0 +1,29 @@
+
+svr (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.6565    0.9738
+             6h    24.6565    0.9738
+             1h    22.7399    0.9134
+          20min    22.0546    0.8714
+           0min    21.6817    0.9737
+  2.9 min
+
+svr_weather (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.5179    0.9024
+             6h    24.5994    0.9556
+             1h    22.8212    0.9221
+          20min    22.1477    0.8700
+           0min    21.7734    0.9899
+  3.2 min
+
+svr_weather_fe_replace (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.7058    0.8609
+             6h    24.7890    0.9085
+             1h    23.2307    0.8165
+          20min    22.6396    0.7821
+           0min    22.3138    0.9354
+  8.9 min
+
+svr_weather_fe_add (delay)

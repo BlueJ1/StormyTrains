@@ -1,0 +1,36 @@
+
+linear_regression (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.5579    0.8794
+             6h    24.5579    0.8794
+             1h    22.9155    0.8207
+          20min    22.3712    0.8697
+           0min    22.0307    1.0033
+  0.1 min
+
+linear_regression_weather (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.5357    0.8708
+             6h    24.5732    0.8612
+             1h    22.9245    0.7637
+          20min    22.3738    0.8128
+           0min    22.0393    0.9486
+  0.2 min
+
+linear_regression_weather_fe_replace (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.5629    0.7643
+             6h    24.6522    0.8133
+             1h    23.0952    0.7315
+          20min    22.5408    0.7142
+           0min    22.2120    0.8615
+  0.2 min
+
+linear_regression_weather_fe_add (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.5734    0.7567
+             6h    24.6841    0.7965
+             1h    23.1130    0.7064
+          20min    22.5639    0.6894
+           0min    22.2386    0.8366
+  0.2 min

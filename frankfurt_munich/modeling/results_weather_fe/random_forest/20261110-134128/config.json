@@ -1,0 +1,148 @@
+{
+  "name": "random_forest",
+  "task": "delay",
+  "target": "arrival_delay_min",
+  "model": "make_random_forest",
+  "weather": false,
+  "feature_set": "recorded_route_diagnostic",
+  "evaluation": "screen",
+  "fixed_from": "results/random_forest/20261026-095720/config.json",
+  "chosen": {
+    "24h": {
+      "config_id": 34,
+      "params": {
+        "max_depth": 16,
+        "max_features": 0.3919105189047466,
+        "max_samples": 0.5610439773503366,
+        "min_samples_leaf": 4
+      }
+    },
+    "6h": {
+      "config_id": 34,
+      "params": {
+        "max_depth": 16,
+        "max_features": 0.3919105189047466,
+        "max_samples": 0.5610439773503366,
+        "min_samples_leaf": 4
+      }
+    },
+    "1h": {
+      "config_id": 12,
+      "params": {
+        "max_depth": 16,
+        "max_features": 0.2560281881569949,
+        "max_samples": 0.6955303037866204,
+        "min_samples_leaf": 2
+      }
+    },
+    "20min": {
+      "config_id": 12,
+      "params": {
+        "max_depth": 16,
+        "max_features": 0.2560281881569949,
+        "max_samples": 0.6955303037866204,
+        "min_samples_leaf": 2
+      }
+    },
+    "0min": {
+      "config_id": 34,
+      "params": {
+        "max_depth": 16,
+        "max_features": 0.3919105189047466,
+        "max_samples": 0.5610439773503366,
+        "min_samples_leaf": 4
+      }
+    }
+  },
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "observed_stops",
+        "unobserved_sequence_positions",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "recorded_route",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "git_commit": "f413be35e0d307578158db88c55e49d8e3f20909 (uncommitted changes)",
+  "runtime": {
+    "python": "3.13.2",
+    "architecture": "arm64",
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "pyarrow": "26.0.0",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1"
+  },
+  "created": "2026-11-10T13:41:28"
+}

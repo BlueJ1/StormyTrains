@@ -1,0 +1,11 @@
+
+random_forest (delay)
+prediction_time  rmse_mean  rmse_std
+            24h    24.4347    0.9195
+             6h    24.4347    0.9195
+             1h    22.6331    0.8550
+          20min    21.9997    0.8270
+           0min    21.5994    0.8704
+  3.4 min
+
+random_forest_weather (delay)

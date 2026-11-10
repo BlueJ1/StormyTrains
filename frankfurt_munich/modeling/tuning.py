@@ -258,6 +258,33 @@ def run_search(name: str, task: str, factory, space: dict, *, weather: bool = Fa
     return summary
 
 
+def run_fixed(name: str, task: str, factory, chosen: dict, *, weather: bool | str = False,
+              source: str = "", prediction_times=PREDICTION_TIMES, feature_set: str = "base",
+              results_dir=RESULTS) -> pd.DataFrame:
+    """Cross-validate one given configuration per prediction time (a screen, no search).
+
+    `chosen` maps each prediction time to {"config_id", "params"}, as in the
+    config.json of a flat search (see fixed_configurations). Saves the run like
+    run_search, with evaluation "screen" and the source search in config.json.
+    """
+    all_metrics, all_predictions, config_features = [], [], {}
+    for prediction_time in prediction_times:
+        numeric, categorical = feature_columns(prediction_time, weather, feature_set=feature_set)
+        config_features[prediction_time] = {"numeric": numeric, "categorical": categorical}
+        rows = load_rows(prediction_time, weather=weather)
+        _, metrics, predictions = search(rows, prediction_time, task, factory,
+                                         [chosen[prediction_time]["params"]], numeric, categorical)
+        all_metrics.append(metrics)
+        all_predictions.append(predictions)
+    config = {"name": name, "task": task, "target": TARGETS[task], "model": factory.__name__,
+              "weather": weather, "feature_set": feature_set, "evaluation": "screen",
+              "fixed_from": source, "chosen": {pt: chosen[pt] for pt in prediction_times},
+              "features": config_features}
+    _, summary = save_run(results_dir, name, config, pd.concat(all_metrics, ignore_index=True),
+                          pd.concat(all_predictions, ignore_index=True))
+    return summary
+
+
 def fixed_configurations(path: Path, *, task: str, model: str, weather: bool) -> dict:
     """Read the per-time configurations from a matching flat search."""
     source = json.loads(path.read_text())

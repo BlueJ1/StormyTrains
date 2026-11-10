@@ -31,7 +31,7 @@ HERE = Path(__file__).resolve().parent
 DATA = HERE.parent / "data"
 sys.path.insert(0, str(HERE.parent))
 from folds import TIME_COLUMN  # noqa: E402  frankfurt_munich/folds.py
-from features import WEATHER  # noqa: E402
+from features import WEATHER, WEATHER_FE, weather_version  # noqa: E402
 
 PREDICTION_TIMES = ["24h", "6h", "1h", "20min", "0min"]
 JOURNEY_COLUMNS = ["journey_id", "train_type", "starts_at_origin",
@@ -41,7 +41,15 @@ ROW_KEY = ["journey_id", "prediction_time", "predicted_at"]
 
 
 def load_rows(prediction_time: str, split: str = "cv", allow_holdout: bool = False,
-              weather: bool = False) -> pd.DataFrame:
+              weather: bool | str = False) -> pd.DataFrame:
+    """weather: False (railway only), True or "base", "fe_replace" or "fe_add".
+
+    Every weather arm merges the 14 base columns; the "fe_*" arms also merge the
+    engineered columns from data/prediction_rows_weather_fe_<split>.parquet
+    (see frankfurt_munich/weather_engineered.py). Which columns are features is
+    decided by features.weather_columns.
+    """
+    version = weather_version(weather)
     if prediction_time not in PREDICTION_TIMES:
         raise ValueError(f"unknown prediction time {prediction_time!r}")
     if split not in ("cv", "holdout"):
@@ -51,7 +59,7 @@ def load_rows(prediction_time: str, split: str = "cv", allow_holdout: bool = Fal
                               "pass allow_holdout=True for the final evaluation.")
 
     rows = pd.read_parquet(DATA / f"prediction_rows_{split}.parquet")
-    if weather:
+    if version is not None:
         path = DATA / f"prediction_rows_weather_{split}.parquet"
         weather_rows = pd.read_parquet(path, columns=[*ROW_KEY, "weather_hour_utc", *WEATHER])
         if not weather_rows[ROW_KEY].equals(rows[ROW_KEY]):
@@ -59,6 +67,14 @@ def load_rows(prediction_time: str, split: str = "cv", allow_holdout: bool = Fal
                              "re-run frankfurt_munich/weather_features.py")
         rows = rows.join(weather_rows.drop(columns=ROW_KEY))
         rows["snow_on_route_24h"] = rows["snow_on_route_24h"].astype(float)
+    if version in ("fe_replace", "fe_add"):
+        path = DATA / f"prediction_rows_weather_fe_{split}.parquet"
+        engineered = pd.read_parquet(path, columns=[*ROW_KEY, "weather_hour_utc", *WEATHER_FE])
+        if not (engineered[ROW_KEY].equals(rows[ROW_KEY])
+                and engineered["weather_hour_utc"].equals(rows["weather_hour_utc"])):
+            raise ValueError(f"{path.name} does not match the prediction rows; "
+                             "re-run frankfurt_munich/weather_engineered.py")
+        rows = rows.join(engineered[WEATHER_FE])
     rows = rows[rows["prediction_time"] == prediction_time]
     journeys = pd.read_parquet(DATA / f"journeys_{split}.parquet",
                                columns=JOURNEY_COLUMNS)

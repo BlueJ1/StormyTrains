@@ -1,0 +1,87 @@
+{
+  "thresholds": {
+    "heat_c": 30.0,
+    "gust_ms": 20.0,
+    "rain_mm_per_h": [
+      15,
+      5
+    ],
+    "frost_c": 0.0
+  },
+  "cv": {
+    "rows": 85901,
+    "missing": {
+      "snow_depth_change_cm": 10
+    },
+    "rows_with_72h_window_before_first_hour": 212,
+    "share_of_rows_nonzero": {
+      "heat_degree_hours_24h": 0.1389,
+      "heat_hours_24h": 0.1389,
+      "heat_flag_24h": 0.1389,
+      "gust_excess_sq_24h": 0.0352,
+      "gust_excess_sq_48h": 0.0655,
+      "storm_hours_24h": 0.0352,
+      "storm_hours_48h": 0.0655,
+      "storm_flag_24h": 0.0352,
+      "route_precip_48h_mm": 0.775,
+      "route_precip_72h_mm": 0.8558,
+      "rain_excess15_24h": 0.0312,
+      "rain_hours15_24h": 0.0312,
+      "rain_flag15_24h": 0.0312,
+      "rain_excess5_24h": 0.1401,
+      "rain_hours5_24h": 0.1401,
+      "rain_flag5_24h": 0.1401,
+      "frost_degree_hours_24h": 0.2537,
+      "frost_hours_24h": 0.2537,
+      "freeze_thaw_24h": 0.2521,
+      "snow_depth_change_cm": 0.0329,
+      "frost_flag_24h": 0.2537,
+      "heat_stations_24h": 0.1389,
+      "storm_stations_24h": 0.0352,
+      "rain15_stations_24h": 0.0312,
+      "rain5_stations_24h": 0.1401,
+      "frost_stations_24h": 0.2537,
+      "origin_gust_max_24h_ms": 1.0,
+      "destination_gust_max_24h_ms": 1.0,
+      "origin_precip_24h_mm": 0.3917,
+      "destination_precip_24h_mm": 0.4107
+    }
+  },
+  "holdout": {
+    "rows": 21260,
+    "missing": {},
+    "rows_with_72h_window_before_first_hour": 0,
+    "share_of_rows_nonzero": {
+      "heat_degree_hours_24h": 0.1035,
+      "heat_hours_24h": 0.1035,
+      "heat_flag_24h": 0.1035,
+      "gust_excess_sq_24h": 0.0453,
+      "gust_excess_sq_48h": 0.0894,
+      "storm_hours_24h": 0.0453,
+      "storm_hours_48h": 0.0894,
+      "storm_flag_24h": 0.0453,
+      "route_precip_48h_mm": 0.7976,
+      "route_precip_72h_mm": 0.8579,
+      "rain_excess15_24h": 0.0169,
+      "rain_hours15_24h": 0.0169,
+      "rain_flag15_24h": 0.0169,
+      "rain_excess5_24h": 0.1675,
+      "rain_hours5_24h": 0.1675,
+      "rain_flag5_24h": 0.1675,
+      "frost_degree_hours_24h": 0.261,
+      "frost_hours_24h": 0.261,
+      "freeze_thaw_24h": 0.2632,
+      "snow_depth_change_cm": 0.0699,
+      "frost_flag_24h": 0.261,
+      "heat_stations_24h": 0.1035,
+      "storm_stations_24h": 0.0453,
+      "rain15_stations_24h": 0.0169,
+      "rain5_stations_24h": 0.1675,
+      "frost_stations_24h": 0.261,
+      "origin_gust_max_24h_ms": 1.0,
+      "destination_gust_max_24h_ms": 1.0,
+      "origin_precip_24h_mm": 0.4665,
+      "destination_precip_24h_mm": 0.5303
+    }
+  }
+}

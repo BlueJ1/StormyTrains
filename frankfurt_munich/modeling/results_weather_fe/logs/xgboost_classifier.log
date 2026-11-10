@@ -1,0 +1,20 @@
+
+xgboost_classifier (severity)
+prediction_time  log_loss_mean  log_loss_std  macro_f1_mean  macro_f1_std
+            24h         0.9189        0.0134         0.2289        0.0046
+             6h         0.9104        0.0131         0.2326        0.0047
+             1h         0.8114        0.0124         0.3358        0.0183
+          20min         0.7773        0.0117         0.3814        0.0232
+           0min         0.7594        0.0115         0.3883        0.0235
+  4.3 min
+
+xgboost_classifier_weather (severity)
+prediction_time  log_loss_mean  log_loss_std  macro_f1_mean  macro_f1_std
+            24h         0.9170        0.0135         0.2190        0.0125
+             6h         0.9104        0.0119         0.2145        0.0135
+             1h         0.8138        0.0133         0.3337        0.0184
+          20min         0.7798        0.0125         0.3619        0.0153
+           0min         0.7628        0.0105         0.3766        0.0202
+  9.2 min
+
+xgboost_classifier_weather_fe_replace (severity)
