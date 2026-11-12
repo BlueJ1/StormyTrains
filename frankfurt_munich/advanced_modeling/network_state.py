@@ -4,6 +4,11 @@ Only CV rows are read by default. The feature is the share of unique ICE/IC
 runs with an observed arrival/departure event in the trailing hour that was
 delayed by at least 20 minutes or cancelled. A cancellation's issue time is its
 event clock. Plan-only rows do not establish an on-time outcome.
+
+Which change rows belong to ICE/IC trains is decided by the plan: about 96% of
+the change rows carry no train type, and the ones that do are mostly disrupted
+trains. A change row is kept if its stop ID has an ICE/IC plan row in the same
+or a neighbouring month, or if it carries the type ICE or IC itself.
 """
 from __future__ import annotations
 
@@ -14,6 +19,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
 HERE = Path(__file__).resolve().parents[1]  # frankfurt_munich
@@ -64,15 +71,50 @@ def _run_month(ids: pd.Series) -> pd.Series:
     return starts.dt.to_period("M")
 
 
-def _read_month(path: Path, *, kind: str, stations: list[str]) -> pd.DataFrame:
-    columns = CHANGE_READ_COLUMNS if kind == "change" else PLAN_READ_COLUMNS
+LONG_DISTANCE = ["ICE", "IC"]
+
+
+def _long_distance_plan_ids(path: Path, *, stations: list[str]) -> pa.Array:
+    """Stop IDs of the ICE/IC plan rows at the given stations in one monthly file."""
     table = pq.read_table(
-        path,
-        columns=columns,
-        filters=[("station_name", "in", stations), ("train_type", "in", ["ICE", "IC"])],
+        path, columns=["id"],
+        filters=[("station_name", "in", stations), ("train_type", "in", LONG_DISTANCE)],
         use_threads=False,
     )
-    frame = table.to_pandas()
+    return pc.unique(table.column("id").combine_chunks())
+
+
+def _read_month(path: Path, *, kind: str, stations: list[str],
+                long_distance_ids: pa.Array | None = None,
+                batch_size: int = 262_144) -> pd.DataFrame:
+    """Read the ICE/IC rows of one monthly file at the given stations.
+
+    Plan rows carry the train type and are filtered on it. Change rows mostly do
+    not, so they are kept when their stop ID is in ``long_distance_ids`` (the
+    IDs of ICE/IC plan rows) or when they carry the type ICE or IC themselves.
+    """
+    if kind == "plan":
+        table = pq.read_table(
+            path, columns=PLAN_READ_COLUMNS,
+            filters=[("station_name", "in", stations), ("train_type", "in", LONG_DISTANCE)],
+            use_threads=False,
+        )
+        frame = table.to_pandas()
+    else:
+        station_set = pa.array(stations, type=pa.string())
+        type_set = pa.array(LONG_DISTANCE, type=pa.string())
+        parts = []
+        for batch in pq.ParquetFile(path).iter_batches(
+                columns=CHANGE_READ_COLUMNS, batch_size=batch_size, use_threads=False):
+            keep = pc.is_in(batch.column("train_type"), value_set=type_set)
+            if long_distance_ids is not None and len(long_distance_ids):
+                keep = pc.or_(keep, pc.is_in(batch.column("id"), value_set=long_distance_ids))
+            keep = pc.and_(keep, pc.is_in(batch.column("station_name"), value_set=station_set))
+            kept = batch.filter(keep)
+            if kept.num_rows:
+                parts.append(kept)
+        frame = (pa.Table.from_batches(parts).to_pandas() if parts
+                 else pd.DataFrame(columns=CHANGE_READ_COLUMNS))
     if frame.empty:
         return frame
     frame = frame.drop_duplicates(["id", "snapshot_timestamp"], keep="last").copy()
@@ -300,9 +342,17 @@ def build_network_features(
 
     pending: dict[pd.Period, dict[str, list[pd.DataFrame]]] = defaultdict(lambda: {"change": [], "plan": []})
     segment_parts: list[pd.DataFrame] = []
-    stats = {"change_rows_read": 0, "plan_rows_read": 0,
+    stats = {"change_rows_read": 0, "change_rows_without_train_type": 0, "plan_rows_read": 0,
              "unparseable_run_ids": 0, "run_months_processed": 0,
              "event_intervals": 0, "run_scope_segments": 0}
+    # A stop's plan row can be in the monthly file before or after its change rows.
+    station_list = sorted(panel)
+    plan_ids = {month: _long_distance_plan_ids(plan_files[month], stations=station_list)
+                for month in available_months if month in plan_files}
+
+    def ids_around(month: pd.Period) -> pa.Array | None:
+        parts = [plan_ids[m] for m in (month - 1, month, month + 1) if m in plan_ids]
+        return pc.unique(pa.concat_arrays(parts)) if parts else None
 
     def process(run_month: pd.Period) -> None:
         bucket = pending.pop(run_month, {"change": [], "plan": []})
@@ -325,14 +375,16 @@ def build_network_features(
 
     for month in available_months:
         if month in change_files:
-            changes = _read_month(change_files[month], kind="change", stations=sorted(panel))
+            changes = _read_month(change_files[month], kind="change", stations=station_list,
+                                  long_distance_ids=ids_around(month))
             if not changes.empty:
                 stats["change_rows_read"] += len(changes)
+                stats["change_rows_without_train_type"] += int(changes["train_type"].isna().sum())
                 stats["unparseable_run_ids"] += int(changes["_run_month"].isna().sum())
                 for run_month, frame in changes.dropna(subset=["_run_month"]).groupby("_run_month", sort=False):
                     pending[run_month]["change"].append(frame)
         if month in plan_files:
-            plans = _read_month(plan_files[month], kind="plan", stations=sorted(panel))
+            plans = _read_month(plan_files[month], kind="plan", stations=station_list)
             if not plans.empty:
                 stats["plan_rows_read"] += len(plans)
                 for run_month, frame in plans.dropna(subset=["_run_month"]).groupby("_run_month", sort=False):
@@ -355,12 +407,13 @@ def build_network_features(
         "stable_panel_path": str(PANEL_PATH),
         "stable_panel_station_count": len(panel),
         "plan_snapshot_policy": (
-            "earliest legacy snapshot per stop treated as a static schedule available at "
-            "1900-01-01 UTC; exact-era snapshots are available at their request timestamp"
+            "earliest snapshot per stop treated as a static schedule available at "
+            "1900-01-01 UTC, in both archive periods"
         ),
-        "legacy_plan_policy": "earliest legacy snapshot per stop is static from 1900-01-01 UTC",
+        "legacy_plan_policy": "earliest snapshot per stop is static from 1900-01-01 UTC",
+        "change_row_selection": "stop ID has an ICE/IC plan row in the same or a neighbouring monthly file, or the change row itself carries the type ICE or IC",
         "change_snapshot_bound": "legacy whole-hour labels receive +45 minutes; exact request timestamps are unchanged",
-        "denominator": "unique ICE/IC runs with a visible arrival/departure report and a plan available under the shared legacy-static/exact-as-of policy, or an in-force cancellation, in the trailing hour",
+        "denominator": "unique ICE/IC runs with a visible arrival/departure report and a static plan, or an in-force cancellation, in the trailing hour",
         "cancellation_event_clock": "cancellation issue time",
         "interval_policy": "activate at max(snapshot request time, event time); expire at the next change/plan update or event time + 1 hour",
         "scopes": {

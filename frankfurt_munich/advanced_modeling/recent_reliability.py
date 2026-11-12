@@ -294,8 +294,8 @@ def build_reliability_file(
 
     Both target splits use the same target-free stop roster. Candidate pairs are bounded to 32 days,
     and only same-service candidates plus the corridor's prior 24-hour window
-    are materialized. The shared plan policy treats the earliest legacy snapshot
-    per stop as a static schedule and applies exact-era plan updates as-of cutoff.
+    are materialized. The shared plan policy treats the earliest plan snapshot
+    per stop as a static schedule in both archive periods.
     """
     if split not in {"cv", "holdout"}:
         raise ValueError("split must be 'cv' or 'holdout'")
@@ -465,10 +465,10 @@ def build_reliability_file(
         "holdout_gate_passed": gate_passed,
         "holdout_target_columns_read": False,
         "plan_snapshot_policy": (
-            "earliest legacy snapshot per stop treated as a static schedule available at "
-            "1900-01-01 UTC; exact-era snapshots are available at their request timestamp"
+            "earliest snapshot per stop treated as a static schedule available at "
+            "1900-01-01 UTC, in both archive periods"
         ),
-        "legacy_plan_policy": "earliest legacy snapshot per stop is static from 1900-01-01 UTC",
+        "legacy_plan_policy": "earliest snapshot per stop is static from 1900-01-01 UTC",
         "candidate_policy": "same-service candidates within 28d, corridor outcomes within 24h/3h; 32d service and 48h corridor run-ID prefilters",
         "candidate_source": "shared target-free stop roster for both splits",
         "candidate_journeys": int(len(candidates)),

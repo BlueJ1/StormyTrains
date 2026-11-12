@@ -21,7 +21,7 @@ from scheduled_timetable import (
 )
 
 
-def test_plan_availability_uses_legacy_static_schedule_by_default():
+def test_plan_availability_is_static_in_both_archive_periods_by_default():
     stamps = pd.Series(pd.to_datetime([
         "2025-11-02 23:00:00",
         "2025-11-03 03:32:22.619260",
@@ -30,9 +30,10 @@ def test_plan_availability_uses_legacy_static_schedule_by_default():
     available = plan_availability_utc(stamps)
 
     assert available.iloc[0] == pd.Timestamp("1900-01-01", tz="UTC")
-    assert available.iloc[1] == EXACT_PLAN_REQUESTS_FROM_UTC
+    assert available.iloc[1] == pd.Timestamp("1900-01-01", tz="UTC")
     sensitivity = plan_availability_utc(stamps, legacy_hour_label_offset=pd.Timedelta(minutes=45))
     assert sensitivity.iloc[0] == pd.Timestamp("2025-11-02 23:45:00", tz="UTC")
+    assert sensitivity.iloc[1] == EXACT_PLAN_REQUESTS_FROM_UTC
 
 
 def test_timetable_features_use_latest_asof_snapshot_and_numpy_path():

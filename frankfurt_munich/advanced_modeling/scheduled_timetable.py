@@ -4,9 +4,9 @@ The parsed plan archive is published at
 https://huggingface.co/datasets/piebro/deutsche-bahn-data/tree/d27b9c413536bb5fe393954371f572050e55176b/monthly_processed_data_plan
 and documents ``snapshot_timestamp`` as the API request time. The older
 fetcher encoded the requested timetable hour in ``{eva}_plan_{hour}.xml``.
-Following the user decision on 5 November 2026, the earliest legacy plan
-per stop is accepted as its static schedule regardless of fetch time.
-Exact-request updates remain cutoff-bound.
+Following the user decisions of 5 and 12 November 2026, the earliest plan
+snapshot per stop is accepted as its static schedule regardless of fetch
+time, in the legacy period and in the period with exact request stamps.
 
 The default builder reads only CV journeys and their stop IDs.  The optional
 holdout builder calls the committed-registration gate before its first holdout
@@ -76,7 +76,7 @@ TIMETABLE_COLUMNS = [
 
 
 def _asof_by_id(queries: pd.DataFrame, snapshots: pd.DataFrame) -> pd.DataFrame:
-    """Attach the latest plan state under the static-legacy timetable policy."""
+    """Attach the plan state under the static timetable policy."""
     if queries.empty or snapshots.empty:
         return queries.copy()
     available = snapshots.loc[snapshots["available_at_utc"].notna()]
@@ -620,9 +620,9 @@ def build_timetable_split(
                 "first_non_hour_archive_stamp_utc": str(EXACT_PLAN_REQUESTS_FROM_UTC),
                 "legacy_plan_maximum_fetch_lag": None,
             },
-            "legacy_plan_policy": "earliest legacy snapshot per stop is a static schedule, regardless of fetch time, by user instruction",
+            "legacy_plan_policy": "earliest snapshot per stop is a static schedule, regardless of fetch time, in both archive periods, by user instruction (5 and 12 November 2026)",
             "change_source_bound": "+45 minutes remains specific to legacy change snapshots only",
-            "feature_policy": "Use the earliest legacy plan per stop as a static schedule; exact-request updates remain bounded by predicted_at in UTC.",
+            "feature_policy": "Use the earliest plan snapshot per stop as a static schedule, before and after the first exact request stamp.",
         },
         "split": split,
         "cv_only": split == "cv",

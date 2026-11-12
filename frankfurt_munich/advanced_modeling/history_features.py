@@ -51,7 +51,8 @@ FEATURE_COLUMNS_BY_GROUP = {
 SNAPSHOT_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:27:54.653106", tz="UTC")
 PLAN_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:32:22.619260", tz="UTC")
 LEGACY_REQUEST_UPPER_BOUND = pd.Timedelta(minutes=45)
-LEGACY_PLAN_AVAILABLE_UTC = pd.Timestamp("1900-01-01", tz="UTC")
+STATIC_PLAN_AVAILABLE_UTC = pd.Timestamp("1900-01-01", tz="UTC")
+LEGACY_PLAN_AVAILABLE_UTC = STATIC_PLAN_AVAILABLE_UTC  # earlier name, kept for imports
 
 CHANGE_COLUMNS = [
     "id", "station_name", "snapshot_timestamp", "train_type", "train_number",
@@ -83,20 +84,27 @@ def request_upper_bound_utc(snapshot_timestamp: pd.Series) -> pd.Series:
 
 def plan_availability_utc(snapshot_timestamp: pd.Series, *,
                           legacy_hour_label_offset: pd.Timedelta | None = None) -> pd.Series:
-    """Use legacy plans as static schedules under the user-approved policy.
+    """Treat every plan snapshot as a static schedule.
 
-    Exact request timestamps remain cutoff-bound. The optional legacy offset
-    preserves the earlier sensitivity calculation for reproducibility.
+    A timetable is published long before the day of travel; the snapshot stamp
+    says when the archive fetched it, not when it was known. The group decided
+    this for the legacy plans on 5 November 2026 and for the plans with exact
+    request stamps (from 3 November 2025) on 12 November 2026.
+
+    The optional legacy offset reproduces the earlier sensitivity calculation:
+    legacy plans are bounded by their hour label plus the offset, and exact
+    request stamps are kept as they are.
     """
     stamps = pd.to_datetime(snapshot_timestamp, utc=True).dt.as_unit("ns")
+    if legacy_hour_label_offset is None:
+        static = pd.Series(STATIC_PLAN_AVAILABLE_UTC, index=stamps.index).dt.as_unit("ns")
+        return static.where(stamps.notna())
     legacy = stamps.lt(PLAN_EXACT_UTC_FROM)
-    availability = (stamps + legacy_hour_label_offset if legacy_hour_label_offset is not None
-                    else LEGACY_PLAN_AVAILABLE_UTC)
-    return stamps.where(~legacy, availability)
+    return stamps.where(~legacy, stamps + legacy_hour_label_offset)
 
 
 def prepare_plan_snapshots(snapshots: pd.DataFrame) -> pd.DataFrame:
-    """Select the earliest legacy schedule per stop and retain exact updates."""
+    """Keep the earliest plan snapshot per stop as its static schedule."""
     plans = snapshots.copy()
     if plans.empty:
         return plans.assign(available_at_utc=pd.Series(dtype="datetime64[ns, UTC]"))
@@ -632,7 +640,7 @@ def build_history_dynamics_split(
         "holdout_target_columns_read": False,
         "prediction_rows": int(len(dynamics)),
         "upstream_events": int(len(persisted_events)),
-        "legacy_plan_policy": "earliest legacy plan per stop used as a static schedule by user instruction",
+        "legacy_plan_policy": "earliest plan snapshot per stop used as a static schedule in both archive periods, by user instruction (5 and 12 November 2026)",
         "replacement_rows_using_scheduled_run": int(use_scheduled.sum()),
     }
     audit_path = output_dir / f"history_{split}_audit.json"

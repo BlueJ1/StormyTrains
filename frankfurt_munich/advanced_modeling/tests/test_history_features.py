@@ -627,7 +627,7 @@ def test_reliability_builder_passes_cutoff_announcement_into_service_gate(tmp_pa
     assert result["corridor_mean_delay_min_24h"] == pytest.approx(90.0)
 
 
-def test_legacy_plan_is_static_before_its_label_and_exact_updates_stay_asof():
+def test_earliest_plan_is_the_static_schedule_in_both_archive_periods():
     from history_features import latest_plan_asof
 
     queries = pd.DataFrame({
@@ -640,6 +640,8 @@ def test_legacy_plan_is_static_before_its_label_and_exact_updates_stay_asof():
         "marker": [20, 30, 10],
     })
     selected = latest_plan_asof(queries, plans)
-    assert selected.marker.tolist() == [10, 30]
+    # The snapshot of December 2025 carries an exact request stamp. Under the
+    # decision of 12 November 2026 it no longer replaces the earliest plan.
+    assert selected.marker.tolist() == [10, 10]
     assert selected.loc[0, "snapshot_timestamp"] > selected.loc[0, "cutoff_utc"]
     assert selected.loc[0, "_observed_utc"] == pd.Timestamp("1900-01-01", tz="UTC")

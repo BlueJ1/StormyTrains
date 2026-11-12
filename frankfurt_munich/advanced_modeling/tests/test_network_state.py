@@ -88,7 +88,7 @@ def test_delay_activation_expiration_and_next_snapshot_update_are_cutoff_safe():
     assert pd.isna(result.loc[5, share])  # Half-open end at event time + one hour.
 
 
-def test_plan_update_recomputes_event_delay_and_ends_the_previous_state():
+def test_later_plan_snapshot_does_not_replace_the_static_schedule():
     stop = "run-p-2511041000-1"
     changes = [change_row(stop, "Hanau Hbf", timestamp="2025-11-04 08:30:00",
                           arrival="2025-11-04 10:25:00")]
@@ -102,9 +102,11 @@ def test_plan_update_recomputes_event_delay_and_ends_the_previous_state():
 
     result = features(rows, changes, plans)
 
+    # Against the first plan the train is 25 minutes late, before and after
+    # the second plan snapshot was requested.
     share = NETWORK_STATE_COLUMNS[0]
     assert result.loc[0, share] == 1.0
-    assert result.loc[1, share] == 0.0
+    assert result.loc[1, share] == 1.0
 
 
 def test_cancellation_counts_until_a_withdrawal_snapshot():
@@ -163,14 +165,14 @@ def test_legacy_plan_is_static_and_can_establish_delay():
     assert result.loc[0, NETWORK_STATE_COLUMNS[0]] == 1.0
 
 
-def test_earliest_legacy_plan_is_static_until_an_exact_update_arrives():
+def test_earliest_plan_stays_the_schedule_across_both_archive_periods():
     stop = "run-old-2511041000-1"
     changes = [change_row(stop, "Hanau Hbf", timestamp="2025-11-04 08:30:00",
                           arrival="2025-11-04 10:25:00")]
     plans = [
         plan_row(stop, "Hanau Hbf", timestamp="2025-11-02 08:00:00",
                  arrival="2025-11-04 10:00:00"),
-        # Later legacy target-hour labels do not replace the earliest static plan.
+        # Neither a later legacy label nor a later exact request stamp replaces it.
         plan_row(stop, "Hanau Hbf", timestamp="2025-11-02 09:00:00",
                  arrival="2025-11-04 10:20:00"),
         plan_row(stop, "Hanau Hbf", timestamp="2025-11-04 09:40:00",
@@ -182,7 +184,7 @@ def test_earliest_legacy_plan_is_static_until_an_exact_update_arrives():
 
     share = NETWORK_STATE_COLUMNS[0]
     assert result.loc[0, share] == 1.0
-    assert result.loc[1, share] == 0.0
+    assert result.loc[1, share] == 1.0
 
 
 def test_no_unintended_prediction_columns_and_unique_row_alignment():
@@ -194,6 +196,48 @@ def test_no_unintended_prediction_columns_and_unique_row_alignment():
     assert result[ROW_KEY].equals(rows[ROW_KEY])
     assert list(result.columns) == [*ROW_KEY, *NETWORK_STATE_COLUMNS]
     assert result[NETWORK_STATE_COLUMNS].isna().all().all()
+
+
+def test_untyped_change_rows_are_selected_by_ice_ic_plan_ids(tmp_path):
+    """Change rows mostly carry no train type; the plan decides which are ICE/IC.
+
+    Before the fix of 12 November 2026 only change rows with their own train type
+    were read. Those are mostly disrupted trains, so the share was close to 1.
+    """
+    change_dir, plan_dir = tmp_path / "change", tmp_path / "plan"
+    change_dir.mkdir()
+    plan_dir.mkdir()
+    late, punctual, also_punctual, regional = (f"run-{key}-2511041000-1" for key in "abcd")
+    changes = pd.DataFrame([
+        change_row(late, "Hanau Hbf", timestamp="2025-11-04 08:30:00",
+                   arrival="2025-11-04 10:25:00", train_type=None),
+        change_row(punctual, "Hanau Hbf", timestamp="2025-11-04 08:30:00",
+                   arrival="2025-11-04 10:02:00", train_type=None),
+        change_row(also_punctual, "Hanau Hbf", timestamp="2025-11-04 08:30:00",
+                   arrival="2025-11-04 10:05:00", train_type=None),
+        # A regional train that is very late must not enter the ICE/IC share.
+        change_row(regional, "Hanau Hbf", timestamp="2025-11-04 08:30:00",
+                   arrival="2025-11-04 10:50:00", train_type=None),
+    ]).astype({"train_type": "string", "arrival_change_status": "string",
+               "departure_change_status": "string"})
+    november_plans = pd.DataFrame([
+        plan_row(late, "Hanau Hbf"),
+        plan_row(also_punctual, "Hanau Hbf"),
+        plan_row(regional, "Hanau Hbf", train_type="RE"),
+    ])
+    # A stop's plan row can sit in the monthly file before its change rows.
+    october_plans = pd.DataFrame([plan_row(punctual, "Hanau Hbf", timestamp="2025-10-31 23:00:00")])
+    changes.to_parquet(change_dir / "data-2025-11.parquet", index=False)
+    november_plans.to_parquet(plan_dir / "data-2025-11.parquet", index=False)
+    october_plans.to_parquet(plan_dir / "data-2025-10.parquet", index=False)
+    rows = rows_at("2025-11-04 10:45")
+
+    result, audit = build_network_features(rows, change_dir=change_dir, plan_dir=plan_dir,
+                                           stations=sorted(PANEL))
+
+    assert result.loc[0, NETWORK_STATE_COLUMNS[0]] == pytest.approx(1 / 3)
+    assert audit["change_rows_read"] == 3
+    assert audit["change_rows_without_train_type"] == 3
 
 
 def test_missing_plan_archive_fails_instead_of_building_cancellation_only_features(tmp_path):
