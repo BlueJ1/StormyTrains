@@ -16,6 +16,11 @@ import pyarrow.parquet as pq
 ROOT = Path(__file__).resolve().parents[1]
 CHANGE_DIR = ROOT / "data" / "monthly_processed_data_change"
 STATIONS = ["Frankfurt (Main) Hbf", "München Hbf"]
+# First exact request stamp in the change archive (UTC); the same instant as
+# SNAPSHOT_EXACT_UTC_FROM in advanced_modeling/history_features.py. Earlier
+# stamps are block labels, and the request can be up to 45 minutes later.
+EXACT_REQUESTS_FROM_UTC = pd.Timestamp("2025-11-03 03:27:54.653106")
+LEGACY_REQUEST_DELAY = pd.Timedelta(minutes=45)
 COLUMNS = ["id", "snapshot_timestamp", "train_label_type", "replaced_train_type", "replaced_train_number",
            "replaced_train_label_type", "replaced_train_owner", "replaced_train_filter_flags"] + [
     f"{side}_{field}" for side in ("arrival", "departure")
@@ -27,7 +32,12 @@ def read_snapshots(ids: set[str]) -> pd.DataFrame:
     for path in sorted(CHANGE_DIR.glob("data-????-??.parquet")):
         frame = pq.read_table(path, columns=COLUMNS, filters=[("station_name", "in", STATIONS)]).to_pandas()
         parts.append(frame[frame.id.isin(ids)])
-    snaps = pd.concat(parts, ignore_index=True).drop_duplicates(["id", "snapshot_timestamp"])
+    return with_request_times(pd.concat(parts, ignore_index=True).drop_duplicates(["id", "snapshot_timestamp"]))
+
+
+def with_request_times(snaps: pd.DataFrame) -> pd.DataFrame:
+    """Add `request_local`, `block_label` and `known_local`; sort by stop and stamp."""
+    snaps = snaps.copy()
     # snapshot_timestamp is UTC (the request time on the fetching machine), while
     # all train times are German local time. Until early November 2025 it is the
     # start of the 6-hour fetch block, and the request itself can be up to about
@@ -36,6 +46,9 @@ def read_snapshots(ids: set[str]) -> pd.DataFrame:
     snaps["request_local"] = (stamp.dt.tz_localize("UTC").dt.tz_convert("Europe/Berlin")
                               .dt.tz_localize(None))
     snaps["block_label"] = stamp.dt.minute.eq(0) & stamp.dt.second.eq(0) & stamp.dt.microsecond.eq(0)
+    # The latest local time at which the snapshot can have been requested.
+    legacy = snaps.block_label & stamp.lt(EXACT_REQUESTS_FROM_UTC)
+    snaps["known_local"] = snaps.request_local.where(~legacy, snaps.request_local + LEGACY_REQUEST_DELAY)
     return snaps.sort_values(["id", "snapshot_timestamp"])
 
 
@@ -75,3 +88,53 @@ def event_summary(snaps: pd.DataFrame, ids: pd.Series, side: str) -> pd.DataFram
         "first_cancellation_time": canceled_rows.groupby("id")[clt].min(),
     })
     return out.reindex(ids.values).set_axis(ids.index)
+
+
+def cancellation_events(snaps: pd.DataFrame, ids, side: str) -> pd.DataFrame:
+    """Every change of the cancellation state of one `side` ("arrival" or
+    "departure") of the stops in `ids`: one row per change with the stop `id`,
+    the local `time` from which it holds and `in_force`.
+
+    - A cancellation holds from its issue time (`cancellation_time`).
+    - A withdrawal (change status "p") holds from the time the first snapshot
+      that shows it can have been requested (`known_local`). The snapshots carry
+      no time for the withdrawal itself.
+    - A cancellation that is shown again after a withdrawal, with an issue time
+      from before that withdrawal, holds from the time its snapshot can have
+      been requested.
+    """
+    issue_col, status_col = f"{side}_cancellation_time", f"{side}_change_status"
+    s = snaps[snaps.id.isin(set(ids))]
+    s = s[s[issue_col].notna() | s[status_col].eq("p")].sort_values(["id", "snapshot_timestamp"])
+    rows = []
+    for stop_id, group in s.groupby("id", sort=False):
+        seen, withdrawn_at = set(), None
+        for issue, status, known in zip(group[issue_col], group[status_col], group["known_local"]):
+            if pd.notna(issue) and issue not in seen:
+                seen.add(issue)
+                rows.append((stop_id, issue if withdrawn_at is None or issue > withdrawn_at else known, True))
+            elif pd.notna(issue) and status != "p" and withdrawn_at is not None and not rows[-1][2]:
+                rows.append((stop_id, known, True))
+            if status == "p" and (not rows or rows[-1][0] != stop_id or rows[-1][2]):
+                rows.append((stop_id, known, False))
+                withdrawn_at = known
+    events = pd.DataFrame(rows, columns=["id", "time", "in_force"])
+    events["time"] = pd.to_datetime(events["time"]).astype("datetime64[ns]")
+    events["in_force"] = events.in_force.astype(bool)
+    events["order"] = range(len(events))
+    return events
+
+
+def cancellation_in_force(events: pd.DataFrame, ids: pd.Series, when: pd.Series) -> pd.Series:
+    """Whether a cancellation of the stops `ids` is in force at the local times
+    `when`; both are indexed alike. The state is that of the latest change at or
+    before `when`; a stop without any change is not cancelled."""
+    query = pd.DataFrame({"id": ids, "when": when.astype("datetime64[ns]")}).reset_index(names="_key")
+    usable = query.dropna(subset=["id", "when"]).sort_values("when")
+    if events.empty or usable.empty:
+        return pd.Series(False, index=ids.index)
+    state = pd.merge_asof(
+        usable, events.sort_values(["time", "order"]), left_on="when", right_on="time", by="id",
+        direction="backward", allow_exact_matches=True)
+    in_force = state.set_index("_key").in_force.eq(True)
+    return in_force.reindex(ids.index, fill_value=False)

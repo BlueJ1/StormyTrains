@@ -432,7 +432,7 @@
     "with_cancellation_time": 956,
     "issued_before_planned_departure_by": {
       "24h_or_more": 41,
-      "6h_or_more": 127,
+      "6h_or_more": 130,
       "1h_or_more": 393,
       "20min_or_more": 513,
       "0min_or_more": 560

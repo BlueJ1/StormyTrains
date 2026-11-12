@@ -7,7 +7,7 @@ The modelling dataset for the chosen origin–destination pair: railway data, an
   - each departure is kept once;
   - journeys over 7 h and journeys with an additional stop at Frankfurt or München are dropped;
   - `current_delay` is added at each prediction time;
-  - the time a cancellation was announced is added, so that no prediction is made once a cancellation is known;
+  - the time a cancellation was announced is added, and no prediction is made while a cancellation is in force;
   - the data are split by week into a cross-validation set (about 80% of the weeks, in 5 folds) and a hold-out set (about 20%).
 - **Source:** the 27 monthly files from July 2024 to September 2026 and the matching live-update snapshots, as rebuilt by the source on 6–8 October 2026 and downloaded on 8 October 2026 (checked against the published SHA-256 sums).
 
@@ -19,9 +19,9 @@ The modelling dataset for the chosen origin–destination pair: railway data, an
 |---|---|---|
 | `data/journeys_cv.parquet` | 17,507 | The cross-validation set: journeys in 95 of the 118 weeks, planned Frankfurt departure from 1 July 2024 to 30 September 2026, with their `fold` |
 | `data/journeys_holdout.parquet` | 4,324 | The hold-out set: journeys in the other 23 weeks |
-| `data/prediction_rows_cv.parquet` | 85,901 | One row per CV journey and prediction time, without known cancellations (see below). A model for one prediction time uses the rows with that `prediction_time` |
-| `data/prediction_rows_holdout.parquet` | 21,260 | The same for the hold-out set |
-| `data/prediction_rows_weather_cv.parquet`, `data/prediction_rows_weather_holdout.parquet` | 85,901, 21,260 | The prediction rows, same order, with the weather known at the prediction time added (see [Weather](#weather)) |
+| `data/prediction_rows_cv.parquet` | 85,826 | One row per CV journey and prediction time, without the journeys whose cancellation is in force then (see below). A model for one prediction time uses the rows with that `prediction_time` |
+| `data/prediction_rows_holdout.parquet` | 21,236 | The same for the hold-out set |
+| `data/prediction_rows_weather_cv.parquet`, `data/prediction_rows_weather_holdout.parquet` | 85,826, 21,236 | The prediction rows, same order, with the weather known at the prediction time added (see [Weather](#weather)) |
 | `data/stops.parquet` | 133,794 | Recorded stops from Frankfurt to München of the kept journeys |
 | `data/upstream_runs.parquet` | 116,528 | Every recorded stop of each run up to and including Frankfurt, used for `current_delay` |
 | `split_weeks.csv` | 118 | The committed week assignment: `week_start` (Monday), `split` (`cv` or `holdout`), `fold` |
@@ -51,13 +51,13 @@ One row per kept journey (one per departure), sorted by planned Frankfurt depart
 | `shared_departure` | Number of journeys listed for this departure before one was kept (see "One journey per departure") |
 | `starts_at_origin` | The run begins at Frankfurt, so it has no upstream stops |
 | `current_delay_24h` … `current_delay_0min` | Latest known delay at each prediction time, in minutes (see "current_delay") |
-| `cancellation_announced` | When the cancellation of the Frankfurt departure or München arrival was issued, the earlier of the two; missing for journeys that ran |
+| `cancellation_announced` | When a cancellation of the cancelled Frankfurt departure or München arrival was first issued, the earlier of the two; missing for journeys that ran |
 | `cancellation_withdrawn` | A cancellation was announced and later withdrawn, and the train ran |
 | `fold` | CV file only: the cross-validation fold, 1 to 5 (see "Hold-out set and cross-validation folds") |
 
 ### `prediction_rows_cv.parquet` and `prediction_rows_holdout.parquet`
 
-One row per journey and prediction time, sorted by planned departure, journey and prediction time. Journeys whose cancellation was already announced at that time have no row (see "When cancellations were issued").
+One row per journey and prediction time, sorted by planned departure, journey and prediction time. A journey has no row at a prediction time at which a cancellation of its Frankfurt departure or München arrival was in force (see "When cancellations were issued").
 
 | Column | Meaning |
 |---|---|
@@ -124,10 +124,11 @@ Both `data/monthly_processed_data` and `data/monthly_processed_data_change` from
 |---|---|
 | `build_dataset.py` | Builds every file in `data/` and `build_audit.json`; with `--new-split` it first makes a new `split_weeks.csv` |
 | `folds.py` | Hold-out set and cross-validation folds |
-| `snapshots.py` | Reads the live-update snapshots; used by the two scripts above and below |
+| `snapshots.py` | Reads the live-update snapshots and builds the cancellation timeline; used by `build_dataset.py` and `check_change_data.py` |
 | `audit.py` | Data-quality audit, `audit.json` |
 | `check_change_data.py` | Where each label comes from and when cancellations were announced, `change_check.json` and `data/change_check.parquet` |
 | `weather_features.py` | Adds the weather features to the prediction rows, `data/prediction_rows_weather_*.parquet` and `weather_features_audit.json` |
+| `tests/` | Tests of the cancellation rule and of `current_delay` (`.venv/bin/python -m pytest frankfurt_munich/tests`) |
 
 ## Hold-out set and cross-validation folds
 
@@ -186,9 +187,9 @@ Journeys where Frankfurt was added and numbered from 100 while München was not 
 
 The value is the latest delay known at that moment, from the train's own run up to Frankfurt:
 
-- The latest non-cancelled arrival or departure that has happened by then.
+- The latest non-cancelled arrival or departure that has happened by then. The departure from Frankfurt itself is not used (since 12 November 2026): at 0 min it would be known only for trains that left on time, so the value would say whether the train left on time.
 - If that event is an arrival (the train is standing at a stop and has not left yet), the delay accumulated by then. That is the larger of the arrival delay and the minutes since the planned departure from that stop.
-- Missing if nothing has happened yet.
+- Missing if nothing has happened yet. A train that starts in Frankfurt has no value at any prediction time.
 
 Only stations in `data/stations_present_in_all_months.csv` are used, so the coverage expansion on 3 November 2025 does not add upstream stops from then on.
 
@@ -200,9 +201,7 @@ Missing values in the CV set (17,507 journeys):
 | 6 h | 16,578 (95%) | 2,106 | 14,382 | 90 | 5.6% vs 3.6% |
 | 1 h | 2,519 (14%) | 2,106 | 323 | 90 | 10.3% vs 4.7% |
 | 20 min | 2,435 (14%) | 2,106 | 239 | 90 | 10.0% vs 4.7% |
-| 0 min | 1,804 (10%) | 1,559 | 155 | 90 | 12.9% vs 4.6% |
-
-At 0 min, the 1,559 trains that start in Frankfurt and have no value had not left by their scheduled time.
+| 0 min | 2,367 (14%) | 2,106 | 171 | 90 | 10.2% vs 4.7% |
 
 **Decided treatment.** Missing values are not set to plain 0: a 0 means "on time", while from 1 h on a missing value goes with two to three times as many cancellations.
 - 24 h: not used (always missing). 6 h: probably not used (95% missing).
@@ -262,12 +261,12 @@ Our files reproduce the snapshot values exactly for every completed journey.
 
 ## When cancellations were issued
 
-The snapshots carry the time each cancellation was issued (`cancellation_time`). All 956 cancelled CV journeys have one (`cancellation_announced`): the issue time of the cancellation in force at the Frankfurt departure or the München arrival, whichever was earlier.
+The snapshots carry the time each cancellation was issued (`cancellation_time`). All 956 cancelled CV journeys have one (`cancellation_announced`): the first issue time of a cancellation of the cancelled Frankfurt departure or München arrival, whichever was earlier. For 3 CV journeys the latest snapshot carries a later issue time, because the cancellation was withdrawn and issued again.
 
 | Issued at least … before planned departure | Cancelled CV journeys |
 |---|---|
 | 24 h | 41 |
-| 6 h | 127 |
+| 6 h | 130 |
 | 1 h | 393 |
 | 20 min | 513 |
 | 0 min | 560 |
@@ -275,17 +274,24 @@ The snapshots carry the time each cancellation was issued (`cancellation_time`).
 
 So at 1 h ahead, 41% of the eventual cancellations were already announced, and at 20 min ahead, 54%.
 
-**Decision: no prediction when a cancellation is already known.** A journey whose cancellation was announced at or before the prediction time has no prediction row for that prediction time. The journey files keep every journey.
+**Decision: no prediction while a cancellation is in force** (rule of 12 November 2026; `snapshots.cancellation_events`). The journey files keep every journey.
 
-| Prediction time | CV rows | Left out | Cancelled share of the rows | Hold-out rows |
-|---|---|---|---|---|
-| 24 h | 17,466 | 41 | 5.2% | 4,315 |
-| 6 h | 17,380 | 127 | 4.8% | 4,298 |
-| 1 h | 17,114 | 393 | 3.3% | 4,243 |
-| 20 min | 16,994 | 513 | 2.6% | 4,210 |
-| 0 min | 16,947 | 560 | 2.3% | 4,194 |
+- A cancellation of the Frankfurt departure or the München arrival is in force from the time it was issued.
+- A withdrawal ends it. The snapshots carry no time for the withdrawal itself, so it counts from the time the first snapshot that shows it (change status `p`) was requested; for snapshots stamped with the start of a fetch block, 45 min after that stamp. The snapshots are a few hours apart, so a withdrawal can count later than it happened.
+- A journey has no prediction row at a prediction time at which a cancellation of either end was in force, and has rows again once the withdrawal counts.
 
-**Flag: withdrawn cancellations stay in.** A journey whose cancellation was announced and later withdrawn, so the train ran, stays in at every prediction time and keeps its real outcome, even if the cancellation was announced before the prediction time. They are marked `cancellation_withdrawn`: 59 in the CV set and 17 in the hold-out set (32 until September 2025, 44 from October 2025). With the rebuilt source files they all count as completed; 30 of them, all until September 2025, were still marked cancelled in the old files.
+| Prediction time | CV rows | Left out | of them ran in the end | Cancelled share of the rows | Hold-out rows |
+|---|---|---|---|---|---|
+| 24 h | 17,463 | 44 | 3 | 5.2% | 4,313 |
+| 6 h | 17,366 | 141 | 14 | 4.8% | 4,294 |
+| 1 h | 17,096 | 411 | 17 | 3.3% | 4,237 |
+| 20 min | 16,975 | 532 | 18 | 2.6% | 4,204 |
+| 0 min | 16,926 | 581 | 20 | 2.3% | 4,188 |
+
+- **Withdrawn cancellations.** A journey whose cancellation was announced and later withdrawn, so the train ran, is marked `cancellation_withdrawn`: 59 in the CV set and 17 in the hold-out set (32 until September 2025, 44 from October 2025). Of the 59 CV journeys, 39 have a 0 min row; for the other 20 the cancellation was still in force then, as far as the snapshots show. Until 12 November 2026 these journeys kept every row.
+- **Cancelled again.** 3 cancelled CV journeys were announced as cancelled more than 6 h ahead, shown as withdrawn in between and cancelled again. They have a 6 h row and no later ones.
+- **One cancelled CV journey** has no row from 1 h on although its own cancellation was issued later: a cancellation of its other end, later withdrawn, was in force.
+- With the rebuilt source files the withdrawn journeys all count as completed; 30 of them, all until September 2025, were still marked cancelled in the old files.
 
 ## Data-quality audit
 

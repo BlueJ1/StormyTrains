@@ -43,7 +43,9 @@ dropped, so that the whole departure leaves the dataset:
   diverted through München Hbf.
 
 CURRENT DELAY. current_delay at prediction time t is the latest delay known at
-t, from the train's own run up to and including its arrival at Frankfurt:
+t, from the train's own run up to and including its arrival at Frankfurt. The
+departure from Frankfurt itself is not used: at 0 min it would say whether the
+train left on time.
 
 - the latest non-cancelled arrival or departure whose reported time is at or
   before t;
@@ -56,15 +58,21 @@ t, from the train's own run up to and including its arrival at Frankfurt:
 Negative values (early trains) are kept. Missing values are kept; how to fill
 them is decided per model.
 
-KNOWN CANCELLATIONS. No prediction is made for a journey whose cancellation is
-already announced at the prediction time. `cancellation_announced` is the time
-DB issued the cancellation of the cancelled Frankfurt departure or München
-arrival, the earlier of the two, from the live-update snapshots in
-data/monthly_processed_data_change (the monthly files have no issue time). A
-journey has no prediction row at prediction times at or after that moment. A
-cancellation that was later withdrawn, so that the train ran, does not count:
-those journeys keep every prediction row and are marked
-`cancellation_withdrawn`.
+KNOWN CANCELLATIONS. No prediction is made for a journey while a cancellation
+of its Frankfurt departure or its München arrival is in force. The state comes
+from the live-update snapshots in data/monthly_processed_data_change (the
+monthly files have no issue time); see snapshots.cancellation_events:
+
+- a cancellation is in force from the time DB issued it;
+- a withdrawal ends it from the time the first snapshot that shows the
+  withdrawal can have been requested, so a journey whose cancellation was
+  withdrawn has prediction rows again after that (decision of 12 November 2026;
+  before, such journeys kept every prediction row).
+
+`cancellation_announced` is the first time a cancellation of the cancelled
+Frankfurt departure or München arrival was issued, the earlier of the two; it
+is missing for journeys that ran. Journeys that ran after a withdrawn
+cancellation are marked `cancellation_withdrawn`.
 
 Run from the project root: .venv/bin/python frankfurt_munich/build_dataset.py
 With --new-split, a new week assignment is made and written to split_weeks.csv
@@ -88,7 +96,8 @@ import extract  # noqa: E402  corridor_analysis/extract.py
 
 from folds import (ASSIGNMENT_FILE, LATER_PERIOD, assign_splits, new_assignment,  # noqa: E402
                    period_of, read_assignment, week_of)
-from snapshots import event_summary, read_snapshots  # noqa: E402
+from snapshots import (cancellation_events, cancellation_in_force, event_summary,  # noqa: E402
+                       read_snapshots)
 
 INPUT_DIR = ROOT / "data" / "monthly_processed_data"
 PANEL_FILE = ROOT / "data" / "stations_present_in_all_months.csv"
@@ -177,8 +186,10 @@ def read_runs(origin_num: pd.Series) -> pd.DataFrame:
     return runs.sort_values(["journey_id", "train_line_station_num"]).reset_index(drop=True)
 
 
-def events_from(runs: pd.DataFrame) -> pd.DataFrame:
-    """One row per non-cancelled arrival or departure of the runs."""
+def events_from(runs: pd.DataFrame, origin_num: pd.Series) -> pd.DataFrame:
+    """One row per non-cancelled arrival or departure of the runs, up to and
+    including the arrival at Frankfurt (`origin_num` is Frankfurt's position in
+    each run, indexed by journey_id)."""
     keep = ["journey_id", "train_line_station_num", "station_name"]
     arr = runs[keep].assign(
         kind=0, planned=runs.arrival_planned_time, reported=runs.arrival_change_time,
@@ -187,6 +198,7 @@ def events_from(runs: pd.DataFrame) -> pd.DataFrame:
     dep = runs[keep].assign(
         kind=1, planned=runs.departure_planned_time, reported=runs.departure_change_time,
         canceled=runs.departure_is_canceled.fillna(False).astype(bool), next_dep_planned=pd.NaT)
+    dep = dep[dep.train_line_station_num.lt(dep.journey_id.map(origin_num))]
     ev = pd.concat([arr, dep], ignore_index=True)
     ev = ev[ev.planned.notna() & ev.reported.notna() & ~ev.canceled]
     ev["delay"] = (ev.reported - ev.planned).dt.total_seconds() / 60
@@ -204,37 +216,52 @@ def current_delay_at(events: pd.DataFrame, when: pd.Series) -> pd.Series:
     return value.reindex(when.index)
 
 
-def cancellation_times(journeys: pd.DataFrame, stops: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
-    """`cancellation_announced` and `cancellation_withdrawn` (see KNOWN CANCELLATIONS),
-    indexed by journey_id."""
+def cancellation_times(journeys: pd.DataFrame, stops: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+    """`cancellation_announced` and `cancellation_withdrawn`, and whether a
+    cancellation is in force at each prediction time (one column per prediction
+    time); both indexed by journey_id. See KNOWN CANCELLATIONS."""
     canceled = journeys.journey_canceled.astype(bool)
     ends = {"departure": (stops[stops.stop_index.eq(0)], journeys.origin_departure_canceled),
             "arrival": (stops[stops.final_destination], journeys.destination_arrival_canceled)}
     snaps = read_snapshots(set(pd.concat([s.id for s, _ in ends.values()])))
-    announced, ever = [], []
+    announced, ever, later_issue = [], [], []
+    in_force = pd.DataFrame(False, index=journeys.index, columns=list(HORIZONS))
     for side, (end_stops, end_canceled) in ends.items():
-        summary = event_summary(snaps, end_stops.set_index("journey_id").id.reindex(journeys.index), side)
-        # The issue time of the cancellation in force. If the latest snapshot only
-        # carries the cancelled status, the first time a cancellation was seen.
-        issued = summary.latest_cancellation_time.fillna(summary.first_cancellation_time)
-        announced.append(issued.where(end_canceled.astype(bool)))
+        ids = end_stops.set_index("journey_id").id.reindex(journeys.index)
+        summary = event_summary(snaps, ids, side)
+        # The first time a cancellation of this end was issued.
+        issued = summary.first_cancellation_time.where(end_canceled.astype(bool))
+        announced.append(issued)
         ever.append(summary.first_cancellation_time.notna())
+        later_issue.append(end_canceled.astype(bool) & summary.latest_cancellation_time.gt(issued))
+        events = cancellation_events(snaps, ids.dropna(), side)
+        for name, ahead in HORIZONS.items():
+            in_force[name] |= cancellation_in_force(events, ids, journeys.origin_departure_planned_local - ahead)
     out = pd.DataFrame({"cancellation_announced": pd.concat(announced, axis=1).min(axis=1),
                         "cancellation_withdrawn": (ever[0] | ever[1]) & ~canceled})
+    withdrawn = out.cancellation_withdrawn
     audit = {"last_snapshot_utc": str(snaps.snapshot_timestamp.max()),
              "canceled": int(canceled.sum()),
              "canceled_without_announcement_time": int((canceled & out.cancellation_announced.isna()).sum()),
-             "withdrawn": int(out.cancellation_withdrawn.sum())}
-    return out, audit
+             "canceled_with_a_later_issue_time_in_the_latest_snapshot": int((later_issue[0] | later_issue[1]).sum()),
+             "withdrawn": int(withdrawn.sum()),
+             "withdrawn_in_force_at": {name: int((in_force[name] & withdrawn).sum()) for name in HORIZONS},
+             "canceled_not_in_force_after_announcement": {
+                 name: int((canceled & ~in_force[name] & out.cancellation_announced.le(
+                     journeys.origin_departure_planned_local - ahead)).sum())
+                 for name, ahead in HORIZONS.items()}}
+    return out, in_force, audit
 
 
-def prediction_rows(journeys: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
-    """One row per journey and prediction time, without known cancellations."""
+def prediction_rows(journeys: pd.DataFrame, in_force: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    """One row per journey and prediction time, without the journeys whose
+    cancellation is in force then (`in_force`: indexed by journey_id, one
+    column per prediction time)."""
     rows, left_out = [], {}
     columns = PREDICTION_ROW_COLUMNS + (["fold"] if "fold" in journeys else [])
     for name, ahead in HORIZONS.items():
         at = journeys.origin_departure_planned_local - ahead
-        known = journeys.cancellation_announced.le(at)
+        known = pd.Series(in_force[name].reindex(journeys.journey_id).to_numpy(), index=journeys.index)
         left_out[name] = int(known.sum())
         rows.append(journeys.loc[~known, columns].assign(
             prediction_time=name, predicted_at=at[~known], current_delay=journeys[f"current_delay_{name}"][~known]))
@@ -265,13 +292,13 @@ def main(new_split: bool = False) -> None:
     off_panel = ~runs.station_name.isin(panel)
     runs_audit = {"run_stops_read": int(len(runs)), "run_stops_off_panel": int(off_panel.sum())}
     runs = runs[~off_panel]
-    events = events_from(runs)
+    events = events_from(runs, origin_num)
     j["starts_at_origin"] = origin_num.reindex(j.index).eq(1)
     for name, ahead in HORIZONS.items():
         j[f"current_delay_{name}"] = current_delay_at(events, j.origin_departure_planned_local - ahead)
 
     # When cancellations were announced
-    cancellations, cancel_audit = cancellation_times(j, stops)
+    cancellations, in_force, cancel_audit = cancellation_times(j, stops)
     j = j.join(cancellations).reset_index()
 
     # Split, folds and prediction rows
@@ -283,7 +310,7 @@ def main(new_split: bool = False) -> None:
     left_out = {}
     for split, frame in splits.items():
         write(frame, f"journeys_{split}.parquet")
-        rows, left_out[split] = prediction_rows(frame)
+        rows, left_out[split] = prediction_rows(frame, in_force)
         write(rows, f"prediction_rows_{split}.parquet")
     write(stops, "stops.parquet")
     write(runs, "upstream_runs.parquet")
