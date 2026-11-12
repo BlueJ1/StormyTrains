@@ -1,5 +1,7 @@
 % Draft of the final report, Project in Data Science (1DL507), HT2026.
-% First draft: 10 November 2026. Every \todo marks something the group still has to decide,
+% First draft: 10 November 2026. Decisions of 12 November 2026 recorded; every number is from before
+% the corrections and is replaced after the rerun (finishing plan B4, B6).
+% Every \todo marks something the group still has to decide,
 % check or fill in. Numbers come from the result files named in report/README.md.
 %
 % The course asks for its own LaTeX conference template (Canvas, Templates page). This file
@@ -45,9 +47,7 @@ gradient-boosted trees lower the multi-class log loss from 0.968 (class shares) 
 24 hours and from 0.897 to 0.819 at departure, and the delay error by 4 to 7\%. The reliability of
 the same service over the previous weeks is the most useful new input. Hourly weather observations
 along the route do not improve either prediction: on 23 held-out weeks, all ten paired 95\%
-intervals for the change include zero. Inputs taken from the final records instead of the archive
-make the models look considerably better, which shows how easily such a study overstates what can
-be known in advance.
+intervals for the change include zero.
 \end{abstract}
 
 \section{Introduction}
@@ -140,13 +140,12 @@ fitted for each prediction time and each target.
 
 The monthly files of the source keep, for every stop, only the last reported values. They do not say
 when a value became known. A model trained on them can therefore use information from after the
-prediction time without anyone noticing. We found two such cases in our own first models. The stops
-recorded for a journey (their number and the route they form) depend on the outcome, because a
-diverted or curtailed train records different stops. And the delay of the train on its way to
-Frankfurt was taken from the final records, without checking that it had been reported by the
-prediction time.
+prediction time without anyone noticing. Two examples: the stops recorded for a journey (their
+number and the route they form) depend on the outcome, because a diverted or curtailed train records
+different stops; and the delay of the train on its way to Frankfurt, as it stands in the final
+records, need not have been reported by the prediction time.
 
-All results in this report, unless stated otherwise, therefore use inputs reconstructed from the
+All results in this report therefore use inputs reconstructed from the
 archive of live-update snapshots of the same source. An event counts as known only if a snapshot
 requested at or before the prediction time shows it. The inputs fall into the following groups.
 
@@ -163,10 +162,8 @@ the last 3 and 24 hours.
 time, its change since the previous prediction time, the number of stops reported, the minutes since
 the last report, and the planned minutes still to run before Frankfurt.
 \item \emph{Network state:} the share of long-distance trains delayed by 20~min or more or cancelled
-in the previous hour, over the network, at Frankfurt Hbf and at M\"unchen Hbf. \todo{The review of
-10 November found that this input is built wrongly: it counts almost only disrupted trains, so its
-value is 1.0 in 68\% of the rows where it is known. Fix it or drop the group, then update this
-item and every result that uses it.}
+in the previous hour, over the network, at Frankfurt Hbf and at M\"unchen Hbf. \todo{Being corrected (finishing plan B2): the version behind the current numbers counted almost
+only disrupted trains. Check this item against the corrected code.}
 \item \emph{Weather:} 14 values from hourly DWD observations at the stations along the route, for
 the last full hour before the prediction time: temperature at both ends, the highest and lowest
 temperature, the highest precipitation, mean wind and gust on the route in that hour and over the
@@ -237,8 +234,9 @@ two arms come from 2{,}000 paired bootstrap resamples of whole weeks.
 \subsection{Dataset}
 
 Railway data come from a public archive of Deutsche Bahn timetable and live-update
-records~\cite{piebro_db_data}, of which monthly files exist from July 2024. \todo{The project brief
-names the Bahn-Vorhersage dataset; say in one sentence why this archive was used instead.} We use the
+records~\cite{piebro_db_data}, of which monthly files exist from July 2024. The
+Bahn-Vorhersage data named in the project description had not been made available to us by its
+owners. We use the
 27 months to September 2026. After keeping one journey per departure (a cancelled train and its
 replacement at the same times are one departure for the passenger) and dropping 193 unusual journeys
 (a detour of about nine hours via K\"oln, and trains for which Frankfurt or M\"unchen was an added
@@ -259,7 +257,8 @@ shows a report requested by that time for only 35\%. \todo{Explain the gap. It i
 the change in how the archive was fetched in November 2025: at 1~h the archive share is 37\% before
 3 November 2025 and 33\% after. Where both versions have a value they agree exactly in only 30\% of
 the rows (mean absolute difference 6~min). Find out what limits the archive version before writing
-this paragraph; see the finishing plan.}
+this paragraph (finishing plan B1); the group then decides whether the report gives one version of
+the current delay or both (Q5).}
 
 \begin{table}[t]
 \caption{Prediction rows in the CV set by prediction time, and the share for which a delay of the
@@ -341,25 +340,10 @@ Registered model (hold-out) & 25.15 & 25.03 & 24.61 & 24.49 & 24.27 \\
 
 On the hold-out weeks the severity scores of the registered models agree with the CV scores
 recorded at registration to within 0.003. The delay errors are 0.7~min higher than those CV scores
-at every prediction time. \todo{The CV rows of Table~\ref{tab:cv} use the corrected inputs, the
-hold-out rows the inputs of the first evaluation; make the table consistent once the decision on
-the rerun is taken.} \todo{Add the two
-reference scores on the hold-out set (class shares and training mean), so that the reader can see
-whether the hold-out weeks are simply harder; see the finishing plan.}
-
-\subsection{What counts as known}
-
-Our first models used the stops recorded for each journey and the delay from the final records. With
-these inputs LightGBM reached a log loss of 0.810 and an RMSE of 22.6~min one hour before departure;
-with inputs restricted to the archive it reaches 0.868 and 24.1~min with otherwise comparable
-features. The recorded-stop inputs account for about 0.007 and 0.15~min of this. The rest, about
-0.05 in log loss and 1.4~min, comes from the definition of the current delay. This difference is
-several times larger than the difference between any two model families that we measured.
-
-\todo{This paragraph needs a group decision. The archive version is a lower bound on what a live
-system knows, the final-record
-version is an upper bound that also contains information from after the prediction time. Decide
-whether to report both as a bracket, and check the size of the leak in the final-record version.}
+at every prediction time. \todo{All numbers in this section are from before the corrections decided on 12 November.
+Replace the tables, the figures and this paragraph after the rerun and the second hold-out
+evaluation (finishing plan B4, B6), and add the two reference scores on the hold-out set (class
+shares and training mean).}
 
 \subsection{Which inputs help}
 
@@ -440,8 +424,8 @@ larger than about 0.003 to 0.006 in log loss and 0.13~min in RMSE, not smaller o
 pointwise for ten related comparisons. The route aggregates were available for
 57 to 65\% of the rows. For most journeys from November 2025 on, the archive holds no timetable
 record requested before the prediction time, so the branch of the journey is unknown and only the
-temperatures at the two ends were used. \todo{Decide whether to treat the timetable of these
-journeys as static, as for the earlier period; see the finishing plan.} And days with extreme weather are rare: the groups with heavy rain contain two to four
+temperatures at the two ends were used. \todo{From the rerun on, the timetable of these journeys is treated as static, as for the
+earlier period (decision of 12 November); rewrite these two sentences with the new coverage.} And days with extreme weather are rare: the groups with heavy rain contain two to four
 hold-out journeys per prediction time, so nothing can be said about them.
 
 \subsection{Errors and risk over time}
@@ -482,11 +466,6 @@ the prediction, which a day ahead says little about the weather during the journ
 improved a linear model more than replacing it by any other model family did. On about ten to thirty
 tabular inputs, tuned boosted trees, neural networks and ensembles ended within noise of each other.
 
-\emph{Leakage is easy to introduce.} Inputs that look harmless, such as the list of recorded stops,
-depended on the outcome, and the current delay taken from final records made the models look better
-by more than all our modelling work together. We consider the reconstruction of what was known at
-each prediction time the most transferable part of this project.
-
 \subsection{Limitations}
 \label{sec:limits}
 
@@ -498,21 +477,8 @@ they are tested on, so the scores describe interpolation within the period, not 
 following year. Recent-reliability inputs may use earlier journeys from hold-out weeks, as a
 deployed system would.
 
-\emph{Hold-out inputs.} \todo{Depends on the decision about a rerun, see the finishing plan. Current
-state: the hold-out evaluation was run once, before a code review changed how two input groups are
-built (recent reliability; the delay history of trains that were later replaced). The CV results
-include these fixes, the hold-out results do not. In eight of the ten pairs the models were trained
-on reliability inputs built differently from those of the hold-out rows; both arms of a pair share
-this, so the weather differences should be affected little, the absolute scores possibly more. Also
-disclose that a first registration was withdrawn and replaced on the day of the evaluation after a
-fix to one input, before any hold-out score was computed.}
-
 \emph{Known at the prediction time.} The archive bounds what we can show was known, not what Deutsche
-Bahn's own systems knew. Timetable fields from before November 2025 carry no request time and were
-accepted as static. DWD observations were assumed to be available at the end of their hour.
-\todo{Mention the two selection effects found in the review, if they are not fixed: journeys with a
-withdrawn cancellation are kept at all prediction times, and at 0~min the current delay can be the
-Frankfurt departure itself.}
+Bahn's own systems knew. Timetable fields are treated as static, whatever their request time in the archive. DWD observations were assumed to be available at the end of their hour.
 
 \emph{Weather.} Observations were used, not forecasts. A forecast for the hours of the journey might
 carry information that the weather at the prediction time does not.
@@ -543,9 +509,7 @@ arrival delay can be predicted better than by historical averages from 24 hours 
 but only modestly: the log loss improves by 5\% a day ahead and by 9\% at departure. The recent
 reliability of the service is the most useful input beyond the timetable, gradient-boosted trees and
 linear models are close, and nothing more elaborate did better. Weather observations along the route
-gave no detectable improvement in cross-validation or on held-out weeks. How strictly ``known at
-the prediction time'' is enforced changed the measured accuracy more than any modelling choice, and
-deserves the same care in any study of this kind.
+gave no detectable improvement in cross-validation or on held-out weeks.
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
