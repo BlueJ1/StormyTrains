@@ -49,10 +49,9 @@ def load_advanced_rows(prediction_time: str, *, weather: bool = False,
         rows = merge_inputs(rows, read_inputs(inputs_dir / f"history_{split}.parquet", history_columns))
     if prediction_time not in CURRENT_DELAY_TIMES:
         rows["current_delay"] = float("nan")
-    for group, name in (("recent_reliability", "reliability"),):
-        columns = tuple(c for c in FEATURE_COLUMNS_BY_GROUP[group] if c in extra_inputs)
-        if columns:
-            rows = merge_inputs(rows, read_inputs(inputs_dir / f"{name}_{split}.parquet", columns))
+    reliability = tuple(c for c in FEATURE_COLUMNS_BY_GROUP["recent_reliability"] if c in extra_inputs)
+    if reliability:
+        rows = merge_inputs(rows, read_inputs(inputs_dir / f"reliability_{split}.parquet", reliability))
     if SEQUENCE_COLUMN in extra_inputs:
         rows = merge_inputs(rows, read_inputs(inputs_dir / f"sequence_{split}.parquet", (SEQUENCE_COLUMN,)))
     if weather:

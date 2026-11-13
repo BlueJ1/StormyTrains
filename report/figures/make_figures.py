@@ -52,8 +52,10 @@ plt.rcParams.update({
 
 
 def latest(name):
-    """The most recent run of an experiment arm, as report_cv.py selects it."""
-    runs = sorted(p for p in (RESULTS / name).iterdir() if p.is_dir())
+    """The most recent completed run of an experiment arm, as report_cv.run_index
+    selects it: one with both config.json and summary.csv."""
+    runs = sorted(p for p in (RESULTS / name).iterdir()
+                  if (p / "config.json").is_file() and (p / "summary.csv").is_file())
     return runs[-1]
 
 
