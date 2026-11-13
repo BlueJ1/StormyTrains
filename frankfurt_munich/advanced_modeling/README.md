@@ -35,7 +35,7 @@ The prediction cohort supplies the planned Frankfurt departure and München arri
 
 Recent-reliability candidates come from the same target-free stop roster for CV and holdout. Both builds reconstruct past outcomes from snapshots available at each cutoff. The resulting rates describe journeys with observed outcomes. A missing arrival report stays unknown. An archive check found a destination arrival report somewhere in the snapshots for 16,550 of 16,551 completed CV journeys. That check measures archive coverage. At an individual cutoff, the builder still requires a visible report and an arrival time at or before the cutoff.
 
-Input coverage after the rebuild of 13 November 2026 (corrected dataset, static plans in both archive periods, corrected network state). The result tables below are from before this rebuild.
+Input coverage after the rebuild of 13 November 2026 (corrected dataset, static plans in both archive periods). The result tables below are from before this rebuild.
 
 | Input coverage | 24 h | 6 h | 1 h | 20 min | 0 min |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -43,14 +43,14 @@ Input coverage after the rebuild of 13 November 2026 (corrected dataset, static 
 | Planned route available | 17,364 | 17,267 | 16,998 | 16,878 | 16,830 |
 | Weather branch available | 17,363 | 17,266 | 16,997 | 16,877 | 16,829 |
 | Snapshot-based `current_delay` used by models | — | — | 6,654 | 7,331 | 8,758 |
-| Network share known | 17,401 | 17,255 | 17,059 | 16,959 | 16,905 |
 
-The snapshot-based `current_delay` is missing for about half the rows because the archive fetched live updates in blocks about six hours apart: for most journeys the last fetch before the cutoff came before the train had reported from any stop before Frankfurt (finishing plan B1). Since 13 November 2026 it does not use the departure from Frankfurt itself, as in the dataset's `current_delay`. The network share now averages 0.11. The scheduled train type is missing for 24 of the 230 kept replacement journeys, whose replaced train no plan matched; the loader sets it to `unknown`.
+The snapshot-based `current_delay` is missing for about half the rows because the archive fetched live updates in blocks about six hours apart: for most journeys the last fetch before the cutoff came before the train had reported from any stop before Frankfurt (finishing plan B1). Since 13 November 2026 it does not use the departure from Frankfurt itself, as in the dataset's `current_delay`.
+
+Inputs that follow the archive's fetch clock rather than the trains are not used (decisions of 13 November 2026): the network state (step 2.5; `network_state.py` is kept but not run), the corridor reliability over 3 h, the time since the last report and `current_delay_change_min`. When the latest report is an arrival, `current_delay` counts the time the train has stood there since its planned departure only if the same snapshot shows the departure after the cutoff, or the stop is Frankfurt. The scheduled train type is missing for 24 of the 230 kept replacement journeys, whose replaced train no plan matched; the loader sets it to `unknown`.
 
 ```bash
 .venv/bin/python frankfurt_munich/advanced_modeling/scheduled_timetable.py
 .venv/bin/python frankfurt_munich/advanced_modeling/history_features.py --feature all
-.venv/bin/python frankfurt_munich/advanced_modeling/network_state.py
 .venv/bin/python frankfurt_munich/advanced_modeling/build_advanced_weather.py
 .venv/bin/python frankfurt_munich/advanced_modeling/run_advanced.py 0.7 --jobs 4
 .venv/bin/python frankfurt_munich/advanced_modeling/run_advanced.py 1.1 --jobs 4
@@ -96,7 +96,7 @@ After the CV steps are complete, `run_final.py register` ranks eligible pipeline
 .venv/bin/python frankfurt_munich/advanced_modeling/build_advanced_weather.py --split holdout
 ```
 
-Build any additional inputs named by the finalists with `--split holdout`. Use `history_features.py --feature reliability` for recent reliability, `network_state.py` for network state, and `sequence_inputs.py` for upstream sequences. Then run `run_final.py evaluate` once. If a distributional learner is registered, supply its pinned interpreter via `--distribution-python`. The evaluation saves scores, paired week-bootstrap intervals, subgroup errors, calibration, risk trajectories, and SHAP summaries in `results/advanced_holdout/`.
+Build any additional inputs named by the finalists with `--split holdout`. Use `history_features.py --feature reliability` for recent reliability and `sequence_inputs.py` for upstream sequences. Then run `run_final.py evaluate` once. If a distributional learner is registered, supply its pinned interpreter via `--distribution-python`. The evaluation saves scores, paired week-bootstrap intervals, subgroup errors, calibration, risk trajectories, and SHAP summaries in `results/advanced_holdout/`.
 
 #### Holdout results
 
