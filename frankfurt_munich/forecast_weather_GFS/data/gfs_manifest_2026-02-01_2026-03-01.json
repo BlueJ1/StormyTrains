@@ -94,8 +94,8 @@
     },
     "weather": {
       "file": "gfs_weather_2026-02-01_2026-03-01.parquet",
-      "bytes": 1998776,
-      "sha256": "162470053fa43b53e66e4ed77724618858ac1966c2b258b5ed4f46ce29d46565",
+      "bytes": 2012929,
+      "sha256": "a1a4ae6f833d7153f6eeffe55d505a06f1c3a402f2e03d4c9dc8576b4bd33404",
       "nulls": {
         "init_time_utc": 0,
         "lead_hour": 0,
@@ -106,9 +106,24 @@
         "precipitation_1h_mm": 1792,
         "wind_speed_10m_ms": 0,
         "wind_gust_ms": 0,
-        "snow_depth_cm": 0
+        "snow_depth_cm": 0,
+        "wrtr": 7559
       }
     }
   },
-  "negative_hourly_precip_values_in_read_window": 0
+  "negative_hourly_precip_values_in_read_window": 0,
+  "precipitation_type": {
+    "method": "noaa_gfs_hour_and_instantaneous_phase_v2",
+    "source": "https://noaa-gfs-bdp-pds.s3.amazonaws.com",
+    "wet_rows": 27759,
+    "wet_rows_without_code": 5767,
+    "wet_rows_filled_from_bucket": 1050,
+    "missing_forecast_indices": 0,
+    "code_counts": {
+      "0": 58257,
+      "6": 17243,
+      "7": 4749
+    },
+    "source_weather_sha256": "162470053fa43b53e66e4ed77724618858ac1966c2b258b5ed4f46ce29d46565"
+  }
 }

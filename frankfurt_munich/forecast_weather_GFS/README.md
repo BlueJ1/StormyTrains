@@ -11,10 +11,25 @@ The files in `data/` cover weather valid from 2025-09-30 through 2026-09-30, inc
 | File | Contents |
 |---|---|
 | `gfs_raw_*.parquet` | Archive values for 2 m temperature (°C), precipitation accumulation (kg/m²), 10 m wind components and surface gust (m/s), and snow depth (m). |
-| `gfs_weather_*.parquet` | Temperature (°C), precipitation in the preceding hour (mm), 10 m wind speed and surface gust (m/s), and snow depth (cm). |
+| `gfs_weather_*.parquet` | Temperature (°C), precipitation in the preceding hour (mm), 10 m wind speed and surface gust (m/s), snow depth (cm), and precipitation type (`wrtr`). |
 | `gfs_manifest_*.json` | Date bounds, grid points, row counts, missing-value counts, file sizes and SHA-256 hashes. |
 
 GFS precipitation accumulates over the preceding 1–6 hours. The export differences consecutive leads within each six-hour accumulation period and uses the source amount directly at the first hour of each period. Precipitation at lead zero and negative hourly differences are missing. The raw table preserves the original archive values.
+
+## Precipitation type
+
+`add_gfs_wrtr.py` adds a nullable integer `wrtr` column to the processed Parquet. It follows the DWD code meanings used in this project. `0` means no precipitation, `6` means liquid (rain or freezing rain), `7` means solid (snow or ice pellets), and `8` means both liquid and solid. [DWD WRTR codes](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/DESCRIPTION_obsgermany_climate_hourly_precipitation_en.pdf)
+
+The script reads the four NOAA GFS precipitation-type flags for the same run, lead and grid point. For a wet hour, it uses the interval flags if that hour accounts for all precipitation in the 1–6 hour accumulation window. Otherwise, it uses the instantaneous flags at the end of the hour. Missing hourly amounts and wet hours without a usable type stay null. The manifest records the number of wet rows with an unknown type. [NOAA GFS product inventory](https://www.nco.ncep.noaa.gov/pmb/products/gfs/gfs.t00z.pgrb2.0p25.f003.shtml)
+
+From 2025-09-30 through 2026-09-30, GFS forecast a positive hourly precipitation amount in 215,506 rows. In 64,807 of those rows (30.1%), the available flags did not identify the precipitation type, so `wrtr` is null.
+
+Run this on completed exports and write the updated files to a separate directory.
+
+```sh
+python -m pip install eccodes requests
+python add_gfs_wrtr.py gfs_weather_base --output data_with_wrtr
+```
 
 ## Run
 
@@ -27,6 +42,6 @@ python -m pip install 'dynamical-catalog==1.1.1' pyarrow
 ZARR_ASYNC__CONCURRENCY=16 python download_gfs_weather.py --start 2025-09-30 --end 2025-10-01 --output gfs_weather_sample
 ```
 
-The one-day command writes its output to `gfs_weather_sample/`. To regenerate this dataset, run `python download_gfs_weather.py --start 2025-09-30 --end 2026-10-01 --output data`. For other ranges, `--end` is exclusive. Rerunning an interval verifies and skips completed parts. The remote archive reads full spatial chunks, so the data transferred can be much larger than the station Parquet files.
+The one-day command writes its output to `gfs_weather_sample/`. For the full published date range, run `python download_gfs_weather.py --start 2025-09-30 --end 2026-10-01 --output gfs_weather_base`, then run the precipitation-type step above. For other ranges, `--end` is exclusive. Rerunning an interval verifies and skips completed parts. The remote archive reads full spatial chunks, so the data transferred can be much larger than the station Parquet files.
 
 NOAA NWS NCEP GFS data processed by dynamical.org from NOAA Open Data Dissemination archives. [Dataset and CC BY 4.0 attribution](https://dynamical.org/catalog/noaa-gfs-forecast-virtual/).
