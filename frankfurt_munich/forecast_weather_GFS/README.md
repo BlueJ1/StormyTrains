@@ -1,6 +1,6 @@
 # StormyTrains GFS weather data
 
-We chose NOAA's Global Forecast System (GFS) because the [dynamical.org archive](https://dynamical.org/catalog/noaa-gfs-forecast-virtual/) covers our study period and preserves each forecast run. GFS starts a new run every six hours. Our extract provides hourly temperature, precipitation, wind speed, gusts and snow depth along the Frankfurt–München route, up to 48 hours after each run starts. The run and valid times help us match the weather forecast to each train prediction cutoff and planned journey.
+We chose NOAA's Global Forecast System (GFS) because the [dynamical.org archive](https://dynamical.org/catalog/noaa-gfs-forecast-virtual/) covers our study period and preserves each forecast run. GFS starts a new run every six hours. Our extract provides hourly temperature, precipitation amount and type (`wrtr`), wind speed, gusts, and snow depth along the Frankfurt–München route, up to 48 hours after each run starts. The run and valid times help us match the weather forecast to each train prediction cutoff and planned journey.
 
 Historical coverage drove the choice of forecast source. The DWD regional forecast archives we found did not provide continuous coverage of individual runs across the full study period. For example, dynamical.org's DWD ICON-EU archive starts on 10 February 2026. [DWD ICON-EU archive](https://dynamical.org/catalog/dwd-icon-eu-forecast-5-day/)
 
