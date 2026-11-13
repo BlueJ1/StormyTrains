@@ -4,9 +4,9 @@ The parsed plan archive is published at
 https://huggingface.co/datasets/piebro/deutsche-bahn-data/tree/d27b9c413536bb5fe393954371f572050e55176b/monthly_processed_data_plan
 and documents ``snapshot_timestamp`` as the API request time. The older
 fetcher encoded the requested timetable hour in ``{eva}_plan_{hour}.xml``.
-Following the user decision on 5 November 2026, the earliest legacy plan
-per stop is accepted as its static schedule regardless of fetch time.
-Exact-request updates remain cutoff-bound.
+Following the user decisions of 5 and 12 November 2026, the earliest plan
+snapshot per stop is accepted as its static schedule regardless of fetch
+time, in the legacy period and in the period with exact request stamps.
 
 The default builder reads only CV journeys and their stop IDs.  The optional
 holdout builder calls the committed-registration gate before its first holdout
@@ -76,7 +76,7 @@ TIMETABLE_COLUMNS = [
 
 
 def _asof_by_id(queries: pd.DataFrame, snapshots: pd.DataFrame) -> pd.DataFrame:
-    """Attach the latest plan state under the static-legacy timetable policy."""
+    """Attach the plan state under the static timetable policy."""
     if queries.empty or snapshots.empty:
         return queries.copy()
     available = snapshots.loc[snapshots["available_at_utc"].notna()]
@@ -145,17 +145,15 @@ def build_timetable_features(
     ]].rename(columns={"plan_query_id": "id"})
     origin = _asof_by_id(queries, plan_snapshots)
 
-    # Upstream minutes need the first stop's planned departure at the same
-    # cutoff.  The source stop ID sequence is stable within a ride ID.
+    # Upstream minutes run from the start of the run to Frankfurt. The run's
+    # planned start is the last part of its ID (`yymmddHHMM`, local time), so it
+    # is known even when the first stop has no plan row (decision of
+    # 13 November 2026). Where that row exists, the two agree exactly.
     origin = origin.set_index("_query_id").reindex(target["_query_id"])
     origin_ids = origin["id"].astype("string")
     ride_ids = origin_ids.str.rsplit("-", n=1).str[0].where(origin_ids.str.contains("-"))
-    upstream_queries = pd.DataFrame({
-        "_query_id": origin.index,
-        "id": ride_ids + "-1",
-        "cutoff_utc": origin["cutoff_utc"],
-    })
-    upstream = _asof_by_id(upstream_queries, plan_snapshots).set_index("_query_id")
+    run_start = pd.to_datetime(ride_ids.str.rsplit("-", n=1).str[-1], format="%y%m%d%H%M",
+                               errors="coerce")
 
     visible = origin.get("available_at_utc", pd.Series(pd.NaT, index=origin.index)).notna()
     stop_number = origin_ids.str.rsplit("-", n=1).str[-1].str.strip()
@@ -166,10 +164,7 @@ def build_timetable_features(
     tails = paths.where(visible).map(_path_to_destination)
     routes = tails.map(lambda tail: [ORIGIN, *tail] if tail else None)
     arrival = pd.to_datetime(origin.get("arrival_planned_time", pd.Series(pd.NaT, index=origin.index)))
-    departure = pd.to_datetime(
-        upstream.get("departure_planned_time", pd.Series(pd.NaT, index=upstream.index))
-    )
-    minutes = (arrival - departure).dt.total_seconds().div(60)
+    minutes = (arrival - run_start).dt.total_seconds().div(60)
     minutes = minutes.mask(starts.fillna(False), 0.0).where(visible)
 
     result = target[ROW_KEY].copy()
@@ -620,9 +615,9 @@ def build_timetable_split(
                 "first_non_hour_archive_stamp_utc": str(EXACT_PLAN_REQUESTS_FROM_UTC),
                 "legacy_plan_maximum_fetch_lag": None,
             },
-            "legacy_plan_policy": "earliest legacy snapshot per stop is a static schedule, regardless of fetch time, by user instruction",
+            "legacy_plan_policy": "earliest snapshot per stop is a static schedule, regardless of fetch time, in both archive periods, by user instruction (5 and 12 November 2026)",
             "change_source_bound": "+45 minutes remains specific to legacy change snapshots only",
-            "feature_policy": "Use the earliest legacy plan per stop as a static schedule; exact-request updates remain bounded by predicted_at in UTC.",
+            "feature_policy": "Use the earliest plan snapshot per stop as a static schedule, before and after the first exact request stamp.",
         },
         "split": split,
         "cv_only": split == "cv",

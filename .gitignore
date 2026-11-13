@@ -1,9 +1,11 @@
-# Python and editor files
+# Python, editor and assistant files
 .venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.pytest_cache/
 .idea/
+.claude/
 .DS_Store
 
 # Raw monthly railway data (about 7 GB), obtained separately
@@ -41,3 +43,14 @@ data/monthly_processed_data_plan/
 
 # Frankfurt–München weather: DWD archives downloaded by frankfurt_munich/weather_features.py.
 frankfurt_munich/weather/raw/
+
+# Report: LaTeX build files. The PDF is ignored by the *.pdf rule above, except the figures.
+report/*.aux
+report/*.bbl
+report/*.blg
+report/*.log
+report/*.out
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+!report/figures/*.pdf

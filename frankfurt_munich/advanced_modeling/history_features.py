@@ -20,6 +20,9 @@ import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 
+import _paths  # noqa: F401  frankfurt_munich on sys.path, for snapshots
+from snapshots import EXACT_REQUESTS_FROM_UTC, LEGACY_REQUEST_DELAY, request_upper_bound
+
 HERE = Path(__file__).resolve().parents[1]  # frankfurt_munich
 ROOT = HERE.parent
 CHANGE_DIR = ROOT / "data" / "monthly_processed_data_change"
@@ -28,30 +31,29 @@ DATA_DIR = HERE / "data"
 
 ROW_KEY = ["journey_id", "prediction_time", "predicted_at"]
 PREDICTION_TIMES = ["24h", "6h", "1h", "20min", "0min"]
+# Decisions of 13 November 2026: no input may follow the archive's six-hourly
+# fetch clock instead of the trains. So there is no corridor window shorter
+# than the fetch cycle (3 h), no time since the last report, no change of
+# current_delay between prediction times (mostly whether a fetch fell in
+# between) and no network state.
 RECENT_RELIABILITY_COLUMNS = [
     "service_severe_or_cancelled_rate_7d", "service_mean_delay_min_7d",
     "service_severe_or_cancelled_rate_28d", "service_mean_delay_min_28d",
     "corridor_severe_or_cancelled_rate_24h", "corridor_mean_delay_min_24h",
-    "corridor_severe_or_cancelled_rate_3h", "corridor_mean_delay_min_3h",
 ]
 DELAY_DYNAMICS_COLUMNS = [
-    "current_delay", "current_delay_change_min", "upstream_stops_reported",
-    "minutes_since_last_report", "planned_minutes_remaining_before_frankfurt",
-]
-NETWORK_STATE_COLUMNS = [
-    "network_delayed_or_cancelled_share_1h",
-    "network_frankfurt_delayed_or_cancelled_share_1h",
-    "network_munich_delayed_or_cancelled_share_1h",
+    "current_delay", "upstream_stops_reported",
+    "planned_minutes_remaining_before_frankfurt",
 ]
 FEATURE_COLUMNS_BY_GROUP = {
     "recent_reliability": RECENT_RELIABILITY_COLUMNS,
     "delay_dynamics": DELAY_DYNAMICS_COLUMNS,
-    "network_state": NETWORK_STATE_COLUMNS,
 }
-SNAPSHOT_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:27:54.653106", tz="UTC")
+# The change-archive visibility rule is defined once, in snapshots.py.
+SNAPSHOT_EXACT_UTC_FROM = EXACT_REQUESTS_FROM_UTC.tz_localize("UTC")
 PLAN_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:32:22.619260", tz="UTC")
-LEGACY_REQUEST_UPPER_BOUND = pd.Timedelta(minutes=45)
-LEGACY_PLAN_AVAILABLE_UTC = pd.Timestamp("1900-01-01", tz="UTC")
+LEGACY_REQUEST_UPPER_BOUND = LEGACY_REQUEST_DELAY
+STATIC_PLAN_AVAILABLE_UTC = pd.Timestamp("1900-01-01", tz="UTC")
 
 CHANGE_COLUMNS = [
     "id", "station_name", "snapshot_timestamp", "train_type", "train_number",
@@ -67,36 +69,38 @@ PLAN_COLUMNS = [
 
 
 def request_upper_bound_utc(snapshot_timestamp: pd.Series) -> pd.Series:
-    """Latest possible request time for each archive snapshot stamp.
+    """Latest possible request time for each archive snapshot stamp, in UTC.
 
     Before the source switched to exact request timestamps, stamps are six-hour
-    block starts.  Those receive a conservative +45 minute bound.  Exact request
-    timestamps are kept as-is.  A whole-hour timestamp after the transition is
-    treated as exact only if it is at or after the observed first exact timestamp.
+    block starts and receive a conservative +45 minute bound; exact request
+    timestamps are kept as they are. The rule is `snapshots.request_upper_bound`.
     """
-    stamps = pd.to_datetime(snapshot_timestamp, utc=True)
-    block_start = (stamps.dt.minute.eq(0) & stamps.dt.second.eq(0)
-                   & stamps.dt.microsecond.eq(0))
-    legacy = stamps.lt(SNAPSHOT_EXACT_UTC_FROM) & block_start
-    return stamps + legacy.astype("int64") * LEGACY_REQUEST_UPPER_BOUND
+    return request_upper_bound(pd.to_datetime(snapshot_timestamp, utc=True))
 
 
 def plan_availability_utc(snapshot_timestamp: pd.Series, *,
                           legacy_hour_label_offset: pd.Timedelta | None = None) -> pd.Series:
-    """Use legacy plans as static schedules under the user-approved policy.
+    """Treat every plan snapshot as a static schedule.
 
-    Exact request timestamps remain cutoff-bound. The optional legacy offset
-    preserves the earlier sensitivity calculation for reproducibility.
+    A timetable is published long before the day of travel; the snapshot stamp
+    says when the archive fetched it, not when it was known. The group decided
+    this for the legacy plans on 5 November 2026 and for the plans with exact
+    request stamps (from 3 November 2025) on 12 November 2026.
+
+    The optional legacy offset reproduces the earlier sensitivity calculation:
+    legacy plans are bounded by their hour label plus the offset, and exact
+    request stamps are kept as they are.
     """
     stamps = pd.to_datetime(snapshot_timestamp, utc=True).dt.as_unit("ns")
+    if legacy_hour_label_offset is None:
+        static = pd.Series(STATIC_PLAN_AVAILABLE_UTC, index=stamps.index).dt.as_unit("ns")
+        return static.where(stamps.notna())
     legacy = stamps.lt(PLAN_EXACT_UTC_FROM)
-    availability = (stamps + legacy_hour_label_offset if legacy_hour_label_offset is not None
-                    else LEGACY_PLAN_AVAILABLE_UTC)
-    return stamps.where(~legacy, availability)
+    return stamps.where(~legacy, stamps + legacy_hour_label_offset)
 
 
 def prepare_plan_snapshots(snapshots: pd.DataFrame) -> pd.DataFrame:
-    """Select the earliest legacy schedule per stop and retain exact updates."""
+    """Keep the earliest plan snapshot per stop as its static schedule."""
     plans = snapshots.copy()
     if plans.empty:
         return plans.assign(available_at_utc=pd.Series(dtype="datetime64[ns, UTC]"))
@@ -383,19 +387,19 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
     events = events.merge(target[ROW_KEY + ["_row_id", "cutoff_utc"]],
                           on=ROW_KEY, how="inner", suffixes=("", "_target"),
                           validate="many_to_one")
+    # The departure from Frankfurt itself is not used (decision of 13 November
+    # 2026, as for the final-record current_delay): at 0 min it would say
+    # whether the train left on time.
+    frankfurt_departure = (events["station_name"].eq("Frankfurt (Main) Hbf")
+                           & events["event_kind"].eq("departure"))
     occurred = events[
-        events["event_occurred_by_cutoff"] & ~events["event_cancelled"]
+        events["event_occurred_by_cutoff"] & ~events["event_cancelled"] & ~frankfurt_departure
     ].copy()
     if occurred.empty:
         return _empty_dynamics(target)
     report_agg = occurred.groupby("_row_id", sort=False).agg(
         upstream_stops_reported=("event_id", "nunique"),
-        _last_report_receipt_utc=("change_observed_at_utc", "max"),
     )
-    report_agg["minutes_since_last_report"] = (
-        target.set_index("_row_id")["cutoff_utc"].reindex(report_agg.index)
-        - report_agg["_last_report_receipt_utc"]
-    ).dt.total_seconds() / 60
 
     delay_events = occurred[occurred["event_delay_min"].notna()].sort_values(
         ["_row_id", "reported_time_utc", "station_sequence", "_event_kind_order"])
@@ -405,10 +409,22 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
         latest["cutoff_utc"] - local_clock_to_utc(
             latest["stop_departure_planned_time"], ambiguous=False)
     ).dt.total_seconds() / 60
-    current_delay = current_delay.where(
-        latest["event_kind"].ne("arrival"),
-        np.fmax(current_delay, waiting),
-    )
+    # A train whose latest report is an arrival counts as still standing at that
+    # stop only if the same snapshot shows its departure after the cutoff, or if
+    # the stop is Frankfurt. A stale snapshot without a departure time says
+    # nothing about where the train is now.
+    departures = events.loc[
+        events["event_kind"].eq("departure") & events["event_report_visible"]
+        & ~events["event_cancelled"],
+        ["_row_id", "event_id", "reported_time_utc"],
+    ].drop_duplicates(["_row_id", "event_id"])
+    departure_time = latest[["event_id"]].reset_index().merge(
+        departures, on=["_row_id", "event_id"], how="left", validate="one_to_one"
+    ).set_index("_row_id")["reported_time_utc"]
+    standing = latest["event_kind"].eq("arrival") & (
+        departure_time.gt(latest["cutoff_utc"])
+        | latest["station_name"].eq("Frankfurt (Main) Hbf"))
+    current_delay = current_delay.where(~standing, np.fmax(current_delay, waiting))
 
     origin = events[
         events["station_name"].eq("Frankfurt (Main) Hbf")
@@ -422,15 +438,7 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
     features = target.set_index("_row_id")[[*ROW_KEY]].copy()
     features["current_delay"] = current_delay
     features["planned_minutes_remaining_before_frankfurt"] = remaining
-    features = features.join(report_agg[["upstream_stops_reported", "minutes_since_last_report"]])
-    time_order = {name: i for i, name in enumerate(PREDICTION_TIMES)}
-    ordered = features.reset_index().assign(
-        _time_order=lambda frame: frame.prediction_time.map(time_order)
-    ).sort_values(["journey_id", "_time_order"])
-    ordered["current_delay_change_min"] = (
-        ordered.groupby("journey_id", sort=False)["current_delay"].diff())
-    features["current_delay_change_min"] = ordered.set_index("_row_id")[
-        "current_delay_change_min"]
+    features = features.join(report_agg[["upstream_stops_reported"]])
     return features.reset_index(drop=True)
 
 
@@ -499,8 +507,7 @@ def build_delay_dynamics(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
 
 def _empty_dynamics(target: pd.DataFrame) -> pd.DataFrame:
     out = target[["_row_id", *ROW_KEY]].copy().set_index("_row_id")
-    for column in ("current_delay", "current_delay_change_min",
-                   "upstream_stops_reported", "minutes_since_last_report",
+    for column in ("current_delay", "upstream_stops_reported",
                    "planned_minutes_remaining_before_frankfurt"):
         out[column] = np.nan
     return out.reset_index(drop=True)
@@ -632,7 +639,7 @@ def build_history_dynamics_split(
         "holdout_target_columns_read": False,
         "prediction_rows": int(len(dynamics)),
         "upstream_events": int(len(persisted_events)),
-        "legacy_plan_policy": "earliest legacy plan per stop used as a static schedule by user instruction",
+        "legacy_plan_policy": "earliest plan snapshot per stop used as a static schedule in both archive periods, by user instruction (5 and 12 November 2026)",
         "replacement_rows_using_scheduled_run": int(use_scheduled.sum()),
     }
     audit_path = output_dir / f"history_{split}_audit.json"

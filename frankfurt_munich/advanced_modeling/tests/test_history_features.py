@@ -123,11 +123,13 @@ def test_delay_dynamics_uses_only_snapshot_and_plan_state_at_cutoff():
     assert arrival["event_report_visible"]
     assert arrival["event_occurred_by_cutoff"]
     assert arrival["change_observed_at_utc"] == pd.Timestamp("2025-12-01 07:00:00", tz="UTC")
-    assert result["current_delay"] == pytest.approx(30.0)  # waits through planned departure
+    # The snapshot shows no departure from Hanau, so the train is not assumed
+    # to be still standing there: the arrival delay is the value.
+    assert result["current_delay"] == pytest.approx(10.0)
     assert result["upstream_stops_reported"] == 1
-    assert result["minutes_since_last_report"] == pytest.approx(60.0)
+    assert "minutes_since_last_report" not in result
     assert result["planned_minutes_remaining_before_frankfurt"] == pytest.approx(110.0)
-    assert pd.isna(result["current_delay_change_min"])
+    assert "current_delay_change_min" not in result
 
 
 def test_delay_dynamics_preserves_negative_delay_while_waiting_at_a_stop():
@@ -168,6 +170,94 @@ def test_delay_dynamics_preserves_negative_delay_while_waiting_at_a_stop():
     result = build_delay_dynamics(rows, upstream, changes, plans).iloc[0]
 
     assert result["current_delay"] == pytest.approx(-10.0)
+
+
+def test_delay_dynamics_do_not_use_the_departure_from_frankfurt():
+    rows = pd.DataFrame([{
+        "journey_id": "journey-on-time", "prediction_time": "0min",
+        "predicted_at": pd.Timestamp("2025-12-01 10:00:00"),
+    }])
+    upstream = pd.DataFrame([
+        {"journey_id": "journey-on-time", "id": "hanau", "station_name": "Hanau",
+         "train_line_station_num": 3},
+        {"journey_id": "journey-on-time", "id": "frankfurt",
+         "station_name": "Frankfurt (Main) Hbf", "train_line_station_num": 4},
+    ])
+    quiet = {"arrival_cancellation_time": pd.NaT, "arrival_change_status": None,
+             "departure_cancellation_time": pd.NaT, "departure_change_status": None}
+    changes = pd.DataFrame([
+        {"id": "hanau", "station_name": "Hanau",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 08:40:00"),
+         "arrival_change_time": pd.Timestamp("2025-12-01 09:34:00"),
+         "departure_change_time": pd.Timestamp("2025-12-01 09:36:00"), **quiet},
+        # Fetched before the cutoff: Frankfurt arrival 4 min late, departure on time.
+        {"id": "frankfurt", "station_name": "Frankfurt (Main) Hbf",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 08:55:00"),
+         "arrival_change_time": pd.Timestamp("2025-12-01 09:59:00"),
+         "departure_change_time": pd.Timestamp("2025-12-01 10:00:00"), **quiet},
+    ])
+    plans = pd.DataFrame([
+        {"id": "hanau", "station_name": "Hanau",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 07:00:00"),
+         "arrival_planned_time": pd.Timestamp("2025-12-01 09:30:00"),
+         "departure_planned_time": pd.Timestamp("2025-12-01 09:32:00")},
+        {"id": "frankfurt", "station_name": "Frankfurt (Main) Hbf",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 07:00:00"),
+         "arrival_planned_time": pd.Timestamp("2025-12-01 09:55:00"),
+         "departure_planned_time": pd.Timestamp("2025-12-01 10:00:00")},
+    ])
+
+    result = build_delay_dynamics(rows, upstream, changes, plans).iloc[0]
+
+    # The latest event is the arrival at Frankfurt (4 min late), not the departure.
+    assert result["current_delay"] == pytest.approx(4.0)
+    assert result["upstream_stops_reported"] == 2
+
+
+@pytest.mark.parametrize("departure_forecast, departure_cancelled, expected", [
+    (None, False, 5.0),                                   # stale snapshot without a departure time
+    (pd.Timestamp("2025-12-01 10:20:00"), False, 90.0),   # departure shown after the cutoff: standing
+    (pd.Timestamp("2025-12-01 10:20:00"), True, 5.0),     # onward departure cancelled: never leaves
+])
+def test_waiting_counts_only_while_the_snapshot_shows_the_train_standing(
+        departure_forecast, departure_cancelled, expected):
+    rows = pd.DataFrame([{
+        "journey_id": "journey-wait", "prediction_time": "1h",
+        "predicted_at": pd.Timestamp("2025-12-01 10:00:00"),
+    }])
+    upstream = pd.DataFrame([
+        {"journey_id": "journey-wait", "id": "wolfsburg", "station_name": "Wolfsburg Hbf",
+         "train_line_station_num": 2},
+        {"journey_id": "journey-wait", "id": "frankfurt", "station_name": "Frankfurt (Main) Hbf",
+         "train_line_station_num": 8},
+    ])
+    changes = pd.DataFrame([{
+        "id": "wolfsburg", "station_name": "Wolfsburg Hbf",
+        "snapshot_timestamp": pd.Timestamp("2025-12-01 07:00:00"),
+        "arrival_change_time": pd.Timestamp("2025-12-01 08:05:00"),
+        "departure_change_time": departure_forecast if departure_forecast is not None else pd.NaT,
+        "arrival_cancellation_time": pd.NaT, "arrival_change_status": None,
+        "departure_cancellation_time": (pd.Timestamp("2025-12-01 07:50:00")
+                                        if departure_cancelled else pd.NaT),
+        "departure_change_status": "c" if departure_cancelled else None,
+    }])
+    plans = pd.DataFrame([
+        {"id": "wolfsburg", "station_name": "Wolfsburg Hbf",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 06:00:00"),
+         "arrival_planned_time": pd.Timestamp("2025-12-01 08:00:00"),
+         "departure_planned_time": pd.Timestamp("2025-12-01 08:30:00")},
+        {"id": "frankfurt", "station_name": "Frankfurt (Main) Hbf",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 06:00:00"),
+         "arrival_planned_time": pd.Timestamp("2025-12-01 10:55:00"),
+         "departure_planned_time": pd.Timestamp("2025-12-01 11:00:00")},
+    ])
+
+    result = build_delay_dynamics(rows, upstream, changes, plans).iloc[0]
+
+    # Arrival at Wolfsburg 5 min late, planned departure 08:30, cutoff 10:00
+    # (local). Only when the snapshot still shows the departure ahead does the
+    # train count as standing there, 90 min after its planned departure.
+    assert result["current_delay"] == pytest.approx(expected)
 
 
 def test_delay_dynamics_rejects_non_cv_rows_when_split_is_present():
@@ -222,8 +312,8 @@ def test_recent_reliability_uses_only_known_prior_outcomes_in_each_window():
     assert result["service_mean_delay_min_28d"] == pytest.approx(145 / 3)
     assert result["corridor_severe_or_cancelled_rate_24h"] == pytest.approx(1.0)
     assert result["corridor_mean_delay_min_24h"] == pytest.approx(65.0)
-    assert result["corridor_severe_or_cancelled_rate_3h"] == pytest.approx(1.0)
-    assert pd.isna(result["corridor_mean_delay_min_3h"])
+    assert "corridor_severe_or_cancelled_rate_3h" not in result
+    assert "corridor_mean_delay_min_3h" not in result
 
 
 def test_unlinked_replacement_is_excluded_from_service_but_kept_for_corridor():
@@ -318,7 +408,8 @@ def test_replacement_uses_scheduled_reports_until_link_is_visible():
     plans = pd.DataFrame({
         "id": ["scheduled-1", "operated-1"],
         "snapshot_timestamp": pd.to_datetime(["2025-12-01 06:00", "2025-12-01 06:00"]),
-        "station_name": ["Frankfurt (Main) Hbf"] * 2,
+        # An upstream stop: the departure from Frankfurt itself is not used.
+        "station_name": ["Hanau Hbf"] * 2,
         "departure_planned_time": pd.to_datetime(["2025-12-01 08:00", "2025-12-01 09:00"]),
     })
     changes = pd.DataFrame({
@@ -331,7 +422,6 @@ def test_replacement_uses_scheduled_reports_until_link_is_visible():
                              changes, plans)
     features = delay_dynamics_from_events(rows, events)
     assert features.current_delay.tolist() == [7.0, 23.0]
-    assert features.current_delay_change_min.iloc[1] == 16.0
 
 
 def test_reliability_candidate_pairs_are_limited_to_service_28d_and_corridor_24h():
@@ -627,7 +717,7 @@ def test_reliability_builder_passes_cutoff_announcement_into_service_gate(tmp_pa
     assert result["corridor_mean_delay_min_24h"] == pytest.approx(90.0)
 
 
-def test_legacy_plan_is_static_before_its_label_and_exact_updates_stay_asof():
+def test_earliest_plan_is_the_static_schedule_in_both_archive_periods():
     from history_features import latest_plan_asof
 
     queries = pd.DataFrame({
@@ -640,6 +730,8 @@ def test_legacy_plan_is_static_before_its_label_and_exact_updates_stay_asof():
         "marker": [20, 30, 10],
     })
     selected = latest_plan_asof(queries, plans)
-    assert selected.marker.tolist() == [10, 30]
+    # The snapshot of December 2025 carries an exact request stamp. Under the
+    # decision of 12 November 2026 it no longer replaces the earliest plan.
+    assert selected.marker.tolist() == [10, 10]
     assert selected.loc[0, "snapshot_timestamp"] > selected.loc[0, "cutoff_utc"]
     assert selected.loc[0, "_observed_utc"] == pd.Timestamp("1900-01-01", tz="UTC")

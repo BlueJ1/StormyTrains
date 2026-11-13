@@ -180,12 +180,13 @@ def test_network_pairs_accept_legacy_timetable_fetched_after_cutoff(monkeypatch,
     assert result.loc[0, "remaining_planned_min"] == 60
 
 
-def test_network_pairs_use_latest_exact_plan_at_cutoff(monkeypatch, tmp_path):
+def test_network_pairs_keep_the_earliest_plan_when_exact_plans_follow(monkeypatch, tmp_path):
     result, _, _ = _paired_month(monkeypatch, tmp_path, "2025-11-10", exact_plans=True)
 
+    # Later snapshots with exact request stamps do not replace the static schedule.
     assert len(result) == 1
-    assert result.loc[0, "last_stop_delay"] == -20
-    assert result.loc[0, "remaining_planned_min"] == 90
+    assert result.loc[0, "last_stop_delay"] == -30
+    assert result.loc[0, "remaining_planned_min"] == 60
 
 
 def test_network_build_defaults_to_all_source_months(monkeypatch, tmp_path):

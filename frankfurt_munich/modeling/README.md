@@ -30,7 +30,7 @@ The cutoff-safe experiments of PR #12 (new input features, nested tuning, other 
 | `tests/test_pipeline.py` | Checks of the method itself |
 | `tests/test_tuned_models.py` | Checks of the tuned models' preprocessing and of the search |
 
-To add a model: write a factory `make_x(numeric, categorical)` in `models.py` and call `run_cv("x", "severity" or "delay", make_x)`; the keyword argument `weather=True` adds the weather features.
+To add a model: write a factory `make_x(numeric, categorical)` in `models.py` and call `run_cv("x", "severity" or "delay", make_x)`; the keyword argument `weather=True` adds the weather features. `run_cv` uses the `base` feature set by default; the tables below were made with `feature_set="recorded_route_diagnostic"`, so a model added with the default is not comparable with them.
 
 ## Method
 
@@ -156,7 +156,7 @@ Mean ± standard deviation over the 5 week folds, with the fixed weather route. 
 |---|---|---|---|---|---|---|
 | 24 h | 0.968 ± 0.009 | 0.927 ± 0.017 | 0.926 ± 0.021 | 0.193 ± 0.001 | 0.223 ± 0.003 | 0.233 ± 0.005 |
 | 6 h | 0.958 ± 0.007 | 0.918 ± 0.016 | 0.919 ± 0.017 | 0.194 ± 0.001 | 0.222 ± 0.005 | 0.232 ± 0.005 |
-| 1 h | 0.923 ± 0.009 | 0.824 ± 0.014 | 0.825 ± 0.016 | 0.196 ± 0.002 | 0.329 ± 0.009 | 0.336 ± 0.020 |
+| 1 h | 0.923 ± 0.009 | 0.824 ± 0.014 | 0.825 ± 0.016 | 0.196 ± 0.001 | 0.328 ± 0.009 | 0.336 ± 0.020 |
 | 20 min | 0.905 ± 0.006 | 0.794 ± 0.016 | 0.796 ± 0.019 | 0.196 ± 0.001 | 0.350 ± 0.015 | 0.355 ± 0.012 |
 | 0 min | 0.897 ± 0.005 | 0.778 ± 0.015 | 0.779 ± 0.017 | 0.197 ± 0.001 | 0.361 ± 0.014 | 0.368 ± 0.017 |
 
@@ -214,7 +214,7 @@ Mean ± standard deviation over the 5 week folds; railway only / railway + weath
 |---|---|---|---|---|
 | 24 h | 0.223 / 0.233 | 0.211 ± 0.006 / 0.213 ± 0.016 | 0.229 ± 0.005 / 0.219 ± 0.012 | 0.222 ± 0.007 / 0.247 ± 0.013 |
 | 6 h | 0.222 / 0.232 | 0.210 ± 0.005 / 0.203 ± 0.010 | 0.233 ± 0.005 / 0.214 ± 0.013 | 0.222 ± 0.007 / 0.210 ± 0.013 |
-| 1 h | 0.329 / 0.336 | 0.336 ± 0.019 / 0.323 ± 0.017 | 0.336 ± 0.018 / 0.334 ± 0.018 | 0.350 ± 0.019 / 0.327 ± 0.017 |
+| 1 h | 0.328 / 0.336 | 0.336 ± 0.019 / 0.323 ± 0.017 | 0.336 ± 0.018 / 0.334 ± 0.018 | 0.350 ± 0.019 / 0.327 ± 0.017 |
 | 20 min | 0.350 / 0.355 | 0.358 ± 0.017 / 0.359 ± 0.017 | 0.381 ± 0.023 / 0.362 ± 0.015 | 0.385 ± 0.019 / 0.375 ± 0.022 |
 | 0 min | 0.361 / 0.368 | 0.371 ± 0.014 / 0.373 ± 0.015 | 0.388 ± 0.023 / 0.377 ± 0.020 | 0.390 ± 0.015 / 0.381 ± 0.016 |
 

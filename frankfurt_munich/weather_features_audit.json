@@ -130,13 +130,13 @@
     "stundenwerte_RR_15444_akt.zip": "e06c2ff047008347b0eaeadba4eabe0ad8d542d4b79b4ea5116d313c131dd7d4"
   },
   "cv": {
-    "rows": 85901,
+    "rows": 85826,
     "missing": {},
     "rows_with_24h_window_before_first_hour": 1,
-    "snow_on_route_24h_true": 12272
+    "snow_on_route_24h_true": 12260
   },
   "holdout": {
-    "rows": 21260,
+    "rows": 21236,
     "missing": {},
     "rows_with_24h_window_before_first_hour": 0,
     "snow_on_route_24h_true": 3791

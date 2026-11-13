@@ -39,7 +39,6 @@ from tuning import SCORE, sample_configs, search, select_feature_variant
 REFIT_STEPS = {"0.8", "3.3", "5.2", "6.1", "6.2", "6.3", "6.5", "7.1", "7.2", "7.3", "7.4", "7.5"}
 FEATURE_FILES = {
     frozenset(PHASE2_GROUPS["recent_reliability"][0]): "reliability",
-    frozenset(PHASE2_GROUPS["network_state"][0]): "network",
     frozenset((SEQUENCE_COLUMN,)): "sequence",
 }
 
