@@ -286,7 +286,7 @@ The accompanying mapping data and availability snapshot support these counts. Or
 
 ## Supporting files and reproducibility
 
-Keep these six files together in `frankfurt_munich/weather/`:
+Keep these six files together in `frankfurt_munich/measured_weather_DWD/`:
 
 1. [README.md](README.md): current scope, deliverable status and the entry point to the weather work.
 2. `railway_to_dwd_station_mapping.md`: station mapping, method, sources and remaining gaps.
