@@ -211,7 +211,9 @@ At 0 min, the 1,559 trains that start in Frankfurt and have no value had not lef
 
 ## Weather
 
-[NOAA GFS historical forecasts](forecast_weather_GFS/README.md) cover 30 September 2025 through 30 September 2026. The forecast tables include initialization and valid times for matching to railway prediction cutoffs.
+We chose NOAA's Global Forecast System (GFS) because the [dynamical.org archive](https://dynamical.org/catalog/noaa-gfs-forecast-virtual/) covers the study period and preserves individual forecast runs. GFS starts a new run every six hours and provides hourly forecasts for the first five days. For each train prediction cutoff, the run time and an estimate of the publication delay determine which forecasts were available. The valid time identifies the forecast for each hour of the planned journey.
+
+The [GFS files currently in this repository](forecast_weather_GFS/README.md) cover 30 September 2025 through 30 September 2026. They provide hourly forecasts up to 48 hours ahead for temperature, precipitation, wind speed, gusts and snow depth at grid points representing 19 stations along the route.
 
 `weather_features.py` adds the weather known at the prediction time along the route to every prediction row. The station observations are the `_final` tables in `measured_weather_DWD/observations/` (see `measured_weather_DWD/README.md`); their gaps are already filled from a backup station within 50 km.
 
