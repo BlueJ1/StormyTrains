@@ -29,18 +29,23 @@ The advanced runner reads generated CV inputs in `../data/advanced/`. It require
 
 Download the 27 `monthly_processed_data_plan` files for July 2024 through September 2026 into `data/monthly_processed_data_plan/`. [Pinned plan archive](https://huggingface.co/datasets/piebro/deutsche-bahn-data/tree/d27b9c413536bb5fe393954371f572050e55176b/monthly_processed_data_plan)
 
-The legacy fetcher used the requested timetable hour in plan filenames. Following the user decision on 5 November 2026, the primary build accepts these legacy fields regardless of fetch time, using the earliest plan per stop as its static schedule. Exact request stamps from 3 November 2025 remain cutoff-bound. The 45-minute bound applies to the separate change archive. [Legacy fetcher](https://github.com/piebro/deutsche-bahn-data/blob/f19888b770a68d5f9010adac33af70e400e2395d/fetch_data.py)
+The legacy fetcher used the requested timetable hour in plan filenames. Following the user decision on 5 November 2026, the primary build accepts these legacy fields regardless of fetch time, using the earliest plan per stop as its static schedule. Following the decision of 12 November 2026, the plans with exact request stamps (from 3 November 2025) are treated the same way. The 45-minute bound applies to the separate change archive. [Legacy fetcher](https://github.com/piebro/deutsche-bahn-data/blob/f19888b770a68d5f9010adac33af70e400e2395d/fetch_data.py)
 
 The prediction cohort supplies the planned Frankfurt departure and München arrival. The additional timetable fields come from the scheduled train's plan available at the cutoff. If the branch is unavailable, the weather pipeline retains the two endpoint temperatures and leaves the route aggregates missing. The live delay requires both a visible change report and a visible plan. For retained replacements, the scheduled service supplies live history until the link to the replacement becomes visible. When the monthly files record no replaced train (17 CV journeys), no other scheduled train is known, and the operated run supplies the history as for an ordinary train. Those runs have no plan snapshot, so `current_delay` stays missing for them; only the report count and the time since the last report are filled. Seven further CV replacements name a replaced train that no plan matched, and their history stays missing. The CV results were computed before this change, which alters `upstream_stops_reported` and `minutes_since_last_report` in 22 CV rows and leaves `current_delay` unchanged.
 
 Recent-reliability candidates come from the same target-free stop roster for CV and holdout. Both builds reconstruct past outcomes from snapshots available at each cutoff. The resulting rates describe journeys with observed outcomes. A missing arrival report stays unknown. An archive check found a destination arrival report somewhere in the snapshots for 16,550 of 16,551 completed CV journeys. That check measures archive coverage. At an individual cutoff, the builder still requires a visible report and an arrival time at or before the cutoff.
 
+Input coverage after the rebuild of 13 November 2026 (corrected dataset, static plans in both archive periods, corrected network state). The result tables below are from before this rebuild.
+
 | Input coverage | 24 h | 6 h | 1 h | 20 min | 0 min |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| CV prediction rows | 17,466 | 17,380 | 17,114 | 16,994 | 16,947 |
-| Planned route available | 10,302 | 10,269 | 10,861 | 11,223 | 11,419 |
-| Weather branch available | 10,301 | 10,268 | 10,860 | 11,222 | 11,418 |
-| Snapshot-based `current_delay` used by models | — | — | 6,046 | 6,788 | 8,323 |
+| CV prediction rows | 17,463 | 17,366 | 17,096 | 16,975 | 16,926 |
+| Planned route available | 17,364 | 17,267 | 16,998 | 16,878 | 16,830 |
+| Weather branch available | 17,363 | 17,266 | 16,997 | 16,877 | 16,829 |
+| Snapshot-based `current_delay` used by models | — | — | 6,654 | 7,331 | 8,758 |
+| Network share known | 17,401 | 17,255 | 17,059 | 16,959 | 16,905 |
+
+The snapshot-based `current_delay` is missing for about half the rows because the archive fetched live updates in blocks about six hours apart: for most journeys the last fetch before the cutoff came before the train had reported from any stop before Frankfurt (finishing plan B1). Since 13 November 2026 it does not use the departure from Frankfurt itself, as in the dataset's `current_delay`. The network share now averages 0.11. The scheduled train type is missing for 24 of the 230 kept replacement journeys, whose replaced train no plan matched; the loader sets it to `unknown`.
 
 ```bash
 .venv/bin/python frankfurt_munich/advanced_modeling/scheduled_timetable.py

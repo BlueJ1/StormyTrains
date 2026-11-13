@@ -253,12 +253,16 @@ cancellations still to be predicted falls from 5.2\% to 2.3\%.
 
 The table also shows the effect of the restriction of Section~\ref{sec:inputs}. One hour before
 departure the final records contain a delay of the run for 86\% of the journeys, but the archive
-shows a report requested by that time for only 35\%. \todo{Explain the gap. It is not
-the change in how the archive was fetched in November 2025: at 1~h the archive share is 37\% before
-3 November 2025 and 33\% after. Where both versions have a value they agree exactly in only 30\% of
-the rows (mean absolute difference 6~min). Find out what limits the archive version before writing
-this paragraph (finishing plan B1); the group then decides whether the report gives one version of
-the current delay or both (Q5).}
+shows a report requested by that time for only 39\%. The gap comes from how often the archive was
+fetched: live updates were requested in blocks about six hours apart, so for most journeys the last
+request before the prediction time came before the train had reported from any stop on its way to
+Frankfurt. In a sample of the journeys without an archive value, the first report of the run arrived
+a median of 1.9~h after the prediction time. Where both versions have a value, the archive version is
+lower in 58\% of the rows and equal in about a third, and the difference grows with the age of the
+latest report, from a mean of $-1.0$~min when it is under 30 minutes old to $-11.7$~min when it is
+over four hours old. The final records thus overstate what was known: they treat every report as
+visible the moment the event happened. \todo{Q5: the group decides whether the report gives the
+archive version only or both versions of the current delay.}
 
 \begin{table}[t]
 \caption{Prediction rows in the CV set by prediction time, and the share for which a delay of the
@@ -271,10 +275,10 @@ run before Frankfurt is available}
 \toprule
  & 24 h & 6 h & 1 h & 20 min & 0 min \\
 \midrule
-Journeys predicted & 17{,}466 & 17{,}380 & 17{,}114 & 16{,}994 & 16{,}947 \\
+Journeys predicted & 17{,}463 & 17{,}366 & 17{,}096 & 16{,}975 & 16{,}926 \\
 Of these cancelled (\%) & 5.2 & 4.8 & 3.3 & 2.6 & 2.3 \\
-Delay in final records (\%) & 0 & 5 & 86 & 87 & 90 \\
-Delay in archive (\%) & -- & -- & 35 & 40 & 49 \\
+Delay in final records (\%) & 0 & 5 & 86 & 87 & 87 \\
+Delay in archive (\%) & -- & -- & 39 & 43 & 52 \\
 \bottomrule
 \end{tabular}
 \end{table}

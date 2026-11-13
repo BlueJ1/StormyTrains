@@ -11,7 +11,7 @@ The modelling dataset for the chosen origin–destination pair: railway data, an
   - the data are split by week into a cross-validation set (about 80% of the weeks, in 5 folds) and a hold-out set (about 20%).
 - **Source:** the 27 monthly files from July 2024 to September 2026 and the matching live-update snapshots, as rebuilt by the source on 6–8 October 2026 and downloaded on 8 October 2026 (checked against the published SHA-256 sums).
 
-**The hold-out set is not to be looked at yet.** Outcome statistics below (classes, delays, cancellations) are for the CV set only. For the hold-out set we only check data quality: counts, coverage, missing values and where the labels come from. Where something changes over time, the README compares July 2024–September 2025 with October 2025–September 2026; these are periods, not splits.
+**The hold-out set is kept for the final evaluation** (scored once on 6 November 2026 and once more after the corrections of 12 November; see `advanced_modeling/PLAN.md`, D15). Nothing is chosen on it. Outcome statistics below (classes, delays, cancellations) are for the CV set only. For the hold-out set we only check data quality: counts, coverage, missing values and where the labels come from. Where something changes over time, the README compares July 2024–September 2025 with October 2025–September 2026; these are periods, not splits.
 
 ## Files
 
@@ -212,7 +212,7 @@ Missing values in the CV set (17,507 journeys):
 
 `weather_features.py` adds the weather known at the prediction time along the route to every prediction row. The station observations are the `_final` tables in `weather/observations/` (see `weather/README.md`); their gaps are already filled from a backup station within 50 km.
 
-- **Prediction time.** `predicted_at` is clock time, so on the spring clock-change days "24 h before" is only 23 h of real time. The weather uses the earlier of `predicted_at` and the planned departure minus the real lead, both in UTC (74 rows move, all at 24 h or 6 h). In the repeated autumn hour the earlier moment is taken.
+- **Prediction time.** `predicted_at` is clock time, so on the spring clock-change days "24 h before" is only 23 h of real time. The weather uses the earlier of `predicted_at` and the planned departure minus the real lead, both in UTC (74 rows move, 36 CV and 38 hold-out, all at 24 h or 6 h except one hold-out row at 1 h). In the repeated autumn hour the earlier moment is taken.
 - **Weather hour.** The latest DWD hour label at or before the prediction time. DWD's hourly rain, mean wind and gust at label H are built from the 10-minute values stamped H−60 to H−10 min, so they contain nothing measured after H. This was checked against the 10-minute data of Frankfurt airport (station 01420) on 17 October 2026: hourly rain equals the sum of those six values in 77% of wet hours (mean difference 0.03 mm), wind and gust in 100%; any other offset fits far worse. Temperature is the value at the hour. How long DWD takes to publish an observation is not modelled, and this is observed weather, not a forecast.
 - **Route.** A fixed station list per branch, not the journey's recorded stops, which can depend on the outcome (a diverted train records other stations). Nürnberg branch: Frankfurt, Hanau, Aschaffenburg, Würzburg, Nürnberg, Ingolstadt, München. Stuttgart branch: Frankfurt, Darmstadt, Mainz, Mannheim, Heidelberg, Stuttgart, Ulm, Augsburg, München-Pasing, München. A journey takes the usual branch of its train number, the one most of that train number's journeys recorded (Würzburg or Nürnberg, or Mannheim, Stuttgart or Ulm): 12,584 journeys on the Nürnberg branch, 9,247 on the Stuttgart branch. This lookup uses all journeys, hold-out included, since the branch is a timetable fact. 75 journeys recorded the other branch and 6 neither. The lists include stops that many trains skip (such as Hanau and Ingolstadt), so most journeys get more stations than they recorded. The stops store EVA numbers as `08000105`, the weather tables as `8000105`.
 - **Missing values.** Aggregates use the stations and hours that have a value, and nothing is filled in. No feature is missing at present. Only the earliest row (24 h ahead of the first departure) has a 24-hour window that starts before the weather tables, so it uses 23 hours.
@@ -324,11 +324,10 @@ Numbers come from `audit.json` and `change_check.json`.
   - Trains departing late on 30 September 2026 that arrive after midnight are missing, because there is no October file.
   - Runs that started on 30 June 2024 lack their upstream stops.
 
-## Not built yet
+## Features built elsewhere
 
-The other railway features in the Initial Data Exploration document:
+The other railway features in the Initial Data Exploration document are not in these files:
 
-- calendar features;
-- `route_id`, `planned_travel_min`, `planned_stops`, `upstream_planned_min`;
-- the recent-reliability features. Decided: they may use every earlier journey, including hold-out journeys, as long as it is known at the prediction time.
-
+- calendar features (hour, weekday, month) and the planned travel time are computed when a model is fitted (`modeling/features.py`); public holidays and school breaks in `advanced_modeling/holiday_features.py`;
+- `route_id`, `planned_stops` and `upstream_planned_min` come from the timetable known at the prediction time (`advanced_modeling/scheduled_timetable.py`);
+- the recent-reliability features (`advanced_modeling/recent_reliability.py`). Decided: they may use every earlier journey, including hold-out journeys, as long as it is known at the prediction time.
