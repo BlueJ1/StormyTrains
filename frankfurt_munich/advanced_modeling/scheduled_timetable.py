@@ -145,17 +145,15 @@ def build_timetable_features(
     ]].rename(columns={"plan_query_id": "id"})
     origin = _asof_by_id(queries, plan_snapshots)
 
-    # Upstream minutes need the first stop's planned departure at the same
-    # cutoff.  The source stop ID sequence is stable within a ride ID.
+    # Upstream minutes run from the start of the run to Frankfurt. The run's
+    # planned start is the last part of its ID (`yymmddHHMM`, local time), so it
+    # is known even when the first stop has no plan row (decision of
+    # 13 November 2026). Where that row exists, the two agree exactly.
     origin = origin.set_index("_query_id").reindex(target["_query_id"])
     origin_ids = origin["id"].astype("string")
     ride_ids = origin_ids.str.rsplit("-", n=1).str[0].where(origin_ids.str.contains("-"))
-    upstream_queries = pd.DataFrame({
-        "_query_id": origin.index,
-        "id": ride_ids + "-1",
-        "cutoff_utc": origin["cutoff_utc"],
-    })
-    upstream = _asof_by_id(upstream_queries, plan_snapshots).set_index("_query_id")
+    run_start = pd.to_datetime(ride_ids.str.rsplit("-", n=1).str[-1], format="%y%m%d%H%M",
+                               errors="coerce")
 
     visible = origin.get("available_at_utc", pd.Series(pd.NaT, index=origin.index)).notna()
     stop_number = origin_ids.str.rsplit("-", n=1).str[-1].str.strip()
@@ -166,10 +164,7 @@ def build_timetable_features(
     tails = paths.where(visible).map(_path_to_destination)
     routes = tails.map(lambda tail: [ORIGIN, *tail] if tail else None)
     arrival = pd.to_datetime(origin.get("arrival_planned_time", pd.Series(pd.NaT, index=origin.index)))
-    departure = pd.to_datetime(
-        upstream.get("departure_planned_time", pd.Series(pd.NaT, index=upstream.index))
-    )
-    minutes = (arrival - departure).dt.total_seconds().div(60)
+    minutes = (arrival - run_start).dt.total_seconds().div(60)
     minutes = minutes.mask(starts.fillna(False), 0.0).where(visible)
 
     result = target[ROW_KEY].copy()
