@@ -272,12 +272,12 @@ The snapshots carry the time each cancellation was issued (`cancellation_time`).
 | 0 min | 560 |
 | after planned departure | 396 |
 
-So at 1 h ahead, 41% of the eventual cancellations were already announced, and at 20 min ahead, 54%.
+This table counts the first issue time. A cancellation can be withdrawn and issued again, so what decides whether a journey is left out is whether a cancellation is in force (`in_force_at_prediction_time` in `change_check.json`): 41, 127, 394, 514 and 561 cancelled CV journeys at 24 h, 6 h, 1 h, 20 min and 0 min. So at 1 h ahead, 41% of the eventual cancellations were already in force, and at 20 min ahead, 54%.
 
 **Decision: no prediction while a cancellation is in force** (rule of 12 November 2026; `snapshots.cancellation_events`). The journey files keep every journey.
 
-- A cancellation of the Frankfurt departure or the München arrival is in force from the time it was issued.
-- A withdrawal ends it. The snapshots carry no time for the withdrawal itself, so it counts from the time the first snapshot that shows it (change status `p`) was requested; for snapshots stamped with the start of a fetch block, 45 min after that stamp. The snapshots are a few hours apart, so a withdrawal can count later than it happened.
+- A cancellation of the Frankfurt departure or the München arrival is in force from the time it was issued (a snapshot with status `c` but no issue time: from the time it was requested).
+- A withdrawal ends it. The snapshots carry no time for the withdrawal itself, so it counts from the time the first snapshot that shows it (change status `p`) was requested; for snapshots stamped with the start of a fetch block, 45 min after that stamp. The snapshots are a few hours apart, so a withdrawal can count later than it happened. A later snapshot of the stop that no longer shows any cancellation ends it in the same way. A withdrawn snapshot with a new issue time does not cancel the journey again.
 - A journey has no prediction row at a prediction time at which a cancellation of either end was in force, and has rows again once the withdrawal counts.
 
 | Prediction time | CV rows | Left out | of them ran in the end | Cancelled share of the rows | Hold-out rows |
