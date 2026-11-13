@@ -44,4 +44,9 @@ ZARR_ASYNC__CONCURRENCY=16 python download_gfs_weather.py --start 2025-09-30 --e
 
 The one-day command writes its output to `gfs_weather_sample/`. For the full published date range, run `python download_gfs_weather.py --start 2025-09-30 --end 2026-10-01 --output gfs_weather_base`, then run the precipitation-type step above. For other ranges, `--end` is exclusive. Rerunning an interval verifies and skips completed parts. The remote archive reads full spatial chunks, so the data transferred can be much larger than the station Parquet files.
 
-NOAA NWS NCEP GFS data processed by dynamical.org from NOAA Open Data Dissemination archives. [Dataset and CC BY 4.0 attribution](https://dynamical.org/catalog/noaa-gfs-forecast-virtual/).
+## References
+
+- **dynamical.org.** *NOAA GFS forecast, virtual.* Archive used for the weather extract. NOAA NWS NCEP GFS data were processed by dynamical.org from NOAA Open Data Dissemination archives. [Dataset and CC BY 4.0 attribution](https://dynamical.org/catalog/noaa-gfs-forecast-virtual/)
+- **NOAA National Centers for Environmental Prediction.** *Global Forecast System (GFS).* The original GRIB2 archive used for the precipitation-type flags and the product inventory that lists those fields. [Open data archive](https://registry.opendata.aws/noaa-gfs-bdp-pds/), [GFS 0.25° product inventory](https://www.nco.ncep.noaa.gov/pmb/products/gfs/gfs.t00z.pgrb2.0p25.f003.shtml)
+- **dynamical.org.** *DWD ICON-EU forecast, 5 day.* Archive consulted when comparing historical forecast coverage. [Dataset catalog](https://dynamical.org/catalog/dwd-icon-eu-forecast-5-day/)
+- **Deutscher Wetterdienst (2024).** *Hourly station observations of precipitation for Germany* (v24.03). Dataset documentation for the DWD `WRTR` codes. [Dataset description, p. 2](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/DESCRIPTION_obsgermany_climate_hourly_precipitation_en.pdf#page=2)
