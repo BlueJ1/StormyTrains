@@ -123,11 +123,13 @@ def test_delay_dynamics_uses_only_snapshot_and_plan_state_at_cutoff():
     assert arrival["event_report_visible"]
     assert arrival["event_occurred_by_cutoff"]
     assert arrival["change_observed_at_utc"] == pd.Timestamp("2025-12-01 07:00:00", tz="UTC")
-    assert result["current_delay"] == pytest.approx(30.0)  # waits through planned departure
+    # The snapshot shows no departure from Hanau, so the train is not assumed
+    # to be still standing there: the arrival delay is the value.
+    assert result["current_delay"] == pytest.approx(10.0)
     assert result["upstream_stops_reported"] == 1
     assert "minutes_since_last_report" not in result
     assert result["planned_minutes_remaining_before_frankfurt"] == pytest.approx(110.0)
-    assert pd.isna(result["current_delay_change_min"])
+    assert "current_delay_change_min" not in result
 
 
 def test_delay_dynamics_preserves_negative_delay_while_waiting_at_a_stop():
@@ -212,6 +214,48 @@ def test_delay_dynamics_do_not_use_the_departure_from_frankfurt():
     assert result["upstream_stops_reported"] == 2
 
 
+@pytest.mark.parametrize("departure_forecast, expected", [
+    (None, 5.0),                                   # stale snapshot without a departure time
+    (pd.Timestamp("2025-12-01 10:20:00"), 90.0),   # departure shown after the cutoff: standing
+])
+def test_waiting_counts_only_while_the_snapshot_shows_the_train_standing(departure_forecast, expected):
+    rows = pd.DataFrame([{
+        "journey_id": "journey-wait", "prediction_time": "1h",
+        "predicted_at": pd.Timestamp("2025-12-01 10:00:00"),
+    }])
+    upstream = pd.DataFrame([
+        {"journey_id": "journey-wait", "id": "wolfsburg", "station_name": "Wolfsburg Hbf",
+         "train_line_station_num": 2},
+        {"journey_id": "journey-wait", "id": "frankfurt", "station_name": "Frankfurt (Main) Hbf",
+         "train_line_station_num": 8},
+    ])
+    changes = pd.DataFrame([{
+        "id": "wolfsburg", "station_name": "Wolfsburg Hbf",
+        "snapshot_timestamp": pd.Timestamp("2025-12-01 07:00:00"),
+        "arrival_change_time": pd.Timestamp("2025-12-01 08:05:00"),
+        "departure_change_time": departure_forecast if departure_forecast is not None else pd.NaT,
+        "arrival_cancellation_time": pd.NaT, "arrival_change_status": None,
+        "departure_cancellation_time": pd.NaT, "departure_change_status": None,
+    }])
+    plans = pd.DataFrame([
+        {"id": "wolfsburg", "station_name": "Wolfsburg Hbf",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 06:00:00"),
+         "arrival_planned_time": pd.Timestamp("2025-12-01 08:00:00"),
+         "departure_planned_time": pd.Timestamp("2025-12-01 08:30:00")},
+        {"id": "frankfurt", "station_name": "Frankfurt (Main) Hbf",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 06:00:00"),
+         "arrival_planned_time": pd.Timestamp("2025-12-01 10:55:00"),
+         "departure_planned_time": pd.Timestamp("2025-12-01 11:00:00")},
+    ])
+
+    result = build_delay_dynamics(rows, upstream, changes, plans).iloc[0]
+
+    # Arrival at Wolfsburg 5 min late, planned departure 08:30, cutoff 10:00
+    # (local). Only when the snapshot still shows the departure ahead does the
+    # train count as standing there, 90 min after its planned departure.
+    assert result["current_delay"] == pytest.approx(expected)
+
+
 def test_delay_dynamics_rejects_non_cv_rows_when_split_is_present():
     rows = pd.DataFrame([{
         "journey_id": "journey-1", "prediction_time": "1h",
@@ -264,8 +308,8 @@ def test_recent_reliability_uses_only_known_prior_outcomes_in_each_window():
     assert result["service_mean_delay_min_28d"] == pytest.approx(145 / 3)
     assert result["corridor_severe_or_cancelled_rate_24h"] == pytest.approx(1.0)
     assert result["corridor_mean_delay_min_24h"] == pytest.approx(65.0)
-    assert result["corridor_severe_or_cancelled_rate_3h"] == pytest.approx(1.0)
-    assert pd.isna(result["corridor_mean_delay_min_3h"])
+    assert "corridor_severe_or_cancelled_rate_3h" not in result
+    assert "corridor_mean_delay_min_3h" not in result
 
 
 def test_unlinked_replacement_is_excluded_from_service_but_kept_for_corridor():
@@ -374,7 +418,6 @@ def test_replacement_uses_scheduled_reports_until_link_is_visible():
                              changes, plans)
     features = delay_dynamics_from_events(rows, events)
     assert features.current_delay.tolist() == [7.0, 23.0]
-    assert features.current_delay_change_min.iloc[1] == 16.0
 
 
 def test_reliability_candidate_pairs_are_limited_to_service_28d_and_corridor_24h():

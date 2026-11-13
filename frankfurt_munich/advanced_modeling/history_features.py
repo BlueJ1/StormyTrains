@@ -28,16 +28,18 @@ DATA_DIR = HERE / "data"
 
 ROW_KEY = ["journey_id", "prediction_time", "predicted_at"]
 PREDICTION_TIMES = ["24h", "6h", "1h", "20min", "0min"]
+# Decisions of 13 November 2026: no input may follow the archive's six-hourly
+# fetch clock instead of the trains. So there is no corridor window shorter
+# than the fetch cycle (3 h), no time since the last report, no change of
+# current_delay between prediction times (mostly whether a fetch fell in
+# between) and no network state (network_state.py is kept but not used).
 RECENT_RELIABILITY_COLUMNS = [
     "service_severe_or_cancelled_rate_7d", "service_mean_delay_min_7d",
     "service_severe_or_cancelled_rate_28d", "service_mean_delay_min_28d",
     "corridor_severe_or_cancelled_rate_24h", "corridor_mean_delay_min_24h",
-    "corridor_severe_or_cancelled_rate_3h", "corridor_mean_delay_min_3h",
 ]
-# No time since the last report (decision of 13 November 2026): it measures how
-# long ago the archive fetched an update, not the train.
 DELAY_DYNAMICS_COLUMNS = [
-    "current_delay", "current_delay_change_min", "upstream_stops_reported",
+    "current_delay", "upstream_stops_reported",
     "planned_minutes_remaining_before_frankfurt",
 ]
 NETWORK_STATE_COLUMNS = [
@@ -48,7 +50,6 @@ NETWORK_STATE_COLUMNS = [
 FEATURE_COLUMNS_BY_GROUP = {
     "recent_reliability": RECENT_RELIABILITY_COLUMNS,
     "delay_dynamics": DELAY_DYNAMICS_COLUMNS,
-    "network_state": NETWORK_STATE_COLUMNS,
 }
 SNAPSHOT_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:27:54.653106", tz="UTC")
 PLAN_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:32:22.619260", tz="UTC")
@@ -415,10 +416,21 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
         latest["cutoff_utc"] - local_clock_to_utc(
             latest["stop_departure_planned_time"], ambiguous=False)
     ).dt.total_seconds() / 60
-    current_delay = current_delay.where(
-        latest["event_kind"].ne("arrival"),
-        np.fmax(current_delay, waiting),
-    )
+    # A train whose latest report is an arrival counts as still standing at that
+    # stop only if the same snapshot shows its departure after the cutoff, or if
+    # the stop is Frankfurt. A stale snapshot without a departure time says
+    # nothing about where the train is now.
+    departures = events.loc[
+        events["event_kind"].eq("departure") & events["event_report_visible"],
+        ["_row_id", "event_id", "reported_time_utc"],
+    ].drop_duplicates(["_row_id", "event_id"])
+    departure_time = latest[["event_id"]].reset_index().merge(
+        departures, on=["_row_id", "event_id"], how="left", validate="one_to_one"
+    ).set_index("_row_id")["reported_time_utc"]
+    standing = latest["event_kind"].eq("arrival") & (
+        departure_time.gt(latest["cutoff_utc"])
+        | latest["station_name"].eq("Frankfurt (Main) Hbf"))
+    current_delay = current_delay.where(~standing, np.fmax(current_delay, waiting))
 
     origin = events[
         events["station_name"].eq("Frankfurt (Main) Hbf")
@@ -433,14 +445,6 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
     features["current_delay"] = current_delay
     features["planned_minutes_remaining_before_frankfurt"] = remaining
     features = features.join(report_agg[["upstream_stops_reported"]])
-    time_order = {name: i for i, name in enumerate(PREDICTION_TIMES)}
-    ordered = features.reset_index().assign(
-        _time_order=lambda frame: frame.prediction_time.map(time_order)
-    ).sort_values(["journey_id", "_time_order"])
-    ordered["current_delay_change_min"] = (
-        ordered.groupby("journey_id", sort=False)["current_delay"].diff())
-    features["current_delay_change_min"] = ordered.set_index("_row_id")[
-        "current_delay_change_min"]
     return features.reset_index(drop=True)
 
 
@@ -509,8 +513,8 @@ def build_delay_dynamics(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
 
 def _empty_dynamics(target: pd.DataFrame) -> pd.DataFrame:
     out = target[["_row_id", *ROW_KEY]].copy().set_index("_row_id")
-    for column in ("current_delay", "current_delay_change_min",
-                   "upstream_stops_reported", "planned_minutes_remaining_before_frankfurt"):
+    for column in ("current_delay", "upstream_stops_reported",
+                   "planned_minutes_remaining_before_frankfurt"):
         out[column] = np.nan
     return out.reset_index(drop=True)
 
