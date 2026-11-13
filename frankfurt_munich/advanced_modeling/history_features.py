@@ -20,6 +20,9 @@ import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 
+import _paths  # noqa: F401  frankfurt_munich on sys.path, for snapshots
+from snapshots import EXACT_REQUESTS_FROM_UTC, LEGACY_REQUEST_DELAY, request_upper_bound
+
 HERE = Path(__file__).resolve().parents[1]  # frankfurt_munich
 ROOT = HERE.parent
 CHANGE_DIR = ROOT / "data" / "monthly_processed_data_change"
@@ -32,7 +35,7 @@ PREDICTION_TIMES = ["24h", "6h", "1h", "20min", "0min"]
 # fetch clock instead of the trains. So there is no corridor window shorter
 # than the fetch cycle (3 h), no time since the last report, no change of
 # current_delay between prediction times (mostly whether a fetch fell in
-# between) and no network state (network_state.py is kept but not used).
+# between) and no network state.
 RECENT_RELIABILITY_COLUMNS = [
     "service_severe_or_cancelled_rate_7d", "service_mean_delay_min_7d",
     "service_severe_or_cancelled_rate_28d", "service_mean_delay_min_28d",
@@ -42,20 +45,15 @@ DELAY_DYNAMICS_COLUMNS = [
     "current_delay", "upstream_stops_reported",
     "planned_minutes_remaining_before_frankfurt",
 ]
-NETWORK_STATE_COLUMNS = [
-    "network_delayed_or_cancelled_share_1h",
-    "network_frankfurt_delayed_or_cancelled_share_1h",
-    "network_munich_delayed_or_cancelled_share_1h",
-]
 FEATURE_COLUMNS_BY_GROUP = {
     "recent_reliability": RECENT_RELIABILITY_COLUMNS,
     "delay_dynamics": DELAY_DYNAMICS_COLUMNS,
 }
-SNAPSHOT_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:27:54.653106", tz="UTC")
+# The change-archive visibility rule is defined once, in snapshots.py.
+SNAPSHOT_EXACT_UTC_FROM = EXACT_REQUESTS_FROM_UTC.tz_localize("UTC")
 PLAN_EXACT_UTC_FROM = pd.Timestamp("2025-11-03 03:32:22.619260", tz="UTC")
-LEGACY_REQUEST_UPPER_BOUND = pd.Timedelta(minutes=45)
+LEGACY_REQUEST_UPPER_BOUND = LEGACY_REQUEST_DELAY
 STATIC_PLAN_AVAILABLE_UTC = pd.Timestamp("1900-01-01", tz="UTC")
-LEGACY_PLAN_AVAILABLE_UTC = STATIC_PLAN_AVAILABLE_UTC  # earlier name, kept for imports
 
 CHANGE_COLUMNS = [
     "id", "station_name", "snapshot_timestamp", "train_type", "train_number",
@@ -71,18 +69,13 @@ PLAN_COLUMNS = [
 
 
 def request_upper_bound_utc(snapshot_timestamp: pd.Series) -> pd.Series:
-    """Latest possible request time for each archive snapshot stamp.
+    """Latest possible request time for each archive snapshot stamp, in UTC.
 
     Before the source switched to exact request timestamps, stamps are six-hour
-    block starts.  Those receive a conservative +45 minute bound.  Exact request
-    timestamps are kept as-is.  A whole-hour timestamp after the transition is
-    treated as exact only if it is at or after the observed first exact timestamp.
+    block starts and receive a conservative +45 minute bound; exact request
+    timestamps are kept as they are. The rule is `snapshots.request_upper_bound`.
     """
-    stamps = pd.to_datetime(snapshot_timestamp, utc=True)
-    block_start = (stamps.dt.minute.eq(0) & stamps.dt.second.eq(0)
-                   & stamps.dt.microsecond.eq(0))
-    legacy = stamps.lt(SNAPSHOT_EXACT_UTC_FROM) & block_start
-    return stamps + legacy.astype("int64") * LEGACY_REQUEST_UPPER_BOUND
+    return request_upper_bound(pd.to_datetime(snapshot_timestamp, utc=True))
 
 
 def plan_availability_utc(snapshot_timestamp: pd.Series, *,
@@ -421,7 +414,8 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
     # the stop is Frankfurt. A stale snapshot without a departure time says
     # nothing about where the train is now.
     departures = events.loc[
-        events["event_kind"].eq("departure") & events["event_report_visible"],
+        events["event_kind"].eq("departure") & events["event_report_visible"]
+        & ~events["event_cancelled"],
         ["_row_id", "event_id", "reported_time_utc"],
     ].drop_duplicates(["_row_id", "event_id"])
     departure_time = latest[["event_id"]].reset_index().merge(

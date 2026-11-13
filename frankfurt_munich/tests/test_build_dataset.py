@@ -67,6 +67,32 @@ def test_cancellation_shown_again_after_a_withdrawal_holds_from_that_snapshot():
                                   "2026-03-03 03:19", "2026-03-03 05:00"]) == [True, False, False, True, True]
 
 
+def test_withdrawn_row_with_a_new_issue_time_does_not_cancel_again():
+    # Review of PR #13: S1 c 09:00, S2 p 09:00, S3 p with a new issue time 18:00.
+    snaps = snapshots([
+        ("a", "2025-07-01 08:00:00", "departure", "2025-07-01 09:00", "c"),
+        ("a", "2025-07-01 14:00:00", "departure", "2025-07-01 09:00", "p"),
+        ("a", "2025-07-01 20:00:00", "departure", "2025-07-01 18:00", "p")])
+    events = sn.cancellation_events(snaps, ["a"], "departure")
+    assert events.in_force.tolist() == [True, False]
+    assert in_force(events, "a", ["2025-07-01 10:00", "2025-07-01 17:00", "2025-07-01 19:00",
+                                  "2025-07-01 23:00"]) == [True, False, False, False]
+
+
+def test_cancelled_status_without_an_issue_time_counts_from_its_snapshot():
+    snaps = snapshots([("a", "2026-01-10 08:30:10", "arrival", None, "c")])
+    events = sn.cancellation_events(snaps, ["a"], "arrival")
+    assert in_force(events, "a", ["2026-01-10 09:30", "2026-01-10 09:31"]) == [False, True]
+
+
+def test_cancellation_that_no_longer_appears_ends_with_that_snapshot():
+    snaps = snapshots([
+        ("a", "2026-01-10 08:30:10", "departure", "2026-01-10 08:00", "c"),
+        ("a", "2026-01-10 11:00:10", "departure", None, None)])  # the stop, no cancellation
+    events = sn.cancellation_events(snaps, ["a"], "departure")
+    assert in_force(events, "a", ["2026-01-10 09:00", "2026-01-10 12:00", "2026-01-10 12:01"]) == [True, True, False]
+
+
 def journeys_and_stops():
     journeys = pd.DataFrame({
         "journey_id": ["ran", "withdrawn", "cancelled"],

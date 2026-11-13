@@ -214,11 +214,13 @@ def test_delay_dynamics_do_not_use_the_departure_from_frankfurt():
     assert result["upstream_stops_reported"] == 2
 
 
-@pytest.mark.parametrize("departure_forecast, expected", [
-    (None, 5.0),                                   # stale snapshot without a departure time
-    (pd.Timestamp("2025-12-01 10:20:00"), 90.0),   # departure shown after the cutoff: standing
+@pytest.mark.parametrize("departure_forecast, departure_cancelled, expected", [
+    (None, False, 5.0),                                   # stale snapshot without a departure time
+    (pd.Timestamp("2025-12-01 10:20:00"), False, 90.0),   # departure shown after the cutoff: standing
+    (pd.Timestamp("2025-12-01 10:20:00"), True, 5.0),     # onward departure cancelled: never leaves
 ])
-def test_waiting_counts_only_while_the_snapshot_shows_the_train_standing(departure_forecast, expected):
+def test_waiting_counts_only_while_the_snapshot_shows_the_train_standing(
+        departure_forecast, departure_cancelled, expected):
     rows = pd.DataFrame([{
         "journey_id": "journey-wait", "prediction_time": "1h",
         "predicted_at": pd.Timestamp("2025-12-01 10:00:00"),
@@ -235,7 +237,9 @@ def test_waiting_counts_only_while_the_snapshot_shows_the_train_standing(departu
         "arrival_change_time": pd.Timestamp("2025-12-01 08:05:00"),
         "departure_change_time": departure_forecast if departure_forecast is not None else pd.NaT,
         "arrival_cancellation_time": pd.NaT, "arrival_change_status": None,
-        "departure_cancellation_time": pd.NaT, "departure_change_status": None,
+        "departure_cancellation_time": (pd.Timestamp("2025-12-01 07:50:00")
+                                        if departure_cancelled else pd.NaT),
+        "departure_change_status": "c" if departure_cancelled else None,
     }])
     plans = pd.DataFrame([
         {"id": "wolfsburg", "station_name": "Wolfsburg Hbf",
