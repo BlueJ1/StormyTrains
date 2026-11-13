@@ -391,8 +391,13 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
     events = events.merge(target[ROW_KEY + ["_row_id", "cutoff_utc"]],
                           on=ROW_KEY, how="inner", suffixes=("", "_target"),
                           validate="many_to_one")
+    # The departure from Frankfurt itself is not used (decision of 13 November
+    # 2026, as for the final-record current_delay): at 0 min it would say
+    # whether the train left on time.
+    frankfurt_departure = (events["station_name"].eq("Frankfurt (Main) Hbf")
+                           & events["event_kind"].eq("departure"))
     occurred = events[
-        events["event_occurred_by_cutoff"] & ~events["event_cancelled"]
+        events["event_occurred_by_cutoff"] & ~events["event_cancelled"] & ~frankfurt_departure
     ].copy()
     if occurred.empty:
         return _empty_dynamics(target)

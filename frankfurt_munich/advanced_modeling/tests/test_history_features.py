@@ -170,6 +170,48 @@ def test_delay_dynamics_preserves_negative_delay_while_waiting_at_a_stop():
     assert result["current_delay"] == pytest.approx(-10.0)
 
 
+def test_delay_dynamics_do_not_use_the_departure_from_frankfurt():
+    rows = pd.DataFrame([{
+        "journey_id": "journey-on-time", "prediction_time": "0min",
+        "predicted_at": pd.Timestamp("2025-12-01 10:00:00"),
+    }])
+    upstream = pd.DataFrame([
+        {"journey_id": "journey-on-time", "id": "hanau", "station_name": "Hanau",
+         "train_line_station_num": 3},
+        {"journey_id": "journey-on-time", "id": "frankfurt",
+         "station_name": "Frankfurt (Main) Hbf", "train_line_station_num": 4},
+    ])
+    quiet = {"arrival_cancellation_time": pd.NaT, "arrival_change_status": None,
+             "departure_cancellation_time": pd.NaT, "departure_change_status": None}
+    changes = pd.DataFrame([
+        {"id": "hanau", "station_name": "Hanau",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 08:40:00"),
+         "arrival_change_time": pd.Timestamp("2025-12-01 09:34:00"),
+         "departure_change_time": pd.Timestamp("2025-12-01 09:36:00"), **quiet},
+        # Fetched before the cutoff: Frankfurt arrival 4 min late, departure on time.
+        {"id": "frankfurt", "station_name": "Frankfurt (Main) Hbf",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 08:55:00"),
+         "arrival_change_time": pd.Timestamp("2025-12-01 09:59:00"),
+         "departure_change_time": pd.Timestamp("2025-12-01 10:00:00"), **quiet},
+    ])
+    plans = pd.DataFrame([
+        {"id": "hanau", "station_name": "Hanau",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 07:00:00"),
+         "arrival_planned_time": pd.Timestamp("2025-12-01 09:30:00"),
+         "departure_planned_time": pd.Timestamp("2025-12-01 09:32:00")},
+        {"id": "frankfurt", "station_name": "Frankfurt (Main) Hbf",
+         "snapshot_timestamp": pd.Timestamp("2025-12-01 07:00:00"),
+         "arrival_planned_time": pd.Timestamp("2025-12-01 09:55:00"),
+         "departure_planned_time": pd.Timestamp("2025-12-01 10:00:00")},
+    ])
+
+    result = build_delay_dynamics(rows, upstream, changes, plans).iloc[0]
+
+    # The latest event is the arrival at Frankfurt (4 min late), not the departure.
+    assert result["current_delay"] == pytest.approx(4.0)
+    assert result["upstream_stops_reported"] == 2
+
+
 def test_delay_dynamics_rejects_non_cv_rows_when_split_is_present():
     rows = pd.DataFrame([{
         "journey_id": "journey-1", "prediction_time": "1h",
@@ -318,7 +360,8 @@ def test_replacement_uses_scheduled_reports_until_link_is_visible():
     plans = pd.DataFrame({
         "id": ["scheduled-1", "operated-1"],
         "snapshot_timestamp": pd.to_datetime(["2025-12-01 06:00", "2025-12-01 06:00"]),
-        "station_name": ["Frankfurt (Main) Hbf"] * 2,
+        # An upstream stop: the departure from Frankfurt itself is not used.
+        "station_name": ["Hanau Hbf"] * 2,
         "departure_planned_time": pd.to_datetime(["2025-12-01 08:00", "2025-12-01 09:00"]),
     })
     changes = pd.DataFrame({
