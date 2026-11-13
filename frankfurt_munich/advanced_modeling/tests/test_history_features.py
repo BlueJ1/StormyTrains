@@ -125,7 +125,7 @@ def test_delay_dynamics_uses_only_snapshot_and_plan_state_at_cutoff():
     assert arrival["change_observed_at_utc"] == pd.Timestamp("2025-12-01 07:00:00", tz="UTC")
     assert result["current_delay"] == pytest.approx(30.0)  # waits through planned departure
     assert result["upstream_stops_reported"] == 1
-    assert result["minutes_since_last_report"] == pytest.approx(60.0)
+    assert "minutes_since_last_report" not in result
     assert result["planned_minutes_remaining_before_frankfurt"] == pytest.approx(110.0)
     assert pd.isna(result["current_delay_change_min"])
 

@@ -34,9 +34,11 @@ RECENT_RELIABILITY_COLUMNS = [
     "corridor_severe_or_cancelled_rate_24h", "corridor_mean_delay_min_24h",
     "corridor_severe_or_cancelled_rate_3h", "corridor_mean_delay_min_3h",
 ]
+# No time since the last report (decision of 13 November 2026): it measures how
+# long ago the archive fetched an update, not the train.
 DELAY_DYNAMICS_COLUMNS = [
     "current_delay", "current_delay_change_min", "upstream_stops_reported",
-    "minutes_since_last_report", "planned_minutes_remaining_before_frankfurt",
+    "planned_minutes_remaining_before_frankfurt",
 ]
 NETWORK_STATE_COLUMNS = [
     "network_delayed_or_cancelled_share_1h",
@@ -403,12 +405,7 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
         return _empty_dynamics(target)
     report_agg = occurred.groupby("_row_id", sort=False).agg(
         upstream_stops_reported=("event_id", "nunique"),
-        _last_report_receipt_utc=("change_observed_at_utc", "max"),
     )
-    report_agg["minutes_since_last_report"] = (
-        target.set_index("_row_id")["cutoff_utc"].reindex(report_agg.index)
-        - report_agg["_last_report_receipt_utc"]
-    ).dt.total_seconds() / 60
 
     delay_events = occurred[occurred["event_delay_min"].notna()].sort_values(
         ["_row_id", "reported_time_utc", "station_sequence", "_event_kind_order"])
@@ -435,7 +432,7 @@ def delay_dynamics_from_events(rows: pd.DataFrame,
     features = target.set_index("_row_id")[[*ROW_KEY]].copy()
     features["current_delay"] = current_delay
     features["planned_minutes_remaining_before_frankfurt"] = remaining
-    features = features.join(report_agg[["upstream_stops_reported", "minutes_since_last_report"]])
+    features = features.join(report_agg[["upstream_stops_reported"]])
     time_order = {name: i for i, name in enumerate(PREDICTION_TIMES)}
     ordered = features.reset_index().assign(
         _time_order=lambda frame: frame.prediction_time.map(time_order)
@@ -513,8 +510,7 @@ def build_delay_dynamics(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
 def _empty_dynamics(target: pd.DataFrame) -> pd.DataFrame:
     out = target[["_row_id", *ROW_KEY]].copy().set_index("_row_id")
     for column in ("current_delay", "current_delay_change_min",
-                   "upstream_stops_reported", "minutes_since_last_report",
-                   "planned_minutes_remaining_before_frankfurt"):
+                   "upstream_stops_reported", "planned_minutes_remaining_before_frankfurt"):
         out[column] = np.nan
     return out.reset_index(drop=True)
 
