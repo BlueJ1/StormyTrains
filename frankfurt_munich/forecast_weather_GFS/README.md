@@ -16,6 +16,22 @@ The files in `data/` cover weather valid from 2024-07-01 through 2026-09-30, inc
 
 GFS precipitation accumulates over the preceding 1–6 hours. The export differences consecutive leads within each six-hour accumulation period and uses the source amount directly at the first hour of each period. Precipitation at lead zero and negative hourly differences are missing. The raw table preserves the original archive values.
 
+## Load the processed forecasts
+
+Run this from the repository root with pandas and PyArrow installed. The `gfs_weather_*.parquet` pattern selects all 28 processed partitions and loads them into one DataFrame.
+
+```python
+from pathlib import Path
+
+import pandas as pd
+
+data_dir = Path("frankfurt_munich/forecast_weather_GFS/data")
+weather = pd.concat(
+    [pd.read_parquet(path) for path in sorted(data_dir.glob("gfs_weather_*.parquet"))],
+    ignore_index=True,
+)
+```
+
 ## Precipitation type
 
 `add_gfs_wrtr.py` adds a nullable integer `wrtr` column to the processed Parquet. It follows the DWD code meanings used in this project. `0` means no precipitation, `6` means liquid (rain or freezing rain), `7` means solid (snow or ice pellets), and `8` means both liquid and solid. [DWD WRTR codes](https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/DESCRIPTION_obsgermany_climate_hourly_precipitation_en.pdf)
