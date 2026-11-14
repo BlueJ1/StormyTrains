@@ -1,0 +1,128 @@
+{
+  "scope": {
+    "dataset": "noaa-gfs-forecast-virtual",
+    "time_zone": "Europe/Berlin",
+    "start_local": "2025-09-01",
+    "end_local_exclusive": "2025-09-30",
+    "max_lead_hours": 48,
+    "grid_points": [
+      {
+        "grid_latitude": 50.0,
+        "grid_longitude": 9.25
+      },
+      {
+        "grid_latitude": 48.25,
+        "grid_longitude": 11.0
+      },
+      {
+        "grid_latitude": 50.0,
+        "grid_longitude": 11.0
+      },
+      {
+        "grid_latitude": 49.75,
+        "grid_longitude": 8.75
+      },
+      {
+        "grid_latitude": 48.75,
+        "grid_longitude": 9.25
+      },
+      {
+        "grid_latitude": 50.0,
+        "grid_longitude": 8.75
+      },
+      {
+        "grid_latitude": 49.5,
+        "grid_longitude": 11.0
+      },
+      {
+        "grid_latitude": 50.0,
+        "grid_longitude": 9.0
+      },
+      {
+        "grid_latitude": 49.5,
+        "grid_longitude": 8.75
+      },
+      {
+        "grid_latitude": 48.5,
+        "grid_longitude": 10.0
+      },
+      {
+        "grid_latitude": 48.75,
+        "grid_longitude": 11.5
+      },
+      {
+        "grid_latitude": 50.0,
+        "grid_longitude": 8.25
+      },
+      {
+        "grid_latitude": 49.5,
+        "grid_longitude": 8.5
+      },
+      {
+        "grid_latitude": 49.75,
+        "grid_longitude": 10.0
+      },
+      {
+        "grid_latitude": 48.25,
+        "grid_longitude": 11.5
+      },
+      {
+        "grid_latitude": 48.75,
+        "grid_longitude": 9.5
+      }
+    ]
+  },
+  "rows": 90944,
+  "files": {
+    "raw": {
+      "file": "gfs_raw_2025-09-01_2025-09-30.parquet",
+      "bytes": 2389404,
+      "sha256": "89fdf0c11e30a9a4118470aae197e7fe513fcba898dd55037f96d8fcb0a2fd41",
+      "nulls": {
+        "init_time_utc": 0,
+        "lead_hour": 0,
+        "grid_latitude": 0,
+        "grid_longitude": 0,
+        "valid_time_utc": 0,
+        "temperature_2m": 0,
+        "total_precipitation_surface": 1856,
+        "wind_u_10m": 0,
+        "wind_v_10m": 0,
+        "wind_gust_surface": 0,
+        "snow_thickness_surface": 0
+      }
+    },
+    "weather": {
+      "file": "gfs_weather_2025-09-01_2025-09-30.parquet",
+      "bytes": 1888526,
+      "sha256": "c4df4b2b13fb43f9c77354cf23765fc4ca9cc89de6834f09052418156ee0b390",
+      "nulls": {
+        "init_time_utc": 0,
+        "lead_hour": 0,
+        "grid_latitude": 0,
+        "grid_longitude": 0,
+        "valid_time_utc": 0,
+        "temperature_c": 0,
+        "precipitation_1h_mm": 1856,
+        "wind_speed_10m_ms": 0,
+        "wind_gust_ms": 0,
+        "snow_depth_cm": 0,
+        "wrtr": 9055
+      }
+    }
+  },
+  "negative_hourly_precip_values_in_read_window": 0,
+  "precipitation_type": {
+    "method": "noaa_gfs_hour_and_instantaneous_phase_v2",
+    "source": "https://noaa-gfs-bdp-pds.s3.amazonaws.com",
+    "wet_rows": 24257,
+    "wet_rows_without_code": 7199,
+    "wet_rows_filled_from_bucket": 1433,
+    "missing_forecast_indices": 0,
+    "code_counts": {
+      "0": 64831,
+      "6": 17058
+    },
+    "source_weather_sha256": "7abe2c68151d77c81b99912205fba55aa12e59c19689112536821b7031031b5b"
+  }
+}

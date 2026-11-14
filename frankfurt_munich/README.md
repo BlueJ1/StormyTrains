@@ -211,7 +211,7 @@ At 0 min, the 1,559 trains that start in Frankfurt and have no value had not lef
 
 ## Weather
 
-[NOAA GFS historical forecasts](forecast_weather_GFS/README.md) cover 30 September 2025 through 30 September 2026. The forecast tables include initialization and valid times for matching to railway prediction cutoffs.
+[NOAA GFS historical forecasts](forecast_weather_GFS/README.md) cover 1 July 2024 through 30 September 2026. The forecast tables include initialization and valid times for matching to railway prediction cutoffs.
 
 `weather_features.py` adds the weather known at the prediction time along the route to every prediction row. The station observations are the `_final` tables in `measured_weather_DWD/observations/` (see `measured_weather_DWD/README.md`); their gaps are already filled from a backup station within 50 km.
 
