@@ -1,0 +1,454 @@
+{
+  "name": "advanced_3_3_linear_regression_backward",
+  "step": "3.3",
+  "task": "delay",
+  "model": "linear_regression",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h",
+        "current_delay",
+        "upstream_stops_reported",
+        "planned_minutes_remaining_before_frankfurt"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h",
+        "current_delay",
+        "upstream_stops_reported",
+        "planned_minutes_remaining_before_frankfurt"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "public_holiday_he",
+        "public_holiday_bw",
+        "school_holiday_he",
+        "school_holiday_bw",
+        "school_holiday_by",
+        "bridge_day",
+        "day_before_holiday",
+        "day_after_holiday",
+        "planned_stops",
+        "upstream_planned_min",
+        "service_severe_or_cancelled_rate_7d",
+        "service_mean_delay_min_7d",
+        "service_severe_or_cancelled_rate_28d",
+        "service_mean_delay_min_28d",
+        "corridor_severe_or_cancelled_rate_24h",
+        "corridor_mean_delay_min_24h",
+        "current_delay",
+        "upstream_stops_reported",
+        "planned_minutes_remaining_before_frankfurt"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month",
+        "route_id"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "backward",
+  "evaluation": "nested",
+  "git_commit": "7e0e96a2569f4722c545856aeae96c0170d7ee80",
+  "chosen": {},
+  "group_choices": [
+    {
+      "prediction_time": "24h",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.394142271376023
+    },
+    {
+      "prediction_time": "24h",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.86107067787871
+    },
+    {
+      "prediction_time": "24h",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "route",
+        "timetable"
+      ],
+      "inner_score": 24.423509455960577
+    },
+    {
+      "prediction_time": "24h",
+      "outer_fold": 4,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.211904859866323
+    },
+    {
+      "prediction_time": "24h",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.633273183318178
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.12578464516224
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.60725529657925
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "route",
+        "timetable"
+      ],
+      "inner_score": 24.326942863385078
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 4,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.16310298304762
+    },
+    {
+      "prediction_time": "6h",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.397144001714956
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.710681296045685
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.14310879301303
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.87057678750214
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 4,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.684133163448
+    },
+    {
+      "prediction_time": "1h",
+      "outer_fold": 5,
+      "groups": [
+        "delay",
+        "recent_reliability",
+        "route",
+        "timetable"
+      ],
+      "inner_score": 24.145999903638835
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.68857444998968
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 24.05140785694077
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.831265772742626
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 4,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.630351162968168
+    },
+    {
+      "prediction_time": "20min",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.933228137984287
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 1,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.486051827369895
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 2,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.90019597127951
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 3,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.615874596589272
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 4,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.417862333105067
+    },
+    {
+      "prediction_time": "0min",
+      "outer_fold": 5,
+      "groups": [
+        "calendar",
+        "delay",
+        "recent_reliability",
+        "timetable"
+      ],
+      "inner_score": 23.73036484361331
+    }
+  ],
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-14T09:05:29"
+}

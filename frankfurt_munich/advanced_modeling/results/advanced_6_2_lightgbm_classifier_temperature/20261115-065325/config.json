@@ -1,0 +1,231 @@
+{
+  "name": "advanced_6_2_lightgbm_classifier_temperature",
+  "step": "6.2",
+  "task": "severity",
+  "model": "lightgbm_classifier",
+  "target": "severity_class",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "temperature",
+  "evaluation": "nested",
+  "git_commit": "7e0e96a2569f4722c545856aeae96c0170d7ee80",
+  "chosen": {},
+  "combination": {
+    "24h": {
+      "source": "advanced_0_8_lightgbm_classifier/20261113-230146",
+      "config_ids": {
+        "1": 18,
+        "2": 18,
+        "3": 14,
+        "4": 16,
+        "5": 16
+      },
+      "fitted": {
+        "1": {
+          "temperature": 0.9820264772767923
+        },
+        "2": {
+          "temperature": 0.9902662676760188
+        },
+        "3": {
+          "temperature": 0.9810164070990438
+        },
+        "4": {
+          "temperature": 1.020312819472011
+        },
+        "5": {
+          "temperature": 1.017455237955622
+        }
+      }
+    },
+    "6h": {
+      "source": "advanced_0_8_lightgbm_classifier/20261113-230146",
+      "config_ids": {
+        "1": 18,
+        "2": 14,
+        "3": 18,
+        "4": 4,
+        "5": 16
+      },
+      "fitted": {
+        "1": {
+          "temperature": 0.9859794341165625
+        },
+        "2": {
+          "temperature": 0.9923432488918145
+        },
+        "3": {
+          "temperature": 0.9813619411505171
+        },
+        "4": {
+          "temperature": 1.0261043582775846
+        },
+        "5": {
+          "temperature": 1.008715878128359
+        }
+      }
+    },
+    "1h": {
+      "source": "advanced_0_8_lightgbm_classifier/20261113-230146",
+      "config_ids": {
+        "1": 5,
+        "2": 14,
+        "3": 5,
+        "4": 5,
+        "5": 18
+      },
+      "fitted": {
+        "1": {
+          "temperature": 1.0344361215892588
+        },
+        "2": {
+          "temperature": 0.9883021340862129
+        },
+        "3": {
+          "temperature": 1.0192922211509363
+        },
+        "4": {
+          "temperature": 1.0198779331364214
+        },
+        "5": {
+          "temperature": 0.9846636393846447
+        }
+      }
+    },
+    "20min": {
+      "source": "advanced_0_8_lightgbm_classifier/20261113-230146",
+      "config_ids": {
+        "1": 4,
+        "2": 4,
+        "3": 5,
+        "4": 5,
+        "5": 5
+      },
+      "fitted": {
+        "1": {
+          "temperature": 1.0479461466742865
+        },
+        "2": {
+          "temperature": 1.0302378391742433
+        },
+        "3": {
+          "temperature": 1.0212083761691177
+        },
+        "4": {
+          "temperature": 1.0314197220325685
+        },
+        "5": {
+          "temperature": 1.040283010114826
+        }
+      }
+    },
+    "0min": {
+      "source": "advanced_0_8_lightgbm_classifier/20261113-230146",
+      "config_ids": {
+        "1": 5,
+        "2": 14,
+        "3": 14,
+        "4": 4,
+        "5": 14
+      },
+      "fitted": {
+        "1": {
+          "temperature": 1.0238968670675277
+        },
+        "2": {
+          "temperature": 0.9783221550958618
+        },
+        "3": {
+          "temperature": 0.9785503710226237
+        },
+        "4": {
+          "temperature": 1.039154365388669
+        },
+        "5": {
+          "temperature": 0.985836136873804
+        }
+      }
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-15T06:53:25"
+}

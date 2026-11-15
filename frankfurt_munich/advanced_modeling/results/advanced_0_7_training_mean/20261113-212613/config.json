@@ -1,0 +1,51 @@
+{
+  "name": "advanced_0_7_training_mean",
+  "step": "0.7",
+  "task": "delay",
+  "model": "training_mean",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [],
+      "categorical": []
+    },
+    "6h": {
+      "numeric": [],
+      "categorical": []
+    },
+    "1h": {
+      "numeric": [],
+      "categorical": []
+    },
+    "20min": {
+      "numeric": [],
+      "categorical": []
+    },
+    "0min": {
+      "numeric": [],
+      "categorical": []
+    }
+  },
+  "feature_set": "base",
+  "variant": "",
+  "evaluation": "prespecified",
+  "git_commit": "7e0e96a2569f4722c545856aeae96c0170d7ee80",
+  "chosen": {},
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-13T21:26:13"
+}

@@ -1,0 +1,137 @@
+{
+  "name": "advanced_7_3_tabgns",
+  "step": "7.3",
+  "task": "delay",
+  "model": "tabgns",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "",
+  "evaluation": "nested",
+  "git_commit": "7e0e96a2569f4722c545856aeae96c0170d7ee80",
+  "chosen": {},
+  "calendar": "native",
+  "cpu_budgets": {
+    "24h": {
+      "1": 75.55141599999999,
+      "2": 73.31319000000008,
+      "3": 67.12857799999995,
+      "4": 65.30120600000004,
+      "5": 62.86020200000013
+    },
+    "6h": {
+      "1": 61.51046599999984,
+      "2": 57.621613999999965,
+      "3": 56.58464299999997,
+      "4": 57.004412000000116,
+      "5": 58.833768999999734
+    },
+    "1h": {
+      "1": 58.14767199999994,
+      "2": 61.953512999999816,
+      "3": 63.75638599999979,
+      "4": 65.09564700000021,
+      "5": 69.10260600000004
+    },
+    "20min": {
+      "1": 68.32958100000019,
+      "2": 67.73033999999984,
+      "3": 66.66173200000026,
+      "4": 68.77195699999947,
+      "5": 61.485177999999905
+    },
+    "0min": {
+      "1": 63.65929299999971,
+      "2": 59.01292199999966,
+      "3": 56.084804000000304,
+      "4": 57.73209699999984,
+      "5": 57.761360999999624
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-14T18:14:38"
+}

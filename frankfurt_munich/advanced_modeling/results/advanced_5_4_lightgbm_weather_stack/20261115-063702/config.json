@@ -1,0 +1,483 @@
+{
+  "name": "advanced_5_4_lightgbm_weather_stack",
+  "step": "5.4",
+  "task": "delay",
+  "model": "lightgbm",
+  "target": "arrival_delay_min",
+  "weather": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "origin_temperature_c",
+        "destination_temperature_c",
+        "route_temp_max_c",
+        "route_temp_min_c",
+        "route_temp_max_24h_c",
+        "route_temp_min_24h_c",
+        "route_precip_max_mm",
+        "route_precip_24h_mm",
+        "route_wind_max_ms",
+        "route_wind_max_24h_ms",
+        "route_gust_max_ms",
+        "route_gust_max_24h_ms",
+        "route_snow_depth_cm",
+        "snow_on_route_24h"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "stack",
+  "evaluation": "exploratory",
+  "git_commit": "7e0e96a2569f4722c545856aeae96c0170d7ee80",
+  "chosen": {
+    "24h": {
+      "config_id": 38,
+      "params": {
+        "cat_smooth": 2.2202595144810537,
+        "colsample_bytree": 0.6036961544665811,
+        "learning_rate": 0.02556063837470779,
+        "min_child_samples": 48,
+        "n_estimators": 670,
+        "num_leaves": 5,
+        "reg_alpha": 0.0315101491238403,
+        "reg_lambda": 1.3467890557370734,
+        "subsample": 0.7515681292900438
+      }
+    },
+    "6h": {
+      "config_id": 41,
+      "params": {
+        "cat_smooth": 1.3763300805327483,
+        "colsample_bytree": 0.3705446009641986,
+        "learning_rate": 0.00538730007236937,
+        "min_child_samples": 7,
+        "n_estimators": 774,
+        "num_leaves": 5,
+        "reg_alpha": 0.01887567630782228,
+        "reg_lambda": 16.76395764312379,
+        "subsample": 0.511635967867913
+      }
+    },
+    "1h": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "20min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "0min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    }
+  },
+  "configuration_source": "lightgbm_weather/20261026-093239/config.json",
+  "combination": {
+    "24h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            -0.04618985418694968,
+            0.7434795442194803,
+            0.19510934579275319
+          ],
+          "intercept": 1.7222933508795641
+        },
+        "2": {
+          "weights": [
+            0.09649563745762978,
+            0.7162300417421461,
+            0.11212277223356222
+          ],
+          "intercept": 1.3161924942137837
+        },
+        "3": {
+          "weights": [
+            0.32540019045043866,
+            0.16623696166774565,
+            0.36831176852527103
+          ],
+          "intercept": 2.3320996347467506
+        },
+        "4": {
+          "weights": [
+            0.04207366906925376,
+            0.7466236881336398,
+            0.1532693319198258
+          ],
+          "intercept": 1.3355962717431566
+        },
+        "5": {
+          "weights": [
+            -0.12857336966325622,
+            0.9139766618597417,
+            0.2090330898279851
+          ],
+          "intercept": 0.12091787251283037
+        }
+      }
+    },
+    "6h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            -0.13358288679199015,
+            1.1359119603471641,
+            0.03995760861877076
+          ],
+          "intercept": -0.7527556616658515
+        },
+        "2": {
+          "weights": [
+            0.04342058282291059,
+            0.5915846816646101,
+            0.27428204831598285
+          ],
+          "intercept": 1.5777417708904515
+        },
+        "3": {
+          "weights": [
+            -0.03483048915178825,
+            0.7755797192587409,
+            0.19597497965308314
+          ],
+          "intercept": 0.8707559497757202
+        },
+        "4": {
+          "weights": [
+            -0.6535096158181259,
+            1.344680865768209,
+            0.09763557407634699
+          ],
+          "intercept": 3.6496312095154284
+        },
+        "5": {
+          "weights": [
+            0.18247337261822294,
+            0.601324753984373,
+            0.25105783579057184
+          ],
+          "intercept": -0.7390761367294303
+        }
+      }
+    },
+    "1h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.18595146082486436,
+            0.3151273702070653,
+            0.4381915211254392
+          ],
+          "intercept": 1.0150178879798517
+        },
+        "2": {
+          "weights": [
+            0.30263400099678694,
+            0.353248644724506,
+            0.22919729029785396
+          ],
+          "intercept": 2.200132338827853
+        },
+        "3": {
+          "weights": [
+            0.39843688294188206,
+            0.25346545463054776,
+            0.2832370261266233
+          ],
+          "intercept": 0.9436711289552839
+        },
+        "4": {
+          "weights": [
+            0.4967684710989587,
+            0.35409890840048974,
+            0.10701721289781109
+          ],
+          "intercept": 0.7138581212378519
+        },
+        "5": {
+          "weights": [
+            0.6949414440196712,
+            0.1198144081479614,
+            0.09311740068426443
+          ],
+          "intercept": 1.512383693440448
+        }
+      }
+    },
+    "20min": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            -0.05886371231717126,
+            1.011505721409103,
+            0.11630369731498878
+          ],
+          "intercept": -1.188921698743279
+        },
+        "2": {
+          "weights": [
+            -0.04402113109617019,
+            0.8068630860381258,
+            0.22911508939899475
+          ],
+          "intercept": -0.1607473272152653
+        },
+        "3": {
+          "weights": [
+            0.14710630113406292,
+            0.5779703442737242,
+            0.2715906183567192
+          ],
+          "intercept": -0.3102316672446719
+        },
+        "4": {
+          "weights": [
+            0.11670503694824554,
+            0.7997467563888842,
+            0.12017645782417596
+          ],
+          "intercept": -0.8008735870058956
+        },
+        "5": {
+          "weights": [
+            -0.11412797404648972,
+            0.8795998478387602,
+            0.2534140755365784
+          ],
+          "intercept": -0.41167443935517056
+        }
+      }
+    },
+    "0min": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.16786318481461382,
+            0.629334777147189,
+            0.17573198491947825
+          ],
+          "intercept": 0.208679048211323
+        },
+        "2": {
+          "weights": [
+            0.1308310874356819,
+            0.7329466771840712,
+            0.15897584698544845
+          ],
+          "intercept": -0.6712466647654871
+        },
+        "3": {
+          "weights": [
+            0.016169911588713174,
+            0.8167966934820884,
+            0.17644845269409587
+          ],
+          "intercept": -0.22602283021220515
+        },
+        "4": {
+          "weights": [
+            0.23216558408737178,
+            0.6781845159599301,
+            0.11917948427301833
+          ],
+          "intercept": -0.7537416648525408
+        },
+        "5": {
+          "weights": [
+            0.11657132806321004,
+            0.5994603712804725,
+            0.29729842510276777
+          ],
+          "intercept": -0.40380426419553217
+        }
+      }
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-15T06:37:02"
+}
