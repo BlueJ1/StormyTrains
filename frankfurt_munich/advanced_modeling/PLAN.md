@@ -1,6 +1,6 @@
 # Advanced modelling plan: Frankfurt (Main) Hbf → München Hbf
 
-Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026, D14–D16 on 12 November 2026; revised the same day after the review of PR #11. Updated 12 November 2026. **On 12 November 2026 the group decided to correct the dataset and the inputs, rerun every CV arm and evaluate newly registered finalists on the hold-out set (D14–D16, Phase 10). Every result below is from before these corrections.** The PR review corrections and affected CV reruns were completed on 7 November, and the original hold-out evaluation is preserved at commit 065b077. These results were merged with PR #12 on 8 November 2026. The CV results include the fixes from its review; the original hold-out results predate them (see the log).
+Drafted 4 November 2026. Decisions D1–D13 made on 4 November 2026, D14–D16 on 12 November 2026; revised the same day after the review of PR #11. Updated 15 November 2026. **On 12 November 2026 the group decided to correct the dataset and the inputs, rerun every CV arm and evaluate newly registered finalists on the hold-out set (D14–D16, Phase 10). The result lines of Phases 0–8 are from the rerun on the corrected inputs (10.4, 15 November 2026); Phase 9 is the original evaluation, from before the corrections.** The PR review corrections and affected CV reruns were completed on 7 November, and the original hold-out evaluation is preserved at commit 065b077. These results were merged with PR #12 on 8 November 2026. The CV results include the fixes from its review; the original hold-out results predate them (see the log).
 
 **Two versions.** This file and `plan.html` (published at https://claude.ai/artifact/KAso5U9ubq5rFxMy7juUna) hold the same plan. Whenever the plan changes or a step is completed, update both: the experiment's status and result line here, and the matching entry in the data lists at the bottom of `plan.html`, then republish the artifact.
 
@@ -75,14 +75,14 @@ Changes to the shared pipeline that later phases need. 0.7 comes first: every la
 | 0.5 | Extra metrics | — | dropped (D9) |
 | 0.6 | **Tests** for each of the above, in the style of `tests/` (answer-as-feature, shuffled labels, no hold-out access, no outer-fold rows in nested choices) | S | done |
 
-- **0.7.** All 26 reference and recorded-route diagnostic runs passed audit after the review corrections. Fixed-configuration comparisons remain exploratory.
+- **0.7.** All 26 reference and recorded-route diagnostic runs passed audit. Fixed-configuration comparisons remain exploratory. At 24 h and 0 min the best fixed scores were log loss 0.920 and 0.829 (class shares 0.968 and 0.896) and RMSE 24.45 and 23.70 min (training mean 25.42 and 25.40 min). The recorded-route fields lowered the error by at least the D12 gain in 14 of 60 diagnostic comparisons.
 - **0.1.** Base and recorded-route diagnostic sets defined. Phase 1 transformations run inside the fitted pipeline.
 - **0.2.** The comparison CLI checks paired validation rows and reports the five differences, their mean, improvement count and D12 decision.
 - **0.3.** Four stratified inner week folds inside each outer training set. Tests check coverage and separation.
 - **0.4.** The CV runner reads matching flat-search configurations by prediction time and marks those runs exploratory.
-- **0.8.** All eight base searches and eight feature-policy arms passed audit at 20 configurations. Each feature variant was screened over the same first three configurations before tuning the selected variant. The policy reached D12 in 20 of 20 LightGBM and 13 of 20 XGBoost comparisons.
+- **0.8.** All eight base searches and eight feature-policy arms passed audit at 20 configurations. Nested LightGBM scored log loss 0.924 and 0.834 and RMSE 24.52 and 23.78 min at 24 h and 0 min. Each feature variant was screened over the same first three configurations before tuning the selected variant. The policy reached D12 in 20 of 20 LightGBM and 13 of 20 XGBoost comparisons.
 
-- **0.6.** The reviewed main suite passed 183 tests with five skips. Four distribution tests passed separately, leaving one intentional duplicate test skipped across the environments. All 366 CV arms passed the result audit. The 336 updated arms preserved the predictions of untouched horizons exactly.
+- **0.6.** The main suite (advanced, modelling and dataset tests) passed 188 tests with five skips on 15 November 2026, and the four distribution tests passed in the pinned environment. All 354 active CV arms of 10.4 passed the output audit.
 
 ## Phase 1. Feature representations
 
@@ -98,15 +98,15 @@ Expectation: trees split on the categories natively, so they should barely react
 | 1.4 | **`current_delay` transforms** (1 h, 20 min, 0 min) | raw (now) / negative values clipped to 0 (open issue 1 in `../README.md`) / `log1p` of the positive part / delay bins; explicit missing indicator for trees too | LR, LightGBM | S | low–medium for LR | done |
 | 1.5 | **Weather representations** | raw (now) / threshold indicators for extremes (heat over 30 °C, gust over 20 m/s, snow, heavy rain) / change over the last 24 h | LightGBM | S | low | done |
 
-- **1.1.** All 16 calendar runs finished under the regenerated inputs. None of 80 exploratory paired comparisons reached D12. The native calendar remains the default for the neural comparisons.
+- **1.1.** All 16 calendar runs passed audit. None of 80 exploratory paired comparisons reached D12. The native calendar remains the default for the neural comparisons.
 
-- **1.2.** All ten finer-time runs finished. None of 50 exploratory paired comparisons reached D12.
+- **1.2.** All ten finer-time runs passed audit. None of 50 exploratory paired comparisons reached D12.
 
-- **1.4.** All 14 delay-transform runs finished. None of 42 exploratory paired comparisons reached D12.
+- **1.4.** All 14 delay-transform runs passed audit. None of 42 exploratory paired comparisons reached D12.
 
-- **1.5.** One of 20 exploratory comparisons reached D12: weather-extreme indicators reduced LightGBM severity log loss at 24 h by 0.00311, with four folds improving. No delay comparison reached the RMSE threshold.
+- **1.5.** Five of 20 exploratory comparisons reached D12, all for the weather-extreme indicators from 1 h on: LightGBM severity log loss fell by 0.0055 to 0.0064 at 1 h, 20 min and 0 min, and delay RMSE by 0.12 and 0.10 min at 1 h and 20 min. The 24-hour weather changes reached D12 in none.
 
-- **1.3.** All 14 route-encoding runs finished. None of 50 exploratory paired comparisons against native planned-route encoding reached D12. Missing routes carry no target-encoded value.
+- **1.3.** All 14 route-encoding runs passed audit. Two of 50 exploratory comparisons against native planned-route encoding reached D12: one-hot routes lowered LightGBM delay RMSE by 0.11 min at 24 h and at 6 h, in all five folds. Missing routes carry no target-encoded value.
 
 ## Phase 2. New features
 
@@ -128,17 +128,17 @@ Each feature group is added to the base set on its own and then all together, wi
 | 2.4 | **Delay dynamics** (1 h on) | number of upstream stops reported, planned minutes still to run before Frankfurt; all as known at `predicted_at`. The minutes since the last report and the change of `current_delay` between prediction times were removed on 13 November 2026: both mostly follow the archive's fetch times | S | medium at 1 h–0 min | done |
 | 2.5 | **Network state** | share of ICE/IC trains delayed 20+ min or cancelled in the hour before `predicted_at`, as known then from the snapshots. Counted over the stations in `data/stations_present_in_all_months.csv`, so that the coverage expansion of 3 November 2025 does not shift the feature; also at Frankfurt Hbf and München Hbf. Dropped on 13 November 2026 (review of PR #13): the shares follow the archive's fetch clock, falling from 0.18 within an hour of a fetch to 0.06 five hours later. | M | medium | dropped |
 
-- **2.3.** All four holiday arms finished. None of 20 exploratory paired comparisons reached D12.
+- **2.3.** All four holiday arms passed audit. None of 20 exploratory paired comparisons reached D12.
 
-- **2.2.** All four timetable-feature arms passed audit. One of 20 exploratory comparisons reached D12.
+- **2.2.** All four timetable-feature arms passed audit. Seven of 20 exploratory comparisons reached D12: LightGBM delay at all five horizons (0.12 to 0.22 min) and LightGBM severity at 24 h and 6 h (0.0044 and 0.0042).
 
-- **2.4.** All four delay-dynamics arms passed audit after switching to scheduled-run history before replacement announcements. Two of 12 exploratory comparisons reached D12. After the second review, replacements without a recorded replaced train use their operated run; this changed two dynamics columns in 22 CV rows, and these arms were not rerun.
+- **2.4.** All four delay-dynamics arms passed audit. One of 12 exploratory comparisons reached D12: LightGBM severity at 1 h (0.0032).
 
-- **2.1.** Both splits now use the same full target-free stop roster. Snapshot visibility still controls whether a past outcome is known. The corrected CV cache and all four model arms passed audit. Seventeen of 20 exploratory comparisons reached D12.
+- **2.1.** Both splits use the same full target-free stop roster. Snapshot visibility still controls whether a past outcome is known. All four model arms passed audit. Seventeen of 20 exploratory comparisons reached D12: all ten for logistic and linear regression, four for LightGBM severity and three for LightGBM delay.
 
-- **2.5.** The input audit found a temporary archive path that had omitted all plans. The builder now requires the project archive. The corrected CV build used 5,336,631 plan rows and had network-wide shares for 61,064 of 85,901 predictions. None of the 20 corrected exploratory paired comparisons reached D12.
+- **2.5.** Dropped on 13 November 2026 (see the log); its arms were not rerun in 10.4.
 
-- **Combined groups.** All four combined-feature arms passed audit with the revised reliability and replacement history. Nineteen of 20 exploratory comparisons reached D12.
+- **Combined groups.** All four combined-feature arms passed audit. All 20 exploratory comparisons reached D12.
 
 ## Phase 3. Feature subsets and importance
 
@@ -154,15 +154,15 @@ Groups: timetable, calendar, route, `current_delay` (+ dynamics), recent reliabi
 | 3.4 | **Weather subsets** | pre-listed: temperature only, wind and gust only, snow only, extremes only (from 1.5). Weather hurt slightly as a whole; a small subset may add signal without noise | S | done |
 | 3.5 | **Per prediction time** | whether the best groups differ between 24 h and 0 min (at 0 min `current_delay` may make others redundant) | S | done |
 
-- **3.1.** All 84 ablation arms were audited after correcting the network inputs. Add-one screens reached D12 in 104 of 172 comparisons against timetable-only inputs. None of 192 drop-one comparisons reached D12 against the full groups. These comparisons are exploratory.
+- **3.1.** All 76 ablation arms passed audit (the eight network-state arms were dropped with 2.5). Add-one screens reached D12 in 94 of 152 comparisons against timetable-only inputs. None of 172 drop-one comparisons reached D12 against the full groups. These comparisons are exploratory.
 
-- **3.2.** The corrected importance fits exactly reproduced 82,755 delay and 85,901 severity predictions from the full-group ablation. Permutation importance favored calendar at 24 h, reliability at 6 h, and delay near departure. Hour led mean absolute TreeSHAP in eight of ten task and horizon panels.
+- **3.2.** The importance fits exactly reproduced the 82,683 delay and 85,826 severity predictions of the full-group ablation. For delay, permutation importance favored calendar at 24 h, recent reliability at 6 h and delay from 1 h on; for severity, route at 24 h, 1 h and 20 min, recent reliability at 6 h and delay at 0 min. Route ID led mean absolute TreeSHAP in all five severity panels and hour in four of five delay panels (the 28-day service mean delay at 6 h).
 
-- **3.3.** All 14 group-selection arms passed audit. L1 logistic regression reached D12 in seven of ten comparisons against its full-group counterpart. Neither forward nor backward selection reached D12 in its 20 comparisons.
+- **3.3.** All 14 group-selection arms passed audit. L1 logistic regression reached D12 in all ten comparisons against its full-group counterpart. Forward and backward selection reached D12 in none of their 40 comparisons.
 
-- **3.4.** All ten corrected weather-subset arms finished. None of 40 exploratory paired comparisons reached D12 against the full-weather feature set.
+- **3.4.** All ten weather-subset arms passed audit. None of 40 exploratory paired comparisons reached D12 against the full-weather feature set.
 
-- **3.5.** Across 40 outer-fold selections per horizon, timetable and recent reliability were retained in all 40 at 24 h and at departure. Delay was retained in all 40 departure selections. Network state rose from 4 to 32 selections and route from 12 to 24. Calendar was retained in 27 at each of those horizons.
+- **3.5.** Across 40 outer-fold selections per horizon, timetable and recent reliability were retained in all 40 at 24 h and at departure, and delay in all 40 departure selections. Calendar fell from 29 selections at 24 h to 20 at departure; route was retained in 16 and 14, temperature in 11 and 16.
 
 ## Phase 4. Two-stage and decomposed models
 
@@ -184,7 +184,7 @@ Question: does splitting the problem into parts that are easier to learn help? B
 
 - **4.5.** Both change-then-level arms passed audit. None of six exploratory comparisons reached D12.
 
-- **4.2.** All six distribution-to-severity arms passed audit in the separate pinned environment. None of 30 exploratory comparisons reached D12.
+- **4.2.** All six distribution-to-severity arms passed audit in the separate pinned environment, with OpenMP limited to one thread (see the log). None of 30 exploratory comparisons reached D12.
 
 ## Phase 5. Ensembles
 
@@ -197,13 +197,13 @@ Question: do combinations of models beat the best single model? Boosters that ti
 | 5.3 | **Weighted ensemble** | weights by greedy ensemble selection (Caruana et al. 2004), chosen on inner folds | M | low–medium | done |
 | 5.4 | **Stacking** | logistic regression (severity) or linear regression (delay) on cross-fitted predictions of the base models (rule 7) | M | low–medium | done |
 
-- **5.1.** All 18 fixed averages passed audit. None of 90 exploratory comparisons reached D12 against the strongest included single model.
+- **5.1.** All 18 fixed averages passed audit. Five of 90 exploratory comparisons reached D12 against the strongest included single model, all with weather: the severity average with LR and CatBoost at 1 h, 20 min and 0 min, the severity average with LR at 20 min, and the delay average with LR at 1 h.
 
-- **5.2.** All 24 seed and configuration averages passed audit. Four of 40 nested and four of 80 exploratory comparisons reached D12.
+- **5.2.** All 24 seed and configuration averages passed audit. Three of 40 nested comparisons reached D12, all for the railway-only LightGBM classifier averaging its top five nested configurations (24 h, 6 h, 0 min). Three of 80 exploratory comparisons reached D12, all for top-five flat averages with weather; seed averages reached it in none.
 
-- **5.3.** All four greedy-weight arms finished. None of 20 exploratory comparisons reached D12 against the strongest included single model at each horizon.
+- **5.3.** All four greedy-weight arms passed audit. Three of 20 exploratory comparisons reached D12 against the strongest included single model at each horizon, all with weather: severity at 1 h and 20 min, delay at 1 h.
 
-- **5.4.** All four cross-fitted stacking arms finished. None of 20 exploratory comparisons reached D12 against the strongest included single model at each horizon.
+- **5.4.** All four cross-fitted stacking arms passed audit. One of 20 exploratory comparisons reached D12 against the strongest included single model at each horizon: delay with weather at 1 h (0.12 min).
 
 ## Phase 6. Further model families
 
@@ -218,15 +218,15 @@ Question: do other learners do better than XGBoost and LightGBM, or add to an en
 | 6.5 | **Distributional delay models**: NGBoost, quantile regression forest, LightGBMLSS (mixture) | already surveyed in `regression_models.md`; scored by the RMSE of the mean and, through 4.2, by the severity log loss (D9); feeds 4.2 | M | done |
 | 6.6 | **Other losses for delay**: Huber, log-shifted target | robust to the long tail; RMSE may get worse, so this is a check rather than a likely gain | S | done |
 
-- **6.1.** All four CatBoost arms finished at the 20-configuration budget. None of the 20 paired comparisons against the matched LightGBM baselines met D12.
+- **6.1.** All four CatBoost arms passed audit at the 20-configuration budget. One of the 20 nested comparisons against the matched LightGBM baselines reached D12: CatBoost with weather lowered delay RMSE at 1 h by 0.11 min, in all five folds.
 
-- **6.5.** All six distributional arms passed audit in the separate pinned environment. None of 30 comparisons reached D12 against the nested LightGBM baseline. The mixture result describes the specified LightGBMLSS adapter.
+- **6.5.** All six distributional arms passed audit in the separate pinned environment, with OpenMP limited to one thread (see the log). None of 30 comparisons reached D12 against the nested LightGBM baseline. The mixture result describes the specified LightGBMLSS adapter.
 
 - **6.3.** All four prespecified EBM arms passed audit. None of 20 comparisons reached D12 against the nested LightGBM baseline. The library's multiclass global visualization omits fitted pairwise terms.
 
 - **6.6.** Both losses in both feature arms passed audit. None of 20 exploratory comparisons reached D12 against the squared-error baseline.
 
-- **6.2.** All 12 cross-fitted isotonic and temperature calibration arms finished. None of the 60 comparisons against the corresponding uncalibrated classifier met D12.
+- **6.2.** All 12 cross-fitted isotonic and temperature calibration arms passed audit. None of the 60 comparisons against the corresponding uncalibrated classifier reached D12.
 
 ## Phase 7. Neural networks
 
@@ -242,15 +242,15 @@ Question: does a neural network match or beat the boosters here, and does it add
 
 **About TabGNS.** The paper compares only with other architecture-search methods (TabNAS, AgE) and a large fixed MLP, on datasets of 31,000 to 940,000 rows. Its main results are smaller networks (51–82% fewer parameters) and faster search, with accuracy about equal to a large MLP. It has no comparison with gradient-boosted trees. So we should expect TabGNS to find a compact MLP about as good as 7.1, not to beat the boosters. The comparison is still worth making, and the method is a reasonable "advanced neural model" for the report.
 
-- **7.1.** All four eight-configuration native-calendar MLP arms finished. None of 20 paired means reached D12 against the nested LightGBM baselines. The measured search and refit CPU times supply the TabGNS budgets.
+- **7.1.** All four eight-configuration native-calendar MLP arms passed audit. None of 20 comparisons reached D12 against the nested LightGBM baselines; the MLP had the higher error in all 20 (median 0.59 min RMSE and 0.020 log loss). The measured search and refit CPU times supply the TabGNS budgets.
 
-- **7.2.** All four native-calendar joint-target arms passed audit. Seven of 20 nested comparisons reached D12 against the MLP.
+- **7.2.** All four native-calendar joint-target arms passed audit. Seven of 20 nested comparisons reached D12 against the MLP, all for delay. Against nested LightGBM none of the 20 reached D12, and all 20 had the higher error.
 
-- **7.3.** All four native-calendar arms passed audit after deterministic checkpoint scoring was added. Thirteen of 20 nested comparisons reached D12 against the MLP. Training uses hard Gumbel gates, checkpoint selection uses the extraction mask, and inner validation selects dense refit epochs before the from-scratch full-training refit.
+- **7.3.** All four native-calendar arms passed audit. Fourteen of 20 nested comparisons reached D12 against the MLP. Against nested LightGBM none of the 20 reached D12, and all 20 had the higher error (median 0.18 min RMSE and 0.016 log loss). Training uses hard Gumbel gates, checkpoint selection uses the extraction mask, and inner validation selects dense refit epochs before the from-scratch full-training refit.
 
-- **7.4.** All eight RealMLP and TabM arms passed audit with a 64-epoch cap and week-held validation. Twenty of 40 comparisons reached D12 against the MLP. The original holdout used models with full-training refit support.
+- **7.4.** All eight RealMLP and TabM arms passed audit with a 64-epoch cap and week-held validation. Twenty-six of 40 comparisons reached D12 against the MLP. Against nested LightGBM none of the 40 reached D12; only TabM with weather had a lower mean error, for delay at 24 h (0.010 min, three folds). The original holdout used models with full-training refit support.
 
-- **7.5.** All four GRU arms passed audit with eight configurations at the three late horizons. One of 12 nested comparisons reached D12 against the MLP.
+- **7.5.** All four GRU arms passed audit with eight configurations at the three late horizons. None of 12 nested comparisons reached D12 against the MLP, and none of 12 against nested LightGBM.
 
 ## Phase 8. Transfer learning and pretraining
 
@@ -264,11 +264,11 @@ Question: can we learn from data beyond our 17,507 CV journeys? Ordered by expec
 | 8.4 | **Network-wide delay propagation** | pretrain a model on all ICE/IC runs in the monthly files: from the delay at some stop and the planned minutes and stops still to run, predict the delay at a later stop. Its prediction for our journey becomes a feature (1 h on), cross-fitted (rule 7), or it initialises the network of 7.5. `arrival_delays/` has only delays and train type, so this needs a new extraction from `data/monthly_processed_data`. Same week restriction as 8.3 | L | medium at 1 h–0 min | done |
 | 8.5 | Self-supervised pretraining (masked-feature reconstruction, SCARF) | every row is labelled and there are about ten features, so there is little to learn without labels | — | low | dropped |
 
-- **8.4.** All four cross-fitted late-horizon arms passed audit using the furthest reported arrival for inference progress. The source cache has 783,935 pairs with CV-only week fields and training-week and validation-run exclusions. None of 12 exploratory comparisons reached D12.
+- **8.4.** All four cross-fitted late-horizon arms passed audit using the furthest reported arrival for inference progress. The rebuilt source cache has 1,029,390 pairs with CV-only week fields and training-week and validation-run exclusions. None of 12 exploratory comparisons reached D12.
 
-- **8.3.** All three railway-only transfer methods finished for both tasks on the three source corridors. The source cache contains 265,684 prediction rows. Fits used eligible training weeks and excluded validation run IDs. None of 30 exploratory comparisons reached D12.
+- **8.3.** All three railway-only transfer methods passed audit for both tasks on the three source corridors. The source cache contains 265,684 prediction rows. Fits used eligible training weeks and excluded validation run IDs. None of 30 exploratory comparisons reached D12.
 
-- **8.2.** All four pooling arms passed audit. Six of 20 exploratory comparisons reached D12.
+- **8.2.** All four pooling arms passed audit. Three of 20 exploratory comparisons against fixed-configuration LightGBM reached D12, all for severity with weather from 1 h on. Against nested LightGBM four of 20 reached D12 (severity at 0 min, severity with weather at 1 h and 20 min, delay with weather at 6 h), and 19 of 20 had a lower mean error; these comparisons are exploratory, because the pooled models reuse flat-search configurations.
 
 ## Phase 9. Original final evaluation and analysis
 
@@ -303,7 +303,7 @@ The week split stays as committed, so the hold-out weeks are the same 23 weeks. 
 | 10.1 | **Correct the dataset build** (D14): In build_dataset.py: for a kept replacement train, train_type and starts_at_origin come from the scheduled train, which the loader of 0.7 already does from the timetable inputs, so build_dataset.py is not changed for this (R5, decided 12 November 2026); no prediction row while a cancellation is in force, that is announced and not yet withdrawn (R6); current_delay no longer takes the Frankfurt departure itself (R7); cancellation_announced is the first issue time over all snapshots (R8). One test per fix. Rebuild the dataset; split_weeks.csv stays. | M | done |
 | 10.2 | **Fix the network state and the timetable after 3 November 2025** (D14): network_state.py selects change rows by the IDs of ICE/IC plan rows instead of the change rows' own train_type, which 96% of them lack (R1). scheduled_timetable.py treats the timetable as static after 3 November 2025 too, as decided for the earlier period on 5 November (R2). A test for each. | S–M | done |
 | 10.3 | **Rebuild the CV inputs** (D14): Timetable, delay history, recent reliability, network state, weather, and the corridor and propagation caches, from the corrected dataset. Record the coverage table; the network shares should be about 0.1–0.2. Check that the scheduled train_type and starts_at_origin are known for the kept replacement trains (R5). | M | done |
-| 10.4 | **Rerun all CV arms** (D14): All 366 arms, audited as before. The result lines of Phases 0–8 in this plan and the tables in README.md are rewritten, with the comparisons the review asked for: neural networks and pooling against nested LightGBM, and failed arms named as failed. | L | todo |
+| 10.4 | **Rerun all CV arms** (D14): All 366 arms, audited as before. The result lines of Phases 0–8 in this plan and the tables in README.md are rewritten, with the comparisons the review asked for: neural networks and pooling against nested LightGBM, and failed arms named as failed. | L | done |
 | 10.5 | **Register new finalists** (D15): From the corrected CV results only, by the rules of 9.1: matched railway and weather pairs with the same feature groups, model family and tuning budget, at most three per task and prediction time, written into finalists.json before the hold-out inputs are built. | S | todo |
 | 10.6 | **Second hold-out evaluation** (D15): Build the hold-out inputs with the corrected code, refit on the 95 CV weeks and score once on the 23 hold-out weeks. Class shares and the training mean are scored as references. Uncertainty by a paired bootstrap of whole weeks. The files of the first evaluation move to results/advanced_holdout_first/. | M | todo |
 | 10.7 | **Analysis on the new predictions:** Errors by class, period and branch, calibration, and the risk over the prediction times on the journeys present at all five times (replaces the single examples of 9.5). | S | todo |
@@ -313,6 +313,8 @@ The week split stays as committed, so the hold-out weeks are the same 23 weeks. 
 - **10.2.** Code corrected on 12 November 2026; the inputs are rebuilt in 10.3. Network state: a change row is kept if it carries ICE or IC itself or if its stop ID belongs to an ICE/IC plan row of the same, the previous or the next month. In two sample months (March 2025 and March 2026) the network share is known for every row and averages 0.08; before it was 0.83 and 1.00, known for 82% and 53% of rows. Timetable: the earliest plan snapshot per stop is the schedule in both archive periods. The rule is the one all builders share, so the planned times in the network state, delay history, recent reliability and transfer inputs follow it too. For the 400 latest CV journeys the timetable inputs are known at every prediction time; before: 0% at 24 h and 6 h, 14–30% later.
 
 - **10.3.** Done on 13 November 2026, in about 30 minutes; every CV input has exactly the 85,826 prediction keys of the corrected dataset. Timetable inputs known for 99.4% of rows at every prediction time (before: about 60%). Network share known for nearly every row, mean 0.11 (before: 0.83 to 1.00 in the sample months). Snapshot current_delay known for 6,654, 7,331 and 8,758 rows at 1 h, 20 min and 0 min (before: 6,046, 6,788 and 8,323); it stays sparse because live updates were fetched in blocks about six hours apart (finishing plan B1). R5: the scheduled train type is known for 206 of 230 kept replacement journeys; the other 24 get unknown. The corridor (8.3) and network-transfer (8.4) caches were rebuilt too. The hold-out inputs are not rebuilt.
+
+- **10.4.** Done on 15 November 2026 (finishing plan B4). 354 active arms were rerun at commit 7e0e96a on the inputs of 10.3: the 366 of D14 less the four 2.5 arms and the eight network-state ablations of 3.1, dropped on 13 November. All 354 passed the output audit: run files present, a clean commit, the expected horizons with five folds each, summaries equal to the fold means, every CV row predicted once in its committed fold, valid predictions, and fold scores recomputed from the saved predictions. No arm failed. The result lines of Phases 0–8 and the README tables are from this rerun; nothing was chosen on the hold-out weeks. As the review asked, the neural networks (7.1–7.5) and pooling (8.2) are also compared with nested LightGBM: no network reached D12 against it (0 of 112), pooling reached it in 4 of 20 (exploratory).
 
 ## Not planned
 
@@ -380,3 +382,5 @@ The week split stays as committed, so the hold-out weeks are the same 23 weeks. 
 - 13 November 2026: upstream_planned_min takes the run's planned start from its ID instead of the first stop's plan row (group decision, after the review of PR #13). Where that row exists the two agree in all 17,307 cases, and every existing value is unchanged; 100 CV journeys whose first stop had no plan row are now filled. 96 stay missing because they have no plan at all. Timetable inputs rebuilt.
 
 - 13 November 2026: second review of PR #13. network_state.py and its tests deleted (2.5 stays dropped). The standing rule of current_delay ignores a cancelled onward departure; the change-archive visibility rule is imported from snapshots.py. Delay history rebuilt; no CV value changed.
+
+- 15 November 2026: 10.4 done (finishing plan B4). All 354 active CV arms were rerun at commit 7e0e96a on the rebuilt inputs, and all passed the output audit. The result lines of Phases 0–8 and the README tables are rewritten from the rerun; the neural networks and pooling are also compared with nested LightGBM. 4.2 and 6.5 ran in a separate environment built from requirements-distributions.txt. LightGBMLSS crashed there (three OpenMP runtimes, from scikit-learn, LightGBM and torch, in one process) until OpenMP was limited to one thread; the models are single-threaded anyway, so the setting changes no result. The pre-rebuild 6.5 LightGBMLSS run had recorded the main environment's numpy, pandas and scikit-learn, not the pins in requirements-distributions.txt.
