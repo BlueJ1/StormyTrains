@@ -1,6 +1,6 @@
 # Status
 
-Updated 15 November 2026. This file records decisions and where things are. What is left to do is in [FINISHING_PLAN.md](FINISHING_PLAN.md); the report draft is in [report/](report/README.md).
+Updated 16 November 2026. This file records decisions and where things are. What is left to do is in [FINISHING_PLAN.md](FINISHING_PLAN.md); the report draft is in [report/](report/README.md).
 
 `FINISHING_PLAN.md` and `finishing_plan.html` hold the same plan; the HTML is published at https://claude.ai/artifact/HKS8W5KAvZb3zty1MbaqBv. Keep the two in sync and republish when a decision is taken or a step is completed.
 
@@ -10,7 +10,7 @@ Updated 15 November 2026. This file records decisions and where things are. What
 |---|---|---|
 | `frankfurt_munich/` | The modelling dataset for Frankfurt (Main) Hbf → München Hbf: journeys, prediction rows, week split, weather features. See its README | current (rebuilt 12 November 2026) |
 | `frankfurt_munich/weather/` | DWD station mapping, quality review and hourly observations for the route stations | current |
-| `frankfurt_munich/modeling/` | Shared cross-validation, tuning, features and models; the first models (15–31 October). Their results use recorded-route inputs and `current_delay` from the final records; they stay out of the report and are to be deleted | code current, results to be deleted |
+| `frankfurt_munich/modeling/` | Shared cross-validation, tuning, features and models; the code of the first models (15–31 October). Their results used recorded-route inputs and `current_delay` from the final records and were deleted on 16 November 2026 (B12); the eight flat searches the advanced models reuse are in `advanced_modeling/flat_searches/` | code current |
 | `frankfurt_munich/advanced_modeling/` | Inputs known at the cutoff, 354 active CV arms, finalist registry and the hold-out evaluation (PR #12, merged 8 November). [Plan](frankfurt_munich/advanced_modeling/PLAN.md), [results](frankfurt_munich/advanced_modeling/README.md) | CV results rerun on the corrected inputs (15 November 2026); finalist registry and hold-out results from before the corrections |
 | `report/` | First draft of the final report (LaTeX) and its two figures | draft |
 | `corridor_analysis/` | Comparison of candidate origin–destination pairs. `extract.py` is imported by `frankfurt_munich/build_dataset.py`, so the folder must stay | code in use, numbers historical |
@@ -21,7 +21,7 @@ The numbers in the three historical folders come from the monthly files as they 
 
 ## Decisions
 
-- **Railway data:** the monthly files, live-update snapshots and plan files of `piebro/deutsche-bahn-data` on Hugging Face (from July 2024), not the Bahn-Vorhersage dataset named in the brief: that data has not been made available to us by the data owners. The supervisor is aware (recorded 12 November 2026).
+- **Railway data:** the monthly files, live-update snapshots and plan files of `piebro/deutsche-bahn-data` on Hugging Face (from July 2024), not the Bahn-Vorhersage dataset named in the brief: that data has not been made available to us by the data owners. The supervisor is aware (recorded 12 November 2026). Revision, download dates, checksums and the station panel: `frankfurt_munich/README.md`, section "Data source".
 - **Origin–destination pair:** Frankfurt (Main) Hbf → München Hbf.
 - **Prediction times:** 24 h, 6 h, 1 h, 20 min and 0 min before the scheduled Frankfurt departure.
 - **Cancelled** means origin departure or destination arrival cancelled. A cancellation only at an intermediate stop does not count.
@@ -51,9 +51,9 @@ The CV results are from the rerun on the corrected inputs (15 November 2026). Th
 
 ## Local data, not in the repository
 
-- `data/monthly_processed_data`, `data/monthly_processed_data_change` and `data/monthly_processed_data_plan` (about 19 GB), July 2024 to September 2026, as rebuilt by the source on 6–8 October 2026; the first two were downloaded on 8 October 2026 and checked against the SHA-256 sums. The plan files are pinned to a revision in `frankfurt_munich/advanced_modeling/README.md`.
+- `data/monthly_processed_data`, `data/monthly_processed_data_change` and `data/monthly_processed_data_plan` (about 19 GB), July 2024 to September 2026, as rebuilt by the source on 6–8 October 2026. All 81 files are identical to revision `d27b9c41` of the dataset; their SHA-256 sums are in `data/SHA256SUMS` (details in `frankfurt_munich/README.md`, "Data source").
 - `frankfurt_munich/data/advanced/` and `frankfurt_munich/data/advanced_original_065b077/`: generated inputs of the advanced models, and the inputs the hold-out evaluation used.
 - `frankfurt_munich/weather/raw/`: DWD archives.
 - A copy of every file under `frankfurt_munich/` that is not in git, as of 12 November 2026 before any rebuild, is in `../Project in Data Science backup 2026-11-12/` (1.06 GB, with checksums). It is on this laptop only.
 - The CV results from before the rerun, with their out-of-fold predictions, are in `../advanced_cv_results_before_B4_484356e/` (also in git at commit 484356e, without the predictions). It is on this laptop only.
-- Out-of-fold predictions (`results/**/oof_predictions.parquet`) are not committed. Those of the first models were copied into `frankfurt_munich/modeling/results/` on 10 November 2026 from the worktrees in which they were made.
+- Out-of-fold predictions (`results/**/oof_predictions.parquet`) are not committed. Those of the first models were deleted with their results on 16 November 2026; copies are in the backup of 12 November.
