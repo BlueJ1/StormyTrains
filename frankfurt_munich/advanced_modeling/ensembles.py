@@ -12,9 +12,9 @@ from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LinearRegression, LogisticRegression
 
 import _paths  # noqa: F401  shared modelling code and dataset builders
-from cv import PROBA_COLUMNS, RESULTS, TARGETS, class_probabilities, score_fold
+from cv import PROBA_COLUMNS, TARGETS, class_probabilities, score_fold
 from data import TIME_COLUMN
-from experiment_models import (CATBOOST, LIGHTGBM, LINEAR, MODELS, NEURAL, XGBOOST, fixed_factory,
+from experiment_models import (CATBOOST, FLAT_SEARCHES, LIGHTGBM, LINEAR, MODELS, NEURAL, XGBOOST, fixed_factory,
                                flat_search_path, top_flat_factories)
 from experiment_specs import Run, latest_run, tuning_reference
 from folds import cv_folds, inner_folds
@@ -186,7 +186,7 @@ def ensemble_recipe(run, prediction_time, results_dir):
     if variant == "top5_flat":
         members = top_flat_factories(model, weather, prediction_time)
         source = flat_search_path(model, weather) / "search_results.csv"
-        return "mean", lambda _: members, {"top": 5, "source": str(source.relative_to(RESULTS))}
+        return "mean", lambda _: members, {"top": 5, "source": str(source.relative_to(FLAT_SEARCHES))}
     if variant == "top5_nested" or run.step == "6.2":
         source = latest_run(results_dir, tuning_reference(run))
         task, factory, _ = MODELS[model]

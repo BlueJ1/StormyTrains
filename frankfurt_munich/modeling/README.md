@@ -4,7 +4,7 @@ Every model for Frankfurt (Main) Hbf → München Hbf is trained and scored by t
 
 Only the CV set is used (`../data/prediction_rows_cv.parquet`). The weather models merge on the route weather from `../data/prediction_rows_weather_cv.parquet`; the railway-only models never read that file. Loading the hold-out set needs `allow_holdout=True`.
 
-The cutoff-safe experiments of PR #12 (new input features, nested tuning, other model families, ensembles, neural networks, transfer learning and the hold-out evaluation) are in [`../advanced_modeling/`](../advanced_modeling/README.md). They reuse this folder's cross-validation and model code. For them, `features.py` names feature sets: its default `base` set leaves out `recorded_route`, `observed_stops` and `unobserved_sequence_positions`, which come from the recorded stops and can depend on the outcome. `run_linear_models.py` and `run_tuned_models.py` pass `feature_set="recorded_route_diagnostic"`, the original columns, so the results below keep their meaning.
+The cutoff-safe experiments of PR #12 (new input features, nested tuning, other model families, ensembles, neural networks, transfer learning and the hold-out evaluation) are in [`../advanced_modeling/`](../advanced_modeling/README.md). They reuse this folder's cross-validation and model code. For them, `features.py` names feature sets: its default `base` set leaves out `recorded_route`, `observed_stops` and `unobserved_sequence_positions`, which come from the recorded stops and can depend on the outcome. `run_linear_models.py` and `run_tuned_models.py` pass `feature_set="recorded_route_diagnostic"`, the original columns. Their results (15–31 October 2026) were deleted on 16 November 2026 (finishing plan B12) and stay in the git history. The eight flat searches of LightGBM and XGBoost that the advanced models reuse for their fixed configurations were moved to [`../advanced_modeling/flat_searches/`](../advanced_modeling/flat_searches/).
 
 ## Run
 
@@ -24,13 +24,13 @@ The cutoff-safe experiments of PR #12 (new input features, nested tuning, other 
 | `models.py` | Model factories: logistic regression, linear regression, the two references, random forest, XGBoost, LightGBM and SVR regressors, and random forest, XGBoost and LightGBM classifiers |
 | `metrics.py` | Class order, log loss, macro-F1, RMSE |
 | `cv.py` | `cross_validate` (one prediction time) and `run_cv` (all prediction times, writes the results) |
-| `run_linear_models.py` | Runs the six linear and reference models below |
+| `run_linear_models.py` | Runs the six linear and reference models |
 | `tuning.py` | Random search of hyperparameters on the 5 folds (`run_search`) and the search spaces |
-| `run_tuned_models.py` | Runs the fourteen tuned models below; `run_tuned_models.py lightgbm svr` runs only those |
+| `run_tuned_models.py` | Runs the fourteen tuned models; `run_tuned_models.py lightgbm svr` runs only those |
 | `tests/test_pipeline.py` | Checks of the method itself |
 | `tests/test_tuned_models.py` | Checks of the tuned models' preprocessing and of the search |
 
-To add a model: write a factory `make_x(numeric, categorical)` in `models.py` and call `run_cv("x", "severity" or "delay", make_x)`; the keyword argument `weather=True` adds the weather features. `run_cv` uses the `base` feature set by default; the tables below were made with `feature_set="recorded_route_diagnostic"`, so a model added with the default is not comparable with them.
+To add a model: write a factory `make_x(numeric, categorical)` in `models.py` and call `run_cv("x", "severity" or "delay", make_x)`; the keyword argument `weather=True` adds the weather features. `run_cv` uses the `base` feature set by default; the first models used `feature_set="recorded_route_diagnostic"`, so a model added with the default is not comparable with them.
 
 ## Method
 
@@ -144,81 +144,4 @@ The railway-only and weather models use the same rows and folds, so they can be 
   - XGBoost: `n_estimators` LU[100, 2000], `learning_rate` LU[0.005, 0.3], `max_depth` 2–10, `min_child_weight` LU[1, 100], `subsample` U[0.5, 1], `colsample_bytree` U[0.3, 1], `reg_lambda` LU[0.001, 100], `reg_alpha` LU[0.001, 10];
   - LightGBM: as XGBoost, but `num_leaves` LU[4, 256] and `min_child_samples` LU[5, 200] instead of `max_depth` and `min_child_weight`, plus `cat_smooth` LU[1, 100];
   - SVR: `C` LU[0.1, 100], `epsilon` LU[0.01, 1] (in standard deviations of the delay), `gamma` LU[0.0001, 1].
-- **Run time:** every model is single-threaded and the search is serial: about 17 CPU hours for the eight delay runs (SVR and the random forest take most of it) and 13 for the six severity runs. The committed runs evaluated configurations in parallel; because each model is single-threaded with a fixed seed, a serial run gives the same scores, only the `seconds` column differs.
-
-## Results, 19 October 2026
-
-Mean ± standard deviation over the 5 week folds, with the fixed weather route. The railway-only scores are identical to those of 15 October, so only the `*_weather` runs of 19 October are in `results/`.
-
-**Severity**
-
-| Prediction time | Log loss: class shares | Log loss: logistic | Log loss: logistic + weather | Macro-F1: class shares | Macro-F1: logistic | Macro-F1: logistic + weather |
-|---|---|---|---|---|---|---|
-| 24 h | 0.968 ± 0.009 | 0.927 ± 0.017 | 0.926 ± 0.021 | 0.193 ± 0.001 | 0.223 ± 0.003 | 0.233 ± 0.005 |
-| 6 h | 0.958 ± 0.007 | 0.918 ± 0.016 | 0.919 ± 0.017 | 0.194 ± 0.001 | 0.222 ± 0.005 | 0.232 ± 0.005 |
-| 1 h | 0.923 ± 0.009 | 0.824 ± 0.014 | 0.825 ± 0.016 | 0.196 ± 0.001 | 0.328 ± 0.009 | 0.336 ± 0.020 |
-| 20 min | 0.905 ± 0.006 | 0.794 ± 0.016 | 0.796 ± 0.019 | 0.196 ± 0.001 | 0.350 ± 0.015 | 0.355 ± 0.012 |
-| 0 min | 0.897 ± 0.005 | 0.778 ± 0.015 | 0.779 ± 0.017 | 0.197 ± 0.001 | 0.361 ± 0.014 | 0.368 ± 0.017 |
-
-**Delay** (completed journeys)
-
-| Prediction time | RMSE: training mean | RMSE: linear | RMSE: linear + weather |
-|---|---|---|---|
-| 24 h | 25.43 ± 0.91 | 24.56 ± 0.88 | 24.54 ± 0.87 |
-| 6 h | 25.43 ± 0.91 | 24.56 ± 0.88 | 24.57 ± 0.86 |
-| 1 h | 25.43 ± 0.91 | 22.92 ± 0.82 | 22.92 ± 0.76 |
-| 20 min | 25.43 ± 0.91 | 22.37 ± 0.87 | 22.37 ± 0.81 |
-| 0 min | 25.43 ± 0.91 | 22.03 ± 1.00 | 22.04 ± 0.95 |
-
-- Both models beat their reference at every prediction time.
-- The largest gain comes from 1 h on, when `current_delay` is available.
-- **Weather adds almost nothing to these linear models.** Per fold (weather minus railway-only), log loss is 0.0013–0.0015 higher on average from 6 h on and 0.0003 lower at 24 h, macro-F1 0.005–0.011 higher, and RMSE changes by less than 0.03 min on average. All are far smaller than the spread between folds. Macro-F1 counts only the most probable class; log loss, which judges the probabilities and is used for choosing models, does not improve beyond noise. A linear model can only use each weather value as a straight line, so this does not yet show that weather is useless; non-linear models may use it better.
-- The class-share reference always predicts `normal_minor`, so its macro-F1 stays near 0.2.
-- The `delay` rows are the same at 24 h and 6 h (completed journeys, no `current_delay`). The railway-only scores are therefore identical; the weather scores differ slightly because the weather differs.
-- The standard deviations are much smaller than with the earlier chronological folds, because every fold mixes weeks from the whole period. The scores are not comparable with the chronological results from 12 October.
-
-## Results: tuned delay models, 26 October 2026
-
-RMSE in minutes, mean ± standard deviation over the 5 week folds, completed journeys; railway only / railway + weather. Linear regression from the table above for comparison.
-
-| Prediction time | Linear | Random forest | XGBoost | LightGBM | SVR |
-|---|---|---|---|---|---|
-| 24 h | 24.56 / 24.54 | 24.43 ± 0.92 / 24.54 ± 0.84 | 24.43 ± 0.85 / 24.38 ± 0.81 | 24.41 ± 0.91 / 24.39 ± 0.80 | 24.66 ± 0.97 / 24.52 ± 0.90 |
-| 6 h | 24.56 / 24.57 | 24.43 ± 0.92 / 24.56 ± 0.85 | 24.43 ± 0.85 / 24.40 ± 0.83 | 24.41 ± 0.91 / 24.42 ± 0.81 | 24.66 ± 0.97 / 24.60 ± 0.96 |
-| 1 h | 22.92 / 22.92 | 22.63 ± 0.85 / 22.84 ± 0.80 | 22.65 ± 0.76 / 22.72 ± 0.89 | 22.60 ± 0.79 / 22.69 ± 0.83 | 22.74 ± 0.91 / 22.82 ± 0.92 |
-| 20 min | 22.37 / 22.37 | 22.00 ± 0.83 / 22.11 ± 0.84 | 21.97 ± 0.83 / 22.01 ± 0.96 | 21.92 ± 0.80 / 21.98 ± 0.89 | 22.05 ± 0.87 / 22.15 ± 0.87 |
-| 0 min | 22.03 / 22.04 | 21.60 ± 0.87 / 21.74 ± 1.02 | 21.62 ± 0.83 / 21.68 ± 1.04 | 21.55 ± 0.88 / 21.61 ± 0.97 | 21.68 ± 0.97 / 21.77 ± 0.99 |
-
-- **The tree models beat linear regression** by 0.1–0.5 min, most from 1 h on, when `current_delay` is known. Fold by fold the gain from 20 min on is consistent (t = 3.5–7.5 over the 5 paired folds).
-- **The three tree models tie:** without weather they are within 0.08 min of each other, far less than the spread between folds. SVR is the weakest, and at 24 h and 6 h without weather it is worse than linear regression.
-- **Weather does not help:** no gain larger than the fold noise (|t| ≤ 2.1 for every model and prediction time), and from 1 h on it makes every tuned model slightly worse. The same holds when the same configuration is compared with and without weather, so it is not an accident of the search.
-- Journeys with 60+ min delay cause about 60% of the squared error; all models predict them far too low.
-
-## Results: tuned severity classifiers, 31 October 2026
-
-Mean ± standard deviation over the 5 week folds; railway only / railway + weather. Logistic regression from the 19 October table for comparison.
-
-**Log loss** (lower is better; used for choosing models)
-
-| Prediction time | Logistic | Random forest | XGBoost | LightGBM |
-|---|---|---|---|---|
-| 24 h | 0.927 / 0.926 | 0.923 ± 0.014 / 0.927 ± 0.014 | 0.919 ± 0.013 / 0.917 ± 0.014 | 0.918 ± 0.011 / 0.920 ± 0.015 |
-| 6 h | 0.918 / 0.919 | 0.914 ± 0.014 / 0.920 ± 0.014 | 0.910 ± 0.013 / 0.910 ± 0.012 | 0.910 ± 0.012 / 0.913 ± 0.013 |
-| 1 h | 0.824 / 0.825 | 0.816 ± 0.013 / 0.822 ± 0.013 | 0.811 ± 0.012 / 0.814 ± 0.013 | 0.810 ± 0.012 / 0.814 ± 0.013 |
-| 20 min | 0.794 / 0.796 | 0.782 ± 0.012 / 0.786 ± 0.013 | 0.777 ± 0.012 / 0.780 ± 0.012 | 0.777 ± 0.011 / 0.778 ± 0.010 |
-| 0 min | 0.778 / 0.779 | 0.762 ± 0.013 / 0.768 ± 0.012 | 0.759 ± 0.012 / 0.763 ± 0.011 | 0.759 ± 0.011 / 0.762 ± 0.010 |
-
-**Macro-F1** (higher is better; the most probable class)
-
-| Prediction time | Logistic | Random forest | XGBoost | LightGBM |
-|---|---|---|---|---|
-| 24 h | 0.223 / 0.233 | 0.211 ± 0.006 / 0.213 ± 0.016 | 0.229 ± 0.005 / 0.219 ± 0.012 | 0.222 ± 0.007 / 0.247 ± 0.013 |
-| 6 h | 0.222 / 0.232 | 0.210 ± 0.005 / 0.203 ± 0.010 | 0.233 ± 0.005 / 0.214 ± 0.013 | 0.222 ± 0.007 / 0.210 ± 0.013 |
-| 1 h | 0.328 / 0.336 | 0.336 ± 0.019 / 0.323 ± 0.017 | 0.336 ± 0.018 / 0.334 ± 0.018 | 0.350 ± 0.019 / 0.327 ± 0.017 |
-| 20 min | 0.350 / 0.355 | 0.358 ± 0.017 / 0.359 ± 0.017 | 0.381 ± 0.023 / 0.362 ± 0.015 | 0.385 ± 0.019 / 0.375 ± 0.022 |
-| 0 min | 0.361 / 0.368 | 0.371 ± 0.014 / 0.373 ± 0.015 | 0.388 ± 0.023 / 0.377 ± 0.020 | 0.390 ± 0.015 / 0.381 ± 0.016 |
-
-- **XGBoost and LightGBM beat logistic regression** at every prediction time, on every fold without weather: log loss 0.007–0.009 lower at 24 h and 6 h and 0.018–0.019 lower at 0 min (t = 3–7 over the 5 paired folds). As for delay, the gain grows once `current_delay` is known.
-- **The two boosters tie:** within 0.0011 log loss without weather, 0.003 with. The random forest is weaker: at 24 h and 6 h it beats logistic regression on only 4 of 5 folds (t ≈ 1.6), and with weather it is no better than logistic regression there. Random forest probabilities tend to be too cautious (see `literature_review/classification_models.md`), which log loss penalises; this was not checked here.
-- **Weather does not help:** it lowers log loss only for XGBoost at 24 h and 6 h, by at most 0.002 (|t| ≤ 1); otherwise it raises it by up to 0.007, most for the random forest (t up to 2.7). Macro-F1 also falls with weather for both boosters from 6 h on (XGBoost also at 24 h); LightGBM at 24 h (+0.025) is the exception.
-- **Macro-F1 stays low before departure:** about 0.22 at 24 h and 6 h, as for logistic regression: the most probable class is `normal_minor` for 94–98% of journeys (62.8% are). It rises to 0.39 at 0 min, where `normal_minor` is still the most probable class for 83–84%.
+- **Run time:** every model is single-threaded and the search is serial: about 17 CPU hours for the eight delay runs (SVR and the random forest take most of it) and 13 for the six severity runs. The searches evaluated configurations in parallel; because each model is single-threaded with a fixed seed, a serial run gives the same scores, only the `seconds` column differs.
