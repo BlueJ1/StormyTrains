@@ -9,7 +9,7 @@ The modelling dataset for the chosen origin–destination pair: railway data, an
   - `current_delay` is added at each prediction time;
   - the time a cancellation was announced is added, and no prediction is made while a cancellation is in force;
   - the data are split by week into a cross-validation set (about 80% of the weeks, in 5 folds) and a hold-out set (about 20%).
-- **Source:** the 27 monthly files from July 2024 to September 2026 and the matching live-update snapshots, as rebuilt by the source on 6–8 October 2026 and downloaded on 8 October 2026 (checked against the published SHA-256 sums).
+- **Source:** the 27 monthly files from July 2024 to September 2026 and the matching live-update snapshots of `piebro/deutsche-bahn-data`, as rebuilt by the source on 6–8 October 2026 and downloaded on 8 October 2026. Revision, checksums, station panel and the reason for this source: [Data source](#data-source).
 
 **The hold-out set is kept for the final evaluation** (scored once on 6 November 2026 and once more after the corrections of 12 November; see `advanced_modeling/PLAN.md`, D15). Nothing is chosen on it. Outcome statistics below (classes, delays, cancellations) are for the CV set only. For the hold-out set we only check data quality: counts, coverage, missing values and where the labels come from. Where something changes over time, the README compares July 2024–September 2025 with October 2025–September 2026; these are periods, not splits.
 
@@ -109,6 +109,24 @@ One row per journey, both splits, with what the live-update snapshots say about 
 | `arrival_reproduced` | Our arrival time equals the snapshot value; only for covered, completed journeys |
 | `cancellation_lead_min` | Minutes from `cancellation_announced` to the planned Frankfurt departure; negative if issued after it |
 
+## Data source
+
+All railway data come from the Hugging Face dataset [`piebro/deutsche-bahn-data`](https://huggingface.co/datasets/piebro/deutsche-bahn-data), licence CC BY 4.0. The code that builds it is at [github.com/piebro/deutsche-bahn-data](https://github.com/piebro/deutsche-bahn-data).
+
+| Folder in `data/` | Contents | Used by |
+|---|---|---|
+| `monthly_processed_data/` | One row per train and stop, with the latest recorded values | this dataset (`build_dataset.py`, with the journey functions of `corridor_analysis/extract.py`), the network-transfer inputs of the advanced models, the early work |
+| `monthly_processed_data_change/` | The live-update snapshots: what was known when | this dataset (cancellation timeline, labels), the advanced inputs |
+| `monthly_processed_data_plan/` | The plan snapshots: the timetable as fetched | the advanced inputs only |
+
+Each folder holds 27 files, `data-2024-07.parquet` to `data-2026-09.parquet` (about 19 GB in all). They are not committed.
+
+- **Revision.** All 81 files are byte-identical to revision [`d27b9c413536bb5fe393954371f572050e55176b`](https://huggingface.co/datasets/piebro/deutsche-bahn-data/tree/d27b9c413536bb5fe393954371f572050e55176b) of 31 October 2026. On 16 November 2026 each file was checked against the SHA-256 sum published at that revision. The dataset gets new commits about twice a day, plus a monthly release, so download from this revision.
+- **Download dates.** The monthly and change files were downloaded on 8 October 2026, after the source rebuilt them on 6–8 October; the plan files on 4 November 2026. Numbers in `arrival_delays/`, `berlin_munich_weather/` and `corridor_analysis/` come from the files as they were before that rebuild (26 months, to August 2026). Those files are no longer on disk.
+- **Checksums.** [`data/SHA256SUMS`](../data/SHA256SUMS) lists the SHA-256 sum of every file. Check a download with `cd data && shasum -a 256 -c SHA256SUMS`.
+- **Station panel.** `data/stations_present_in_all_months.csv` lists the 105 stations whose `station_name` appears in every monthly file of `monthly_processed_data/`. It arrived with the repository's first commit (29 September 2026), and no script here builds it. Recomputed on 16 November 2026 from the files above, the stations present in all 27 months are exactly these 105, and so are those present in every month from July 2024 to August 2026. The archive covers 108 stations a month in 2024 and over 5,000 a month in 2026, after its coverage expansion on 3 November 2025; keeping only panel stations keeps the station set the same over time.
+- **Why not Bahn-Vorhersage.** The project brief names the Bahn-Vorhersage dataset. Its owners have not made that data available to us, so the project uses `piebro/deutsche-bahn-data` (finishing plan, decision Q12 of 12 November 2026). The supervisor is aware.
+
 ## Rebuild
 
 ```bash
@@ -118,7 +136,7 @@ One row per journey, both splits, with what the live-update snapshots say about 
 .venv/bin/python frankfurt_munich/weather_features.py    # under 1 min; downloads WRTR archives on the first run
 ```
 
-Both `data/monthly_processed_data` and `data/monthly_processed_data_change` from the Hugging Face dataset are needed.
+Both `data/monthly_processed_data` and `data/monthly_processed_data_change` from the Hugging Face dataset are needed (see [Data source](#data-source)).
 
 | Script | Purpose |
 |---|---|

@@ -1,0 +1,413 @@
+{
+  "name": "advanced_5_4_lightgbm_stack",
+  "step": "5.4",
+  "task": "delay",
+  "model": "lightgbm",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "stack",
+  "evaluation": "exploratory",
+  "git_commit": "7e0e96a2569f4722c545856aeae96c0170d7ee80",
+  "chosen": {
+    "24h": {
+      "config_id": 23,
+      "params": {
+        "cat_smooth": 21.23261760236048,
+        "colsample_bytree": 0.30354310869235307,
+        "learning_rate": 0.009658530198821904,
+        "min_child_samples": 38,
+        "n_estimators": 795,
+        "num_leaves": 60,
+        "reg_alpha": 0.007890004262668575,
+        "reg_lambda": 3.638279896646448,
+        "subsample": 0.6186245437484
+      }
+    },
+    "6h": {
+      "config_id": 23,
+      "params": {
+        "cat_smooth": 21.23261760236048,
+        "colsample_bytree": 0.30354310869235307,
+        "learning_rate": 0.009658530198821904,
+        "min_child_samples": 38,
+        "n_estimators": 795,
+        "num_leaves": 60,
+        "reg_alpha": 0.007890004262668575,
+        "reg_lambda": 3.638279896646448,
+        "subsample": 0.6186245437484
+      }
+    },
+    "1h": {
+      "config_id": 32,
+      "params": {
+        "cat_smooth": 3.741816659607169,
+        "colsample_bytree": 0.7135832823983075,
+        "learning_rate": 0.0056650541034924205,
+        "min_child_samples": 6,
+        "n_estimators": 1176,
+        "num_leaves": 18,
+        "reg_alpha": 0.003222864528968034,
+        "reg_lambda": 0.4085228003668622,
+        "subsample": 0.8849967765493054
+      }
+    },
+    "20min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "0min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    }
+  },
+  "configuration_source": "lightgbm/20261026-092616/config.json",
+  "combination": {
+    "24h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.4880328438151459,
+            0.19346209327188818,
+            0.1640892344423329
+          ],
+          "intercept": 2.654859404099943
+        },
+        "2": {
+          "weights": [
+            0.12087415535396626,
+            0.7912136107357107,
+            0.026382988637643035
+          ],
+          "intercept": 1.1931677485535808
+        },
+        "3": {
+          "weights": [
+            0.4613867482182909,
+            0.39954323576305695,
+            0.05546796297904112
+          ],
+          "intercept": 1.4108317969732695
+        },
+        "4": {
+          "weights": [
+            0.23459400283169596,
+            0.7838076389196075,
+            -0.08366163546691212
+          ],
+          "intercept": 1.5921796519726428
+        },
+        "5": {
+          "weights": [
+            0.0335080399756643,
+            0.7664365092053038,
+            0.12961291720099247
+          ],
+          "intercept": 1.3682554880652553
+        }
+      }
+    },
+    "6h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.19384419076760773,
+            0.6852681796786444,
+            0.09533584609394219
+          ],
+          "intercept": 0.5996965752446641
+        },
+        "2": {
+          "weights": [
+            -0.018028034472220202,
+            0.8874721405793474,
+            0.047995725122034
+          ],
+          "intercept": 1.5581186559791398
+        },
+        "3": {
+          "weights": [
+            0.3234404923939534,
+            0.7599294082946414,
+            -0.16154238909212915
+          ],
+          "intercept": 1.3679337677040309
+        },
+        "4": {
+          "weights": [
+            0.2436746968128777,
+            0.8641022134447912,
+            -0.21628547528010258
+          ],
+          "intercept": 1.8505438143968505
+        },
+        "5": {
+          "weights": [
+            0.10874013205729409,
+            0.6073479128342818,
+            0.2619848286523576
+          ],
+          "intercept": 0.42789007949096103
+        }
+      }
+    },
+    "1h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.3220514145390008,
+            0.3261015862124674,
+            0.3042869953319978
+          ],
+          "intercept": 0.943741214553043
+        },
+        "2": {
+          "weights": [
+            0.7190664320323938,
+            -0.021979541677112132,
+            0.19088684709689901
+          ],
+          "intercept": 2.304504475156758
+        },
+        "3": {
+          "weights": [
+            0.38707617543305267,
+            0.2943171090362521,
+            0.2426568491695756
+          ],
+          "intercept": 1.2348830759676979
+        },
+        "4": {
+          "weights": [
+            0.42985603311892895,
+            0.3010470787885559,
+            0.19630936684203615
+          ],
+          "intercept": 1.2463962132614874
+        },
+        "5": {
+          "weights": [
+            0.22213228887965308,
+            0.2828591288841548,
+            0.2416169214259664
+          ],
+          "intercept": 4.506151114465604
+        }
+      }
+    },
+    "20min": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.3828972225735114,
+            0.4546326202604498,
+            0.0721624507116186
+          ],
+          "intercept": 1.7202889117335864
+        },
+        "2": {
+          "weights": [
+            0.7495029883591474,
+            0.059107131944512246,
+            0.11867831593940784
+          ],
+          "intercept": 1.1585655184188894
+        },
+        "3": {
+          "weights": [
+            0.6015551522484555,
+            0.25013422760874665,
+            0.0820570802913896
+          ],
+          "intercept": 1.0293650989030674
+        },
+        "4": {
+          "weights": [
+            0.44836375652409016,
+            0.48022321385945227,
+            -0.0014533014329243124
+          ],
+          "intercept": 1.2897920076095737
+        },
+        "5": {
+          "weights": [
+            0.41290710596692115,
+            0.3195632201321189,
+            0.17728766938039042
+          ],
+          "intercept": 1.7527320696395776
+        }
+      }
+    },
+    "0min": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.38604824458270937,
+            0.32573359669662666,
+            0.17494544452590244
+          ],
+          "intercept": 1.8460349108629543
+        },
+        "2": {
+          "weights": [
+            0.5551864186329565,
+            0.282588254197463,
+            0.11638649908857551
+          ],
+          "intercept": 0.8265047369615566
+        },
+        "3": {
+          "weights": [
+            0.26152404644795146,
+            0.5309892812449903,
+            0.14402953447490977
+          ],
+          "intercept": 1.279736361471187
+        },
+        "4": {
+          "weights": [
+            0.43906688887531264,
+            0.3570373469966268,
+            0.13782772750968025
+          ],
+          "intercept": 1.1189423141823909
+        },
+        "5": {
+          "weights": [
+            0.32049990598012895,
+            0.3097678818937682,
+            0.28547628893649
+          ],
+          "intercept": 1.5742945472900018
+        }
+      }
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-15T06:36:34"
+}

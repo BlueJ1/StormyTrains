@@ -15,10 +15,11 @@ import _paths  # noqa: F401  shared modelling code and dataset builders
 from advanced_data import ADVANCED, ADVANCED_RESULTS, load_advanced_rows
 from compare import compare_runs
 from corridor_transfer import evaluate_corridor_transfer
-from cv import RESULTS, TARGETS, cross_validate, git_commit, pooled_cv, save_run
+from cv import TARGETS, cross_validate, git_commit, pooled_cv, save_run
 from data import PREDICTION_TIMES, TIME_COLUMN, load_rows
 from ensembles import cv_ensemble, ensemble_recipe, saved_average
-from experiment_models import LIGHTGBM, LINEAR, MODELS, NEURAL, fixed_factory, flat_choices, flat_search_path, variant_model
+from experiment_models import (FLAT_SEARCHES, LIGHTGBM, LINEAR, MODELS, NEURAL, fixed_factory, flat_choices,
+                               flat_search_path, variant_model)
 from experiment_specs import (AUTO_VARIANTS, DECOMPOSED, LATE_STEPS, LATE_VARIANTS, SEARCH_CONFIGS,
                               VARIANTS, Run, latest_run, nested_feature_variants, registered_runs,
                               tuning_reference)
@@ -177,7 +178,7 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
               "git_commit": revision,
               "chosen": {pt: chosen[pt] for pt in features if pt in chosen}}
     if source:
-        config["configuration_source"] = str((source / "config.json").relative_to(RESULTS))
+        config["configuration_source"] = str((source / "config.json").relative_to(FLAT_SEARCHES))
     if run.nested:
         config["search"] = {"n_configs": len(configs), "selection": f"inner mean {SCORE[task]}"}
         if run.variant in AUTO_VARIANTS:
@@ -267,7 +268,7 @@ def evaluate_pool(run, inputs_dir, results_dir, prediction_times, revision):
               "git_commit": revision,
               "evaluation": "exploratory", "features": {"numeric": numeric, "categorical": categorical},
               "chosen": flat_choices(run.model, run.weather)["1h"],
-              "configuration_source": str(flat_search_path(run.model, run.weather).relative_to(RESULTS))}
+              "configuration_source": str(flat_search_path(run.model, run.weather).relative_to(FLAT_SEARCHES))}
     out, _ = save_run(results_dir, run.name, config, metrics, predictions)
     print(out, flush=True)
     return out

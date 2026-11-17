@@ -7,7 +7,7 @@ from functools import cache, partial
 import pandas as pd
 
 import _paths  # noqa: F401  shared modelling code and dataset builders
-from cv import RESULTS
+from _paths import HERE
 from decomposed import (make_cancellation_then_class, make_cancellation_then_distribution,
                         make_cancellation_then_ordinal, make_change_then_level, make_mixture_of_experts)
 from distributions import make_lightgbmlss, make_ngboost, make_quantile_forest
@@ -30,6 +30,10 @@ NEURAL = {"7.1": ("mlp", "mlp_classifier"), "7.2": ("multitask", "multitask_clas
           "7.4": ("realmlp", "realmlp_classifier", "tabm", "tabm_classifier"),
           "7.5": ("sequence_gru", "sequence_gru_classifier")}
 
+# The eight flat searches of the first models that supply the fixed configurations
+# (config.json) and the top-five averages of 5.2 (search_results.csv). Moved here
+# from ../modeling/results/ when the first models' results were deleted (B12).
+FLAT_SEARCHES = HERE / "flat_searches"
 FLAT_TIMESTAMPS = {
     "lightgbm": "20261026-092616",
     "lightgbm_weather": "20261026-093239",
@@ -77,7 +81,7 @@ for models in NEURAL.values():
 
 def flat_search_path(model, weather):
     key = model + ("_weather" if weather else "")
-    return RESULTS / key / FLAT_TIMESTAMPS[key] if key in FLAT_TIMESTAMPS else None
+    return FLAT_SEARCHES / key / FLAT_TIMESTAMPS[key] if key in FLAT_TIMESTAMPS else None
 
 
 @cache
