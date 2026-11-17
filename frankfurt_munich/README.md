@@ -115,7 +115,7 @@ All railway data come from the Hugging Face dataset [`piebro/deutsche-bahn-data`
 
 | Folder in `data/` | Contents | Used by |
 |---|---|---|
-| `monthly_processed_data/` | One row per train and stop, with the latest recorded values | this dataset (through `corridor_analysis/extract.py`), the network-transfer inputs of the advanced models, the early work |
+| `monthly_processed_data/` | One row per train and stop, with the latest recorded values | this dataset (`build_dataset.py`, with the journey functions of `corridor_analysis/extract.py`), the network-transfer inputs of the advanced models, the early work |
 | `monthly_processed_data_change/` | The live-update snapshots: what was known when | this dataset (cancellation timeline, labels), the advanced inputs |
 | `monthly_processed_data_plan/` | The plan snapshots: the timetable as fetched | the advanced inputs only |
 

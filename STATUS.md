@@ -46,7 +46,7 @@ The numbers in the three historical folders come from the monthly files as they 
 The CV results are from the rerun on the corrected inputs (15 November 2026). The hold-out results are from the first evaluation, before the corrections; B6 replaces them.
 
 - With inputs known at the cutoff, railway-only nested LightGBM with selected feature groups reaches a CV log loss of 0.918 at 24 h and 0.821 at 0 min (class shares 0.968 and 0.896) and an RMSE of 24.28 and 23.41 min (training mean 25.42 and 25.40).
-- Recent reliability helps most among the new feature groups (17 of 20 comparisons reached the minimum gain, D12). Against nested LightGBM, only CatBoost with weather reached D12, once (delay at 1 h); no neural network did. Pooling the prediction times reached it in 4 of 20 exploratory comparisons.
+- Recent reliability helps most among the new feature groups (17 of 20 comparisons reached the minimum gain, D12). Of the other model families compared with nested LightGBM (CatBoost, EBM, distributional models, neural networks), only CatBoost with weather reached D12, once (delay at 1 h). Averaging the top five nested LightGBM configurations reached it in 3 of 40 nested comparisons, and pooling the prediction times in 4 of 20 exploratory ones.
 - Weather did not reach D12 in cross-validation: with selected feature groups the weather arm of nested LightGBM had the higher error at every horizon. On the hold-out set (first evaluation) all ten paired 95% intervals include zero.
 - The first models looked much better (0.759 and 21.55 min at 0 min) because of the recorded-route inputs and, mostly, `current_delay` from the final records.
 

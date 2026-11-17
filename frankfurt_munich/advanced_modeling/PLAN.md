@@ -8,7 +8,7 @@ Status values: `todo`, `running`, `done`, `dropped`. Cost: S (under 1 CPU hour),
 
 ## Where we are
 
-From `../modeling/README.md` (31 October 2026), CV set, 5 week folds:
+The starting point when the plan was drafted: the first models in `../modeling/` (31 October 2026), CV set, 5 week folds. Their result tables were deleted on 16 November 2026 (finishing plan B12) and are in the git history at commit 484356e.
 
 | Task | Best so far | 24 h | 0 min | Reference |
 |---|---|---|---|---|
@@ -314,7 +314,7 @@ The week split stays as committed, so the hold-out weeks are the same 23 weeks. 
 
 - **10.3.** Done on 13 November 2026, in about 30 minutes; every CV input has exactly the 85,826 prediction keys of the corrected dataset. Timetable inputs known for 99.4% of rows at every prediction time (before: about 60%). Network share known for nearly every row, mean 0.11 (before: 0.83 to 1.00 in the sample months). Snapshot current_delay known for 6,654, 7,331 and 8,758 rows at 1 h, 20 min and 0 min (before: 6,046, 6,788 and 8,323); it stays sparse because live updates were fetched in blocks about six hours apart (finishing plan B1). R5: the scheduled train type is known for 206 of 230 kept replacement journeys; the other 24 get unknown. The corridor (8.3) and network-transfer (8.4) caches were rebuilt too. The hold-out inputs are not rebuilt.
 
-- **10.4.** Done on 15 November 2026 (finishing plan B4). 354 active arms were rerun at commit 7e0e96a on the inputs of 10.3: the 366 of D14 less the four 2.5 arms and the eight network-state ablations of 3.1, dropped on 13 November. All 354 passed the output audit: run files present, a clean commit, the expected horizons with five folds each, summaries equal to the fold means, every CV row predicted once in its committed fold, valid predictions, and fold scores recomputed from the saved predictions. No arm failed. The result lines of Phases 0–8 and the README tables are from this rerun; nothing was chosen on the hold-out weeks. As the review asked, the neural networks (7.1–7.5) and pooling (8.2) are also compared with nested LightGBM: no network reached D12 against it (0 of 112), pooling reached it in 4 of 20 (exploratory).
+- **10.4.** Done on 15 November 2026 (finishing plan B4). 354 active arms were rerun at commit 7e0e96a on the inputs of 10.3: the 366 of D14 less the four 2.5 arms and the eight network-state ablations of 3.1, dropped on 13 November. All 354 passed the output audit (audit_cv_results.py): run files present, a clean commit, the expected horizons with five folds each, summaries equal to the fold means, every CV row predicted once in its committed fold, valid predictions, and fold scores recomputed from the saved predictions. No arm failed. The result lines of Phases 0–8 and the README tables are from this rerun; nothing was chosen on the hold-out weeks. As the review asked, the neural networks (7.1–7.5) and pooling (8.2) are also compared with nested LightGBM: no network reached D12 against it (0 of 112), pooling reached it in 4 of 20 (exploratory).
 
 ## Not planned
 
