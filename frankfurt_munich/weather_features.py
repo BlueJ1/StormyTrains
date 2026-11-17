@@ -26,7 +26,7 @@ other stations). A journey takes the usual branch of its train number: the
 branch most of that train number's journeys in data/stops.parquet recorded
 (via Würzburg or Nürnberg, or via Mannheim, Stuttgart or Ulm; all journeys,
 hold-out included, as this is a timetable fact). Each station's weather
-comes from weather/observations/railway_<variable>_final.parquet, where gaps
+comes from measured_weather_DWD/observations/railway_<variable>_final.parquet, where gaps
 are already filled from a backup weather station.
 
 FEATURES (the latest hour unless "24h": the 24 hours ending with it):
@@ -45,9 +45,9 @@ MISSING VALUES. Aggregates use whatever stations and hours have a value; a
 feature is missing only if none has. Nothing is filled in.
 
 PRECIPITATION TYPE (WRTR) is not in the observation tables, so it is read here
-from DWD's hourly precipitation archives, downloaded into weather/raw/wrtr/ on
+from DWD's hourly precipitation archives, downloaded into measured_weather_DWD/raw/wrtr/ on
 the first run (delete that folder to download newer versions). For each
-railway station: the primary DWD station in weather/station_mapping.json
+railway station: the primary DWD station in measured_weather_DWD/station_mapping.json
 first, its backup at the same hour when the primary has no usable code
 (0, 6, 7 or 8), historical archives before recent ones.
 
@@ -71,7 +71,7 @@ sys.path.insert(0, str(HERE.parent / "berlin_munich_weather"))
 from fetch_weather import CTX  # noqa: E402  SSL context with the system certificates
 
 DATA = HERE / "data"
-WEATHER = HERE / "weather"
+WEATHER = HERE / "measured_weather_DWD"
 RAW = WEATHER / "raw" / "wrtr"
 DWD = "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/hourly/precipitation/"
 HOURLY = {"temperature": "temperature_c", "precipitation": "precipitation_mm",

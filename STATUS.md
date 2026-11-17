@@ -1,6 +1,6 @@
 # Status
 
-Updated 16 November 2026. This file records decisions and where things are. What is left to do is in [FINISHING_PLAN.md](FINISHING_PLAN.md); the report draft is in [report/](report/README.md).
+Updated 17 November 2026. This file records decisions and where things are. What is left to do is in [FINISHING_PLAN.md](FINISHING_PLAN.md); the report draft is in [report/](report/README.md).
 
 `FINISHING_PLAN.md` and `finishing_plan.html` hold the same plan; the HTML is published at https://claude.ai/artifact/HKS8W5KAvZb3zty1MbaqBv. Keep the two in sync and republish when a decision is taken or a step is completed.
 
@@ -9,7 +9,8 @@ Updated 16 November 2026. This file records decisions and where things are. What
 | Folder | Contents | State |
 |---|---|---|
 | `frankfurt_munich/` | The modelling dataset for Frankfurt (Main) Hbf → München Hbf: journeys, prediction rows, week split, weather features. See its README | current (rebuilt 12 November 2026) |
-| `frankfurt_munich/weather/` | DWD station mapping, quality review and hourly observations for the route stations | current |
+| `frankfurt_munich/measured_weather_DWD/` | DWD station mapping, quality review and hourly observations for the route stations (renamed from `weather/` in PR #14) | current |
+| `frankfurt_munich/forecast_weather_GFS/` | NOAA GFS historical forecasts (a run every 6 h, leads 0–48 h) at the 16 grid cells nearest the route stations, valid 1 July 2024 to 30 September 2026, with precipitation type (PR #14). See its README | data current; not used by any model or in the report |
 | `frankfurt_munich/modeling/` | Shared cross-validation, tuning, features and models; the code of the first models (15–31 October). Their results used recorded-route inputs and `current_delay` from the final records and were deleted on 16 November 2026 (B12); the eight flat searches the advanced models reuse are in `advanced_modeling/flat_searches/` | code current |
 | `frankfurt_munich/advanced_modeling/` | Inputs known at the cutoff, 354 active CV arms, finalist registry and the hold-out evaluation (PR #12, merged 8 November). [Plan](frankfurt_munich/advanced_modeling/PLAN.md), [results](frankfurt_munich/advanced_modeling/README.md) | CV results rerun on the corrected inputs (15 November 2026); finalist registry and hold-out results from before the corrections |
 | `report/` | First draft of the final report (LaTeX) and its two figures | draft |
@@ -49,11 +50,20 @@ The CV results are from the rerun on the corrected inputs (15 November 2026). Th
 - Weather did not reach D12 in cross-validation: with selected feature groups the weather arm of nested LightGBM had the higher error at every horizon. On the hold-out set (first evaluation) all ten paired 95% intervals include zero.
 - The first models looked much better (0.759 and 21.55 min at 0 min) because of the recorded-route inputs and, mostly, `current_delay` from the final records.
 
+## GFS forecasts: open issues
+
+Found in the review of PR #14 (17 November 2026). The README and script fixes were made in PR #16; the points below are still open.
+
+- **Not in the plan or the report.** `FINISHING_PLAN.md` has no forecast step, and `report/main.tex` says forecasts were not used. Decide whether to add a plan item or keep the data unused; `frankfurt_munich/README.md` says that no model uses it yet.
+- **Availability.** The archive has the run's start time only; GFS is published some hours later. A delay rule is needed before matching runs to prediction times.
+- **Precipitation type.** `wrtr` is unknown for 159,538 of 510,859 wet rows (31%): 53% for the smallest amount (0.0625 mm) against 21% at 0.1 mm or more, and 6% at leads 1, 7, 13, … against 33–38% at other leads. Likely cause: outside those leads the code uses the flags at the end of the hour, which are all 0 when the rain stopped earlier. Code 8 never occurs, so "7 or 8" is not comparable with DWD.
+- **Wet-hour threshold.** GFS hourly amounts come in steps of 0.0625 mm and 19.8% of rows are wet; DWD measures in 0.1 mm steps. Comparisons need a common threshold.
+
 ## Local data, not in the repository
 
 - `data/monthly_processed_data`, `data/monthly_processed_data_change` and `data/monthly_processed_data_plan` (about 19 GB), July 2024 to September 2026, as rebuilt by the source on 6–8 October 2026. All 81 files are identical to revision `d27b9c41` of the dataset; their SHA-256 sums are in `data/SHA256SUMS` (details in `frankfurt_munich/README.md`, "Data source").
 - `frankfurt_munich/data/advanced/` and `frankfurt_munich/data/advanced_original_065b077/`: generated inputs of the advanced models, and the inputs the hold-out evaluation used.
-- `frankfurt_munich/weather/raw/`: DWD archives.
+- `frankfurt_munich/measured_weather_DWD/raw/`: DWD archives.
 - A copy of every file under `frankfurt_munich/` that is not in git, as of 12 November 2026 before any rebuild, is in `../Project in Data Science backup 2026-11-12/` (1.06 GB, with checksums). It is on this laptop only.
 - The CV results from before the rerun, with their out-of-fold predictions, are in `../advanced_cv_results_before_B4_484356e/` (also in git at commit 484356e, without the predictions). It is on this laptop only.
 - Out-of-fold predictions (`results/**/oof_predictions.parquet`) are not committed. Those of the first models were deleted with their results on 16 November 2026; copies are in the backup of 12 November.
