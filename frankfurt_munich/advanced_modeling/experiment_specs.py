@@ -130,7 +130,6 @@ VARIANTS = {
     "2.2": ("planned_timetable",),
     "2.3": ("holidays",),
     "2.4": ("delay_dynamics",),
-    "2.5": ("network_state",),
     "2.all": ("all_groups",),
 }
 

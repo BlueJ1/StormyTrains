@@ -614,13 +614,13 @@
       "canceled_share_known": 0.0473
     },
     "0min": {
-      "missing": 1804,
-      "share": 0.103,
-      "starts_at_origin": 1559,
+      "missing": 2367,
+      "share": 0.1352,
+      "starts_at_origin": 2106,
       "no_usable_report": 90,
-      "run_not_started": 155,
-      "canceled_share_missing": 0.1286,
-      "canceled_share_known": 0.0461
+      "run_not_started": 171,
+      "canceled_share_missing": 0.1018,
+      "canceled_share_known": 0.0472
     }
   },
   "current_delay": {
@@ -674,10 +674,10 @@
     },
     "0min": {
       "known_share_by_split": {
-        "cv": 0.897,
-        "holdout": 0.9119
+        "cv": 0.8648,
+        "holdout": 0.8749
       },
-      "missing_in_cv": 1804,
+      "missing_in_cv": 2367,
       "cv_median": 3.0,
       "cv_below_minus_10": 0,
       "cv_below_minus_10_by_train": {}
@@ -686,18 +686,18 @@
   },
   "prediction_rows": {
     "cv": {
-      "24h": 17466,
-      "6h": 17380,
-      "1h": 17114,
-      "20min": 16994,
-      "0min": 16947
+      "24h": 17463,
+      "6h": 17366,
+      "1h": 17096,
+      "20min": 16975,
+      "0min": 16926
     },
     "holdout": {
-      "24h": 4315,
-      "6h": 4298,
-      "1h": 4243,
-      "20min": 4210,
-      "0min": 4194
+      "24h": 4313,
+      "6h": 4294,
+      "1h": 4237,
+      "20min": 4204,
+      "0min": 4188
     },
     "cv_class_shares": {
       "24h": {
@@ -707,28 +707,28 @@
         "canceled": 0.0524
       },
       "6h": {
-        "normal_minor": 0.6325,
-        "moderate": 0.257,
+        "normal_minor": 0.6326,
+        "moderate": 0.2569,
         "severe": 0.0628,
         "canceled": 0.0477
       },
       "1h": {
-        "normal_minor": 0.6423,
-        "moderate": 0.261,
+        "normal_minor": 0.6425,
+        "moderate": 0.2609,
         "severe": 0.0638,
         "canceled": 0.0329
       },
       "20min": {
-        "normal_minor": 0.6469,
-        "moderate": 0.2628,
-        "severe": 0.0643,
-        "canceled": 0.0261
+        "normal_minor": 0.6472,
+        "moderate": 0.2625,
+        "severe": 0.0642,
+        "canceled": 0.026
       },
       "0min": {
-        "normal_minor": 0.6487,
-        "moderate": 0.2635,
+        "normal_minor": 0.6491,
+        "moderate": 0.2631,
         "severe": 0.0644,
-        "canceled": 0.0234
+        "canceled": 0.0233
       }
     },
     "cv_withdrawn_cancellations": 59

@@ -24,6 +24,10 @@ Sources:
 - KMK summer schedule, 2025--2030:
   https://www.kmk.org/fileadmin/Dateien/pdf/Ferienkalender/Sommerferienregelung_2025-2030_2022-09-21.pdf
 
+Bavaria's state-wide public holidays equal Baden-Württemberg's, so only
+``public_holiday_bw`` is a feature (decision of 13 November 2026); Bavaria's
+holidays still count for the adjacency and bridge-day features.
+
 Scope limits: dates are state-wide holidays only. Bavaria's Assumption Day
 and Augsburg Peace Festival vary by municipality and are excluded. KMK's
 movable school-free days are not included unless the calendar lists their
@@ -38,7 +42,6 @@ import pandas as pd
 FEATURES = [
     "public_holiday_he",
     "public_holiday_bw",
-    "public_holiday_by",
     "school_holiday_he",
     "school_holiday_bw",
     "school_holiday_by",
@@ -133,7 +136,7 @@ _SCHOOL_BREAKS = {
         ("2025-03-03", "2025-03-07"),
         ("2025-04-14", "2025-04-25"),
         ("2025-06-10", "2025-06-20"),
-        ("2025-08-04", "2025-09-15"),
+        ("2025-08-01", "2025-09-15"),
         ("2025-11-03", "2025-11-07"),
         ("2025-11-19", "2025-11-19"),
         ("2025-12-22", "2026-01-05"),
@@ -172,7 +175,7 @@ def add_holiday_features(
     the CV coverage interval. The input is not modified. Holiday-adjacency
     features use the union of state-wide public holidays across the three
     states. ``bridge_day`` is a Friday after a Thursday holiday or a Monday
-    before a Tuesday holiday.
+    before a Tuesday holiday that is not a public holiday itself.
     """
     if date_column not in rows:
         raise KeyError(f"missing holiday date column {date_column!r}")
@@ -189,13 +192,16 @@ def add_holiday_features(
             f"{SUPPORTED_START.isoformat()} through {SUPPORTED_END.isoformat()}"
         )
 
-    years = {day.year for day in days}
+    # Every year in the span and the next one, so that the adjacency features
+    # do not depend on which dates the frame happens to contain.
+    years = set(range(min(days).year, max(days).year + 2)) if not days.empty else set()
     public_by_state = _holiday_dates(years)
     public_any = set().union(*public_by_state.values())
     school_by_state = {state: _school_dates(state) for state in _STATES}
     result = rows.copy()
     for state in _STATES:
-        result[f"public_holiday_{state}"] = days.isin(public_by_state[state]).to_numpy(dtype=bool)
+        if f"public_holiday_{state}" in FEATURES:
+            result[f"public_holiday_{state}"] = days.isin(public_by_state[state]).to_numpy(dtype=bool)
         result[f"school_holiday_{state}"] = days.isin(school_by_state[state]).to_numpy(dtype=bool)
 
     # Friday after Thursday, or Monday before Tuesday, with a public holiday
@@ -204,10 +210,10 @@ def add_holiday_features(
     day_before = []
     day_after = []
     for day in days:
-        bridge.append(
+        bridge.append(day not in public_any and (
             (day.weekday() == 4 and day - timedelta(days=1) in public_any)
             or (day.weekday() == 0 and day + timedelta(days=1) in public_any)
-        )
+        ))
         day_before.append(day + timedelta(days=1) in public_any)
         day_after.append(day - timedelta(days=1) in public_any)
     result["bridge_day"] = bridge

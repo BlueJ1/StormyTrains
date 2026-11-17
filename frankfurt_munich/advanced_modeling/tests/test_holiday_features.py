@@ -24,7 +24,8 @@ def test_public_holidays_follow_the_three_state_rules():
 
     assert result["public_holiday_he"].tolist() == [False, True, False, False]
     assert result["public_holiday_bw"].tolist() == [True, True, True, False]
-    assert result["public_holiday_by"].tolist() == [True, True, True, False]
+    # Bavaria's state-wide holidays equal Baden-Württemberg's: one column only.
+    assert "public_holiday_by" not in result
 
 
 def test_school_break_ranges_are_inclusive_and_state_specific():
@@ -43,7 +44,8 @@ def test_school_break_ranges_are_inclusive_and_state_specific():
 
     assert result["school_holiday_he"].tolist() == [True, True, True, True, True, False]
     assert result["school_holiday_bw"].tolist() == [False, True, True, True, True, True]
-    assert result["school_holiday_by"].tolist() == [False, False, False, True, True, True]
+    # Bavaria's summer break 2025 starts on Friday 1 August.
+    assert result["school_holiday_by"].tolist() == [False, False, True, True, True, True]
 
 
 def test_bavarian_day_of_repentance_is_school_free_only():
@@ -52,7 +54,7 @@ def test_bavarian_day_of_repentance_is_school_free_only():
     })
     result = add_holiday_features(rows)
     assert result["school_holiday_by"].all()
-    assert not result["public_holiday_by"].any()
+    assert not result["day_before_holiday"].any() and not result["bridge_day"].any()
     assert not result["school_holiday_bw"].any()
 
 
@@ -72,6 +74,18 @@ def test_holiday_adjacency_and_bridge_day_definitions():
     assert result["day_before_holiday"].tolist() == [True, False, False, True, False]
     assert result["day_after_holiday"].tolist() == [False, False, True, False, False]
     assert result["bridge_day"].tolist() == [False, False, True, True, False]
+
+
+def test_a_public_holiday_is_never_a_bridge_day():
+    rows = pd.DataFrame({"origin_departure_planned_local": pd.to_datetime([
+        "2025-12-26",  # Friday after Thursday Christmas Day, but a holiday itself
+    ])})
+    assert not add_holiday_features(rows)["bridge_day"].any()
+
+
+def test_adjacency_does_not_depend_on_the_other_dates_in_the_frame():
+    alone = pd.DataFrame({"origin_departure_planned_local": pd.to_datetime(["2024-12-31"])})
+    assert add_holiday_features(alone)["day_before_holiday"].tolist() == [True]
 
 
 def test_adds_only_the_declared_boolean_features_without_mutating_input():

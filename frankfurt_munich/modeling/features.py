@@ -27,7 +27,6 @@ def feature_groups(prediction_time: str, weather: bool = False):
         "calendar": (tuple(HOLIDAYS), CALENDAR[1]),
         "route": PLANNED_TIMETABLE,
         "recent_reliability": PHASE2_GROUPS["recent_reliability"],
-        "network_state": PHASE2_GROUPS["network_state"],
     }
     if prediction_time in CURRENT_DELAY_TIMES:
         groups["delay"] = (("current_delay", *PHASE2_GROUPS["delay_dynamics"][0]), ())

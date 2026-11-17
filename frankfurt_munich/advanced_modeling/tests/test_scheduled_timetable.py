@@ -21,7 +21,7 @@ from scheduled_timetable import (
 )
 
 
-def test_plan_availability_uses_legacy_static_schedule_by_default():
+def test_plan_availability_is_static_in_both_archive_periods_by_default():
     stamps = pd.Series(pd.to_datetime([
         "2025-11-02 23:00:00",
         "2025-11-03 03:32:22.619260",
@@ -30,9 +30,10 @@ def test_plan_availability_uses_legacy_static_schedule_by_default():
     available = plan_availability_utc(stamps)
 
     assert available.iloc[0] == pd.Timestamp("1900-01-01", tz="UTC")
-    assert available.iloc[1] == EXACT_PLAN_REQUESTS_FROM_UTC
+    assert available.iloc[1] == pd.Timestamp("1900-01-01", tz="UTC")
     sensitivity = plan_availability_utc(stamps, legacy_hour_label_offset=pd.Timedelta(minutes=45))
     assert sensitivity.iloc[0] == pd.Timestamp("2025-11-02 23:45:00", tz="UTC")
+    assert sensitivity.iloc[1] == EXACT_PLAN_REQUESTS_FROM_UTC
 
 
 def test_timetable_features_use_latest_asof_snapshot_and_numpy_path():
@@ -41,12 +42,12 @@ def test_timetable_features_use_latest_asof_snapshot_and_numpy_path():
         "predicted_at": [pd.Timestamp("2025-11-03 10:00")],
     })
     context = pd.DataFrame({
-        "journey_id": ["j1"], "current_origin_id": ["ride-2"],
-        "scheduled_origin_id": ["ride-2"], "is_replacement_train": [False],
+        "journey_id": ["j1"], "current_origin_id": ["123-2511030801-2"],
+        "scheduled_origin_id": ["123-2511030801-2"], "is_replacement_train": [False],
     })
     plans = pd.DataFrame([
         {
-            "id": "ride-2", "snapshot_timestamp": pd.Timestamp("2025-11-03 08:00"),
+            "id": "123-2511030801-2", "snapshot_timestamp": pd.Timestamp("2025-11-03 08:00"),
             "available_at_utc": pd.Timestamp("2025-11-03 08:00", tz="UTC"),
             "station_name": "Frankfurt (Main) Hbf", "train_type": "ICE", "train_number": "1",
             "arrival_planned_time": pd.Timestamp("2025-11-03 09:30"),
@@ -55,15 +56,7 @@ def test_timetable_features_use_latest_asof_snapshot_and_numpy_path():
             "departure_planned_path": np.array(["Stuttgart Hbf", "Ulm Hbf", "München Hbf"], dtype=object),
         },
         {
-            "id": "ride-1", "snapshot_timestamp": pd.Timestamp("2025-11-03 08:00"),
-            "available_at_utc": pd.Timestamp("2025-11-03 08:00", tz="UTC"),
-            "station_name": "Mannheim Hbf", "train_type": "ICE", "train_number": "1",
-            "arrival_planned_time": pd.Timestamp("2025-11-03 08:00"),
-            "departure_planned_time": pd.Timestamp("2025-11-03 08:01"),
-            "arrival_planned_path": None, "departure_planned_path": None,
-        },
-        {
-            "id": "ride-2", "snapshot_timestamp": pd.Timestamp("2025-11-03 10:00"),
+            "id": "123-2511030801-2", "snapshot_timestamp": pd.Timestamp("2025-11-03 10:00"),
             "available_at_utc": pd.Timestamp("2025-11-03 10:00", tz="UTC"),
             "station_name": "Frankfurt (Main) Hbf", "train_type": "ICE", "train_number": "1",
             "arrival_planned_time": pd.Timestamp("2025-11-03 09:30"),
@@ -84,6 +77,8 @@ def test_timetable_features_use_latest_asof_snapshot_and_numpy_path():
     assert result.loc[0, "route_id"] == (
         "Frankfurt (Main) Hbf | Stuttgart Hbf | Ulm Hbf | München Hbf"
     )
+    # From the run start in the ID (08:01) to the Frankfurt arrival (09:30); the
+    # first stop needs no plan row of its own.
     assert result.loc[0, "upstream_planned_min"] == 89.0
 
 

@@ -34,6 +34,14 @@ from snapshots import event_summary, read_snapshots
 HERE = Path(__file__).resolve().parent
 
 
+def in_force_counts(journey_ids) -> dict:
+    """Cancelled CV journeys without a prediction row, per prediction time."""
+    rows = pd.read_parquet(HERE / "data" / "prediction_rows_cv.parquet", columns=["journey_id", "prediction_time"])
+    present = rows.groupby("prediction_time", observed=True).journey_id.agg(set)
+    ids = pd.Index(journey_ids)
+    return {str(time): int((~ids.isin(present[time])).sum()) for time in present.index}
+
+
 def main() -> None:
     journeys = pd.concat([pd.read_parquet(HERE / "data" / f"journeys_{s}.parquet").assign(split=s)
                           for s in ("cv", "holdout")], ignore_index=True)
@@ -115,6 +123,11 @@ def main() -> None:
                 f"{h}_or_more": int(lead.ge(m).sum())
                 for h, m in [("24h", 1440), ("6h", 360), ("1h", 60), ("20min", 20), ("0min", 0)]},
             "issued_after_planned_departure": int(lead.lt(0).sum()),
+            # The first issue time is not when a journey leaves the data: a
+            # cancellation can be withdrawn and issued again. A cancelled
+            # journey is left out at a prediction time if a cancellation is in
+            # force then, that is, if it has no prediction row.
+            "in_force_at_prediction_time": in_force_counts(canceled.index),
         },
         "cancellation_withdrawn": {
             "journeys_by_split": c[c.cancellation_withdrawn].split.value_counts().to_dict(),
