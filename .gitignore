@@ -42,7 +42,7 @@ frankfurt_munich/data/advanced_original_065b077/
 data/monthly_processed_data_plan/
 
 # Frankfurt–München weather: DWD archives downloaded by frankfurt_munich/weather_features.py.
-frankfurt_munich/weather/raw/
+frankfurt_munich/measured_weather_DWD/raw/
 
 # Report: LaTeX build files. The PDF is ignored by the *.pdf rule above, except the figures.
 report/*.aux
