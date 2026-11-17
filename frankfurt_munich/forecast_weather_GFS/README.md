@@ -43,8 +43,8 @@ Across the full dataset, GFS forecast a positive hourly precipitation amount in 
 Run this on completed exports and write the updated files to a separate directory.
 
 ```sh
-python -m pip install eccodes requests
-python add_gfs_wrtr.py gfs_weather_base --output data_with_wrtr
+python -m pip install eccodes requests xarray
+python add_gfs_wrtr.py gfs_weather_base --output data
 ```
 
 ## Run

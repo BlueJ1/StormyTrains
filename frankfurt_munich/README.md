@@ -210,7 +210,7 @@ Missing values in the CV set (17,507 journeys):
 
 ## Weather
 
-[NOAA GFS historical forecasts](forecast_weather_GFS/README.md) cover 1 July 2024 through 30 September 2026. The forecast tables include initialization and valid times for matching to railway prediction cutoffs.
+[NOAA GFS historical forecasts](forecast_weather_GFS/README.md) cover 1 July 2024 through 30 September 2026. The forecast tables include initialization and valid times for matching to railway prediction cutoffs. No model uses them yet; the weather features below are DWD observations.
 
 `weather_features.py` adds the weather known at the prediction time along the route to every prediction row. The station observations are the `_final` tables in `measured_weather_DWD/observations/` (see `measured_weather_DWD/README.md`); their gaps are already filled from a backup station within 50 km.
 

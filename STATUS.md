@@ -51,6 +51,15 @@ All from before the corrections decided on 12 November; they are replaced after 
 - The hold-out evaluation ran before the review fixes to two input groups; the CV results include the fixes.
 - The first models looked much better (0.759 and 21.55 min at 0 min) because of the recorded-route inputs and, mostly, `current_delay` from the final records.
 
+## GFS forecasts: open issues
+
+Found in the review of PR #14 (17 November 2026). The README and script fixes were made in PR #16; the points below are still open.
+
+- **Not in the plan or the report.** `FINISHING_PLAN.md` has no forecast step, and `report/main.tex` says forecasts were not used. Decide whether to add a plan item or keep the data unused; `frankfurt_munich/README.md` says that no model uses it yet.
+- **Availability.** The archive has the run's start time only; GFS is published some hours later. A delay rule is needed before matching runs to prediction times.
+- **Precipitation type.** `wrtr` is unknown for 159,538 of 510,859 wet rows (31%): 53% for the smallest amount (0.0625 mm) against 21% at 0.1 mm or more, and 6% at leads 1, 7, 13, … against 33–38% at other leads. Likely cause: outside those leads the code uses the flags at the end of the hour, which are all 0 when the rain stopped earlier. Code 8 never occurs, so "7 or 8" is not comparable with DWD.
+- **Wet-hour threshold.** GFS hourly amounts come in steps of 0.0625 mm and 19.8% of rows are wet; DWD measures in 0.1 mm steps. Comparisons need a common threshold.
+
 ## Local data, not in the repository
 
 - `data/monthly_processed_data`, `data/monthly_processed_data_change` and `data/monthly_processed_data_plan` (about 19 GB), July 2024 to September 2026, as rebuilt by the source on 6–8 October 2026; the first two were downloaded on 8 October 2026 and checked against the SHA-256 sums. The plan files are pinned to a revision in `frankfurt_munich/advanced_modeling/README.md`.

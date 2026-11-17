@@ -3,7 +3,6 @@
 import argparse
 import io
 import json
-import re
 import shutil
 import threading
 from concurrent.futures import ThreadPoolExecutor
