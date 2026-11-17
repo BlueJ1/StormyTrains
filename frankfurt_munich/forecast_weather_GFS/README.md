@@ -6,7 +6,7 @@ Historical coverage drove the choice of forecast source. The DWD regional foreca
 
 The files in `data/` cover weather valid from 2024-07-01 through 2026-09-30, inclusive, in `Europe/Berlin`. Each of the raw and processed datasets has 2,577,792 rows across 28 date partitions. September 2025 is split into two partitions at the download boundary on 30 September. The tables retain every six-hour NOAA GFS cycle and hourly lead from 0 to 48 hours with a valid time in this window, including cycles initialized before the first day. The 48-hour limit is a project choice for the planned 24-hour prediction horizon and a buffer for the weather forecast's age and the train journey.
 
-`gfs_stations.csv` maps the project's 19 Frankfurt–München railway stations to 16 nearest 0.25° GFS cells. Coordinates come from the existing Frankfurt–München weather station mapping. The Parquet tables contain one row per grid point, initialization time and lead hour. Both time columns are UTC. A later stage can use the station map and select a forecast that was available by each train prediction time. The GFS initialization time records when the run starts. The archive extract has no historical publication timestamp. Apply and document an availability rule when matching a run to a train prediction cutoff.
+`gfs_stations.csv` maps the project's 19 Frankfurt–München railway stations to 16 nearest 0.25° GFS cells. Coordinates come from the existing Frankfurt–München weather station mapping. The Parquet tables contain one row per grid point, initialization time and lead hour. Both time columns are UTC. A later stage can use the station map and select a forecast that was available by each train prediction time. The GFS initialization time records when the run starts. The archive extract has no historical publication timestamp; the rule the models use is below.
 
 | File | Contents |
 |---|---|
@@ -15,6 +15,14 @@ The files in `data/` cover weather valid from 2024-07-01 through 2026-09-30, inc
 | `gfs_manifest_*.json` | Date bounds, grid points, row counts, missing-value counts, file sizes and SHA-256 hashes. |
 
 GFS precipitation accumulates over the preceding 1–6 hours. The export differences consecutive leads within each six-hour accumulation period and uses the source amount directly at the first hour of each period. Precipitation at lead zero and negative hourly differences are missing. The raw table preserves the original archive values.
+
+## Use in the models
+
+`../advanced_modeling/build_forecast_weather.py` turns these tables into model inputs (step 10.8 of the modelling plan, decision D17; finishing plan B13–B16).
+
+- **Availability (B13).** A run counts as available from its start time (`init_time_utc`), decided on 17 November 2026: a system in use would receive forecasts in near real time. Each prediction row uses the latest run that started at or before its cutoff. NOAA's own files arrive later: for 1,100 runs sampled every third day from 29 June 2024 to 30 September 2026, the 48-hour file reached the `noaa-gfs-bdp-pds` AWS bucket a median of 3.8 h after the start (2 runs after more than 5 h, none after 6 h). So the rule is optimistic by about that much.
+- **Hours.** The planned journey, from the departure hour rounded down to the arrival hour rounded up, at the cells of the branch's fixed station list.
+- **Precipitation type (B14).** Not used: snow enters the models only as forecast snow depth. Where GFS and DWD wet hours are compared, an hour is wet from 0.1 mm in both.
 
 ## Load the processed forecasts
 
@@ -38,7 +46,7 @@ weather = pd.concat(
 
 The script reads the four NOAA GFS precipitation-type flags for the same run, lead and grid point. For a wet hour, it uses the interval flags if that hour accounts for all precipitation in the 1–6 hour accumulation window. Otherwise, it uses the instantaneous flags at the end of the hour. Missing hourly amounts and wet hours without a usable type stay null. The manifest records the number of wet rows with an unknown type. [NOAA GFS product inventory](https://www.nco.ncep.noaa.gov/pmb/products/gfs/gfs.t00z.pgrb2.0p25.f003.shtml)
 
-Across the full dataset, GFS forecast a positive hourly precipitation amount in 510,859 rows. In 159,538 of those rows (31.2%), the available flags did not identify the precipitation type, so `wrtr` is null.
+Across the full dataset, GFS forecast a positive hourly precipitation amount in 510,859 rows. In 159,538 of those rows (31.2%), the available flags did not identify the precipitation type, so `wrtr` is null. Most likely, the 1–6 hour window-average flags are fractions rather than 0 or 1 whenever the window covers more than one hour, so the script rejects them and falls back to the flags at the end of the hour, which are 0 when the precipitation stopped earlier. The models do not use `wrtr` (B14).
 
 Run this on completed exports and write the updated files to a separate directory.
 

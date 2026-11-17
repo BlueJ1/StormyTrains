@@ -10,6 +10,7 @@ The experiments of the [advanced modelling plan](PLAN.md), added in PR #12: inpu
 |---|---|
 | `scheduled_timetable.py`, `history_features.py`, `recent_reliability.py`, `holiday_features.py` | Inputs known at the cutoff, built from the plan and change snapshots: planned timetable, live delay and its dynamics, recent reliability, network state, holidays |
 | `build_advanced_weather.py`, `build_corridor_inputs.py`, `network_transfer.py`, `sequence_inputs.py` | Weather on the planned route, other corridors (8.3), network-wide delay pairs (8.4), upstream sequences (7.5) |
+| `build_forecast_weather.py` | GFS forecast weather for the hours of the planned journey (step 10.8, decision D17), alongside the observed weather |
 | `holdout_gate.py` | Refuses hold-out builds unless the committed registry matches the current source |
 | `run_advanced.py`, `experiment_specs.py`, `experiment_models.py`, `advanced_data.py` | The CV steps of the plan: which arms exist, their models and inputs |
 | `representations.py`, `group_selection.py`, `decomposed.py`, `ensembles.py`, `extra_models.py`, `distributions.py`, `neural.py`, `gated_neural.py`, `sequence_model.py`, `corridor_transfer.py` | Phase 1 and 3 to 8 methods |
@@ -44,6 +45,9 @@ Input coverage after the rebuild of 13 November 2026 (corrected dataset, static 
 | Planned route available | 17,364 | 17,267 | 16,998 | 16,878 | 16,830 |
 | Weather branch available | 17,363 | 17,266 | 16,997 | 16,877 | 16,829 |
 | Snapshot-based `current_delay` used by models | — | — | 6,654 | 7,331 | 8,758 |
+| GFS forecast, route features (built 17 November 2026) | 17,363 | 17,266 | 16,997 | 16,877 | 16,829 |
+
+The GFS forecast endpoint temperatures are known for every CV row; the route features need the weather branch, like the observed weather. Each row uses the latest GFS run that started by its cutoff (a run counts as available from its start, decision D17) and the hours from the planned departure to the planned arrival. No model uses the forecasts yet (step 10.9).
 
 The snapshot-based `current_delay` is missing for about half the rows because the archive fetched live updates in blocks about six hours apart: for most journeys the last fetch before the cutoff came before the train had reported from any stop before Frankfurt (finishing plan B1). Since 13 November 2026 it does not use the departure from Frankfurt itself, as in the dataset's `current_delay`.
 
@@ -53,6 +57,7 @@ Inputs that follow the archive's fetch clock rather than the trains are not used
 .venv/bin/python frankfurt_munich/advanced_modeling/scheduled_timetable.py
 .venv/bin/python frankfurt_munich/advanced_modeling/history_features.py --feature all
 .venv/bin/python frankfurt_munich/advanced_modeling/build_advanced_weather.py
+.venv/bin/python frankfurt_munich/advanced_modeling/build_forecast_weather.py
 .venv/bin/python frankfurt_munich/advanced_modeling/run_advanced.py 0.7 --jobs 4
 .venv/bin/python frankfurt_munich/advanced_modeling/run_advanced.py 1.1 --jobs 4
 .venv/bin/python frankfurt_munich/advanced_modeling/report_cv.py --write-readme
