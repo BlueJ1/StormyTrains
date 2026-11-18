@@ -12,17 +12,13 @@ from data import DATA, ROW_KEY, TIME_COLUMN, merge_inputs
 from features import WEATHER
 from holdout_gate import REGISTRY, committed_registration
 from representations import WEATHER_LAG
-from weather_features import DESTINATION, ORIGIN, ROUTES, features, station_values
+from weather_features import branch_routes, features, station_values
 
 
 def weather_from_timetable(rows, timetable, hourly, depth):
     rows = merge_inputs(rows, timetable[[*ROW_KEY, "weather_branch"]])
-    unrecognized = set(rows["weather_branch"].dropna()) - ROUTES.keys()
-    if unrecognized:
-        raise ValueError(f"unrecognized timetable weather branches: {sorted(unrecognized)}")
-    routes = {**ROUTES, "unknown": [ORIGIN, DESTINATION]}
-    branch = rows["weather_branch"].astype("string").fillna("unknown")
-    route = rows[ROW_KEY[:2]].assign(eva=branch.map(routes)).explode("eva")
+    branch, stations = branch_routes(rows["weather_branch"])
+    route = rows[ROW_KEY[:2]].assign(eva=stations).explode("eva")
     current = features(rows, route, hourly, depth)
     earlier = features(rows, route, hourly, depth, lag_hours=24)
     route_columns = [column for column in WEATHER if column.startswith("route_")

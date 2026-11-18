@@ -172,6 +172,21 @@ def station_values() -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     return hourly, depth.set_index(["snow_date", "eva"])[["snow_depth_cm"]].astype(float), wrtr_audit
 
 
+def branch_routes(branches: pd.Series) -> tuple[pd.Series, pd.Series]:
+    """The fixed station list (ROUTES) of each row's timetable weather branch.
+
+    Returns the branch with missing values as "unknown", and each row's list of EVA
+    numbers. An unknown branch gets only Frankfurt and München; the callers blank
+    its route aggregates, so only the two endpoint temperatures remain. Shared by the
+    observed (build_advanced_weather.py) and forecast (build_forecast_weather.py)
+    inputs, so both always use the same stations."""
+    unrecognized = set(branches.dropna()) - ROUTES.keys()
+    if unrecognized:
+        raise ValueError(f"unrecognized timetable weather branches: {sorted(unrecognized)}")
+    branch = branches.astype("string").fillna("unknown")
+    return branch, branch.map({**ROUTES, "unknown": [ORIGIN, DESTINATION]})
+
+
 def route_stations(stops: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """(journey_id, eva) of each journey's fixed route (see ROUTE), and counts for the audit."""
     journeys = stops.groupby("journey_id").agg(train_number=("train_number", "first"), eva=("eva", set))

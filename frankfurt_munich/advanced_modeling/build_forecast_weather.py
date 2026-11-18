@@ -33,6 +33,8 @@ FEATURES (journey hours, route cells):
 - forecast_route_wind_max_ms, forecast_route_gust_max_ms;
 - forecast_route_snow_depth_cm: the deepest snow (B14: no precipitation type).
 Aggregates use the cells and hours that have a value, as for the DWD weather.
+`forecast_hours_missing` counts the journey hours in which some route cell
+lacks a value of any variable.
 The *_lag24h columns are the same features with the cutoff and the journey
 moved 24 h back in real time, for the 24-hour change representation (1.5).
 
@@ -52,7 +54,7 @@ import _paths  # noqa: F401  shared modelling code and dataset builders
 from advanced_data import ADVANCED
 from data import DATA, ROW_KEY, TIME_COLUMN, merge_inputs
 from holdout_gate import REGISTRY, committed_registration
-from weather_features import DESTINATION, ORIGIN, ROUTES, cutoff_utc, utc
+from weather_features import DESTINATION, ORIGIN, ROUTES, branch_routes, cutoff_utc, utc
 
 GFS = Path(__file__).resolve().parents[1] / "forecast_weather_GFS"
 MAX_LEAD_HOURS = 48
@@ -84,7 +86,11 @@ def load_gfs(directory: Path = GFS / "data") -> pd.DataFrame:
 
 
 def cell_name(lat: pd.Series, lon: pd.Series) -> pd.Series:
-    return lat.map("{:.2f}".format) + "," + lon.map("{:.2f}".format)
+    """The join key of a grid cell, "lat,lon" with two decimals; formats each distinct cell once."""
+    codes, cells = pd.MultiIndex.from_arrays([np.asarray(lat, dtype=float),
+                                              np.asarray(lon, dtype=float)]).factorize()
+    names = np.array([f"{a:.2f},{b:.2f}" for a, b in cells], dtype=object)
+    return pd.Series(names[codes], index=lat.index)
 
 
 def station_cells(path: Path = GFS / "gfs_stations.csv") -> dict[str, str]:
@@ -109,9 +115,7 @@ def forecast_features(rows: pd.DataFrame, gfs: pd.DataFrame, cells: dict[str, st
     if lag_hours < 0:
         raise ValueError("forecast lag must be non-negative")
     rows = rows.reset_index(drop=True)
-    unrecognized = set(rows["weather_branch"].dropna()) - ROUTES.keys()
-    if unrecognized:
-        raise ValueError(f"unrecognized weather branches: {sorted(unrecognized)}")
+    branch, stations = branch_routes(rows["weather_branch"])
     lag = pd.Timedelta(hours=lag_hours)
     at = cutoff_utc(rows) - lag
     departure = utc(rows.origin_departure_planned_local) - lag
@@ -119,16 +123,19 @@ def forecast_features(rows: pd.DataFrame, gfs: pd.DataFrame, cells: dict[str, st
     if not departure.lt(arrival).all():
         raise ValueError("planned arrival not after planned departure")
     run = latest_run(at, pd.DatetimeIndex(gfs.init_time_utc.unique()))
-    # Available at the cutoff, and never later than the departure (B13).
-    assert run.dropna().le(at[run.notna()]).all()
+    # B13: a run is used only if it started by the cutoff, and so by the departure.
+    known = run.notna()
+    if not (run[known].le(at[known]).all() and run[known].le(departure[known]).all()):
+        raise ValueError("a forecast run starts after the cutoff or the departure (B13)")
     first, last = departure.dt.floor("h"), arrival.dt.ceil("h")
 
-    branch = rows["weather_branch"].astype("string").fillna("unknown")
-    routes = {**ROUTES, "unknown": [ORIGIN, DESTINATION]}
-    missing_cells = {eva for evas in routes.values() for eva in evas} - cells.keys()
-    if missing_cells:
-        raise ValueError(f"route stations without a GFS cell: {sorted(missing_cells)}")
-    route = (pd.DataFrame({"row": rows.index, "eva": branch.map(routes)}).explode("eva")
+    route_stations = {eva for evas in (*ROUTES.values(), [ORIGIN, DESTINATION]) for eva in evas}
+    if missing_stations := route_stations - cells.keys():
+        raise ValueError(f"route stations without a GFS cell: {sorted(missing_stations)}")
+    # The join key is formatted from floats on both sides; a mismatch would leave every value missing.
+    if missing_cells := {cells[eva] for eva in route_stations} - set(gfs.cell.unique()):
+        raise ValueError(f"station cells not in the GFS data: {sorted(missing_cells)}")
+    route = (pd.DataFrame({"row": rows.index, "eva": stations}).explode("eva")
              .assign(cell=lambda f: f.eva.map(cells)).drop_duplicates(["row", "cell"]))
     hours = ((last - first) // pd.Timedelta(hours=1)).astype(int)
     window = pd.DataFrame({"row": rows.index.repeat(hours + 1)})
@@ -158,13 +165,18 @@ def forecast_features(rows: pd.DataFrame, gfs: pd.DataFrame, cells: dict[str, st
     out["forecast_route_snow_depth_cm"] = route_rows.snow_depth_cm.max()
     out.loc[branch.eq("unknown"), list(ROUTE_COLUMNS)] = np.nan
     out["forecast_run_utc"] = run
-    out["forecast_hours_missing"] = pairs.temperature_c.isna().groupby(pairs.row).sum().astype(int)
+    # Journey hours in which some route cell lacks a value (precipitation only after the first hour).
+    instant = ["temperature_c", "wind_speed_10m_ms", "wind_gust_ms", "snow_depth_cm"]
+    gap = pairs[instant].isna().any(axis=1) | (pairs.step.gt(0) & pairs.precipitation_1h_mm.isna())
+    out["forecast_hours_missing"] = gap.groupby([pairs.row, pairs.step]).any().groupby(level=0).sum().astype(int)
     return pd.concat([rows[ROW_KEY], out[["forecast_run_utc", "forecast_hours_missing", *FORECAST]]], axis=1)
 
 
 def build(rows: pd.DataFrame, gfs: pd.DataFrame, cells: dict[str, str]) -> pd.DataFrame:
     current = forecast_features(rows, gfs, cells)
     earlier = forecast_features(rows, gfs, cells, lag_hours=24)
+    if not earlier[ROW_KEY].equals(current[ROW_KEY]):
+        raise ValueError("the lagged forecast rows are not in the order of the current ones")
     current[list(FORECAST_LAG)] = earlier[list(FORECAST)].to_numpy()
     return current
 
@@ -187,8 +199,6 @@ def main():
                                 columns=[*ROW_KEY, "weather_branch"])
     rows = merge_inputs(rows, timetable).reset_index(drop=True)
     output = build(rows, load_gfs(), station_cells())
-    if not output[ROW_KEY].equals(rows[ROW_KEY].reset_index(drop=True)):
-        raise ValueError("forecast rows do not match the prediction rows")
     output.to_parquet(args.inputs_dir / f"forecast_weather_{args.split}.parquet", index=False,
                       compression="zstd")
     by_time = output.groupby("prediction_time", observed=True)

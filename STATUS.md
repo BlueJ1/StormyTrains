@@ -52,7 +52,7 @@ The CV results are from the rerun on the corrected inputs (15 November 2026). Th
 
 ## GFS forecasts
 
-Decided 17 November 2026 (finishing plan Q13, B13–B15; modelling plan D17, 10.8–10.9). Forecasts supplement the DWD observations. A run counts as available from its start time; NOAA's files actually arrive about 3.8 h later, so this is optimistic, and the report must say so. Features cover the hours of the planned journey. Snow enters only as forecast snow depth; `wrtr` is not used (unknown for 31% of wet rows). Where GFS and DWD wet hours are compared, an hour is wet from 0.1 mm in both. The CV forecast inputs are built (B16); the 332 forecast runs are next (B17: 166 weather arms, without nested XGBoost and CatBoost; about 20–25 h), then B6. `report/main.tex` still says forecasts were not used (revised in B17).
+Decided 17 November 2026 (finishing plan Q13, B13–B15; modelling plan D17, 10.8–10.9). Forecasts supplement the DWD observations. A run counts as available from its start time; NOAA's files actually arrive about 3.8 h later, so this is optimistic, and the report must say so. Features cover the hours of the planned journey. Snow enters only as forecast snow depth; `wrtr` is not used (unknown for 31% of wet rows). Where GFS and DWD wet hours are compared, an hour is wet from 0.1 mm in both. The CV forecast inputs are built (B16); the 364 forecast runs are next (B17: 166 weather arms, 32 more 3.1 ablations in the combined arm, without nested XGBoost and CatBoost; about 20–25 h), then B6. `report/main.tex` still says forecasts were not used (revised in B17).
 
 ## Local data, not in the repository
 

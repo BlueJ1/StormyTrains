@@ -47,7 +47,7 @@ Input coverage after the rebuild of 13 November 2026 (corrected dataset, static 
 | Snapshot-based `current_delay` used by models | — | — | 6,654 | 7,331 | 8,758 |
 | GFS forecast, route features (built 17 November 2026) | 17,363 | 17,266 | 16,997 | 16,877 | 16,829 |
 
-The GFS forecast endpoint temperatures are known for every CV row; the route features need the weather branch, like the observed weather. Each row uses the latest GFS run that started by its cutoff (a run counts as available from its start, decision D17) and the hours from the planned departure to the planned arrival. No model uses the forecasts yet (step 10.9).
+The GFS forecast Frankfurt temperature is known for every CV row and the München temperature for all but 10 (two journeys on 30 September 2026 arrive after the end of the extract); the route features need the weather branch, like the observed weather. Each row uses the latest GFS run that started by its cutoff (a run counts as available from its start, decision D17) and the hours from the planned departure to the planned arrival. No model uses the forecasts yet (step 10.9).
 
 The snapshot-based `current_delay` is missing for about half the rows because the archive fetched live updates in blocks about six hours apart: for most journeys the last fetch before the cutoff came before the train had reported from any stop before Frankfurt (finishing plan B1). Since 13 November 2026 it does not use the departure from Frankfurt itself, as in the dataset's `current_delay`.
 
