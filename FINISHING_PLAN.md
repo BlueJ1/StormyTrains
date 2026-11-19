@@ -27,7 +27,7 @@ Against the brief's "minimum successful project":
 |---|---|
 | Reproducible journey dataset with a clear severity target | Done (`frankfurt_munich/`). The download source and revision of the two main data folders are not documented in one place |
 | Baselines and standard ML models with temporal evaluation | Done. The split is by stratified week, not chronological (agreed with the supervisor on 12 October); the report must justify it |
-| Fair railway-only versus railway-plus-weather experiment | Done once: matched pairs, same rows and budget, one hold-out evaluation, no gain from weather. It is repeated on the corrected inputs with newly registered finalists (Q1, Q2) |
+| Fair railway-only versus railway-plus-weather experiment | Done once: matched pairs, same rows and budget, one hold-out evaluation, no gain from weather. It is repeated on the corrected inputs with newly registered finalists (Q1, Q2), and with forecast weather (Q13) |
 | Explanation of errors, useful features and limitations | Partly: errors by class, period and branch, calibration and SHAP exist as files; they are not yet turned into findings |
 
 Optional extensions: an advanced neural model is covered (MLPs, RealMLP, TabM, a gated architecture search, a GRU). Risk updates exist only before departure (five prediction times up to 0 min); the brief's "during the journey" setting is not covered. Extreme-weather analysis is too sparse to report. Connections and a decision-support prototype are not started.
@@ -72,7 +72,7 @@ Three arms failed rather than "showed no gain" and should be reported as failed 
 
 ## Decisions
 
-Taken on 12 November 2026; Q11 is deferred. Where a decision differs from the suggestion in the draft of 10 November, it says so.
+Taken on 12 November 2026; Q11 is deferred. Q13 was added and decided on 17 November 2026. Where a decision differs from the suggestion in the draft of 10 November, it says so.
 
 | # | Question | Decision | State |
 |---|---|---|---|
@@ -88,6 +88,7 @@ Taken on 12 November 2026; Q11 is deferred. Where a decision differs from the su
 | Q10 | **Repository for submission.** Root README and one environment file; what to do with `eda.ipynb` (empty since 8 October), `arrival_delays/` and `berlin_munich_weather/`; licence holder; attribution of the railway and DWD data. | Create the root README (step E1). Remove `arrival_delays/`, `berlin_munich_weather/` and `eda.ipynb` (step E3). `corridor_analysis/` stays, because `build_dataset.py` uses its `extract.py`. Not answered yet: the single environment file, the licence holder and the data attribution (steps E2 and E4). | decided |
 | Q11 | **Who did what, and use of AI tools.** The course requires each student's code and text contributions to be identifiable. The git history shows them poorly (squash merges under one account), and most commits carry an AI co-author line. | Left empty for now. The course needs the statement with the code submission on 8 January, so the question comes back in December. | deferred |
 | Q12 | **Why not Bahn-Vorhersage?** Record the reason for using `piebro/deutsche-bahn-data` and tell the supervisor. | The Bahn-Vorhersage data has not been made available to us by the data owners, so we use `piebro/deutsche-bahn-data`. The supervisor is aware. Recorded in `STATUS.md` and in the report draft. | decided |
+| Q13 | **Forecast weather (GFS).** The brief asks for weather available at the prediction time and allows forecasts issued before the cutoff; its example passenger reads a forecast for tomorrow. Every weather arm so far uses DWD observations of the latest hour before the cutoff, which at 24 h and 6 h say little about the hours of the journey. GFS forecasts for the route are downloaded (PR #14) but unused. (a) Replace: the weather arm of every matched pair uses forecasts instead of observations; the report keeps one weather comparison. (b) Supplement: keep the observed-weather arms and add forecast arms (forecasts alone, or observations plus forecasts) on the same rows, so the report compares railway-only, observed and forecast weather. (b) means more runtime and more comparisons on the same five folds (R9). Either way the scope freeze (Q8) is lifted for this one feature group, and the forecast arms must be in CV before the new finalists are registered (B6), because the hold-out weeks are scored only once more. | (b) Supplement (17 November 2026; steps B13–B17). Forecasts are added alongside the observations, so the impact of each weather feature can be measured afterwards and it can be seen whether measured weather adds anything once forecasts are in (C6). For that, B15 lists, besides railway-only and observed weather, an arm with forecasts alone and one with observations plus forecasts. | decided |
 
 ## Work packages
 
@@ -98,10 +99,10 @@ Owners are left empty for the group to fill in.
 | ID | Step | Cost | Owner | Due | Status |
 |---|---|---|---|---|---|
 | A1 | Decisions on Q1–Q12: taken on 12 November 2026; Q11 is deferred | S |  | 13 Nov | done |
-| A2 | Supervisor meeting: tell the supervisor about the full rebuild and the second hold-out evaluation (Q1, Q2) and the scope freeze (Q8); go through the report outline | S |  | 20 Nov | todo |
+| A2 | Supervisor meeting: tell the supervisor about the full rebuild and the second hold-out evaluation (Q1, Q2), the scope freeze (Q8) and the forecast weather added to it (Q13); go through the report outline | S |  | 20 Nov | todo |
 | A3 | Assign owners to the steps below | S |  | 16 Nov | todo |
 
-### B. Correct, rebuild and rerun (weeks 46–49; decisions Q1–Q7 and Q9)
+### B. Correct, rebuild and rerun (weeks 46–49; decisions Q1–Q7, Q9 and Q13)
 
 | ID | Step | Cost | Owner | Due | Status |
 |---|---|---|---|---|---|
@@ -116,7 +117,12 @@ Owners are left empty for the group to fill in.
 | B9 | Record the data source in one place: repository id, revision or download date, SHA-256 sums of the monthly files, how `stations_present_in_all_months.csv` was made, and why it is not Bahn-Vorhersage (Q12). Done 16 November: section "Data source" in `frankfurt_munich/README.md`, sums in `data/SHA256SUMS`. All 81 files are identical to revision `d27b9c41`; the station panel is the set of stations present in every monthly file | S |  | 27 Nov | done |
 | B4 | Rerun all CV arms on the rebuilt inputs and audit them as before: 354 active arms, the 366 less the 12 network-state arms dropped on 13 November. Rewrite the result tables in `advanced_modeling/README.md` and the result lines in `PLAN.md` and `plan.html`. Done 15 November: about 34 hours on this laptop, all 354 passed the audit | L |  | 1 Dec | done |
 | B5 | Write the second evaluation into `PLAN.md` before anything is rerun: decisions D14–D16 and Phase 10 (new finalists from the corrected CV results only, by the rules of 9.1; one more scoring of the hold-out weeks) | S |  | 12 Nov | done |
-| B6 | Register the new finalists in `finalists.json` from the corrected CV results. Build the hold-out inputs with the corrected code, refit on the 95 CV weeks and score once on the 23 hold-out weeks, together with class shares and the training mean (Q7). The first evaluation's files move to `results/advanced_holdout_first/` | M |  | 4 Dec | todo |
+| B13 | Availability rule for the GFS runs. The archive keeps only each run's start time, and NOAA publishes a run some hours later. The group sets a fixed delay from NOAA's production schedule; a run counts as available from its start plus that delay, and each prediction row uses the latest run available at its cutoff. Record the rule in `forecast_weather_GFS/README.md` and the report, with a test that no row uses a run that was not yet available Done on 17 November 2026: a run counts as available from its start time (group decision), on the assumption that a system in use would receive forecasts in near real time. NOAA's 48-hour files reached its AWS bucket a median of 3.8 h after the start (1,100 runs sampled every third day; 2 after more than 5 h, none after 6 h), so the rule is optimistic by about that much; the report says so in B17. Rule in `forecast_weather_GFS/README.md` and `build_forecast_weather.py`, test in `advanced_modeling/tests/test_forecast_weather.py` | S |  | 21 Nov | done |
+| B14 | Precipitation in the forecasts. Fix or drop `wrtr`: its type is unknown for 31% of wet rows, most likely because outside leads 1, 7, 13, … the end-of-hour flags are used, and code 8 never occurs. Set a common wet-hour threshold for GFS (steps of 0.0625 mm) and DWD (0.1 mm), and decide how the snow indicator is formed from forecasts (precipitation type, snow depth or both) Done on 17 November 2026: no forecast precipitation type (group decision); snow enters the models only as forecast snow depth, and `wrtr` is not used. The features use amounts, so no wet-hour threshold enters them; where GFS and DWD wet hours are compared (C3, C6), an hour is wet from 0.1 mm in both. The likely cause of the unknown types (the window-average flags are fractions, which the script rejects) is noted in the GFS README | S–M |  | 24 Nov | done |
+| B15 | Write the forecast step into the modelling plan (`PLAN.md` and `plan.html`, Phase 10) before anything is built or run: the forecast features, which forecast hours they cover (proposed: the hours of the planned journey, from the Frankfurt departure to the München arrival, at the GFS cells of the fixed station list per branch in `gfs_stations.csv`), which arms get forecast variants (Q13: forecasts alone and observations plus forecasts, next to railway-only and observed weather; for scale, 182 of the 354 arms of B4 are weather arms), matched pairs and budgets as in 9.1, the minimum gain D12, and how 10.5 registers forecast pairs. Includes a runtime estimate Done on 17 November 2026: decision D17 and steps 10.8 (inputs) and 10.9 (arms) in the modelling plan. Group decisions: the journey hours, and both variants for every weather arm (182 arms, 364 runs, about 40 h); narrowed the same day to 166 arms (364 runs with the extra 3.1 ablations of the combined arm, about 20–25 h) by leaving out nested XGBoost, CatBoost and the arms built on them. Written in 10.9 for the group to check: forecast feature groups separate from the observed ones; forecast extremes with the thresholds of 1.5 and snow from snow depth; the 24-hour change as forecast minus the forecast 24 h earlier; the three comparisons with D12 | S |  | 24 Nov | done |
+| B16 | Build the forecast weather inputs for the CV set with the rules of B13–B15, with tests; record their coverage in `advanced_modeling/README.md`. The hold-out inputs are built in B6 Done on 17 November 2026: `advanced_modeling/build_forecast_weather.py` with 8 tests; `forecast_weather_cv.parquet` built in about 6 s (local, not committed). Every one of the 85,826 rows has a run; the Frankfurt temperature is known for all rows and the München temperature for 85,816; the route features for all but the 494 rows without a weather branch. Two journeys on 30 September 2026 arrive after the end of the extract: their last hour, and with it the München temperature, is missing, and their other features use the hours that exist. Coverage in `advanced_modeling/README.md` | M |  | 27 Nov | done |
+| B17 | Run and audit the forecast CV arms listed in B15 (step 10.9: 166 weather arms, 364 runs, about 20–25 h; nested XGBoost, CatBoost and the arms built on them are left out), as in B4. First the runner needs the two variants (`experiment_specs.py`, `advanced_data.py`, the feature groups and the 1.5 representations). Add their tables to `advanced_modeling/README.md` and the result lines to `PLAN.md` and `plan.html`. The report's sentences saying that forecasts were not used (`report/main.tex`, data and limitations sections) are revised with the results | M–L |  | 2 Dec | todo |
+| B6 | Register the new finalists in `finalists.json` from the corrected CV results, including the forecast pairs of Q13 (so not before B17). Build the hold-out inputs, forecasts included, with the corrected code, refit on the 95 CV weeks and score once on the 23 hold-out weeks, together with class shares and the training mean (Q7). The first evaluation's files move to `results/advanced_holdout_first/` | M |  | 4 Dec | todo |
 
 ### C. Analysis for the report (weeks 49–50; from the new saved predictions, no new model)
 
@@ -127,6 +133,7 @@ Owners are left empty for the group to fill in.
 | C3 | Weather on rare days: say what can and cannot be concluded on the hold-out set; a descriptive table of outcome shares on snow, gust and heat days in the CV set | S |  | 9 Dec | todo |
 | C4 | Check the wording of the rewritten results (B4) against the review's list of claims: neural networks, pooling, failed arms | S |  | 4 Dec | todo |
 | C5 | Regenerate Fig. 1, Fig. 2 and all tables of the report from the new result files (`report/figures/make_figures.py`); consider a figure of feature-group importance by prediction time | S |  | 11 Dec | todo |
+| C6 | Impact of each weather feature: observed against forecast feature groups, and whether measured weather adds anything once forecasts are in (observations plus forecasts against forecasts alone), from the CV arms of B17 and the hold-out pairs of B6 (Q13) | S |  | 9 Dec | todo |
 
 ### D. Report (deadline 11 January)
 
@@ -147,7 +154,7 @@ Owners are left empty for the group to fill in.
 | E1 | Root `README.md` (Q10): what the project is, folder map, data download, run order from raw files to the report's tables. The part on who did what stays empty for now (Q11) | M |  | 11 Dec | todo |
 | E2 | One environment file for the main pipeline that matches `.venv` (the pins in `modeling/requirements.txt` differ from the installed numpy and pyarrow), plus the existing separate file for the distributional models. Not yet confirmed by the group | S |  | 11 Dec | todo |
 | E3 | Remove `arrival_delays/`, `berlin_munich_weather/` and `eda.ipynb` (Q10). First move the SSL context that `frankfurt_munich/weather_features.py` imports from `berlin_munich_weather/fetch_weather.py` into `frankfurt_munich/`, and update the references in the READMEs. `corridor_analysis/` stays and gets a header saying that its numbers come from the files before the source rebuild | S |  | 20 Nov | todo |
-| E4 | Licence and data attribution: licence holder; a note on the railway data (CC BY 4.0) and DWD. Not yet decided by the group | S |  | 11 Dec | todo |
+| E4 | Licence and data attribution: licence holder; a note on the railway data (CC BY 4.0), DWD and the GFS forecasts (NOAA, processed by dynamical.org, CC BY 4.0). Not yet decided by the group | S |  | 11 Dec | todo |
 | E5 | Fresh-clone test: clone into an empty folder, create the environment, run both test suites and `report/figures/make_figures.py` | S |  | 18 Dec | todo |
 | E6 | Submit the repository link (the repository is public) with the contribution statement |  |  | 8 Jan | todo |
 
@@ -173,10 +180,10 @@ Owners are left empty for the group to fill in.
 | Week | Dates | Focus |
 |---|---|---|
 | 46 | 9–15 Nov | A1 (done), A3; B5 (done), B10; start B1, B2 |
-| 47 | 16–22 Nov | A2; B1–B3, B7, B12; E3; D1, D2 |
-| 48 | 23–29 Nov | B8, B11, B9; start B4 (laptop runs); D2, D3 |
-| 49 | 30 Nov–6 Dec | B4, C4; B6; D3 |
-| 50 | 7–13 Dec | C1–C3, C5; D3; E1, E2, E4 |
+| 47 | 16–22 Nov | A2; B1–B3, B7, B12; B13–B16 (done 17 Nov); E3; D1, D2 |
+| 48 | 23–29 Nov | B8, B11, B9; start B4 (laptop runs); start B17 (follow-up PR); D2, D3 |
+| 49 | 30 Nov–6 Dec | B4, C4; B17, then B6; D3 |
+| 50 | 7–13 Dec | C1–C3, C5, C6; D3; E1, E2, E4 |
 | 51 | 14–20 Dec | D4 (draft to supervisor, Monday); D5; E5; F1. Code submission if ready |
 | 52–53 | 21 Dec–3 Jan | Break; buffer |
 | 1 | 4–10 Jan | D6; F2; E6 (Friday 8 Jan) |
@@ -191,6 +198,7 @@ Owners are left empty for the group to fill in.
 | The supervisor sees the full draft only on 14 December | Method and related work can go to the supervisor earlier; the outline is discussed in A2 |
 | The report exceeds five pages of text | The draft is about five pages; anything new replaces something |
 | Contributions cannot be shown from git | Q11 is deferred, but the course requires the statement with the code on 8 January. It comes back in December |
+| The forecast steps (B13–B17) delay B6, and with it every number in the report | B13–B15 are small and start this week. If the forecast arms are not done by 2 December, the group decides whether B6 waits for them or runs without them; without them, forecasts can only be reported from CV, as exploratory |
 
 ## Review findings
 
@@ -246,3 +254,8 @@ Severity as judged by the reviewers. "Checked" means the finding was reproduced 
 - 15 November 2026: B10 done. A copy off this laptop is no longer required (decided 15 November); the local backup of 12 November protects against the rebuild overwriting files.
 - 16 November 2026: B9 done. The railway data source is recorded in `frankfurt_munich/README.md` (section "Data source"): `piebro/deutsche-bahn-data` (CC BY 4.0); all 81 local files (monthly, change and plan, July 2024–September 2026) are byte-identical to revision `d27b9c41` of 31 October 2026; download dates; SHA-256 sums in `data/SHA256SUMS`; the station panel is the 105 stations present in every monthly file (recomputed); and the reason it is not Bahn-Vorhersage (Q12).
 - 16 November 2026: B12 done. The first models' results and the result tables in `modeling/README.md` are deleted. The eight flat searches the advanced models still read moved to `advanced_modeling/flat_searches/` (group choice); rerunning the 0.7 LightGBM and 5.2 top-five flat arms after the move reproduced the B4 predictions exactly.
+- 17 November 2026: forecast weather added to the plan, as asked by the group: decision Q13 (open: replace or supplement the DWD observations) and steps B13–B17 (availability rule, precipitation type and threshold, modelling-plan step, inputs, CV arms). B6 now waits for the forecast arms; A2, E4, timeline and risks updated.
+- 17 November 2026: Q13 decided: forecasts supplement the observed weather (b), so the impact of each weather feature can be measured and it can be seen whether measured weather adds anything once forecasts are in. B15 lists forecast-only and observations-plus-forecast arms next to railway-only and observed weather; C6 added for the analysis.
+- 17 November 2026: B13–B16 done, with the group's choices: a GFS run counts as available from its start time; no forecast precipitation type, snow only as snow depth; features over the hours of the planned journey; every weather arm gets a forecast-only and an observations-plus-forecast variant (364 runs). Modelling plan: D17, 10.8 done, 10.9 added. Forecast inputs for the CV set built (`build_forecast_weather.py`); next is B17.
+- 17 November 2026: B17 narrowed (group decision): no forecast variants for nested XGBoost (0.8) and CatBoost (6.1), which would take about 16 h, nor for the 10 arms built on them. 166 weather arms remain: 332 runs, about 20–25 h, estimated from the start times of the B4 rerun.
+- 18 November 2026: review of PR #17. The forecast run count is 364, not 332: the combined arm of 3.1 gets an add and a drop variant for each forecast group (32 more cheap runs). B16 corrected: the München forecast temperature is missing for 10 rows (two journeys on 30 September 2026). The week 47 and 48 rows of the timeline are updated. Builder checks hardened; the rebuilt inputs are unchanged apart from the missing-hours column.

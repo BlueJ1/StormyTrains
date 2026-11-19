@@ -172,6 +172,21 @@ def station_values() -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     return hourly, depth.set_index(["snow_date", "eva"])[["snow_depth_cm"]].astype(float), wrtr_audit
 
 
+def branch_routes(branches: pd.Series) -> tuple[pd.Series, pd.Series]:
+    """The fixed station list (ROUTES) of each row's timetable weather branch.
+
+    Returns the branch with missing values as "unknown", and each row's list of EVA
+    numbers. An unknown branch gets only Frankfurt and München; the callers blank
+    its route aggregates, so only the two endpoint temperatures remain. Shared by the
+    observed (build_advanced_weather.py) and forecast (build_forecast_weather.py)
+    inputs, so both always use the same stations."""
+    unrecognized = set(branches.dropna()) - ROUTES.keys()
+    if unrecognized:
+        raise ValueError(f"unrecognized timetable weather branches: {sorted(unrecognized)}")
+    branch = branches.astype("string").fillna("unknown")
+    return branch, branch.map({**ROUTES, "unknown": [ORIGIN, DESTINATION]})
+
+
 def route_stations(stops: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """(journey_id, eva) of each journey's fixed route (see ROUTE), and counts for the audit."""
     journeys = stops.groupby("journey_id").agg(train_number=("train_number", "first"), eva=("eva", set))
@@ -192,16 +207,20 @@ def utc(local: pd.Series) -> pd.Series:
     return local.dt.tz_localize("Europe/Berlin", ambiguous=True, nonexistent="shift_backward").dt.tz_convert("UTC")
 
 
+def cutoff_utc(rows: pd.DataFrame) -> pd.Series:
+    """The prediction time in UTC: the earlier of `predicted_at` and the departure minus the real lead."""
+    departure = rows.origin_departure_planned_local
+    real = utc(departure) - (departure - rows.predicted_at)  # departure minus the real lead
+    return utc(rows.predicted_at).where(lambda t: t.le(real), real)  # see PREDICTION TIME
+
+
 def features(rows: pd.DataFrame, route: pd.DataFrame, hourly: pd.DataFrame,
              depth: pd.DataFrame, *, lag_hours: int = 0) -> pd.DataFrame:
     """Weather as of the row's cutoff, optionally shifted back in real time."""
     if lag_hours < 0:
         raise ValueError("weather lag must be non-negative")
     rows = rows.reset_index(drop=True)
-    departure = rows.origin_departure_planned_local
-    real = utc(departure) - (departure - rows.predicted_at)  # departure minus the real lead
-    at = utc(rows.predicted_at).where(lambda t: t.le(real), real)  # see PREDICTION TIME
-    at -= pd.Timedelta(hours=lag_hours)
+    at = cutoff_utc(rows) - pd.Timedelta(hours=lag_hours)
     hour = at.dt.floor("h")
     snow_date = (at - pd.Timedelta(hours=6)).dt.floor("D").dt.tz_localize(None)
     # Nothing measured after the prediction time: the hour label and the 06 UTC snow measurement.
