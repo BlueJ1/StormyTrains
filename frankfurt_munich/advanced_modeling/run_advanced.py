@@ -21,13 +21,13 @@ from ensembles import cv_ensemble, ensemble_recipe, saved_average
 from experiment_models import (FLAT_SEARCHES, LIGHTGBM, LINEAR, MODELS, NEURAL, fixed_factory, flat_choices,
                                flat_search_path, variant_model)
 from experiment_specs import (AUTO_VARIANTS, DECOMPOSED, LATE_STEPS, LATE_VARIANTS, SEARCH_CONFIGS,
-                              VARIANTS, Run, latest_run, nested_feature_variants, registered_runs,
+                              ARMS, VARIANTS, Run, latest_run, nested_feature_variants, registered_runs,
                               tuning_reference)
 from features import CURRENT_DELAY_TIMES, PHASE2_GROUPS, feature_columns, feature_groups
 from group_selection import ablations, columns_for, cv_importance, nested_groups
 from models import L1_LOGISTIC, make_lightgbm_classifier
 from network_transfer import NETWORK_FEATURE, inference_context, network_cv
-from representations import REPRESENTATIONS, route_representation
+from representations import REPRESENTATIONS, WEATHER_VARIANTS, route_representation, weather_representation
 from sequence_inputs import SEQUENCE_COLUMN
 from tuning import FEATURE_SCREEN_CONFIGS, SCORE, nested_search, sample_configs
 
@@ -39,7 +39,8 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
     if run.step == "5.1":
         metrics, predictions, sources = saved_average(run, results_dir, prediction_times)
         config = {"name": run.name, "step": run.step, "task": MODELS[run.model][0], "model": run.model,
-                  "weather": run.weather, "evaluation": "exploratory", "variant": run.variant,
+                  "weather": run.weather, "forecast": run.forecast, "evaluation": "exploratory",
+                  "variant": run.variant,
                   "members": [str(path.relative_to(results_dir)) for path in sources],
                   "git_commit": revision}
         out, _ = save_run(results_dir, run.name, config, metrics, predictions)
@@ -48,8 +49,8 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
     task, factory, space = MODELS[run.model]
     nested_members = run.variant == "top5_nested" or run.step == "6.2"
     source_model = LIGHTGBM[1] if run.step == "4.2" else run.model
-    source = None if run.nested or nested_members else flat_search_path(source_model, run.weather)
-    chosen = dict(flat_choices(source_model, run.weather)) if source else {}
+    source = None if run.nested or nested_members else flat_search_path(source_model, run.flat_weather)
+    chosen = dict(flat_choices(source_model, run.flat_weather)) if source else {}
     evaluation = "exploratory" if source else "prespecified"
     if run.nested:
         configs = sample_configs(space, n=8 if run.step in NEURAL else run.n_configs)
@@ -71,13 +72,13 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
             if late_only and prediction_time not in CURRENT_DELAY_TIMES:
                 continue
             numeric, categorical = feature_columns(prediction_time, run.weather,
-                                                   feature_set=feature_set)
+                                                   feature_set=feature_set, forecast=run.forecast)
             if dummy_reference:
                 numeric, categorical = [], []
             if run.step == "1.3" or run.variant.startswith("route_"):
                 categorical.append("route_id")
             if run.step.startswith("3."):
-                group_map = feature_groups(prediction_time, run.weather)
+                group_map = feature_groups(prediction_time, run.weather, run.forecast)
                 selected = select_groups(run, group_map)
                 if not selected:
                     continue
@@ -107,12 +108,13 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
             if run.step == "8.4":
                 extra_inputs += ("planned_stops",)
             if run.variant in REPRESENTATIONS or run.variant == "route_target":
-                rep = route_representation(run.variant, task)
+                rep = (weather_representation(run.variant, weather=run.weather, forecast=run.forecast)
+                       if run.variant in WEATHER_VARIANTS else route_representation(run.variant, task))
                 make_model, numeric, categorical = rep.wrap(make_model, numeric, categorical)
                 extra_inputs += rep.extra_inputs
             rows = (load_rows(prediction_time) if dummy_reference else
-                    load_advanced_rows(prediction_time, weather=run.weather, inputs_dir=inputs_dir,
-                                       extra_inputs=extra_inputs))
+                    load_advanced_rows(prediction_time, weather=run.weather, forecast=run.forecast,
+                                       inputs_dir=inputs_dir, extra_inputs=extra_inputs))
             if run.step == "8.4":
                 events = pd.read_parquet(inputs_dir / "upstream_events_cv.parquet",
                                          filters=[("prediction_time", "=", prediction_time)])
@@ -173,7 +175,7 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
     if not all_metrics:
         return None
     config = {"name": run.name, "step": run.step, "task": task, "model": run.model,
-              "target": TARGETS[task], "weather": run.weather, "features": features,
+              "target": TARGETS[task], "weather": run.weather, "forecast": run.forecast, "features": features,
               "feature_set": feature_set, "variant": run.variant, "evaluation": evaluation,
               "git_commit": revision,
               "chosen": {pt: chosen[pt] for pt in features if pt in chosen}}
@@ -225,7 +227,8 @@ def select_groups(run, groups):
             return dict(ablations(groups)).get(run.variant)
     if run.step == "3.4" and run.variant not in ("full", "weather_extremes"):
         railway = set(feature_groups("1h")) & groups.keys()
-        return railway | {run.variant}
+        # The observed and the forecast group of the subset, as far as the arm has them.
+        return railway | ({run.variant, f"forecast_{run.variant}"} & groups.keys())
     return set(groups)
 
 
@@ -234,7 +237,7 @@ def run_tabgns(run, rows, prediction_time, task, factory, numeric, categorical, 
     from folds import cv_folds
 
     reference = latest_run(results_dir, Run("7.1", NEURAL["7.1"][task == "severity"],
-                                           run.weather, calendar=run.calendar))
+                                           run.weather, calendar=run.calendar, forecast=run.forecast))
     config = json.loads((reference / "config.json").read_text())
     if config["calendar"] != (run.calendar or "native"):
         raise ValueError("TabGNS and the MLP reference must use the same calendar encoding")
@@ -255,20 +258,20 @@ def run_tabgns(run, rows, prediction_time, task, factory, numeric, categorical, 
 def evaluate_pool(run, inputs_dir, results_dir, prediction_times, revision):
     if tuple(prediction_times) != tuple(PREDICTION_TIMES):
         raise ValueError("pooling requires all five prediction times")
-    rows = pd.concat([load_advanced_rows(pt, weather=run.weather, inputs_dir=inputs_dir)
+    rows = pd.concat([load_advanced_rows(pt, weather=run.weather, forecast=run.forecast, inputs_dir=inputs_dir)
                       for pt in prediction_times], ignore_index=True)
     task = MODELS[run.model][0]
-    numeric, categorical = feature_columns("1h", run.weather)
+    numeric, categorical = feature_columns("1h", run.weather, forecast=run.forecast)
     categorical.append("prediction_time")
     # One set of parameters for the pooled model. Freeze the 1 h flat-search choice.
-    factory = fixed_factory(run.model, run.weather, "1h")
+    factory = fixed_factory(run.model, run.flat_weather, "1h")
     with threadpool_limits(limits=1):
         metrics, predictions = pooled_cv(rows, task, factory, numeric, categorical)
     config = {"step": run.step, "task": task, "model": run.model, "weather": run.weather,
-              "git_commit": revision,
+              "forecast": run.forecast, "git_commit": revision,
               "evaluation": "exploratory", "features": {"numeric": numeric, "categorical": categorical},
-              "chosen": flat_choices(run.model, run.weather)["1h"],
-              "configuration_source": str(flat_search_path(run.model, run.weather).relative_to(FLAT_SEARCHES))}
+              "chosen": flat_choices(run.model, run.flat_weather)["1h"],
+              "configuration_source": str(flat_search_path(run.model, run.flat_weather).relative_to(FLAT_SEARCHES))}
     out, _ = save_run(results_dir, run.name, config, metrics, predictions)
     print(out, flush=True)
     return out
@@ -281,7 +284,8 @@ def compare_ensemble_to_members(run, out, results_dir, task):
         members = [results_dir / name for name in config["members"]]
     else:
         recipe = next(iter(config["combination"].values()))
-        members = [latest_run(results_dir, Run("0.7", name, run.weather)) for name in recipe["members"]]
+        members = [latest_run(results_dir, Run("0.7", name, run.weather, forecast=run.forecast))
+                   for name in recipe["members"]]
     score = f"{SCORE[task]}_mean"
     means = pd.concat({path: pd.read_csv(path / "summary.csv").set_index("prediction_time")[score]
                        for path in members}, axis=1)
@@ -311,20 +315,20 @@ def compare_to_base(run, out, results_dir, *, require_reference=False):
         reference_run = Run("1.3", run.model, variant="route_native")
     elif run.step.startswith("3."):
         variant = "timetable" if run.variant.startswith("add_") else "full"
-        reference_run = Run(run.step, run.model, run.weather, variant)
+        reference_run = Run(run.step, run.model, run.weather, variant, forecast=run.forecast)
     elif run.step in ("7.2", "7.3", "7.4", "7.5"):
         reference_run = Run("7.1", NEURAL["7.1"][task == "severity"], run.weather,
-                            calendar=run.calendar)
+                            calendar=run.calendar, forecast=run.forecast)
     elif run.step in standalone:
         reference_model = LIGHTGBM[task == "severity"]
-        reference_run = (Run("0.7", reference_model, run.weather) if run.step == "4.2"
-                         else Run("0.8", reference_model, run.weather, nested=True))
+        reference_run = (Run("0.7", reference_model, run.weather, forecast=run.forecast) if run.step == "4.2"
+                         else Run("0.8", reference_model, run.weather, nested=True, forecast=run.forecast))
     elif run.variant == "top5_nested" or run.step == "6.2":
         reference_run = tuning_reference(run)
     elif run.nested:
-        reference_run = Run(run.step, run.model, run.weather, nested=True)
+        reference_run = Run(run.step, run.model, run.weather, nested=True, forecast=run.forecast)
     else:
-        reference_run = Run("0.7", run.model, run.weather)
+        reference_run = Run("0.7", run.model, run.weather, forecast=run.forecast)
     try:
         reference = latest_run(results_dir, reference_run)
     except FileNotFoundError:
@@ -355,7 +359,8 @@ def main():
     parser.add_argument("--n-configs", type=int,
                         help=f"configuration count for steps 0.8 and 6.1 (default {SEARCH_CONFIGS})")
     parser.add_argument("--model", nargs="+", choices=MODELS)
-    parser.add_argument("--weather-arm", choices=("railway", "weather"), help="run one arm of a comparison")
+    parser.add_argument("--weather-arm", nargs="+", choices=ARMS,
+                        help="run only these arms: railway, observed weather, forecasts (D17), or both")
     parser.add_argument("--variant", nargs="+", help="run only these registered variants")
     parser.add_argument("--compare-only", action="store_true", help="compare saved runs without refitting")
     parser.add_argument("--calendar", choices=VARIANTS["1.1"], help="Phase 1 calendar encoding for neural runs")
@@ -374,7 +379,7 @@ def main():
     if args.model:
         runs = [run for run in runs if run.model in args.model]
     if args.weather_arm:
-        runs = [run for run in runs if run.weather == (args.weather_arm == "weather")]
+        runs = [run for run in runs if run.arm in args.weather_arm]
     if args.variant:
         runs = [run for run in runs if run.variant in args.variant]
     if args.calendar:
@@ -385,7 +390,7 @@ def main():
         if args.step != "0.8":
             parser.error("--nested-variant is only for the nested booster search")
         runs = [replace(run, variant=args.nested_variant) for run in runs
-                if run.weather or not args.nested_variant.startswith("weather_")]
+                if run.flat_weather or not args.nested_variant.startswith("weather_")]
     if not runs or args.jobs < 1:
         parser.error("choose at least one registered model and a positive job count")
     if args.compare_only:

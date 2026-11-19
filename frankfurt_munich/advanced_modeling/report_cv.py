@@ -18,6 +18,11 @@ BEGIN = "<!-- BEGIN ADVANCED CV -->"
 END = "<!-- END ADVANCED CV -->"
 
 
+def arm(config):
+    """railway, weather (observed), forecast or weather_forecast (D17)."""
+    return "_".join(name for name in ("weather", "forecast") if config.get(name)) or "railway"
+
+
 def run_index(results_dir: Path):
     """Read each completed run with its saved configuration and summary."""
     for root in sorted(results_dir.glob("advanced_*")):
@@ -37,7 +42,7 @@ def reference_table(runs, step):
             continue
         score = SCORE[config["task"]]
         scores = summary.set_index("prediction_time")[f"{score}_mean"]
-        model = config["model"] + (" + weather" if config["weather"] else "")
+        model = config["model"] + ("" if arm(config) == "railway" else f" + {arm(config).replace('_', ' + ')}")
         records.append({"Model": f"[{model}](results/{path.parent.name}/{path.name})",
                         "Search configs": config.get("search", {}).get("n_configs", "fixed"),
                         "Score": score, **{time: scores.get(time, float("nan"))
@@ -59,13 +64,13 @@ def comparison_table(runs):
             contrast = "timetable-only" if variant.startswith("add_") else "full"
         comparisons.append(table.assign(
             step=config["step"], task=config["task"], method=config["model"],
-            variant=variant, evaluation=evaluation, weather=config["weather"], contrast=contrast,
+            variant=variant, evaluation=evaluation, arm=arm(config), contrast=contrast,
             result=f"[folds](results/{path.parent.name}/{path.name}/paired_vs_base.csv)"))
     if not comparisons:
         return pd.DataFrame()
     table = pd.concat(comparisons, ignore_index=True)
     best = table.groupby(["step", "task", "evaluation", "prediction_time", "contrast"])["mean"].idxmin()
-    return table.loc[best, ["step", "task", "evaluation", "prediction_time", "method", "variant", "weather", "contrast",
+    return table.loc[best, ["step", "task", "evaluation", "prediction_time", "method", "variant", "arm", "contrast",
                             "mean", "folds_improved", "reaches_minimum_gain", "result"]]
 
 
@@ -76,7 +81,7 @@ def selection_table(runs):
             if choice["prediction_time"] not in ("24h", "0min"):
                 continue
             for group in choice["groups"]:
-                rows.append({"task": config["task"], "weather": config["weather"],
+                rows.append({"task": config["task"], "arm": arm(config),
                              "direction": config["variant"], "prediction_time": choice["prediction_time"],
                              "group": group})
     if not rows:

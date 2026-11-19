@@ -8,8 +8,10 @@ journeys), in the row's committed fold, and are finite (probabilities
 nonnegative, summing to one); and the fold scores recomputed from them equal
 fold_metrics.csv.
 
-Usage (finishing plan B4 used commit 7e0e96a):
-    .venv/bin/python frankfurt_munich/advanced_modeling/audit_cv_results.py --commit <sha>
+Usage (finishing plan B4 used commit 7e0e96a for the railway and weather arms;
+B17 audits the forecast arms of D17 on their own commit with
+--arm forecast weather_forecast):
+    .venv/bin/python frankfurt_munich/advanced_modeling/audit_cv_results.py --commit <sha> [--arm ...]
 """
 import argparse
 import json
@@ -24,7 +26,7 @@ from advanced_data import ADVANCED_RESULTS
 from cv import PROBA_COLUMNS, TARGETS
 from data import PREDICTION_TIMES, load_rows
 from experiment_models import MODELS, NEURAL
-from experiment_specs import DECOMPOSED, LATE_STEPS, LATE_VARIANTS, VARIANTS, registered_runs
+from experiment_specs import ARMS, DECOMPOSED, LATE_STEPS, LATE_VARIANTS, VARIANTS, registered_runs
 from features import CURRENT_DELAY_TIMES
 from metrics import class_log_loss, rmse
 
@@ -135,8 +137,9 @@ def main():
     parser.add_argument("--steps", nargs="+", default=STEPS)
     parser.add_argument("--commit", required=True, help="full commit hash the runs must record")
     parser.add_argument("--results-dir", type=Path, default=ADVANCED_RESULTS)
+    parser.add_argument("--arm", nargs="+", choices=ARMS, default=ARMS, help="audit only these arms")
     args = parser.parse_args()
-    arms = active_arms(args.steps)
+    arms = [run for run in active_arms(args.steps) if run.arm in args.arm]
     failed = 0
     for run in arms:
         out, problems = audit(run, args.commit, args.results_dir)
