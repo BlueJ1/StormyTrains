@@ -1,0 +1,32 @@
+{
+  "name": "advanced_5_1_lightgbm_classifier_forecast_plus_linear",
+  "step": "5.1",
+  "task": "severity",
+  "model": "lightgbm_classifier",
+  "weather": false,
+  "forecast": true,
+  "evaluation": "exploratory",
+  "variant": "plus_linear",
+  "members": [
+    "advanced_0_7_lightgbm_classifier_forecast/20261119-162945",
+    "advanced_0_7_xgboost_classifier_forecast/20261119-163020",
+    "advanced_0_7_logistic_regression_forecast/20261119-162644"
+  ],
+  "git_commit": "7300d61bf69e7c504b15a327c48092b6a8532481 (uncommitted changes)",
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-20T01:59:20"
+}

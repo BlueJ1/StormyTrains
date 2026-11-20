@@ -1,0 +1,459 @@
+{
+  "name": "advanced_5_4_lightgbm_forecast_stack",
+  "step": "5.4",
+  "task": "delay",
+  "model": "lightgbm",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "forecast": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "stack",
+  "evaluation": "exploratory",
+  "git_commit": "7300d61bf69e7c504b15a327c48092b6a8532481 (uncommitted changes)",
+  "chosen": {
+    "24h": {
+      "config_id": 38,
+      "params": {
+        "cat_smooth": 2.2202595144810537,
+        "colsample_bytree": 0.6036961544665811,
+        "learning_rate": 0.02556063837470779,
+        "min_child_samples": 48,
+        "n_estimators": 670,
+        "num_leaves": 5,
+        "reg_alpha": 0.0315101491238403,
+        "reg_lambda": 1.3467890557370734,
+        "subsample": 0.7515681292900438
+      }
+    },
+    "6h": {
+      "config_id": 41,
+      "params": {
+        "cat_smooth": 1.3763300805327483,
+        "colsample_bytree": 0.3705446009641986,
+        "learning_rate": 0.00538730007236937,
+        "min_child_samples": 7,
+        "n_estimators": 774,
+        "num_leaves": 5,
+        "reg_alpha": 0.01887567630782228,
+        "reg_lambda": 16.76395764312379,
+        "subsample": 0.511635967867913
+      }
+    },
+    "1h": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "20min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    },
+    "0min": {
+      "config_id": 26,
+      "params": {
+        "cat_smooth": 2.4574572727813155,
+        "colsample_bytree": 0.8057164806830537,
+        "learning_rate": 0.01578431472182506,
+        "min_child_samples": 5,
+        "n_estimators": 691,
+        "num_leaves": 8,
+        "reg_alpha": 5.77875573445746,
+        "reg_lambda": 58.83596555133606,
+        "subsample": 0.9574321951102243
+      }
+    }
+  },
+  "configuration_source": "lightgbm_weather/20261026-093239/config.json",
+  "combination": {
+    "24h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            -0.35923384809485875,
+            1.1152631008418505,
+            0.1949146368956195
+          ],
+          "intercept": 0.6225818207483087
+        },
+        "2": {
+          "weights": [
+            -0.13337051710393494,
+            0.978511383066797,
+            0.13828215252220233
+          ],
+          "intercept": 0.3292461668681881
+        },
+        "3": {
+          "weights": [
+            0.40489672596004417,
+            0.3127178735463369,
+            0.19815563852143556
+          ],
+          "intercept": 1.3985369570760753
+        },
+        "4": {
+          "weights": [
+            0.18867222659661648,
+            0.6445811051663688,
+            0.11260184610333034
+          ],
+          "intercept": 1.3077671478696864
+        },
+        "5": {
+          "weights": [
+            -0.03776559780734521,
+            0.8659899543526134,
+            0.18774367793729654
+          ],
+          "intercept": -0.2270795195005597
+        }
+      }
+    },
+    "6h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.09130605158016115,
+            0.9601258307365322,
+            0.01131717571575738
+          ],
+          "intercept": -0.9863312949477887
+        },
+        "2": {
+          "weights": [
+            0.5448883107437198,
+            0.363076055854246,
+            0.10290842119590793
+          ],
+          "intercept": -0.2075925567812078
+        },
+        "3": {
+          "weights": [
+            0.09034792424066981,
+            0.9997001773081888,
+            -0.07009389413667595
+          ],
+          "intercept": -0.49383348754656
+        },
+        "4": {
+          "weights": [
+            -0.08355664038392577,
+            0.8778214267330897,
+            0.08738365351747361
+          ],
+          "intercept": 2.0304426401797038
+        },
+        "5": {
+          "weights": [
+            0.11936237654500408,
+            0.6425654057909062,
+            0.254879916716642
+          ],
+          "intercept": -0.37389015078301924
+        }
+      }
+    },
+    "1h": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.4719432626263851,
+            0.2467211038503151,
+            0.22534815436728767
+          ],
+          "intercept": 1.1468117815792276
+        },
+        "2": {
+          "weights": [
+            0.698785361712647,
+            -0.01208508866273704,
+            0.19731033684258892
+          ],
+          "intercept": 2.3661404260413086
+        },
+        "3": {
+          "weights": [
+            0.2824630430857992,
+            0.4491041567640813,
+            0.21428985268155656
+          ],
+          "intercept": 0.8105538991785828
+        },
+        "4": {
+          "weights": [
+            0.4883179707260926,
+            0.3401093667142436,
+            0.12764486002492934
+          ],
+          "intercept": 0.9490890004150572
+        },
+        "5": {
+          "weights": [
+            0.7995885783941421,
+            -0.01549244796330484,
+            0.08942601157135219
+          ],
+          "intercept": 2.118213007610322
+        }
+      }
+    },
+    "20min": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.1392891966752727,
+            0.7861415789995838,
+            0.10127733084749446
+          ],
+          "intercept": -0.32680199205109517
+        },
+        "2": {
+          "weights": [
+            0.19217730518220996,
+            0.570934293684058,
+            0.1979470191843257
+          ],
+          "intercept": 0.4578312487655367
+        },
+        "3": {
+          "weights": [
+            0.27593978606251623,
+            0.6394579506028868,
+            0.08808911971487246
+          ],
+          "intercept": -0.300667953074484
+        },
+        "4": {
+          "weights": [
+            0.3329605666684969,
+            0.6073180917416753,
+            0.06427358278947215
+          ],
+          "intercept": -0.10876523943500871
+        },
+        "5": {
+          "weights": [
+            0.2616061820725936,
+            0.6545754249241508,
+            0.08614063553093906
+          ],
+          "intercept": -0.053268773906836486
+        }
+      }
+    },
+    "0min": {
+      "members": [
+        "lightgbm",
+        "xgboost",
+        "linear_regression"
+      ],
+      "fitted": {
+        "1": {
+          "weights": [
+            0.42148552950848833,
+            0.4043355751992419,
+            0.12104455655774773
+          ],
+          "intercept": 0.768702456052818
+        },
+        "2": {
+          "weights": [
+            0.3958778555764579,
+            0.5154553240536397,
+            0.09751119841240562
+          ],
+          "intercept": -0.2881103906886082
+        },
+        "3": {
+          "weights": [
+            -0.00032371878722439236,
+            1.0555403227938365,
+            -0.03077947466041265
+          ],
+          "intercept": -0.4757621505983529
+        },
+        "4": {
+          "weights": [
+            0.3639289630342483,
+            0.5661731736800759,
+            0.07254052758722523
+          ],
+          "intercept": -0.23694929074774151
+        },
+        "5": {
+          "weights": [
+            0.30262787541466435,
+            0.4885448726223196,
+            0.2124263391336362
+          ],
+          "intercept": -0.11753473537816106
+        }
+      }
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-20T02:47:01"
+}
