@@ -236,3 +236,38 @@ def test_cli_and_audit_select_arms(monkeypatch):
     monkeypatch.setattr(audit_cv_results, "audit", lambda run, *args: audited.append(run) or (None, []))
     audit_cv_results.main()
     assert len(audited) == 364 and all(run.forecast for run in audited)
+
+
+def test_audit_accepts_dirty_flag_only_when_asked_and_only_on_forecast_arms():
+    from audit_cv_results import commit_ok
+    forecast, observed = Run("0.7", "lightgbm", forecast=True), Run("0.7", "lightgbm", weather=True)
+    flagged = "abc (uncommitted changes)"
+    assert commit_ok("abc", "abc", observed)
+    assert not commit_ok(flagged, "abc", forecast)
+    assert commit_ok(flagged, "abc", forecast, accept_flagged=True)
+    assert not commit_ok(flagged, "abc", observed, accept_flagged=True)
+    assert not commit_ok("other (uncommitted changes)", "abc", forecast, accept_flagged=True)
+
+
+def test_git_commit_ignores_results_outside_its_own_folder_but_not_other_changes(tmp_path, monkeypatch):
+    import subprocess
+    import cv
+
+    def git(*args):
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True)
+    git("init", "-q")
+    (tmp_path / "modeling").mkdir()
+    (tmp_path / "modeling" / "cv.py").write_text("")
+    old = tmp_path / "advanced" / "results" / "old_run"
+    old.mkdir(parents=True)
+    (old / "config.json").write_text("{}")
+    git("add", ".")
+    git("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "init")
+    monkeypatch.setattr(cv, "HERE", tmp_path / "modeling")  # git_commit runs from modeling/
+    new = tmp_path / "advanced" / "results" / "new_run" / "20261119-000000"
+    new.mkdir(parents=True)
+    (new / "config.json").write_text("{}")
+    (old / "config.json").write_text('{"rerun": true}')
+    assert "uncommitted" not in cv.git_commit()
+    (tmp_path / "advanced" / "notes.txt").write_text("x")
+    assert cv.git_commit().endswith("(uncommitted changes)")

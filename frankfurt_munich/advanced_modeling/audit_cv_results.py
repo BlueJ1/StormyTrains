@@ -12,6 +12,13 @@ Usage (finishing plan B4 used commit 7e0e96a for the railway and weather arms;
 B17 audits the forecast arms of D17 on their own commit with
 --arm forecast weather_forecast):
     .venv/bin/python frankfurt_munich/advanced_modeling/audit_cv_results.py --commit <sha> [--arm ...]
+
+--accept-b17-dirty-flag exists for B17 only (students' decision, 20 November 2026):
+the forecast runs were made from commit 7300d61, before cv.git_commit anchored its results/
+exclusion at the repository top. Unanchored, it applied only below frankfurt_munich/modeling, so
+every run started after the first new run folder appeared recorded "<sha> (uncommitted changes)"
+although only results/ had changed. With the option the audit accepts that flag on the forecast
+arms, for the given commit only.
 """
 import argparse
 import json
@@ -60,7 +67,16 @@ def cv_rows(pt):
     return ROWS[pt]
 
 
-def audit(run, commit, results_dir):
+DIRTY_FLAG = " (uncommitted changes)"
+
+
+def commit_ok(recorded, commit, run, accept_flagged=False):
+    if recorded == commit:
+        return True
+    return accept_flagged and run.forecast and recorded == commit + DIRTY_FLAG
+
+
+def audit(run, commit, results_dir, accept_flagged=False):
     problems = []
     root = results_dir / run.name
     runs = sorted(p for p in root.glob("*") if (p / "config.json").is_file()) if root.is_dir() else []
@@ -73,7 +89,7 @@ def audit(run, commit, results_dir):
     if problems:
         return out, problems
     config = json.loads((out / "config.json").read_text())
-    if config.get("git_commit") != commit:
+    if not commit_ok(config.get("git_commit"), commit, run, accept_flagged):
         problems.append(f"git_commit {config.get('git_commit')!r}")
     task = config.get("task") or task_of(run)
     # the current-delay group exists only at 1h, 20min and 0min, so its 3.1 ablations cover only those
@@ -138,11 +154,13 @@ def main():
     parser.add_argument("--commit", required=True, help="full commit hash the runs must record")
     parser.add_argument("--results-dir", type=Path, default=ADVANCED_RESULTS)
     parser.add_argument("--arm", nargs="+", choices=ARMS, default=ARMS, help="audit only these arms")
+    parser.add_argument("--accept-b17-dirty-flag", action="store_true",
+                        help="B17 only: accept '<commit> (uncommitted changes)' on the forecast arms")
     args = parser.parse_args()
     arms = [run for run in active_arms(args.steps) if run.arm in args.arm]
     failed = 0
     for run in arms:
-        out, problems = audit(run, args.commit, args.results_dir)
+        out, problems = audit(run, args.commit, args.results_dir, args.accept_b17_dirty_flag)
         if problems:
             failed += 1
             print(f"FAIL {run.name}: {'; '.join(problems)}")
