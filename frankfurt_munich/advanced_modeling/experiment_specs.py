@@ -1,7 +1,7 @@
 """Registered experiment names and pre-listed variants."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import _paths  # noqa: F401  shared modelling code and dataset builders
 from corridor_transfer import METHODS as CORRIDOR_METHODS
@@ -27,16 +27,73 @@ class Run:
     nested: bool = False
     calendar: str = ""
     n_configs: int = SEARCH_CONFIGS
+    forecast: bool = False
+
+    @property
+    def arm(self):
+        """railway, weather (observed), forecast or weather_forecast (D17)."""
+        return "_".join(name for name, used in (("weather", self.weather), ("forecast", self.forecast))
+                        if used) or "railway"
+
+    @property
+    def flat_weather(self):
+        """The flat-search arm whose configuration a fixed-configuration run uses (D2).
+
+        The forecast arms reuse the observed-weather configuration (D17)."""
+        return self.weather or self.forecast
 
     @property
     def name(self):
-        suffix = ("_weather" if self.weather else "") + (f"_{self.variant}" if self.variant else "")
+        suffix = ("_weather" if self.weather else "") + ("_forecast" if self.forecast else "")
+        suffix += f"_{self.variant}" if self.variant else ""
         if self.calendar:
             suffix += f"_{self.calendar}"
         return f"advanced_{self.step.replace('.', '_')}_{self.model}{suffix}"
 
 
+ARMS = ("railway", "weather", "forecast", "weather_forecast")
+FORECAST_ARMS = ({"weather": False, "forecast": True}, {"weather": True, "forecast": True})
+
+
 def registered_runs(step: str):
+    """Every registered arm of a step: railway, observed weather and the forecast arms (D17)."""
+    if step == "3.1":
+        # The ablations follow each arm's own groups, so the combined arm has eight more.
+        yield from observed_runs(step)
+        for arm in FORECAST_ARMS:
+            yield from ablation_runs(**arm)
+        return
+    for run in observed_runs(step):
+        yield run
+        if run.weather and has_forecast_arms(run):
+            for arm in FORECAST_ARMS:
+                yield replace(run, **arm)
+
+
+def has_forecast_arms(run):
+    """False for nested XGBoost, CatBoost and the arms built on them (10.9, 17 November 2026)."""
+    excluded = (*XGBOOST, *CATBOOST)
+    if run.model in CATBOOST or (run.nested and run.model in excluded):
+        return False
+    if run.variant in ("plus_catboost", "plus_neural"):
+        return False
+    if run.variant == "top5_nested" or run.step == "6.2":
+        return tuning_reference(run).model not in excluded
+    return True
+
+
+def ablation_runs(weather=True, forecast=False):
+    variants = [name for name, _ in ablations(feature_groups("1h", weather, forecast))]
+    for model in (*LINEAR, *LIGHTGBM):
+        for variant in ("full", "timetable", *variants):
+            yield Run("3.1", model, weather, variant=variant, forecast=forecast)
+
+
+def observed_runs(step: str):
+    """The arms with railway inputs only or with observed weather, as registered before D17."""
+    if step == "3.1":
+        yield from ablation_runs()
+        return
     if step == "0.7":
         for model in ("class_shares", "training_mean"):
             yield Run(step, model)
@@ -49,12 +106,6 @@ def registered_runs(step: str):
         for model in (*LIGHTGBM, *XGBOOST):
             for weather in (False, True):
                 yield Run(step, model, weather, nested=True)
-        return
-    if step == "3.1":
-        variants = [name for name, _ in ablations(feature_groups("1h", weather=True))]
-        for model in (*LINEAR, *LIGHTGBM):
-            for variant in ("full", "timetable", *variants):
-                yield Run(step, model, weather=True, variant=variant)
         return
     if step == "3.2":
         for model in LIGHTGBM:
@@ -166,7 +217,7 @@ def latest_run(results_dir, run):
 def tuning_reference(run):
     """The single-booster nested reference for bagging or calibration."""
     step = "6.1" if run.model in CATBOOST else "0.8"
-    return Run(step, run.model, run.weather, nested=True)
+    return Run(step, run.model, run.weather, nested=True, forecast=run.forecast)
 
 
 LATE_STEPS = ("1.4", "2.4", "4.5", "7.5", "8.4")
@@ -179,13 +230,14 @@ AUTO_VARIANTS = ("auto_groups", "auto_representations")
 def nested_feature_variants(run, prediction_time, task, factory):
     if run.variant not in AUTO_VARIANTS:
         return None
-    numeric, categorical = feature_columns(prediction_time, run.weather)
+    numeric, categorical = feature_columns(prediction_time, run.weather, forecast=run.forecast)
     variants = {"base": (factory, numeric, categorical)}
     late = prediction_time in CURRENT_DELAY_TIMES
     if run.variant == "auto_groups":
         groups = [group for group in PHASE2_GROUPS if late or group != "delay_dynamics"]
         for group in (*groups, "all_groups"):
-            num, cat = feature_columns(prediction_time, run.weather, feature_set=group)
+            num, cat = feature_columns(prediction_time, run.weather, feature_set=group,
+                                       forecast=run.forecast)
             variants[group] = factory, num, cat
     else:
         for step in ("1.1", "1.2", "1.3", "1.4"):

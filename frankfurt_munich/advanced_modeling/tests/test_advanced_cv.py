@@ -159,7 +159,7 @@ def test_nested_runner_uses_registered_configuration_budget(monkeypatch, tmp_pat
 
 
 @pytest.mark.parametrize("arguments,expected", [([], 20), (["--n-configs", "7"], 7)])
-def test_search_cli_passes_same_budget_to_both_weather_arms(monkeypatch, arguments, expected):
+def test_search_cli_passes_same_budget_to_every_weather_arm(monkeypatch, arguments, expected):
     import sys
     import run_advanced
 
@@ -170,7 +170,8 @@ def test_search_cli_passes_same_budget_to_both_weather_arms(monkeypatch, argumen
 
     run_advanced.main()
 
-    assert budgets == [expected, expected]
+    # railway, observed weather, forecasts, observations plus forecasts (D17)
+    assert budgets == [expected] * 4
 
 
 def test_differences_align_by_fold_and_use_the_registered_threshold():

@@ -178,7 +178,8 @@ def fit_combiner(method, y, inner, members, inner_fold, task):
 
 def ensemble_recipe(run, prediction_time, results_dir):
     variant = run.variant
-    model, weather = run.model, run.weather
+    # The forecast arms reuse the observed-weather flat configurations (D17).
+    model, weather = run.model, run.flat_weather
     if variant == "seeds":
         factory = fixed_factory(model, weather, prediction_time)
         seeds = list(range(5))
@@ -228,7 +229,7 @@ def saved_average(run, results_dir, prediction_times):
     if run.variant == "plus_neural":
         names += [(step, model) for step in ("7.1", "7.2", "7.3", "7.4")
                   for model in NEURAL[step][index::2]]
-    sources = [latest_run(results_dir, Run(step, model, run.weather,
+    sources = [latest_run(results_dir, Run(step, model, run.weather, forecast=run.forecast,
                                           calendar=run.calendar if step.startswith("7.") else ""))
                for step, model in names]
     row_key = ["prediction_time", "fold", "journey_id"]

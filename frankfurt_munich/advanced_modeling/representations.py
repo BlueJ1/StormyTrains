@@ -15,6 +15,7 @@ import _paths  # noqa: F401  shared modelling code and dataset builders
 from data import TIME_COLUMN
 from features import WEATHER
 from folds import N_FOLDS, SEED, week_of
+from forecast_columns import FORECAST, FORECAST_CHANGE, FORECAST_LAG
 from metrics import CLASSES
 
 CALENDAR = ("month", "hour", "weekday")
@@ -29,6 +30,15 @@ EXTREMES = {
 }
 WEATHER_LAG = tuple(f"{column}_lag24h" for column in WEATHER)
 WEATHER_CHANGE = tuple(f"{column}_change24h" for column in WEATHER)
+# The thresholds of 1.5 over the forecast journey hours (D17). There is no
+# forecast precipitation type, so snow is forecast snow depth above 0 cm.
+FORECAST_EXTREMES = {
+    "forecast_heat": ("forecast_route_temp_max_c", 30),
+    "forecast_gust": ("forecast_route_gust_max_ms", 20),
+    "forecast_snow": ("forecast_route_snow_depth_cm", 0),
+    "forecast_heavy_rain": ("forecast_route_precip_max_mm", 15),
+}
+WEATHER_VARIANTS = ("weather_extremes", "weather_change")
 
 
 @dataclass(frozen=True)
@@ -118,17 +128,17 @@ def delay_transform(X, *, variant):
     return X.assign(current_delay_missing=delay.isna().astype(float))
 
 
-def extreme_weather(X):
-    result = X.drop(columns=WEATHER).copy()
-    for name, (column, threshold) in EXTREMES.items():
+def extreme_weather(X, *, columns=WEATHER, extremes=None):
+    result = X.drop(columns=list(columns)).copy()
+    for name, (column, threshold) in (EXTREMES if extremes is None else extremes).items():
         values = X[column]
         result[name] = values.gt(threshold).astype(float).where(values.notna())
     return result
 
 
-def weather_change(X):
-    result = X.drop(columns=[*WEATHER, *WEATHER_LAG]).copy()
-    for current, lag, change in zip(WEATHER, WEATHER_LAG, WEATHER_CHANGE):
+def weather_change(X, *, columns=WEATHER, lags=WEATHER_LAG, changes=WEATHER_CHANGE):
+    result = X.drop(columns=[*columns, *lags]).copy()
+    for current, lag, change in zip(columns, lags, changes):
         result[change] = X[current].astype(float) - X[lag].astype(float)
     return result
 
@@ -195,6 +205,27 @@ class RouteTarget(TransformerMixin, BaseEstimator):
 
 def route_target_columns(task):
     return tuple(f"route_target_{label}" for label in CLASSES) if task == "severity" else ("route_target",)
+
+
+def weather_representation(variant, *, weather=True, forecast=False):
+    """The 1.5 representation of an arm's weather: observed, forecast or both (D17).
+
+    With both, the observed and the forecast columns are each replaced as in their own arm."""
+    if variant not in WEATHER_VARIANTS:
+        raise ValueError(f"unknown weather representation {variant!r}")
+    if weather and not forecast:
+        return REPRESENTATIONS[variant]
+    if not forecast:
+        raise ValueError("a weather representation needs observed or forecast weather")
+    sources = [(WEATHER, WEATHER_LAG, WEATHER_CHANGE, EXTREMES)] if weather else []
+    sources.append((FORECAST, FORECAST_LAG, FORECAST_CHANGE, FORECAST_EXTREMES))
+    columns, lags, changes = (tuple(c for source in sources for c in source[i]) for i in range(3))
+    if variant == "weather_extremes":
+        extremes = {name: rule for source in sources for name, rule in source[3].items()}
+        return Representation(columns, tuple(extremes),
+                              transformer=stateless(extreme_weather, columns=columns, extremes=extremes))
+    return Representation(columns, changes, extra_inputs=lags,
+                          transformer=stateless(weather_change, columns=columns, lags=lags, changes=changes))
 
 
 def route_representation(variant, task):

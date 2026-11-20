@@ -147,8 +147,10 @@ def git_commit() -> str:
         return subprocess.run(["git", *args], cwd=HERE, capture_output=True,
                               text=True).stdout.strip()
     commit = git("rev-parse", "HEAD")
-    # Results written earlier in the same run don't count as changes.
-    changed = git("status", "--porcelain", "--", ":/", ":(exclude,glob)**/results/**")
+    # Results written earlier in the same run don't count as changes. The exclusion is anchored
+    # at the repository top: unanchored, git reads it relative to this folder, so results under
+    # advanced_modeling/ counted as changes (the B17 forecast runs were flagged this way).
+    changed = git("status", "--porcelain", "--", ":/", ":(top,exclude,glob)**/results/**")
     return commit + (" (uncommitted changes)" if changed else "")
 
 
