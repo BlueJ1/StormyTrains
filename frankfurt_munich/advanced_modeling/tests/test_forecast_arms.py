@@ -271,3 +271,14 @@ def test_git_commit_ignores_results_outside_its_own_folder_but_not_other_changes
     assert "uncommitted" not in cv.git_commit()
     (tmp_path / "advanced" / "notes.txt").write_text("x")
     assert cv.git_commit().endswith("(uncommitted changes)")
+
+
+def test_forecast_comparisons_pair_each_forecast_arm_with_its_registered_counterparts():
+    from forecast_comparisons import pairs
+    found = Counter(contrast for contrast, _, _ in pairs())
+    # railway only has no 1.5, 3.2 or 3.4 arm; the 3.1 forecast ablations exist only with forecasts
+    assert found == {"forecast_vs_railway": 74, "forecast_vs_weather": 134,
+                     "weather_forecast_vs_weather": 166, "weather_forecast_vs_forecast": 166}
+    for contrast, run, reference in pairs():
+        assert (run.step, run.model, run.variant, run.nested) == (
+            reference.step, reference.model, reference.variant, reference.nested)
