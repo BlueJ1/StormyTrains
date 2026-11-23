@@ -238,15 +238,27 @@ def test_cli_and_audit_select_arms(monkeypatch):
     assert len(audited) == 364 and all(run.forecast for run in audited)
 
 
-def test_audit_accepts_dirty_flag_only_when_asked_and_only_on_forecast_arms():
-    from audit_cv_results import commit_ok
+def test_audit_accepts_dirty_flag_only_for_the_b17_commit_and_forecast_arms():
+    from audit_cv_results import B17_COMMIT, commit_ok
     forecast, observed = Run("0.7", "lightgbm", forecast=True), Run("0.7", "lightgbm", weather=True)
-    flagged = "abc (uncommitted changes)"
-    assert commit_ok("abc", "abc", observed)
-    assert not commit_ok(flagged, "abc", forecast)
-    assert commit_ok(flagged, "abc", forecast, accept_flagged=True)
-    assert not commit_ok(flagged, "abc", observed, accept_flagged=True)
-    assert not commit_ok("other (uncommitted changes)", "abc", forecast, accept_flagged=True)
+    flagged, other = B17_COMMIT + " (uncommitted changes)", "a" * 40
+    assert commit_ok(other, [other], observed)
+    assert commit_ok(other, [B17_COMMIT, other], forecast)
+    assert not commit_ok(flagged, [B17_COMMIT], forecast)
+    assert commit_ok(flagged, [B17_COMMIT], forecast, accept_flagged=True)
+    assert not commit_ok(flagged, [B17_COMMIT], observed, accept_flagged=True)
+    assert not commit_ok(other + " (uncommitted changes)", [other], forecast, accept_flagged=True)
+    assert not commit_ok(flagged, [other], forecast, accept_flagged=True)
+
+
+def test_audit_defaults_to_the_railway_and_observed_arms(monkeypatch):
+    import sys
+    import audit_cv_results
+    audited = []
+    monkeypatch.setattr(sys, "argv", ["audit", "--commit", "x"])
+    monkeypatch.setattr(audit_cv_results, "audit", lambda run, *args: audited.append(run) or (None, []))
+    audit_cv_results.main()
+    assert len(audited) == 354 and not any(run.forecast for run in audited)
 
 
 def test_git_commit_ignores_results_outside_its_own_folder_but_not_other_changes(tmp_path, monkeypatch):
@@ -282,3 +294,106 @@ def test_forecast_comparisons_pair_each_forecast_arm_with_its_registered_counter
     for contrast, run, reference in pairs():
         assert (run.step, run.model, run.variant, run.nested) == (
             reference.step, reference.model, reference.variant, reference.nested)
+
+
+@pytest.mark.parametrize("weather, forecast, groups", [
+    (True, False, ("temperature", "precipitation", "wind", "snow")),
+    (False, True, FORECAST_GROUPS),
+    (True, True, ("temperature", "precipitation", "wind", "snow", *FORECAST_GROUPS))])
+def test_auto_groups_weather_stage_keeps_all_none_or_all_but_one_group(weather, forecast, groups):
+    from experiment_specs import weather_group_variants
+    run = Run("0.8", "lightgbm", weather, variant="auto_groups", nested=True, forecast=forecast)
+    numeric, categorical = feature_columns("1h", weather, feature_set="holidays", forecast=forecast)
+    variant = ("factory", numeric, categorical)
+    options = weather_group_variants(run, "1h", variant)
+    assert list(options)[:2] == ["all_weather", "no_weather"]
+    assert options["all_weather"] is variant
+    assert set(options) == {"all_weather", "no_weather", *(f"drop_{group}" for group in groups)}
+    all_groups = feature_groups("1h", weather, forecast)
+    weather_columns = {c for group in groups for c in all_groups[group][0]}
+    assert set(options["no_weather"][1]) == set(numeric) - weather_columns
+    for group in groups:
+        assert set(options[f"drop_{group}"][1]) == set(numeric) - set(all_groups[group][0])
+        assert options[f"drop_{group}"][2] == categorical
+    assert weather_group_variants(replace_run(run, weather=False, forecast=False), "1h", variant) is None
+    assert weather_group_variants(replace_run(run, variant="auto_representations"), "1h", variant) is None
+
+
+def replace_run(run, **changes):
+    from dataclasses import replace
+    return replace(run, **changes)
+
+
+def test_nested_search_weather_stage_reuses_the_kept_screen_and_records_the_choice(monkeypatch):
+    import tuning
+    from sklearn.dummy import DummyRegressor
+    frame = load_rows("1h").groupby("fold", group_keys=False).head(300).assign(arrival_delay_min=3.0)
+
+    def constant(numeric, categorical, *, value=0.0, offset=0.0):
+        return DummyRegressor(strategy="constant", constant=value + offset)
+    variants = {"base": (partial(constant, value=10.0), [], ["hour"]),
+                "holidays": (partial(constant, value=6.0), [], ["hour"])}
+    screened = []
+    real = tuning.screen_feature_variants
+    monkeypatch.setattr(tuning, "screen_feature_variants",
+                        lambda rows, pt, task, options, *args: screened.append(list(options)) or
+                        real(rows, pt, task, options, *args))
+
+    def weather(variant):
+        return {"all_weather": variant, "no_weather": (partial(constant, value=3.0), [], ["hour"]),
+                "drop_wind": (partial(constant, value=4.0), [], ["hour"])}
+    table, metrics, _ = tuning.nested_search(frame, "1h", "delay", constant, [{"offset": 0.0}], [], ["hour"],
+                                             variants=variants, weather_variants=weather)
+    chosen = table.loc[table["chosen"]]
+    assert set(chosen["feature_variant"]) == {"holidays"} and set(chosen["weather_variant"]) == {"no_weather"}
+    assert np.allclose(metrics["rmse"], 0)
+    assert screened[1] == ["no_weather", "drop_wind"]  # the kept variant is not screened again
+
+    tie = lambda variant: {"all_weather": variant, "no_weather": variant}
+    table, _, _ = tuning.nested_search(frame, "1h", "delay", constant, [{"offset": 0.0}], [], ["hour"],
+                                       variants=variants, weather_variants=tie)
+    assert set(table.loc[table["chosen"], "weather_variant"]) == {"all_weather"}
+
+
+def test_finalist_selector_ignores_forecast_runs(tmp_path):
+    import json
+    import run_final
+    for name, weather, forecast in [("a", False, False), ("b", True, False), ("c", False, True), ("d", True, True)]:
+        out = tmp_path / f"advanced_0_8_lightgbm_{name}" / "20261120-000000"
+        out.mkdir(parents=True)
+        (out / "config.json").write_text(json.dumps({
+            "step": "0.8", "model": "lightgbm", "task": "delay", "evaluation": "nested",
+            "weather": weather, "forecast": forecast, "variant": "", "features": {}}))
+        pd.DataFrame({"prediction_time": ["1h"], "rmse_mean": [1.0]}).to_csv(out / "summary.csv", index=False)
+    pairs = run_final.matched_candidates(tmp_path)
+    assert len(pairs) == 1
+    assert {arm: config["forecast"] for arm, (_, config, _) in pairs[0].items()} == {False: False, True: False}
+
+
+def test_forecast_comparisons_mark_diagnostics_same_inputs_and_configurations(tmp_path):
+    import json
+    from forecast_comparisons import configuration, excluded
+
+    def save(name, **config):
+        out = tmp_path / name / "20261120-000000"
+        out.mkdir(parents=True)
+        (out / "config.json").write_text(json.dumps(config))
+        return out
+    railway = save("r", features={"1h": {"numeric": ["a"], "categorical": ["c"]}},
+                   configuration_source="lightgbm/x/config.json")
+    forecast = save("f", features={"1h": {"numeric": ["a", "f"], "categorical": ["c"]}},
+                    configuration_source="lightgbm_weather/y/config.json")
+    same = save("s", features={"1h": {"numeric": ["a"], "categorical": ["c"]}},
+                configuration_source="lightgbm_weather/y/config.json")
+    run = Run("3.1", "lightgbm", forecast=True, variant="timetable")
+    assert excluded(run, same, railway) == "same inputs"
+    assert excluded(run, forecast, railway) == ""
+    assert excluded(Run("0.7", "lightgbm", forecast=True, variant="recorded_route", diagnostic=True),
+                    forecast, railway) == "recorded-route diagnostic"
+    assert configuration(forecast, railway, tmp_path) == "different flat configuration"
+    assert configuration(forecast, same, tmp_path) == "same configuration"
+    average = save("m", members=["f/20261120-000000"])
+    base_average = save("n", members=["r/20261120-000000"])
+    assert configuration(average, base_average, tmp_path) == "different flat configuration"
+    nested = [save(n, search={"n_configs": 20}, features={}) for n in ("x", "y")]
+    assert configuration(*nested, tmp_path) == "tuned per arm"

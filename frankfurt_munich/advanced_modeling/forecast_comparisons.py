@@ -12,6 +12,16 @@ A pair is skipped when its reference arm is not registered (railway only has no 
 3.4 arm, and the 3.1 forecast ablations exist only in the forecast arms). Negative means favor
 the forecast run (the candidate).
 
+The CSV keeps every pair; the summary leaves out the rows marked in `excluded`: the
+recorded-route leakage diagnostic of 0.7, and pairs whose two runs have the same inputs at every
+horizon (3.1 variants that offer neither arm's weather, such as timetable-only or a railway
+add-one), which test nothing. Ties between runs with different inputs are kept.
+
+`configuration` says how the two runs were configured: "tuned per arm" (nested searches),
+"same configuration", or "different flat configuration": fixed-configuration boosters take the
+flat search of their own arm (D2), so a forecast run uses the observed-weather configuration and
+its railway-only counterpart the railway one. Such a pair compares two pipelines, not inputs alone.
+
 Usage:
     .venv/bin/python frankfurt_munich/advanced_modeling/forecast_comparisons.py
 """
@@ -59,6 +69,43 @@ def pairs():
                 yield contrast, run, reference
 
 
+def configuration_sources(path, results_dir):
+    """The flat searches a run's configuration comes from, through saved ensemble members too."""
+    config = json.loads((path / "config.json").read_text())
+    sources = {config["configuration_source"]} if config.get("configuration_source") else set()
+    for member in config.get("members", []):
+        sources |= configuration_sources(results_dir / member, results_dir)
+    return sources
+
+
+def configuration(candidate_path, reference_path, results_dir):
+    configs = [json.loads((path / "config.json").read_text()) for path in (candidate_path, reference_path)]
+    if all("search" in config for config in configs):
+        return "tuned per arm"
+    same = (configuration_sources(candidate_path, results_dir)
+            == configuration_sources(reference_path, results_dir))
+    return "same configuration" if same else "different flat configuration"
+
+
+def inputs(features):
+    """The saved input columns per horizon, as a comparable set."""
+    def columns(value):
+        if isinstance(value, dict):
+            return frozenset(column for part in value.values() for column in part)
+        return frozenset(value)
+    return {pt: columns(value) for pt, value in features.items()}
+
+
+def excluded(run, candidate_path, reference_path):
+    if run.diagnostic:
+        return "recorded-route diagnostic"
+    features = [json.loads((path / "config.json").read_text()).get("features")
+                for path in (candidate_path, reference_path)]
+    if all(features) and inputs(features[0]) == inputs(features[1]):
+        return "same inputs"
+    return ""
+
+
 def comparisons(results_dir=ADVANCED_RESULTS):
     tables = []
     for contrast, run, reference in pairs():
@@ -68,9 +115,12 @@ def comparisons(results_dir=ADVANCED_RESULTS):
         tables.append(table.assign(
             contrast=contrast, step=run.step, task=task, model=run.model, variant=run.variant,
             evaluation=evaluation(reference_path, candidate_path),
+            configuration=configuration(candidate_path, reference_path, results_dir),
+            excluded=excluded(run, candidate_path, reference_path),
             candidate=str(candidate_path.relative_to(results_dir)),
             reference=str(reference_path.relative_to(results_dir))))
-    columns = ["contrast", "step", "task", "model", "variant", "evaluation", "prediction_time"]
+    columns = ["contrast", "step", "task", "model", "variant", "evaluation", "configuration", "excluded",
+               "prediction_time"]
     table = pd.concat(tables, ignore_index=True)
     return table[columns + [c for c in table if c not in columns]]
 
@@ -85,16 +135,13 @@ def family(row):
     return "linear and boosters"
 
 
-def summary(table):
-    """Comparisons and how many reach D12 in each direction, by contrast, family and task.
-
-    Pairs with identical fold scores are left out: in 3.1 the timetable-only and railway add-one
-    variants use no weather in any arm, so both runs are the same model."""
-    table = table[table["mean"].abs() > 1e-12]
+def summary(table, by=("contrast", "family", "task")):
+    """Comparisons and how many reach D12 in each direction, without the excluded rows."""
+    table = table[table["excluded"].fillna("").eq("")]
     threshold = table["task"].map({"severity": 0.003, "delay": 0.1})
     table = table.assign(family=table.apply(family, axis=1),
                          reference_better=table["mean"] >= threshold - 1e-12)
-    return table.groupby(["contrast", "family", "task"]).agg(
+    return table.groupby(list(by)).agg(
         comparisons=("mean", "size"), candidate_reaches_d12=("reaches_minimum_gain", "sum"),
         reference_reaches_d12=("reference_better", "sum"),
         candidate_lower=("mean", lambda m: int((m < 0).sum()))).reset_index()

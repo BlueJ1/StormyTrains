@@ -173,14 +173,18 @@ def search(rows: pd.DataFrame, prediction_time: str, task: str, factory, configs
 
 
 def nested_search(rows, prediction_time, task, factory, configs, numeric, categorical, *,
-                  variants=None):
-    """Search features and configurations on inner weeks, then score the outer fold."""
+                  variants=None, weather_variants=None):
+    """Search features and configurations on inner weeks, then score the outer fold.
+
+    weather_variants, if given, is a second stage after the variant choice: it maps the chosen
+    (factory, numeric, categorical) to named candidates whose first entry is that variant
+    unchanged. Its screen is reused, and it wins ties."""
     tables, metrics, predictions = [], [], []
     for fold, train, validation in cv_folds(rows):
         outer_train = rows.loc[train]
         inner = tuple(inner_folds(outer_train))
         splits = lambda _: inner
-        chosen_variant = None
+        chosen_variant = weather_choice = None
         model, num, cat = factory, numeric, categorical
         screen = None
         if variants:
@@ -189,6 +193,16 @@ def nested_search(rows, prediction_time, task, factory, configs, numeric, catego
             chosen_variant = best_variant(screens, task)
             model, num, cat = variants[chosen_variant]
             screen = screens[chosen_variant]
+            options = weather_variants(variants[chosen_variant]) if weather_variants else None
+            if options:
+                keep, *_ = options
+                screens = {keep: screen, **screen_feature_variants(
+                    outer_train, prediction_time, task,
+                    {name: option for name, option in options.items() if name != keep},
+                    configs, splits)}
+                weather_choice = best_variant(screens, task)
+                model, num, cat = options[weather_choice]
+                screen = screens[weather_choice]
         table, _, _ = search(outer_train, prediction_time, task, model, configs,
                              num, cat, splits=splits, prior=screen)
         best = int(table.loc[table["chosen"], "config_id"].item())
@@ -196,6 +210,8 @@ def nested_search(rows, prediction_time, task, factory, configs, numeric, catego
                                task, partial(model, **configs[best]), num, cat)
         if chosen_variant is not None:
             table["feature_variant"] = chosen_variant
+        if weather_choice is not None:
+            table["weather_variant"] = weather_choice
         tables.append(table.assign(outer_fold=fold))
         metrics.append(scores)
         predictions.append(out.assign(config_id=best))

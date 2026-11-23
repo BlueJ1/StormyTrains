@@ -22,7 +22,7 @@ from experiment_models import (FLAT_SEARCHES, LIGHTGBM, LINEAR, MODELS, NEURAL, 
                                flat_search_path, variant_model)
 from experiment_specs import (AUTO_VARIANTS, DECOMPOSED, LATE_STEPS, LATE_VARIANTS, SEARCH_CONFIGS,
                               ARMS, VARIANTS, Run, latest_run, nested_feature_variants, registered_runs,
-                              tuning_reference)
+                              tuning_reference, weather_group_variants)
 from features import CURRENT_DELAY_TIMES, PHASE2_GROUPS, feature_columns, feature_groups
 from group_selection import ablations, columns_for, cv_importance, nested_groups
 from models import L1_LOGISTIC, make_lightgbm_classifier
@@ -153,15 +153,20 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
                 group_choices.extend(selections)
                 evaluation = "nested"
             elif run.nested:
+                weather_stage = (partial(weather_group_variants, run, prediction_time)
+                                 if nested_variants and run.variant == "auto_groups" and run.flat_weather
+                                 else None)
                 table, metrics, predictions = nested_search(
                     rows, prediction_time, task, make_model, configs, numeric, categorical,
-                    variants=nested_variants)
+                    variants=nested_variants, weather_variants=weather_stage)
                 tables.append(table)
                 chosen[prediction_time] = {}
                 for choice in table.loc[table["chosen"]].itertuples():
                     decision = {"config_id": int(choice.config_id), "params": configs[choice.config_id]}
                     if nested_variants:
                         decision["feature_variant"] = choice.feature_variant
+                    if weather_stage:
+                        decision["weather_variant"] = choice.weather_variant
                     chosen[prediction_time][str(choice.outer_fold)] = decision
                 print(f"{run.name} {prediction_time}: {SCORE[task]} "
                       f"{metrics[SCORE[task]].mean():.4f}, "
@@ -186,6 +191,10 @@ def evaluate_run(run: Run, *, inputs_dir: Path, results_dir: Path, prediction_ti
         if run.variant in AUTO_VARIANTS:
             count = min(FEATURE_SCREEN_CONFIGS, len(configs))
             config["search"]["feature_selection"] = f"best inner mean over the first {count} configurations"
+            if run.variant == "auto_groups" and run.flat_weather:
+                config["search"]["weather_selection"] = (
+                    "on the chosen variant: all weather, none, or one weather group dropped; "
+                    f"best inner mean over the first {count} configurations, ties keep all weather")
         elif run.step == "0.8" and run.variant:
             config["evaluation"] = "nested tuning, exploratory variant"
     if group_choices:

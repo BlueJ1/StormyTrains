@@ -13,12 +13,15 @@ B17 audits the forecast arms of D17 on their own commit with
 --arm forecast weather_forecast):
     .venv/bin/python frankfurt_munich/advanced_modeling/audit_cv_results.py --commit <sha> [--arm ...]
 
+By default only the railway and observed-weather arms are audited. --commit takes several
+hashes when arms were rerun at a later commit; each run must record one of them.
+
 --accept-b17-dirty-flag exists for B17 only (students' decision, 20 November 2026):
 the forecast runs were made from commit 7300d61, before cv.git_commit anchored its results/
 exclusion at the repository top. Unanchored, it applied only below frankfurt_munich/modeling, so
 every run started after the first new run folder appeared recorded "<sha> (uncommitted changes)"
 although only results/ had changed. With the option the audit accepts that flag on the forecast
-arms, for the given commit only.
+arms for that commit only, and only when it is one of the commits given.
 """
 import argparse
 import json
@@ -68,12 +71,16 @@ def cv_rows(pt):
 
 
 DIRTY_FLAG = " (uncommitted changes)"
+B17_COMMIT = "7300d61bf69e7c504b15a327c48092b6a8532481"
+DEFAULT_ARMS = ("railway", "weather")
 
 
-def commit_ok(recorded, commit, run, accept_flagged=False):
-    if recorded == commit:
+def commit_ok(recorded, commits, run, accept_flagged=False):
+    commits = (commits,) if isinstance(commits, str) else tuple(commits)
+    if recorded in commits:
         return True
-    return accept_flagged and run.forecast and recorded == commit + DIRTY_FLAG
+    return (accept_flagged and run.forecast and B17_COMMIT in commits
+            and recorded == B17_COMMIT + DIRTY_FLAG)
 
 
 def audit(run, commit, results_dir, accept_flagged=False):
@@ -151,11 +158,13 @@ def audit(run, commit, results_dir, accept_flagged=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--steps", nargs="+", default=STEPS)
-    parser.add_argument("--commit", required=True, help="full commit hash the runs must record")
+    parser.add_argument("--commit", nargs="+", required=True,
+                        help="full commit hashes; each run must record one of them")
     parser.add_argument("--results-dir", type=Path, default=ADVANCED_RESULTS)
-    parser.add_argument("--arm", nargs="+", choices=ARMS, default=ARMS, help="audit only these arms")
+    parser.add_argument("--arm", nargs="+", choices=ARMS, default=DEFAULT_ARMS,
+                        help="audit only these arms (default: railway and observed weather)")
     parser.add_argument("--accept-b17-dirty-flag", action="store_true",
-                        help="B17 only: accept '<commit> (uncommitted changes)' on the forecast arms")
+                        help=f"B17 only: accept '{B17_COMMIT[:7]} (uncommitted changes)' on the forecast arms")
     args = parser.parse_args()
     arms = [run for run in active_arms(args.steps) if run.arm in args.arm]
     failed = 0

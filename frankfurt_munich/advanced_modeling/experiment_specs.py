@@ -220,6 +220,27 @@ def tuning_reference(run):
     return Run(step, run.model, run.weather, nested=True, forecast=run.forecast)
 
 
+def weather_group_variants(run, prediction_time, variant):
+    """Second stage of the 0.8 automatic groups (decided 23 November 2026, review of PR #18).
+
+    On the railway candidate chosen in the first stage: keep all of the arm's weather groups,
+    keep none, or drop one group at a time. The arm's observed and forecast groups count
+    separately. None for other runs and for railway-only arms."""
+    if run.variant != "auto_groups" or not run.flat_weather:
+        return None
+    factory, numeric, categorical = variant
+    railway = feature_groups(prediction_time)
+    groups = feature_groups(prediction_time, run.weather, run.forecast)
+    weather = [group for group in groups if group not in railway]
+
+    def without(dropped):
+        columns = {column for group in dropped for column in (*groups[group][0], *groups[group][1])}
+        return (factory, [column for column in numeric if column not in columns],
+                [column for column in categorical if column not in columns])
+    return {"all_weather": variant, "no_weather": without(weather),
+            **{f"drop_{group}": without([group]) for group in weather}}
+
+
 LATE_STEPS = ("1.4", "2.4", "4.5", "7.5", "8.4")
 LATE_VARIANTS = (*VARIANTS["1.4"], "delay_dynamics")
 
