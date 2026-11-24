@@ -131,7 +131,35 @@ After the CV steps are complete, `run_final.py register` ranks the pipelines tha
 
 Build any additional inputs named by the finalists with `--split holdout`. Use `history_features.py --feature reliability` for recent reliability and `sequence_inputs.py` for upstream sequences. Then run `run_final.py evaluate` once. If a distributional learner is registered, supply its pinned interpreter via `--distribution-python`. The evaluation saves scores, paired week-bootstrap intervals and subgroup errors for five comparisons (observed weather against railway only in `{task}_weather.csv` and `{task}_errors.csv`; forecasts against railway only and against observations, and observations plus forecasts against observations and against forecasts in `{task}_<candidate>_vs_<reference>.csv` and `..._errors.csv`), calibration, risk trajectories, and SHAP summaries in `results/advanced_holdout/`.
 
-#### Holdout results
+#### Second hold-out evaluation (24 November 2026)
+
+The registry (finishing plan B6, modelling plan 10.5) fixed 40 arms before any hold-out input was built: nested LightGBM with automatic groups for all ten tasks and horizons, each in four arms (railway only, observed weather, forecasts, both). The railway groups are all groups, except recent reliability only for severity at 6 h. Run on all 95 CV weeks, the weather stage kept weather in only 7 of the 30 weather arms; the other 23 have the railway columns and the railway configuration, so they are the same model as their railway arm and score identically. The group chose to score this registry as registered. Each arm was refitted on the 95 CV weeks and scored once on the 23 hold-out weeks; intervals are pointwise 95% paired bootstraps of whole ISO weeks (2,000 resamples). [Finalist registry](finalists.json), [scores](results/advanced_holdout/scores.csv)
+
+Delay RMSE (min). The training mean is the reference.
+
+| Horizon | Rows | Railway | Observed weather | Forecasts | Both | Training mean |
+|---|---|---|---|---|---|---|
+| 24 h | 4,089 | 25.106 | 25.249 | = railway | = railway | 26.409 |
+| 6 h | 4,086 | 24.995 | = railway | 25.025 | = railway | 26.398 |
+| 1 h | 4,084 | 24.562 | = railway | 24.557 | = railway | 26.390 |
+| 20 min | 4,084 | 24.553 | = railway | = railway | = railway | 26.390 |
+| 0 min | 4,084 | 24.468 | = railway | = railway | = railway | 26.390 |
+
+Severity log loss (macro-F1). Class shares are the reference.
+
+| Horizon | Rows | Railway | Observed weather | Forecasts | Both | Class shares |
+|---|---|---|---|---|---|---|
+| 24 h | 4,313 | 0.9137 (0.245) | 0.9170 (0.209) | 0.9120 (0.241) | 0.9156 (0.208) | 0.9708 (0.194) |
+| 6 h | 4,294 | 0.9049 (0.222) | = railway | 0.9041 (0.215) | = railway | 0.9633 (0.195) |
+| 1 h | 4,237 | 0.8616 (0.259) | = railway | = railway | = railway | 0.9347 (0.196) |
+| 20 min | 4,204 | 0.8412 (0.271) | = railway | = railway | = railway | 0.9150 (0.197) |
+| 0 min | 4,188 | 0.8221 (0.276) | = railway | = railway | = railway | 0.9046 (0.198) |
+
+Of the 50 contrasts (five pairs, ten slots), 33 are exactly zero because both arms are the same model. Observed weather against railway only is the only comparison whose interval excludes zero: at 24 h, observed weather raised delay RMSE by 0.143 min (95% interval 0.039 to 0.246); forecasts against observations and both against observations show the same difference with the opposite sign, because those arms equal the railway arm there. The other nonzero deltas are smaller than the D12 minimum gain (0.1 min, 0.003 log loss) or have intervals that include zero; the largest is forecasts against observations for severity at 24 h, 0.0050 lower log loss (−0.0110 to 0.0004). Every finalist beats its reference at every horizon. [Comparisons](results/advanced_holdout/), [subgroup errors](results/advanced_holdout/severity_errors.csv)
+
+The two references were not part of `run_final.py`, so they were scored after the registered run, on the same training and hold-out rows, with [score_references.py](results/advanced_holdout/score_references.py) ([reference scores](results/advanced_holdout/references.csv)); they choose nothing (finishing plan Q7). The hold-out inputs were rebuilt with the corrected code on 24 November 2026 in `../data/advanced/`; the first evaluation's inputs stay archived in `../data/advanced_original_065b077/`.
+
+#### First holdout evaluation (6 November 2026)
 
 The registry fixed 20 arms before the holdout labels were read. Each model was refitted on the 95 CV weeks and scored on the same rows as its matched arm across 23 held-out ISO weeks. LightGBM was selected for all severity horizons and for delay at 24 h and departure. Full-group linear regression was selected for delay at 6 h, 1 h and 20 min. The LightGBM pairs share railway features, and each arm was tuned separately over the same 20 configurations. [Finalist registry](results/advanced_holdout_first/finalists.json)
 
