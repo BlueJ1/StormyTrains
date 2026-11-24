@@ -1,4 +1,9 @@
-"""Register a matched finalist pair per task and horizon, then score it once."""
+"""Register one matched finalist per task and horizon in four arms, then score it once.
+
+The arms (D17, finishing plan B6): railway only, observed weather, forecasts, and observations
+plus forecasts. Only pipelines with all four arms in CV are candidates (group decision,
+24 November 2026). The hold-out set compares five pairs (CONTRASTS), each by a paired week
+bootstrap."""
 from __future__ import annotations
 
 import argparse
@@ -24,9 +29,10 @@ from cv import (PROBA_COLUMNS, TARGETS, class_probabilities, cross_validate,
 from data import DATA, PREDICTION_TIMES, ROW_KEY, TIME_COLUMN, merge_inputs
 from ensembles import FittedAverage, apply_isotonic, apply_temperature, fit_isotonic, fit_temperature
 from experiment_models import DISTRIBUTION_CLASSIFIERS, DISTRIBUTIONS, MODELS
-from experiment_specs import AUTO_VARIANTS, SEARCH_CONFIGS, Run, nested_feature_variants
+from experiment_specs import AUTO_VARIANTS, SEARCH_CONFIGS, Run, nested_feature_variants, weather_group_variants
 from features import PHASE2_GROUPS, WEATHER, feature_groups
 from folds import cv_folds
+from forecast_columns import FORECAST
 from final_analysis import (calibration_reliability, example_risk_trajectories,
                             paired_bootstrap_ci, paired_error_table)
 from group_selection import columns_for, greedy_groups, lightgbm_contributions
@@ -36,6 +42,13 @@ from representations import REPRESENTATIONS, extreme_weather, route_representati
 from sequence_inputs import SEQUENCE_COLUMN
 from tuning import SCORE, sample_configs, search, select_feature_variant
 
+# Arm name: (observed weather, forecasts). Registration and scoring keep this order.
+ARMS = {"railway": (False, False), "weather": (True, False), "forecast": (False, True),
+        "weather_forecast": (True, True)}
+# Hold-out comparisons (candidate, reference), decided 24 November 2026: observed weather against
+# railway only as before, and the four forecast contrasts of the CV comparisons (step 10.9).
+CONTRASTS = (("weather", "railway"), ("forecast", "railway"), ("forecast", "weather"),
+             ("weather_forecast", "weather"), ("weather_forecast", "forecast"))
 REFIT_STEPS = {"0.8", "3.3", "5.2", "6.1", "6.2", "6.3", "6.5", "7.1", "7.2", "7.3", "7.4", "7.5"}
 FEATURE_FILES = {
     frozenset(PHASE2_GROUPS["recent_reliability"][0]): "reliability",
@@ -43,43 +56,64 @@ FEATURE_FILES = {
 }
 
 
+def arm_name(spec):
+    """The arm of a run configuration or a registered finalist; old runs have no forecast key."""
+    return next(name for name, flags in ARMS.items()
+                if flags == (bool(spec["weather"]), bool(spec.get("forecast"))))
+
+
+def arm_weather_columns(name):
+    weather, forecast = ARMS[name]
+    return (set(WEATHER) if weather else set()) | (set(FORECAST) if forecast else set())
+
+
 def matched_candidates(results_dir):
+    """Pipelines registered in all four arms, as {arm name: (path, config, scores)}."""
     pairs = {}
     for path, config, scores in run_index(results_dir):
         if config["step"] not in REFIT_STEPS or config["evaluation"] not in ("nested", "prespecified"):
             continue
         if config.get("variant", "").startswith("weather_"):
             continue
-        if config.get("forecast"):
-            continue  # The forecast arms (D17) need four-arm selection and refitting first (B6).
         if config["model"] in ("tabm", "tabm_classifier"):
             continue  # PyTabKit 1.8 cannot refit TabM on all CV training rows.
         key = (config["step"], config["model"], config.get("variant", ""), config.get("calendar"))
-        pairs.setdefault(key, {})[config["weather"]] = (path, config, scores.set_index("prediction_time"))
-    return [pair for pair in pairs.values() if pair.keys() == {False, True}]
+        pairs.setdefault(key, {})[arm_name(config)] = (path, config, scores.set_index("prediction_time"))
+    return [pair for pair in pairs.values() if pair.keys() == ARMS.keys()]
 
 
 def choose_finalists(results_dir):
-    """Rank matched pairs by the railway-only CV score, independently by task and horizon."""
+    """Rank four-arm candidates by the railway-only CV score, independently by task and horizon."""
     pairs = matched_candidates(results_dir)
     for task in SCORE:
         metric = f"{SCORE[task]}_mean"
         for pt in PREDICTION_TIMES:
-            eligible = [pair for pair in pairs if pair[False][1]["task"] == task
+            eligible = [pair for pair in pairs if pair["railway"][1]["task"] == task
                         and all(pt in arm[2].index for arm in pair.values())
-                        and matched_features(pair[False][1]["features"][pt],
-                                             pair[True][1]["features"][pt])
-                        and pair[False][1].get("search") == pair[True][1].get("search")]
+                        and all(matched_features(pair["railway"][1]["features"][pt], arm[1]["features"][pt], name)
+                                for name, arm in pair.items() if name != "railway")
+                        and all(matched_search(pair["railway"][1], arm[1]) for arm in pair.values())]
             if not eligible:
                 raise ValueError(f"no matched finalist candidates for {task} at {pt}")
-            best = min(eligible, key=lambda pair: pair[False][2].loc[pt, metric])
+            best = min(eligible, key=lambda pair: pair["railway"][2].loc[pt, metric])
             yield task, pt, best
 
 
-def matched_features(railway, with_weather):
-    weather_numeric = [column for column in with_weather["numeric"] if column in WEATHER]
-    railway_numeric = [column for column in with_weather["numeric"] if column not in WEATHER]
-    return (set(weather_numeric) == set(WEATHER) and railway_numeric == railway["numeric"]
+def matched_search(railway, other):
+    """The same tuning policy and budget; the weather stage exists only in weather arms."""
+    def policy(config):
+        return {key: value for key, value in config.get("search", {}).items() if key != "weather_selection"}
+    return policy(railway) == policy(other)
+
+
+def matched_features(railway, with_weather, arm="weather", *, subset=False):
+    """Same railway inputs, plus the arm's weather columns: all of them, or a subset after the
+    weather stage of the 0.8 automatic groups."""
+    allowed = arm_weather_columns(arm)
+    weather_numeric = {column for column in with_weather["numeric"] if column in allowed}
+    railway_numeric = [column for column in with_weather["numeric"] if column not in allowed]
+    complete = weather_numeric <= allowed if subset else weather_numeric == allowed
+    return (complete and railway_numeric == railway["numeric"]
             and with_weather["categorical"] == railway["categorical"])
 
 
@@ -116,12 +150,14 @@ def final_group_selection(config, prediction_time, task, inputs_dir):
 
 def tune_finalist(spec, config, inputs_dir):
     task, pt, weather, step = (spec[key] for key in ("task", "prediction_time", "weather", "step"))
+    forecast = spec.get("forecast", False)
     n_configs = SEARCH_CONFIGS if step in ("5.2", "6.2") else config.get("search", {}).get("n_configs")
     if n_configs:
         n_configs = min(n_configs, SEARCH_CONFIGS)
         factory, numeric, categorical = registered_factory(spec)
         configs = sample_configs(MODELS[spec["model"]][2], n=n_configs)
-        rows = load_advanced_rows(pt, weather=weather, inputs_dir=inputs_dir, extra_inputs=tuple(numeric + categorical))
+        rows = load_advanced_rows(pt, weather=weather, forecast=forecast, inputs_dir=inputs_dir,
+                                  extra_inputs=tuple(numeric + categorical))
         table, _, _ = search(rows, pt, task, factory, configs, numeric, categorical)
         policy = {"method": "five CV week folds", "n_configs": n_configs}
         if step == "5.2":
@@ -161,7 +197,7 @@ def register(results_dir, inputs_dir, registry, jobs=1):
     sources = source_fingerprints(HERE.parent)
     records = []
     for task, pt, pair in choose_finalists(results_dir):
-        railway = pair[False][1]
+        railway = pair["railway"][1]
         variant = railway.get("variant", "")
         selection = None
         selected_groups = None
@@ -175,19 +211,29 @@ def register(results_dir, inputs_dir, registry, jobs=1):
                                                sample_configs(space, n=SEARCH_CONFIGS), cv_folds)
         elif railway["step"] == "3.3" and variant in ("forward", "backward"):
             selected_groups = final_group_selection(railway, pt, task, inputs_dir)
-        for weather in (False, True):
-            source, config, scores = pair[weather]
+        for name, (weather, forecast) in ARMS.items():
+            source, config, scores = pair[name]
             spec = {key: config[key] for key in ("model", "task", "weather", "step")}
-            spec.update(prediction_time=pt, variant=config.get("variant", ""),
+            spec.update(forecast=forecast, prediction_time=pt, variant=config.get("variant", ""),
                         calendar=config.get("calendar"), features=config["features"][pt],
                         source=str(source.relative_to(results_dir)),
                         cv_score=float(scores.loc[pt, f"{SCORE[task]}_mean"]))
             if selection is not None:
-                run = Run(config["step"], config["model"], weather, variant=variant)
-                _, numeric, categorical = nested_feature_variants(run, pt, task, factory)[selection]
+                run = Run(config["step"], config["model"], weather, variant=variant, forecast=forecast)
+                chosen = nested_feature_variants(run, pt, task, factory)[selection]
+                # The weather stage of the 0.8 automatic groups, on this arm's CV weeks (B6).
+                options = weather_group_variants(run, pt, chosen)
+                if options:
+                    columns = tuple(dict.fromkeys(c for _, num, cat in options.values() for c in num + cat))
+                    rows = load_advanced_rows(pt, weather=weather, forecast=forecast, inputs_dir=inputs_dir,
+                                              extra_inputs=columns)
+                    spec["weather_variant"] = select_feature_variant(
+                        rows, pt, task, options, sample_configs(space, n=SEARCH_CONFIGS), cv_folds)
+                    chosen = options[spec["weather_variant"]]
+                _, numeric, categorical = chosen
                 spec.update(variant=selection, features={"numeric": numeric, "categorical": categorical})
             if selected_groups is not None:
-                groups = feature_groups(pt, weather)
+                groups = feature_groups(pt, weather, forecast)
                 weather_groups = groups.keys() - feature_groups(pt).keys()
                 numeric, categorical = columns_for(groups, selected_groups | weather_groups)
                 spec["features"] = {"numeric": numeric, "categorical": categorical}
@@ -203,9 +249,9 @@ def register(results_dir, inputs_dir, registry, jobs=1):
         with ProcessPoolExecutor(max_workers=jobs) as pool:
             finalists = list(pool.map(tune, records))
     for spec in finalists:
-        print(spec["task"], spec["prediction_time"], spec["model"],
-              "weather" if spec["weather"] else "railway", flush=True)
-    registration = {"policy": "one matched pair ranked by railway-only CV score per task and horizon",
+        print(spec["task"], spec["prediction_time"], spec["model"], arm_name(spec), flush=True)
+    registration = {"policy": "one pipeline in four arms (railway, weather, forecast, weather_forecast), "
+                              "ranked by railway-only CV score per task and horizon",
                     "git_commit": git_commit(), "runtime": runtime_versions(),
                     "development_fingerprints": development, "finalists": finalists}
     if (source_fingerprints(HERE.parent) != sources
@@ -230,22 +276,23 @@ def validate_registry(registration):
             raise ValueError("registered configuration bagging requires five members")
         if spec["step"] == "6.2" and (spec["task"] != "severity" or spec["variant"] not in ("temperature", "isotonic")):
             raise ValueError("registered calibration requires a severity classifier and calibration method")
-    keys = [(spec["task"], spec["prediction_time"], spec["weather"]) for spec in finalists]
-    expected = {(task, pt, weather) for task in SCORE for pt in PREDICTION_TIMES
-                for weather in (False, True)}
+    keys = [(spec["task"], spec["prediction_time"], arm_name(spec)) for spec in finalists]
+    expected = {(task, pt, arm) for task in SCORE for pt in PREDICTION_TIMES for arm in ARMS}
     if len(keys) != len(expected) or set(keys) != expected:
-        raise ValueError("registration must have one matched pair for each task and prediction time")
+        raise ValueError("registration must have one pipeline in all four arms for each task and prediction time")
     specs = dict(zip(keys, finalists))
     for task in SCORE:
         for pt in PREDICTION_TIMES:
-            a, b = (specs[(task, pt, weather)] for weather in (False, True))
-            if (any(a[key] != b[key] for key in ("model", "step", "variant", "calendar"))
-                    or not matched_features(a["features"], b["features"])):
-                raise ValueError(f"unmatched weather comparison for {task} at {pt}")
-            policy = [{key: value for key, value in spec["tuning_policy"].items()
-                       if key != "config_id"} for spec in (a, b)]
-            if policy[0] != policy[1]:
-                raise ValueError(f"unmatched tuning policy for {task} at {pt}")
+            railway = specs[(task, pt, "railway")]
+            policy = {key: value for key, value in railway["tuning_policy"].items() if key != "config_id"}
+            for arm in ARMS:
+                spec = specs[(task, pt, arm)]
+                if (any(spec[key] != railway[key] for key in ("model", "step", "variant", "calendar"))
+                        or not matched_features(railway["features"], spec["features"], arm,
+                                                subset="weather_variant" in spec)):
+                    raise ValueError(f"unmatched {arm} comparison for {task} at {pt}")
+                if {key: value for key, value in spec["tuning_policy"].items() if key != "config_id"} != policy:
+                    raise ValueError(f"unmatched tuning policy for {task} at {pt}")
 
 
 def fitted_model(spec, rows, factory, numeric, categorical):
@@ -333,9 +380,11 @@ def score_registered_arm(registry, inputs_dir, output, index):
     if (arm / "score.json").exists():
         return
     task, pt, weather = (spec[key] for key in ("task", "prediction_time", "weather"))
+    arm_label = arm_name(spec)
     factory, numeric, categorical = registered_factory(spec)
     features = numeric + categorical
-    options = {"weather": weather, "inputs_dir": inputs_dir, "extra_inputs": tuple(features)}
+    options = {"weather": weather, "forecast": spec.get("forecast", False), "inputs_dir": inputs_dir,
+               "extra_inputs": tuple(features)}
     cv = load_advanced_rows(pt, **options)
     model, n_train = fitted_model(spec, cv, factory, numeric, categorical)
     holdout = load_advanced_rows(pt, split="holdout", allow_holdout=True, **options)
@@ -345,16 +394,16 @@ def score_registered_arm(registry, inputs_dir, output, index):
     score, prediction = score_fold(rows, pt, 0, task, n_train, pred)
     prediction = prediction.drop(columns="fold")
     background = cv.loc[cv[TARGETS[task]].notna(), features]
-    shap = explanation(model, X, background, task).assign(task=task, prediction_time=pt, weather=weather)
+    shap = explanation(model, X, background, task).assign(task=task, prediction_time=pt, arm=arm_label)
     metadata = pd.DataFrame()
-    if weather:
+    if arm_label == "weather":  # journey metadata and observed extremes, the same for every arm
         timetable = read_inputs(inputs_dir / "timetable_holdout.parquet", ("weather_branch",))
         metadata = merge_inputs(holdout[[*ROW_KEY, TIME_COLUMN, "severity_class"]], timetable)
         flags = extreme_weather(holdout).filter(regex=r"^weather_(heat|gust|snow|heavy_rain)$")
         metadata = metadata.join(flags).drop(columns="predicted_at")
     prediction.to_parquet(arm / "predictions.parquet", index=False)
     shap.to_parquet(arm / "shap.parquet", index=False)
-    if spec["weather"]:
+    if arm_label == "weather":
         metadata.to_parquet(arm / "metadata.parquet", index=False)
     (arm / "environment.json").write_text(json.dumps({
         "interpreter": sys.executable, "runtime": runtime_versions()}, indent=2) + "\n")
@@ -366,6 +415,8 @@ def score_registered_arm(registry, inputs_dir, output, index):
 def evaluation_fingerprints(registration, inputs_dir, *, splits=("cv", "holdout")):
     """Fingerprint the pipeline source and requested model-input splits."""
     required = {"timetable", "history", "weather"}
+    if any(spec.get("forecast") for spec in registration["finalists"]):
+        required.add("forecast_weather")
     features = {c for spec in registration["finalists"] for names in spec["features"].values() for c in names}
     for group, filename in FEATURE_FILES.items():
         if features & group:
@@ -436,28 +487,34 @@ def run_final_arms(registration, registry, inputs_dir, output, distribution_pyth
         scores = json.loads((arm_dir / "score.json").read_text())
         environment = json.loads((arm_dir / "environment.json").read_text())
         environments.append({"task": spec["task"], "prediction_time": spec["prediction_time"],
-                             "weather": spec["weather"], **environment})
-        arm = (spec["task"], spec["weather"])
+                             "arm": arm_name(spec), **environment})
+        arm = (spec["task"], arm_name(spec))
         predictions.setdefault(arm, []).append(pd.read_parquet(arm_dir / "predictions.parquet"))
-        if spec["weather"]:
+        if arm_name(spec) == "weather":
             metadata.setdefault(spec["task"], []).append(pd.read_parquet(arm_dir / "metadata.parquet"))
         shap_rows.append(pd.read_parquet(arm_dir / "shap.parquet"))
         metric_rows.append({**scores, "step": spec["step"], "model": spec["model"], "variant": spec["variant"],
-                            "task": spec["task"], "weather": spec["weather"]})
+                            "task": spec["task"], "weather": spec["weather"],
+                            "forecast": spec.get("forecast", False), "arm": arm_name(spec)})
     pd.DataFrame(metric_rows).drop(columns="fold").to_csv(output / "scores.csv", index=False)
     (output / "environments.json").write_text(json.dumps(environments, indent=2) + "\n")
     if shap_rows:
         pd.concat(shap_rows, ignore_index=True).to_csv(output / "shap.csv", index=False)
     for task in SCORE:
-        left, right = (pd.concat(predictions[(task, weather)], ignore_index=True) for weather in (False, True))
-        paired_bootstrap_ci(left, right, task).to_csv(output / f"{task}_weather.csv", index=False)
+        frames = {arm: pd.concat(predictions[(task, arm)], ignore_index=True) for arm in ARMS}
         meta = pd.concat(metadata[task], ignore_index=True)
-        errors = [paired_error_table(left[left["prediction_time"].eq(pt)],
-                                     right[right["prediction_time"].eq(pt)], task, metadata=meta)
-                  .assign(prediction_time=pt) for pt in PREDICTION_TIMES]
-        pd.concat(errors, ignore_index=True).to_csv(output / f"{task}_errors.csv", index=False)
+        for candidate, reference in CONTRASTS:
+            left, right = frames[reference], frames[candidate]
+            # Observed weather against railway only keeps the file names of the first evaluation.
+            name = "weather" if (candidate, reference) == ("weather", "railway") else f"{candidate}_vs_{reference}"
+            paired_bootstrap_ci(left, right, task).to_csv(output / f"{task}_{name}.csv", index=False)
+            errors = [paired_error_table(left[left["prediction_time"].eq(pt)],
+                                         right[right["prediction_time"].eq(pt)], task, metadata=meta)
+                      .assign(prediction_time=pt) for pt in PREDICTION_TIMES]
+            suffix = "errors" if name == "weather" else f"{name}_errors"
+            pd.concat(errors, ignore_index=True).to_csv(output / f"{task}_{suffix}.csv", index=False)
         calibration, risk = {}, {}
-        for arm, frame in (("railway", left), ("weather", right)):
+        for arm, frame in frames.items():
             frame.to_parquet(output / f"{task}_{arm}.parquet", index=False)
             if task == "severity":
                 calibration[arm] = calibration_reliability(frame)
