@@ -122,7 +122,7 @@ the error on completed journeys from the classification of disruptions.
 \section{Methodology}
 \label{sec:method}
 
-\subsection{Prediction task}
+\subsection{Problem formulation}
 
 A \emph{journey} is one dated run of one ICE or IC train that stops at Frankfurt (Main) Hbf and
 later at M\"unchen Hbf. For each journey we predict two targets. The \emph{arrival delay} is the
@@ -136,7 +136,7 @@ scheduled departure from Frankfurt. No prediction is made for a journey whose ca
 already been announced at that time, since the passenger then knows the outcome. A separate model is
 fitted for each prediction time and each target.
 
-\subsection{Inputs known at the prediction time}
+\subsection{Features}
 \label{sec:inputs}
 
 The monthly files of the source keep, for every stop, only the last reported values. They do not say
