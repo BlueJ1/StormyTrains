@@ -41,3 +41,4 @@ Paths are relative to `frankfurt_munich/`.
 | Table III and Fig. 2 | `advanced_modeling/results/advanced_holdout/severity_weather.csv`, `delay_weather.csv` |
 | Feature-group, model-family and ensemble counts | `advanced_modeling/PLAN.md`, result lines of Phases 1 to 8 |
 | Errors by class, risk example | `advanced_modeling/results/advanced_holdout/delay_errors.csv`, `risk_railway.csv` |
+| Forecast comparisons (CV), forecast inputs and availability | `advanced_modeling/README.md` (B17 table; all pairs in `results/forecast_arm_comparisons.csv`, linear models and boosters, without excluded rows); `forecast_weather_GFS/README.md`. These numbers are from the corrected inputs (24 November 2026) |
