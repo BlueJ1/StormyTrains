@@ -106,14 +106,33 @@ def matched_search(railway, other):
     return policy(railway) == policy(other)
 
 
-def matched_features(railway, with_weather, arm="weather", *, subset=False):
-    """Same railway inputs, plus the arm's weather columns: all of them, or a subset after the
-    weather stage of the 0.8 automatic groups."""
-    allowed = arm_weather_columns(arm)
-    weather_numeric = {column for column in with_weather["numeric"] if column in allowed}
-    railway_numeric = [column for column in with_weather["numeric"] if column not in allowed]
-    complete = weather_numeric <= allowed if subset else weather_numeric == allowed
-    return (complete and railway_numeric == railway["numeric"]
+def weather_variant_columns(arm, prediction_time, weather_variant):
+    """The arm's weather columns left by one outcome of the weather stage of the 0.8 automatic
+    groups (experiment_specs.weather_group_variants): all groups, none, or all but one."""
+    weather, forecast = ARMS[arm]
+    railway = feature_groups(prediction_time)
+    groups = {name: columns for name, columns in feature_groups(prediction_time, weather, forecast).items()
+              if name not in railway}
+    if weather_variant == "all_weather":
+        dropped = []
+    elif weather_variant == "no_weather":
+        dropped = list(groups)
+    elif weather_variant.startswith("drop_") and weather_variant.removeprefix("drop_") in groups:
+        dropped = [weather_variant.removeprefix("drop_")]
+    else:
+        raise ValueError(f"unknown weather variant {weather_variant!r} for the {arm} arm")
+    removed = {column for group in dropped for column in (*groups[group][0], *groups[group][1])}
+    return arm_weather_columns(arm) - removed
+
+
+def matched_features(railway, with_weather, arm="weather", *, weather_columns=None):
+    """Same railway inputs, plus the arm's weather columns: all of them, or exactly the ones a
+    recorded weather stage of the 0.8 automatic groups left (weather_columns)."""
+    arm_columns = arm_weather_columns(arm)
+    expected = arm_columns if weather_columns is None else set(weather_columns)
+    weather_numeric = {column for column in with_weather["numeric"] if column in arm_columns}
+    railway_numeric = [column for column in with_weather["numeric"] if column not in arm_columns]
+    return (weather_numeric == expected and railway_numeric == railway["numeric"]
             and with_weather["categorical"] == railway["categorical"])
 
 
@@ -287,9 +306,11 @@ def validate_registry(registration):
             policy = {key: value for key, value in railway["tuning_policy"].items() if key != "config_id"}
             for arm in ARMS:
                 spec = specs[(task, pt, arm)]
+                columns = (weather_variant_columns(arm, pt, spec["weather_variant"])
+                           if "weather_variant" in spec else None)
                 if (any(spec[key] != railway[key] for key in ("model", "step", "variant", "calendar"))
                         or not matched_features(railway["features"], spec["features"], arm,
-                                                subset="weather_variant" in spec)):
+                                                weather_columns=columns)):
                     raise ValueError(f"unmatched {arm} comparison for {task} at {pt}")
                 if {key: value for key, value in spec["tuning_policy"].items() if key != "config_id"} != policy:
                     raise ValueError(f"unmatched tuning policy for {task} at {pt}")

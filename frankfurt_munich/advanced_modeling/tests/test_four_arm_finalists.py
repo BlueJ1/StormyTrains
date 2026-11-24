@@ -63,11 +63,60 @@ def test_matched_features_by_arm():
     assert run_final.matched_features(RAILWAY, arm_features("forecast"), "forecast")
     assert not run_final.matched_features(RAILWAY, arm_features("weather"), "forecast")
     assert run_final.matched_features(RAILWAY, arm_features("weather_forecast"), "weather_forecast")
-    one_group = arm_features("weather", [c for c in WEATHER if "temp" in c])
-    assert not run_final.matched_features(RAILWAY, one_group, "weather")
-    assert run_final.matched_features(RAILWAY, one_group, "weather", subset=True)
-    changed_railway = {**arm_features("weather"), "categorical": []}
-    assert not run_final.matched_features(RAILWAY, changed_railway, "weather", subset=True)
+    left = run_final.weather_variant_columns("weather", "1h", "drop_temperature")
+    assert left and not any("temp" in column for column in left)
+    dropped = arm_features("weather", sorted(left))
+    assert not run_final.matched_features(RAILWAY, dropped, "weather")
+    assert run_final.matched_features(RAILWAY, dropped, "weather", weather_columns=left)
+    # The recorded outcome must explain exactly which columns are missing (review of PR #19).
+    other = run_final.weather_variant_columns("weather", "1h", "drop_wind")
+    assert not run_final.matched_features(RAILWAY, dropped, "weather", weather_columns=other)
+    changed_railway = {**dropped, "categorical": []}
+    assert not run_final.matched_features(RAILWAY, changed_railway, "weather", weather_columns=left)
+
+
+def test_weather_variant_columns_follow_the_weather_stage():
+    for arm in ("weather", "forecast", "weather_forecast"):
+        assert run_final.weather_variant_columns(arm, "1h", "all_weather") == run_final.arm_weather_columns(arm)
+        assert run_final.weather_variant_columns(arm, "1h", "no_weather") == set()
+    both = run_final.weather_variant_columns("weather_forecast", "1h", "drop_forecast_wind")
+    assert set(WEATHER) <= both and set(FORECAST) - both and both < run_final.arm_weather_columns("weather_forecast")
+    with pytest.raises(ValueError, match="unknown weather variant"):
+        run_final.weather_variant_columns("weather", "1h", "drop_forecast_wind")
+
+
+def save_scored_run(results, model, task, arm, score, *, features=None, n_configs=20):
+    weather, forecast = run_final.ARMS[arm]
+    search = {"n_configs": n_configs, "selection": "inner mean"}
+    if weather or forecast:
+        search["weather_selection"] = "all, none or one group dropped"  # the 0.8 weather stage
+    out = results / f"advanced_0_8_{model}_{arm}" / "20261124-000000"
+    out.mkdir(parents=True)
+    config = {"step": "0.8", "model": model, "task": task, "evaluation": "nested", "variant": "auto_groups",
+              "weather": weather, "forecast": forecast, "search": search,
+              "features": {pt: features or arm_features(arm) for pt in PREDICTION_TIMES}}
+    (out / "config.json").write_text(json.dumps(config))
+    pd.DataFrame({"prediction_time": PREDICTION_TIMES, f"{SCORE[task]}_mean": score}).to_csv(
+        out / "summary.csv", index=False)
+
+
+def test_choose_finalists_ranks_matched_four_arm_pipelines_by_railway_score(tmp_path):
+    def pipeline(model, task, railway_score, **overrides):
+        for arm in run_final.ARMS:
+            save_scored_run(tmp_path, model, task, arm, railway_score if arm == "railway" else 0.0,
+                            **overrides.get(arm, {}))
+    pipeline("lightgbm", "delay", 2.0)  # weather stage recorded in the weather arms only
+    pipeline("xgboost", "delay", 3.0)
+    pipeline("extra_trees", "delay", 1.0, forecast={"features": arm_features("weather")})  # wrong columns
+    for arm in ("railway", "weather", "weather_forecast"):  # no forecast arm: not a candidate
+        save_scored_run(tmp_path, "catboost", "delay", arm, 0.5)
+    pipeline("lightgbm_classifier", "severity", 0.4)
+    pipeline("xgboost_classifier", "severity", 0.3, forecast={"n_configs": 8})  # different budget
+    chosen = {(task, pt): {arm: config["model"] for arm, (_, config, _) in pair.items()}
+              for task, pt, pair in run_final.choose_finalists(tmp_path)}
+    assert set(chosen) == {(task, pt) for task in SCORE for pt in PREDICTION_TIMES}
+    for (task, _), models in chosen.items():
+        assert models == dict.fromkeys(run_final.ARMS, "lightgbm" if task == "delay" else "lightgbm_classifier")
 
 
 def registration(edit=None):
@@ -99,15 +148,17 @@ def test_registry_has_four_matched_arms_per_slot():
         run_final.validate_registry(registration(other_model))
 
 
-def test_registry_allows_fewer_weather_columns_only_after_the_weather_stage():
-    def dropped(spec, arm, record=True):
+def test_registry_allows_fewer_weather_columns_only_as_the_weather_stage_recorded():
+    def dropped(spec, arm, record="drop_forecast_wind"):
         if arm == "weather_forecast":
-            spec["features"] = arm_features(arm, sorted(FORECAST))
+            left = run_final.weather_variant_columns(arm, spec["prediction_time"], "drop_forecast_wind")
+            spec["features"] = arm_features(arm, sorted(left))
             if record:
-                spec["weather_variant"] = "no_weather"  # hypothetical: only forecasts left
+                spec["weather_variant"] = record
     run_final.validate_registry(registration(dropped))
-    with pytest.raises(ValueError, match="unmatched weather_forecast comparison"):
-        run_final.validate_registry(registration(lambda spec, arm: dropped(spec, arm, record=False)))
+    for record in (None, "all_weather", "drop_forecast_snow"):
+        with pytest.raises(ValueError, match="unmatched weather_forecast comparison"):
+            run_final.validate_registry(registration(lambda spec, arm: dropped(spec, arm, record)))
 
 
 def test_registration_runs_the_weather_stage_in_weather_arms_only(tmp_path, monkeypatch):
