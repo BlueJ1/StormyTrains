@@ -6,7 +6,8 @@ First draft of the final report (10 November 2026). Deadline: 11 January 2027. R
 
 | File | Contents |
 |---|---|
-| `main.tex` | The draft. It uses the standard IEEE conference class as a stand-in for the course template on Canvas (Templates page); move the text into that template before submission |
+| `main.tex` | The draft, in the course LaTeX conference template (Canvas, Templates page: `conference_101719.tex`) |
+| `IEEEtran.cls` | The class file from the course template (V1.8b), so the build does not depend on the installed version |
 | `references.bib` | BibTeX entries. Entries marked `CHECK` have not been compared with the publication |
 | `figures/make_figures.py` | Draws both figures from the committed result files; fits no model and computes no new score |
 | `figures/fig_scores.pdf`, `figures/fig_weather.pdf` | Fig. 1 and Fig. 2 |

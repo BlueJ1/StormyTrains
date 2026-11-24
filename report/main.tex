@@ -4,17 +4,24 @@
 % Every \todo marks something the group still has to decide,
 % check or fill in. Numbers come from the result files named in report/README.md.
 %
-% The course asks for its own LaTeX conference template (Canvas, Templates page). This file
-% uses the standard IEEE conference class as a stand-in; move the body into the course
-% template before submission.
+% Layout from the course's LaTeX conference template (Canvas, Templates page:
+% conference_101719.tex with IEEEtran.cls V1.8b, copied into this folder). Template packages
+% first, then the ones this report adds.
 \documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed for the \thanks footnote in the title.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{amsmath}
 \usepackage{booktabs}
-\usepackage{graphicx}
-\usepackage{xcolor}
 \usepackage{url}
 \usepackage{siunitx}
 \sisetup{detect-all}
@@ -25,13 +32,30 @@
 \begin{document}
 
 \title{How Early Can a Disrupted Train Journey Be Foreseen?\\
-Severity and Delay Prediction for Frankfurt--M\"unchen\\ With and Without Weather}
+Severity and Delay Prediction for Frankfurt--M\"unchen\\ With and Without Weather
+\thanks{Project in Data Science (1DL507), Uppsala University, HT2026. Supervisor: Qing He, Mid
+Sweden University. Division of work: \todo{one sentence per author, for text and for code; the
+course requires this, see ProjectInstructions.md, ``Final report'' and ``Code and scripts''}.}
+}
 
-\author{\IEEEauthorblockN{\todo{Name 1}, \todo{Name 2} and \todo{Name 3}\thanks{Division of work:
-\todo{one sentence per author, for text and for code; the course requires this, see
-ProjectInstructions.md, ``Final report'' and ``Code and scripts''}. Supervisor: Qing He, Mid Sweden
-University.}}
-\IEEEauthorblockA{Project in Data Science (1DL507), Uppsala University, HT2026}}
+\author{\IEEEauthorblockN{\todo{Name 1}}
+\IEEEauthorblockA{\textit{\todo{department}} \\
+\textit{Uppsala University}\\
+Uppsala, Sweden \\
+\todo{email address}}
+\and
+\IEEEauthorblockN{\todo{Name 2}}
+\IEEEauthorblockA{\textit{\todo{department}} \\
+\textit{Uppsala University}\\
+Uppsala, Sweden \\
+\todo{email address}}
+\and
+\IEEEauthorblockN{\todo{Name 3}}
+\IEEEauthorblockA{\textit{\todo{department}} \\
+\textit{Uppsala University}\\
+Uppsala, Sweden \\
+\todo{email address}}
+}
 
 \maketitle
 
@@ -50,6 +74,10 @@ along the route do not improve either prediction: on 23 held-out weeks, all ten 
 intervals for the change include zero.\todo{After B6: one sentence on the forecasts, if the group
 wants them in the abstract.}
 \end{abstract}
+
+\begin{IEEEkeywords}
+\todo{keywords, as in the course template}
+\end{IEEEkeywords}
 
 \section{Introduction}
 
