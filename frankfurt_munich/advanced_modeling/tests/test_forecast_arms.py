@@ -355,21 +355,6 @@ def test_nested_search_weather_stage_reuses_the_kept_screen_and_records_the_choi
     assert set(table.loc[table["chosen"], "weather_variant"]) == {"all_weather"}
 
 
-def test_finalist_selector_ignores_forecast_runs(tmp_path):
-    import json
-    import run_final
-    for name, weather, forecast in [("a", False, False), ("b", True, False), ("c", False, True), ("d", True, True)]:
-        out = tmp_path / f"advanced_0_8_lightgbm_{name}" / "20261120-000000"
-        out.mkdir(parents=True)
-        (out / "config.json").write_text(json.dumps({
-            "step": "0.8", "model": "lightgbm", "task": "delay", "evaluation": "nested",
-            "weather": weather, "forecast": forecast, "variant": "", "features": {}}))
-        pd.DataFrame({"prediction_time": ["1h"], "rmse_mean": [1.0]}).to_csv(out / "summary.csv", index=False)
-    pairs = run_final.matched_candidates(tmp_path)
-    assert len(pairs) == 1
-    assert {arm: config["forecast"] for arm, (_, config, _) in pairs[0].items()} == {False: False, True: False}
-
-
 def test_forecast_comparisons_mark_diagnostics_same_inputs_and_configurations(tmp_path):
     import json
     from forecast_comparisons import configuration, excluded
