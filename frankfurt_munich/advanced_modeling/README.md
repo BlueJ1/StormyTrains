@@ -118,7 +118,7 @@ The registration can re-tune arms in parallel after shared feature selection. It
 
 After a forced stop, resume with the same registry once the scorer and its arm workers have exited and the stale `.evaluation.lock` has been cleared.
 
-After the CV steps are complete, `run_final.py register` ranks eligible pipelines by the railway-only CV score and writes one matched pair per task and horizon to `finalists.json`. Commit that file with the preregistration entry in the plan before generating holdout inputs.
+After the CV steps are complete, `run_final.py register` ranks the pipelines that have all four CV arms (railway only, observed weather, forecasts, observations plus forecasts) by the railway-only CV score and writes one pipeline per task and horizon, in all four arms, to `finalists.json` (finishing plan B6, group decisions of 24 November 2026). The railway feature groups are chosen on the railway arm and reused in every arm. For the 0.8 automatic groups, each weather arm then runs the weather stage on its own CV weeks; the 3.3 weather arms keep all their weather groups. With the CV results of 24 November, nested LightGBM with automatic groups is chosen for all ten tasks and horizons. The first evaluation's registry is still at that path and `register` will not overwrite it, so move it to `results/advanced_holdout_first/finalists.json` with the other first-evaluation files first. Commit the new file with the preregistration entry in the plan before generating holdout inputs.
 
 ```bash
 .venv/bin/python frankfurt_munich/advanced_modeling/run_final.py register --jobs 4
@@ -126,9 +126,10 @@ After the CV steps are complete, `run_final.py register` ranks eligible pipeline
 .venv/bin/python frankfurt_munich/advanced_modeling/scheduled_timetable.py --split holdout
 .venv/bin/python frankfurt_munich/advanced_modeling/history_features.py --split holdout
 .venv/bin/python frankfurt_munich/advanced_modeling/build_advanced_weather.py --split holdout
+.venv/bin/python frankfurt_munich/advanced_modeling/build_forecast_weather.py --split holdout
 ```
 
-Build any additional inputs named by the finalists with `--split holdout`. Use `history_features.py --feature reliability` for recent reliability and `sequence_inputs.py` for upstream sequences. Then run `run_final.py evaluate` once. If a distributional learner is registered, supply its pinned interpreter via `--distribution-python`. The evaluation saves scores, paired week-bootstrap intervals, subgroup errors, calibration, risk trajectories, and SHAP summaries in `results/advanced_holdout/`.
+Build any additional inputs named by the finalists with `--split holdout`. Use `history_features.py --feature reliability` for recent reliability and `sequence_inputs.py` for upstream sequences. Then run `run_final.py evaluate` once. If a distributional learner is registered, supply its pinned interpreter via `--distribution-python`. The evaluation saves scores, paired week-bootstrap intervals and subgroup errors for five comparisons (observed weather against railway only in `{task}_weather.csv` and `{task}_errors.csv`; forecasts against railway only and against observations, and observations plus forecasts against observations and against forecasts in `{task}_<candidate>_vs_<reference>.csv` and `..._errors.csv`), calibration, risk trajectories, and SHAP summaries in `results/advanced_holdout/`.
 
 #### Holdout results
 

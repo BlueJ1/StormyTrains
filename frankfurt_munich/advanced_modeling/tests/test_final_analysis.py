@@ -309,11 +309,11 @@ def test_parallel_registration_preserves_arm_order_and_serial_result(tmp_path, m
     for task, model, metric in (("delay", "lightgbm", "rmse_mean"),
                                  ("severity", "lightgbm_classifier", "log_loss_mean")):
         pair = {}
-        for weather in (False, True):
-            config = {"model": model, "task": task, "weather": weather, "step": "0.8",
+        for arm, (weather, forecast) in run_final.ARMS.items():
+            config = {"model": model, "task": task, "weather": weather, "forecast": forecast, "step": "0.8",
                       "features": {"24h": {"numeric": ["example"], "categorical": []}}}
             scores = pd.DataFrame({metric: [1.0]}, index=pd.Index(["24h"], name="prediction_time"))
-            pair[weather] = (results / f"{model}_{weather}", config, scores)
+            pair[arm] = (results / f"{model}_{arm}", config, scores)
         pairs.append((task, "24h", pair))
     monkeypatch.setattr(run_final, "choose_finalists", lambda path: iter(pairs))
     monkeypatch.setattr(run_final, "tune_finalist", lambda spec, config, inputs: {
@@ -347,9 +347,8 @@ def test_parallel_registration_preserves_arm_order_and_serial_result(tmp_path, m
     registered = json.loads(parallel.read_text())
     assert registered["development_fingerprints"] == {"cv": "frozen"}
     finalists = registered["finalists"]
-    assert [(spec["task"], spec["weather"]) for spec in finalists] == [
-        ("delay", False), ("delay", True), ("severity", False), ("severity", True),
-    ]
+    assert [(spec["task"], run_final.arm_name(spec)) for spec in finalists] == [
+        (task, arm) for task in ("delay", "severity") for arm in run_final.ARMS]
 
 
 def test_registered_tuning_retains_shared_feature_policy(monkeypatch):
