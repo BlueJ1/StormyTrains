@@ -1,6 +1,6 @@
 # Status
 
-Updated 20 November 2026. This file records decisions and where things are. What is left to do is in [FINISHING_PLAN.md](FINISHING_PLAN.md); the report draft is in [report/](report/README.md).
+Updated 24 November 2026. This file records decisions and where things are. What is left to do is in [FINISHING_PLAN.md](FINISHING_PLAN.md); the report draft is in [report/](report/README.md).
 
 `FINISHING_PLAN.md` and `finishing_plan.html` hold the same plan; the HTML is published at https://claude.ai/artifact/HKS8W5KAvZb3zty1MbaqBv. Keep the two in sync and republish when a decision is taken or a step is completed.
 
@@ -47,8 +47,8 @@ The CV results are from the rerun on the corrected inputs (15 November 2026). Th
 
 - With inputs known at the cutoff, railway-only nested LightGBM with selected feature groups reaches a CV log loss of 0.918 at 24 h and 0.821 at 0 min (class shares 0.968 and 0.896) and an RMSE of 24.28 and 23.41 min (training mean 25.42 and 25.40).
 - Recent reliability helps most among the new feature groups (17 of 20 comparisons reached the minimum gain, D12). Of the other model families compared with nested LightGBM (CatBoost, EBM, distributional models, neural networks), only CatBoost with weather reached D12, once (delay at 1 h). Averaging the top five nested LightGBM configurations reached it in 3 of 40 nested comparisons, and pooling the prediction times in 4 of 20 exploratory ones.
-- Weather did not reach D12 in cross-validation: with selected feature groups the weather arm of nested LightGBM had the higher error at every horizon. On the hold-out set (first evaluation) all ten paired 95% intervals include zero.
-- Forecast weather (B17, CV, linear models and boosters): forecasts did better than observations (ahead by D12 in 47 of 456 comparisons, observations in 9) but not better than railway inputs alone (4 of 264; railway ahead in 31), and neither source added to the other. Forecast extremes (1.5) reached D12 against raw forecasts in 5 of 10 comparisons.
+- Weather did not reach D12 in cross-validation: with selected feature groups, and since 24 November a weather-group stage (review of PR #18), the weather arm of nested LightGBM reached it at no horizon against railway only. It had the lower error at 3 of 5 horizons for delay and 1 of 5 for severity, by at most 0.022 min and 0.0001; the stage dropped all weather in 71 of 200 outer folds of the eight rerun weather arms. On the hold-out set (first evaluation) all ten paired 95% intervals include zero.
+- Forecast weather (B17, CV, linear models and boosters): forecasts did better than observations (ahead by D12 in 43 of 426 comparisons, observations in 8) but not better than railway inputs alone (3 of 234; railway ahead in 29, and 149 of the 234 pairs also differ in flat configuration), and neither source added to the other. Forecast extremes (1.5) reached D12 against raw forecasts in 5 of 10 comparisons.
 - The first models looked much better (0.759 and 21.55 min at 0 min) because of the recorded-route inputs and, mostly, `current_delay` from the final records.
 
 ## GFS forecasts
@@ -62,4 +62,4 @@ Decided 17 November 2026 (finishing plan Q13, B13–B15; modelling plan D17, 10.
 - `frankfurt_munich/measured_weather_DWD/raw/`: DWD archives.
 - A copy of every file under `frankfurt_munich/` that is not in git, as of 12 November 2026 before any rebuild, is in `../Project in Data Science backup 2026-11-12/` (1.06 GB, with checksums). It is on this laptop only.
 - The CV results from before the rerun, with their out-of-fold predictions, are in `../advanced_cv_results_before_B4_484356e/` (also in git at commit 484356e, without the predictions). It is on this laptop only.
-- Out-of-fold predictions (`results/**/oof_predictions.parquet`) are not committed. Those of the forecast arms (B17) were copied into the main checkout's `advanced_modeling/results/` on 20 November 2026; `forecast_comparisons.py` reads them and the B4 ones. Those of the first models were deleted with their results on 16 November 2026; copies are in the backup of 12 November.
+- Out-of-fold predictions (`results/**/oof_predictions.parquet`) are not committed. Those of the forecast arms (B17) were copied into the main checkout's `advanced_modeling/results/` on 20 November 2026, and those of the eight rerun 0.8 `auto_groups` weather arms on 24 November; `forecast_comparisons.py` reads them and the B4 ones. Those of the first models were deleted with their results on 16 November 2026; copies are in the backup of 12 November.
