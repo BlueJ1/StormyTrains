@@ -53,17 +53,12 @@ import pandas as pd
 import _paths  # noqa: F401  shared modelling code and dataset builders
 from advanced_data import ADVANCED
 from data import DATA, ROW_KEY, TIME_COLUMN, merge_inputs
+from forecast_columns import FORECAST, FORECAST_LAG
 from holdout_gate import REGISTRY, committed_registration
 from weather_features import DESTINATION, ORIGIN, ROUTES, branch_routes, cutoff_utc, utc
 
 GFS = Path(__file__).resolve().parents[1] / "forecast_weather_GFS"
 MAX_LEAD_HOURS = 48
-FORECAST = ("forecast_origin_temperature_c", "forecast_destination_temperature_c",
-            "forecast_route_temp_max_c", "forecast_route_temp_min_c",
-            "forecast_route_precip_max_mm", "forecast_route_precip_total_mm",
-            "forecast_route_wind_max_ms", "forecast_route_gust_max_ms",
-            "forecast_route_snow_depth_cm")
-FORECAST_LAG = tuple(f"{column}_lag24h" for column in FORECAST)
 ROUTE_COLUMNS = tuple(c for c in FORECAST if c.startswith("forecast_route_"))
 GFS_COLUMNS = ["init_time_utc", "valid_time_utc", "grid_latitude", "grid_longitude",
                "temperature_c", "precipitation_1h_mm", "wind_speed_10m_ms", "wind_gust_ms", "snow_depth_cm"]

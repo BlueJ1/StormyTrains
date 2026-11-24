@@ -50,6 +50,8 @@ def matched_candidates(results_dir):
             continue
         if config.get("variant", "").startswith("weather_"):
             continue
+        if config.get("forecast"):
+            continue  # The forecast arms (D17) need four-arm selection and refitting first (B6).
         if config["model"] in ("tabm", "tabm_classifier"):
             continue  # PyTabKit 1.8 cannot refit TabM on all CV training rows.
         key = (config["step"], config["model"], config.get("variant", ""), config.get("calendar"))

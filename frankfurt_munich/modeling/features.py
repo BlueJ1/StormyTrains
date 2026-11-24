@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "advanced_modeling"
 from history_features import FEATURE_COLUMNS_BY_GROUP  # noqa: E402
 from holiday_features import FEATURES as HOLIDAYS  # noqa: E402
 from weather_features import FEATURE_COLUMNS as WEATHER  # noqa: E402
+from forecast_columns import FORECAST  # noqa: E402
 
 TIMETABLE = (("planned_travel_min",), ("train_type", "starts_at_origin"))
 CALENDAR = ((), ("hour", "weekday", "month"))
@@ -20,8 +21,12 @@ PHASE2_GROUPS.update({group: (tuple(c for c in columns if c != "current_delay"),
                       for group, columns in FEATURE_COLUMNS_BY_GROUP.items()})
 
 
-def feature_groups(prediction_time: str, weather: bool = False):
-    """Disjoint groups for the full Phase 2 set, suitable for Phase 3 ablations."""
+def feature_groups(prediction_time: str, weather: bool = False, forecast: bool = False):
+    """Disjoint groups for the full Phase 2 set, suitable for Phase 3 ablations.
+
+    weather adds the observed (DWD) groups and forecast the GFS forecast groups
+    (D17). The two never share a group, so the ablations (3.1) and the group
+    selections (0.8 automatic groups, 3.3) keep or drop them separately."""
     groups = {
         "timetable": TIMETABLE,
         "calendar": (tuple(HOLIDAYS), CALENDAR[1]),
@@ -37,11 +42,18 @@ def feature_groups(prediction_time: str, weather: bool = False):
             "wind": (tuple(c for c in WEATHER if "wind" in c or "gust" in c), ()),
             "snow": (tuple(c for c in WEATHER if "snow" in c), ()),
         })
+    if forecast:
+        groups.update({
+            "forecast_temperature": (tuple(c for c in FORECAST if "temp" in c), ()),
+            "forecast_precipitation": (tuple(c for c in FORECAST if "precip" in c), ()),
+            "forecast_wind": (tuple(c for c in FORECAST if "wind" in c or "gust" in c), ()),
+            "forecast_snow": (tuple(c for c in FORECAST if "snow" in c), ()),
+        })
     return groups
 
 
 def feature_columns(prediction_time: str, weather: bool = False, *,
-                    feature_set: str = "base") -> tuple[list[str], list[str]]:
+                    feature_set: str = "base", forecast: bool = False) -> tuple[list[str], list[str]]:
     """Return numeric and categorical columns for a named feature set."""
     if feature_set not in ("base", "recorded_route_diagnostic", "all_groups", *PHASE2_GROUPS):
         raise ValueError(f"unknown feature set {feature_set!r}")
@@ -54,6 +66,8 @@ def feature_columns(prediction_time: str, weather: bool = False, *,
         numeric.append("current_delay")
     if weather:
         numeric.extend(WEATHER)
+    if forecast:
+        numeric.extend(FORECAST)
     added = PHASE2_GROUPS if feature_set == "all_groups" else (feature_set,)
     for group in added:
         if group == "delay_dynamics" and prediction_time not in CURRENT_DELAY_TIMES:

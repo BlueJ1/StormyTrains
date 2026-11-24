@@ -1,0 +1,183 @@
+{
+  "name": "advanced_7_3_tabgns_forecast",
+  "step": "7.3",
+  "task": "delay",
+  "model": "tabgns",
+  "target": "arrival_delay_min",
+  "weather": false,
+  "forecast": true,
+  "features": {
+    "24h": {
+      "numeric": [
+        "planned_travel_min",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "6h": {
+      "numeric": [
+        "planned_travel_min",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "1h": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "20min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    },
+    "0min": {
+      "numeric": [
+        "planned_travel_min",
+        "current_delay",
+        "forecast_origin_temperature_c",
+        "forecast_destination_temperature_c",
+        "forecast_route_temp_max_c",
+        "forecast_route_temp_min_c",
+        "forecast_route_precip_max_mm",
+        "forecast_route_precip_total_mm",
+        "forecast_route_wind_max_ms",
+        "forecast_route_gust_max_ms",
+        "forecast_route_snow_depth_cm",
+        "origin_departure_planned_local"
+      ],
+      "categorical": [
+        "train_type",
+        "starts_at_origin",
+        "hour",
+        "weekday",
+        "month"
+      ]
+    }
+  },
+  "feature_set": "base",
+  "variant": "",
+  "evaluation": "nested",
+  "git_commit": "7300d61bf69e7c504b15a327c48092b6a8532481 (uncommitted changes)",
+  "chosen": {},
+  "calendar": "native",
+  "cpu_budgets": {
+    "24h": {
+      "1": 61.05929400000001,
+      "2": 59.06738100000001,
+      "3": 56.73981300000003,
+      "4": 57.22589500000001,
+      "5": 58.81199699999996
+    },
+    "6h": {
+      "1": 56.4980690000001,
+      "2": 56.81556299999994,
+      "3": 56.33294899999993,
+      "4": 57.87832599999996,
+      "5": 58.03326599999991
+    },
+    "1h": {
+      "1": 57.81535599999995,
+      "2": 54.95996500000001,
+      "3": 53.45054800000014,
+      "4": 56.20075600000018,
+      "5": 57.694405000000074
+    },
+    "20min": {
+      "1": 59.01645800000005,
+      "2": 57.39472500000011,
+      "3": 57.94311200000004,
+      "4": 58.08006,
+      "5": 58.77541799999972
+    },
+    "0min": {
+      "1": 56.826707999999826,
+      "2": 58.98847599999999,
+      "3": 57.076613999999836,
+      "4": 55.922567999999956,
+      "5": 59.1506760000002
+    }
+  },
+  "runtime": {
+    "python": "3.13.7",
+    "architecture": "arm64",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "pyarrow": "25.0.1",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "lightgbm": "4.7.0",
+    "xgboost": "3.4.1",
+    "catboost": "1.2.10",
+    "interpret-core": "0.7.8",
+    "torch": "2.9.1",
+    "pytabkit": "1.8.0"
+  },
+  "created": "2026-11-20T04:26:34"
+}

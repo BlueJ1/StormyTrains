@@ -8,8 +8,20 @@ journeys), in the row's committed fold, and are finite (probabilities
 nonnegative, summing to one); and the fold scores recomputed from them equal
 fold_metrics.csv.
 
-Usage (finishing plan B4 used commit 7e0e96a):
-    .venv/bin/python frankfurt_munich/advanced_modeling/audit_cv_results.py --commit <sha>
+Usage (finishing plan B4 used commit 7e0e96a for the railway and weather arms;
+B17 audits the forecast arms of D17 on their own commit with
+--arm forecast weather_forecast):
+    .venv/bin/python frankfurt_munich/advanced_modeling/audit_cv_results.py --commit <sha> [--arm ...]
+
+By default only the railway and observed-weather arms are audited. --commit takes several
+hashes when arms were rerun at a later commit; each run must record one of them.
+
+--accept-b17-dirty-flag exists for B17 only (students' decision, 20 November 2026):
+the forecast runs were made from commit 7300d61, before cv.git_commit anchored its results/
+exclusion at the repository top. Unanchored, it applied only below frankfurt_munich/modeling, so
+every run started after the first new run folder appeared recorded "<sha> (uncommitted changes)"
+although only results/ had changed. With the option the audit accepts that flag on the forecast
+arms for that commit only, and only when it is one of the commits given.
 """
 import argparse
 import json
@@ -24,7 +36,7 @@ from advanced_data import ADVANCED_RESULTS
 from cv import PROBA_COLUMNS, TARGETS
 from data import PREDICTION_TIMES, load_rows
 from experiment_models import MODELS, NEURAL
-from experiment_specs import DECOMPOSED, LATE_STEPS, LATE_VARIANTS, VARIANTS, registered_runs
+from experiment_specs import ARMS, DECOMPOSED, LATE_STEPS, LATE_VARIANTS, VARIANTS, registered_runs
 from features import CURRENT_DELAY_TIMES
 from metrics import class_log_loss, rmse
 
@@ -58,7 +70,20 @@ def cv_rows(pt):
     return ROWS[pt]
 
 
-def audit(run, commit, results_dir):
+DIRTY_FLAG = " (uncommitted changes)"
+B17_COMMIT = "7300d61bf69e7c504b15a327c48092b6a8532481"
+DEFAULT_ARMS = ("railway", "weather")
+
+
+def commit_ok(recorded, commits, run, accept_flagged=False):
+    commits = (commits,) if isinstance(commits, str) else tuple(commits)
+    if recorded in commits:
+        return True
+    return (accept_flagged and run.forecast and B17_COMMIT in commits
+            and recorded == B17_COMMIT + DIRTY_FLAG)
+
+
+def audit(run, commit, results_dir, accept_flagged=False):
     problems = []
     root = results_dir / run.name
     runs = sorted(p for p in root.glob("*") if (p / "config.json").is_file()) if root.is_dir() else []
@@ -71,7 +96,7 @@ def audit(run, commit, results_dir):
     if problems:
         return out, problems
     config = json.loads((out / "config.json").read_text())
-    if config.get("git_commit") != commit:
+    if not commit_ok(config.get("git_commit"), commit, run, accept_flagged):
         problems.append(f"git_commit {config.get('git_commit')!r}")
     task = config.get("task") or task_of(run)
     # the current-delay group exists only at 1h, 20min and 0min, so its 3.1 ablations cover only those
@@ -133,13 +158,18 @@ def audit(run, commit, results_dir):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--steps", nargs="+", default=STEPS)
-    parser.add_argument("--commit", required=True, help="full commit hash the runs must record")
+    parser.add_argument("--commit", nargs="+", required=True,
+                        help="full commit hashes; each run must record one of them")
     parser.add_argument("--results-dir", type=Path, default=ADVANCED_RESULTS)
+    parser.add_argument("--arm", nargs="+", choices=ARMS, default=DEFAULT_ARMS,
+                        help="audit only these arms (default: railway and observed weather)")
+    parser.add_argument("--accept-b17-dirty-flag", action="store_true",
+                        help=f"B17 only: accept '{B17_COMMIT[:7]} (uncommitted changes)' on the forecast arms")
     args = parser.parse_args()
-    arms = active_arms(args.steps)
+    arms = [run for run in active_arms(args.steps) if run.arm in args.arm]
     failed = 0
     for run in arms:
-        out, problems = audit(run, args.commit, args.results_dir)
+        out, problems = audit(run, args.commit, args.results_dir, args.accept_b17_dirty_flag)
         if problems:
             failed += 1
             print(f"FAIL {run.name}: {'; '.join(problems)}")

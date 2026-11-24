@@ -9,6 +9,7 @@ import pandas as pd
 import _paths  # noqa: F401  shared modelling code and dataset builders
 from data import DATA, ROW_KEY, load_rows, merge_inputs
 from features import CURRENT_DELAY_TIMES, FEATURE_COLUMNS_BY_GROUP, HOLIDAYS, PLANNED_TIMETABLE, WEATHER
+from forecast_columns import FORECAST, FORECAST_LAG
 from holiday_features import add_holiday_features
 from representations import WEATHER_LAG
 from sequence_inputs import SEQUENCE_COLUMN
@@ -29,10 +30,12 @@ def read_inputs(path: Path, columns: tuple[str, ...]) -> pd.DataFrame:
     return pd.read_parquet(path, columns=[*ROW_KEY, *columns])
 
 
-def load_advanced_rows(prediction_time: str, *, weather: bool = False,
+def load_advanced_rows(prediction_time: str, *, weather: bool = False, forecast: bool = False,
                        inputs_dir: Path = ADVANCED, extra_inputs: tuple[str, ...] = (),
                        split: str = "cv", allow_holdout: bool = False) -> pd.DataFrame:
-    """Load paired rows with only reconstructed timetable, live and weather inputs."""
+    """Load paired rows with only reconstructed timetable, live and weather inputs.
+
+    weather merges the observed (DWD) inputs, forecast the GFS forecast inputs (D17)."""
     rows = load_rows(prediction_time, split=split, allow_holdout=allow_holdout)
     timetable_columns = (*TIMETABLE_INPUTS, *(c for c in ROUTE_INPUTS if c in extra_inputs))
     timetable = read_inputs(inputs_dir / f"timetable_{split}.parquet", timetable_columns)
@@ -59,4 +62,8 @@ def load_advanced_rows(prediction_time: str, *, weather: bool = False,
                            *(c for c in WEATHER_LAG if c in extra_inputs))
         rows = merge_inputs(rows, read_inputs(inputs_dir / f"weather_{split}.parquet", weather_columns))
         rows["snow_on_route_24h"] = rows["snow_on_route_24h"].astype(float)
+    if forecast:
+        forecast_columns = (*FORECAST, *(c for c in FORECAST_LAG if c in extra_inputs))
+        rows = merge_inputs(rows, read_inputs(inputs_dir / f"forecast_weather_{split}.parquet",
+                                              forecast_columns))
     return add_holiday_features(rows) if set(HOLIDAYS).intersection(extra_inputs) else rows

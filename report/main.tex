@@ -47,7 +47,8 @@ gradient-boosted trees lower the multi-class log loss from 0.968 (class shares) 
 24 hours and from 0.897 to 0.819 at departure, and the delay error by 4 to 7\%. The reliability of
 the same service over the previous weeks is the most useful new input. Hourly weather observations
 along the route do not improve either prediction: on 23 held-out weeks, all ten paired 95\%
-intervals for the change include zero.
+intervals for the change include zero.\todo{After B6: one sentence on the forecasts, if the group
+wants them in the abstract.}
 \end{abstract}
 
 \section{Introduction}
@@ -164,6 +165,11 @@ time, the number of stops reported, and the planned minutes still to run before 
 the last full hour before the prediction time: temperature at both ends, the highest and lowest
 temperature, the highest precipitation, mean wind and gust on the route in that hour and over the
 previous 24 hours, snow depth, and whether snow fell.
+\item \emph{Forecast weather} (separate arms): 9 values from the latest run of the NOAA Global
+Forecast System (GFS) that started by the prediction time, at the grid cells nearest the route
+stations, over the hours of the planned journey: temperature at Frankfurt at departure and at
+M\"unchen at arrival, the highest and lowest temperature, the highest hourly precipitation and the
+largest total at one cell, the highest wind and gust, and the greatest snow depth.
 \end{itemize}
 
 Inputs that would mostly measure when the archive fetched its updates rather than the trains were
@@ -173,8 +179,9 @@ last report and the change of the current delay between prediction times follow 
 
 The route used for the weather is a fixed list of stations for each of the two branches (via
 N\"urnberg and via Stuttgart), chosen by the timetable of the scheduled train, not by the stops the
-journey recorded. The weather is observed weather; a forecast for the time of travel is not used
-(Section~\ref{sec:limits}).
+journey recorded. The forecasts use the same station lists. Each weather arm is run three times on
+the same journeys and folds: with the observations, with the forecasts in their place, and with
+both.
 
 \subsection{Models}
 
@@ -244,6 +251,8 @@ replacement at the same times are one departure for the passenger) and dropping 
 stop), 21{,}831 journeys remain: 17{,}507 in the CV set and 4{,}324 in the hold-out set. Weather
 comes from hourly observations of the DWD Climate Data Center~\cite{dwd_cdc} at stations near the
 15 railway stations on the two branches, with gaps filled from a second station within 50~km.
+Forecasts come from the GFS archive of dynamical.org~\cite{dynamical_gfs}, which keeps every
+six-hourly run with hourly leads up to 48~h; the stations map to 16 grid cells of 0.25\textdegree.
 
 In the CV set, 62.8\% of journeys arrive less than 20~min late, 25.5\% arrive 20 to 59~min late,
 6.2\% arrive 60~min or more late, and 5.5\% are cancelled. Completed journeys are on average
@@ -394,6 +403,14 @@ logistic and linear regression, random forest, XGBoost, LightGBM and support vec
 gained nothing from the weather inputs, and no pre-specified subset of them (temperature only, wind
 only, snow only, indicators of extremes) changed this.
 
+Forecasts for the hours of the journey were compared in cross-validation only.\todo{The hold-out
+pairs with forecasts come with B6; extend or replace this paragraph then.} For the linear models and
+the gradient-boosted trees, forecasts in place of the observations reached the minimum gain in 43
+of 426 paired comparisons and the observations in 8. Against railway inputs alone, forecasts reached
+it in 3 of 234 comparisons and the railway-only model in 29; in 149 of these the two models also
+used different fixed configurations. Adding forecasts to the observations reached it in 5 of 506
+comparisons, and adding observations to the forecasts in none of 506.
+
 \begin{table}[t]
 \caption{Hold-out set: railway plus weather minus railway only, with 95\% intervals from a
 paired bootstrap of 23 weeks. Negative values favour weather}
@@ -464,8 +481,10 @@ models fall back on the average.
 differs from Oneto et al.~\cite{oneto2016weather}. Several explanations are possible, and our data
 cannot separate them. Weather that disrupts trains is rare and local, so two years on one route
 contain few examples. The recent reliability of the service and of the pair already
-reflects a disruption once it has begun, whatever its cause. And we used the weather at the time of
-the prediction, which a day ahead says little about the weather during the journey.
+reflects a disruption once it has begun, whatever its cause. And the observations describe the
+weather at the time of the prediction, which a day ahead says little about the weather during the
+journey; forecasts for the hours of the journey did better than the observations in
+cross-validation, but still not better than railway inputs alone.
 
 \emph{Information matters more than the learner.} Adding the recent reliability of a service
 improved a linear model more than replacing it by any other model family did. On about ten to thirty
@@ -485,8 +504,9 @@ deployed system would.
 \emph{Known at the prediction time.} The archive bounds what we can show was known, not what Deutsche
 Bahn's own systems knew. Timetable fields are treated as static, whatever their request time in the archive. DWD observations were assumed to be available at the end of their hour.
 
-\emph{Weather.} Observations were used, not forecasts. A forecast for the hours of the journey might
-carry information that the weather at the prediction time does not.
+\emph{Weather.} A GFS run is treated as available from its start. NOAA's files arrive a median of
+3.8~h later, so the forecast inputs are optimistic by about that much. Snow enters only as forecast
+snow depth, because the forecast precipitation type is unknown for about a third of the wet hours.
 
 \emph{Labels.} A small number of arrival times are forecasts made shortly before arrival, mostly in
 summer 2026 (132 of 21{,}800 checked journeys), and from October 2025 the source reports arrivals of
@@ -501,8 +521,7 @@ assistant in this project and how its output was checked.}
 
 \subsection{Future work}
 
-The most direct extensions are weather forecasts for the time of travel in place of observations;
-prediction times after departure, where the brief asks how risk updates during the journey; and more
+The most direct extensions are prediction times after departure, where the brief asks how risk updates during the journey; and more
 origin--destination pairs with a longer history, which would permit a chronological test. Since the
 severe class drives both the error and the value to passengers, causes of disruption that are known
 in advance, such as planned construction work and strikes, are the most promising missing input.
@@ -514,7 +533,8 @@ arrival delay can be predicted better than by historical averages from 24 hours 
 but only modestly: the log loss improves by 5\% a day ahead and by 9\% at departure. The recent
 reliability of the service is the most useful input beyond the timetable, gradient-boosted trees and
 linear models are close, and nothing more elaborate did better. Weather observations along the route
-gave no detectable improvement in cross-validation or on held-out weeks.
+gave no detectable improvement in cross-validation or on held-out weeks.\todo{After B6: one
+sentence on the forecasts.}
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
