@@ -373,7 +373,7 @@ def build_upstream_events_asof(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
 
 def delay_dynamics_from_events(rows: pd.DataFrame,
                                upstream_events: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate Phase 2.4 values from `build_upstream_events_asof` output."""
+    """Aggregate the delay-dynamics values (step 2.4) from `build_upstream_events_asof` output."""
     if rows.duplicated(ROW_KEY).any():
         raise ValueError("prediction rows must be unique by ROW_KEY")
     target = rows[ROW_KEY].reset_index(drop=True).copy()
@@ -497,7 +497,7 @@ def build_delay_dynamics(rows: pd.DataFrame, upstream_stops: pd.DataFrame,
                          change_snapshots: pd.DataFrame,
                          plan_snapshots: pd.DataFrame, *,
                          plan_legacy_policy: str = "static") -> pd.DataFrame:
-    """Build cutoff-safe Phase 2.4 dynamics from as-of plan/change snapshots."""
+    """Build cutoff-safe delay dynamics (step 2.4) from as-of plan/change snapshots."""
     events = build_upstream_events_asof(
         rows, upstream_stops, change_snapshots, plan_snapshots,
         plan_legacy_policy=plan_legacy_policy,
@@ -562,7 +562,7 @@ def build_history_dynamics_split(
 ) -> tuple[Path, Path]:
     """Build split-specific dynamics after replacement evidence is available.
 
-    The holdout gate runs before any holdout path is read. Inputs for a holdout
+    The check of the committed finalist list (holdout_gate.py) runs before any hold-out path is read. Inputs for a holdout
     rebuild are projected to prediction keys and stop identifiers only.
     """
     if split not in {"cv", "holdout"}:

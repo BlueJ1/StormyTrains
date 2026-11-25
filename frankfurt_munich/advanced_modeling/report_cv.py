@@ -19,7 +19,7 @@ END = "<!-- END ADVANCED CV -->"
 
 
 def arm(config):
-    """railway, weather (observed), forecast or weather_forecast (D17)."""
+    """The feature set: railway, weather (observed), forecast or weather_forecast (forecast decision D17)."""
     return "_".join(name for name in ("weather", "forecast") if config.get(name)) or "railway"
 
 
@@ -110,12 +110,16 @@ def importance_table(runs):
 def render(results_dir):
     runs = list(run_index(results_dir))
     output = ["### Advanced CV results", "",
-              "Scores use the five committed CV week folds. Positive paired differences favor the reference."]
-    tables = [("Step 0.7 reference scores", reference_table(runs, "0.7"), False),
-              ("Step 0.8 nested reference scores", reference_table(runs, "0.8"), False),
-              ("Smallest paired differences by step, task and horizon", comparison_table(runs), True),
-              ("Step 3.2 leading permutation groups and TreeSHAP features", importance_table(runs), False),
-              ("Step 3.5 group choices at 24 h and 0 min", selection_table(runs), False)]
+              "Scores use the five committed CV week folds. A difference is a run's score minus the score of the run "
+              "it is compared with, on the same folds, so positive differences favor the run it is compared with. "
+              "The column `arm` is the feature set (railway only, plus observed weather, plus forecasts, plus both); "
+              "`contrast` says whether a group-ablation variant of step 3.1 is compared with timetable-only or with "
+              "full inputs."]
+    tables = [("Step 0.7 starting scores (inputs known at the cutoff)", reference_table(runs, "0.7"), False),
+              ("Step 0.8 starting scores with nested tuning", reference_table(runs, "0.8"), False),
+              ("Smallest differences by step, task and horizon (same folds for both runs)", comparison_table(runs), True),
+              ("Step 3.2 importance: leading feature groups (permutation) and features (TreeSHAP)", importance_table(runs), False),
+              ("Step 3.5 feature groups chosen at 24 h and 0 min", selection_table(runs), False)]
     for title, table, signed in tables:
         if not table.empty:
             output.extend(["", f"#### {title}", "", markdown(table, signed=signed)])

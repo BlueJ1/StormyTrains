@@ -1,12 +1,12 @@
 """Build GFS forecast weather inputs for the hours of the planned journey, without reading targets.
 
-Step 10.8 of PLAN.md (finishing plan B13-B16, decision Q13). The forecasts
+Forecast inputs, step 10.8 of PLAN.md (finishing plan B13-B16, decision Q13). The forecasts
 supplement the DWD observations of build_advanced_weather.py; they do not
 replace them.
 
 RUN. Each row uses the latest GFS run that started at or before its cutoff
 (`weather_features.cutoff_utc`). A run counts as available from its start
-time (B13, decided 17 November 2026): a system in use would receive forecasts
+time (availability rule, finishing plan B13, decided 17 November 2026): a system in use would receive forecasts
 in near real time. NOAA's own files reach its AWS bucket about 3.8 h after the
 start (median of 1,100 sampled runs), so this is optimistic by that much.
 
@@ -95,7 +95,7 @@ def station_cells(path: Path = GFS / "gfs_stations.csv") -> dict[str, str]:
 
 
 def latest_run(at: pd.Series, runs: pd.DatetimeIndex) -> pd.Series:
-    """The latest run that started at or before each moment (B13); NaT if none."""
+    """The latest run that started at or before each moment (availability rule B13); NaT if none."""
     runs = runs.sort_values()
     position = np.searchsorted(runs.asi8, at.dt.tz_convert("UTC").astype(runs.dtype).astype("int64"),
                                side="right") - 1
@@ -118,10 +118,10 @@ def forecast_features(rows: pd.DataFrame, gfs: pd.DataFrame, cells: dict[str, st
     if not departure.lt(arrival).all():
         raise ValueError("planned arrival not after planned departure")
     run = latest_run(at, pd.DatetimeIndex(gfs.init_time_utc.unique()))
-    # B13: a run is used only if it started by the cutoff, and so by the departure.
+    # Availability rule (finishing plan B13): a run is used only if it started by the cutoff, and so by the departure.
     known = run.notna()
     if not (run[known].le(at[known]).all() and run[known].le(departure[known]).all()):
-        raise ValueError("a forecast run starts after the cutoff or the departure (B13)")
+        raise ValueError("a forecast run starts after the cutoff or the departure (availability rule B13)")
     first, last = departure.dt.floor("h"), arrival.dt.ceil("h")
 
     route_stations = {eva for evas in (*ROUTES.values(), [ORIGIN, DESTINATION]) for eva in evas}

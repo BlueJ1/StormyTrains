@@ -21,10 +21,10 @@ The cutoff-safe experiments of PR #12 (new input features, nested tuning, other 
 |---|---|
 | `data.py` | `load_rows(prediction_time, weather=False)`: the prediction rows for one prediction time, joined with journey columns, plus derived columns and, with `weather=True`, the weather columns |
 | `features.py` | Feature columns per prediction time |
-| `models.py` | Model factories: logistic regression, linear regression, the two references, random forest, XGBoost, LightGBM and SVR regressors, and random forest, XGBoost and LightGBM classifiers |
+| `models.py` | Model factories: logistic regression, linear regression, the two baselines (class shares and the training mean), random forest, XGBoost, LightGBM and SVR regressors, and random forest, XGBoost and LightGBM classifiers |
 | `metrics.py` | Class order, log loss, macro-F1, RMSE |
 | `cv.py` | `cross_validate` (one prediction time) and `run_cv` (all prediction times, writes the results) |
-| `run_linear_models.py` | Runs the six linear and reference models |
+| `run_linear_models.py` | Runs the six linear and baseline models |
 | `tuning.py` | Random search of hyperparameters on the 5 folds (`run_search`) and the search spaces |
 | `run_tuned_models.py` | Runs the fourteen tuned models; `run_tuned_models.py lightgbm svr` runs only those |
 | `tests/test_pipeline.py` | Checks of the method itself |

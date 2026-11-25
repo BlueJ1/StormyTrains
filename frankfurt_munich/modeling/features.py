@@ -22,11 +22,13 @@ PHASE2_GROUPS.update({group: (tuple(c for c in columns if c != "current_delay"),
 
 
 def feature_groups(prediction_time: str, weather: bool = False, forecast: bool = False):
-    """Disjoint groups for the full Phase 2 set, suitable for Phase 3 ablations.
+    """Disjoint feature groups for the full set of new features (Phase 2), for the group
+    ablations and selections of Phase 3.
 
-    weather adds the observed (DWD) groups and forecast the GFS forecast groups
-    (D17). The two never share a group, so the ablations (3.1) and the group
-    selections (0.8 automatic groups, 3.3) keep or drop them separately."""
+    weather adds the observed (DWD) groups and forecast the GFS forecast groups (forecast
+    decision D17). The two never share a group, so the group ablation (step 3.1) and the group
+    selections (automatically chosen groups in step 0.8, nested group selection in step 3.3)
+    keep or drop them separately."""
     groups = {
         "timetable": TIMETABLE,
         "calendar": (tuple(HOLIDAYS), CALENDAR[1]),

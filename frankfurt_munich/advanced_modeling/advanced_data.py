@@ -33,9 +33,9 @@ def read_inputs(path: Path, columns: tuple[str, ...]) -> pd.DataFrame:
 def load_advanced_rows(prediction_time: str, *, weather: bool = False, forecast: bool = False,
                        inputs_dir: Path = ADVANCED, extra_inputs: tuple[str, ...] = (),
                        split: str = "cv", allow_holdout: bool = False) -> pd.DataFrame:
-    """Load paired rows with only reconstructed timetable, live and weather inputs.
+    """Load the rows, the same for every feature set, with only reconstructed timetable, live and weather inputs.
 
-    weather merges the observed (DWD) inputs, forecast the GFS forecast inputs (D17)."""
+    weather merges the observed (DWD) inputs, forecast the GFS forecast inputs (forecast decision D17)."""
     rows = load_rows(prediction_time, split=split, allow_holdout=allow_holdout)
     timetable_columns = (*TIMETABLE_INPUTS, *(c for c in ROUTE_INPUTS if c in extra_inputs))
     timetable = read_inputs(inputs_dir / f"timetable_{split}.parquet", timetable_columns)

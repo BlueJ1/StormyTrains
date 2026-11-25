@@ -1,4 +1,4 @@
-"""Distributional delay estimators for Phase 6.5.
+"""Distributional delay estimators (step 6.5).
 
 Each factory returns a scikit-learn-style regressor with ``fit``, ``predict``
 (the fitted conditional mean), and ``predict_cdf(X, cutoff)`` (the conditional

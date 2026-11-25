@@ -43,7 +43,7 @@ def test_latest_run_never_after_the_cutoff():
     chosen = latest_run(at, runs)
     assert chosen.isna().iloc[0]
     assert chosen.iloc[1] == runs[0]
-    assert chosen.iloc[2] == runs[1]  # available from its start time (B13)
+    assert chosen.iloc[2] == runs[1]  # available from its start time (availability rule, finishing plan B13)
 
 
 def test_journey_hours_and_precipitation_after_the_first_hour():

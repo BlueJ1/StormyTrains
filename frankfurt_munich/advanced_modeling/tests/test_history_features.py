@@ -526,7 +526,7 @@ def test_holdout_history_builder_gates_before_reading_any_input(tmp_path, monkey
         raise PermissionError("registration not committed")
 
     def unexpected_read(*args, **kwargs):
-        raise AssertionError("holdout data was read before the gate")
+        raise AssertionError("hold-out data were read before the finalist-list check")
 
     monkeypatch.setattr(holdout_gate, "committed_registration", reject_registry)
     monkeypatch.setattr(history_features.pd, "read_parquet", unexpected_read)
@@ -572,7 +572,7 @@ def test_holdout_reliability_builder_gates_before_reading_any_input(tmp_path, mo
         raise PermissionError("registration not committed")
 
     def unexpected_read(*args, **kwargs):
-        raise AssertionError("holdout data was read before the gate")
+        raise AssertionError("hold-out data were read before the finalist-list check")
 
     monkeypatch.setattr(holdout_gate, "committed_registration", reject_registry)
     monkeypatch.setattr(history_features.pd, "read_parquet", unexpected_read)

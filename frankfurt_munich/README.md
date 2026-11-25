@@ -11,7 +11,7 @@ The modelling dataset for the chosen origin–destination pair: railway data, an
   - the data are split by week into a cross-validation set (about 80% of the weeks, in 5 folds) and a hold-out set (about 20%).
 - **Source:** the 27 monthly files from July 2024 to September 2026 and the matching live-update snapshots of `piebro/deutsche-bahn-data`, as rebuilt by the source on 6–8 October 2026 and downloaded on 8 October 2026. Revision, checksums, station panel and the reason for this source: [Data source](#data-source).
 
-**The hold-out set is kept for the final evaluation** (scored once on 6 November 2026 and once more after the corrections of 12 November; see `advanced_modeling/PLAN.md`, D15). Nothing is chosen on it. Outcome statistics below (classes, delays, cancellations) are for the CV set only. For the hold-out set we only check data quality: counts, coverage, missing values and where the labels come from. Where something changes over time, the README compares July 2024–September 2025 with October 2025–September 2026; these are periods, not splits.
+**The hold-out set is kept for the final evaluation** (scored once on 6 November 2026 and once more after the corrections of 12 November; see the hold-out decision D15 in `advanced_modeling/PLAN.md`). Nothing is chosen on it. Outcome statistics below (classes, delays, cancellations) are for the CV set only. For the hold-out set we only check data quality: counts, coverage, missing values and where the labels come from. Where something changes over time, the README compares July 2024–September 2025 with October 2025–September 2026; these are periods, not splits.
 
 ## Files
 

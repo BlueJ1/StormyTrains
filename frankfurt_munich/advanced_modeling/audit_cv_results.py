@@ -1,6 +1,6 @@
-"""Output audit of the CV runs: every active arm, its latest run directory.
+"""Output audit of the CV runs: every active run, in its latest run directory.
 
-Checks per arm: the run files exist; the run was made from the given commit
+Checks per run: the run files exist; the run was made from the given commit
 with a clean tree; the summary has exactly the expected horizons and its means
 equal the fold means; each horizon has five folds; the out-of-fold predictions
 cover each CV row of the task once (severity: all rows, delay: completed
@@ -8,20 +8,20 @@ journeys), in the row's committed fold, and are finite (probabilities
 nonnegative, summing to one); and the fold scores recomputed from them equal
 fold_metrics.csv.
 
-Usage (finishing plan B4 used commit 7e0e96a for the railway and weather arms;
-B17 audits the forecast arms of D17 on their own commit with
---arm forecast weather_forecast):
+Usage (the CV rerun on the corrected inputs, finishing plan B4, used commit 7e0e96a for the
+railway-only and weather runs; the forecast CV runs, finishing plan B17, are audited on their
+own commit with --arm forecast weather_forecast):
     .venv/bin/python frankfurt_munich/advanced_modeling/audit_cv_results.py --commit <sha> [--arm ...]
 
-By default only the railway and observed-weather arms are audited. --commit takes several
-hashes when arms were rerun at a later commit; each run must record one of them.
+By default only the railway-only and observed-weather runs are audited. --commit takes several
+hashes when runs were repeated at a later commit; each run must record one of them.
 
---accept-b17-dirty-flag exists for B17 only (students' decision, 20 November 2026):
+--accept-b17-dirty-flag exists for the forecast CV runs (finishing plan B17) only (students' decision, 20 November 2026):
 the forecast runs were made from commit 7300d61, before cv.git_commit anchored its results/
 exclusion at the repository top. Unanchored, it applied only below frankfurt_munich/modeling, so
 every run started after the first new run folder appeared recorded "<sha> (uncommitted changes)"
 although only results/ had changed. With the option the audit accepts that flag on the forecast
-arms for that commit only, and only when it is one of the commits given.
+runs for that commit only, and only when it is one of the commits given.
 """
 import argparse
 import json
@@ -99,7 +99,7 @@ def audit(run, commit, results_dir, accept_flagged=False):
     if not commit_ok(config.get("git_commit"), commit, run, accept_flagged):
         problems.append(f"git_commit {config.get('git_commit')!r}")
     task = config.get("task") or task_of(run)
-    # the current-delay group exists only at 1h, 20min and 0min, so its 3.1 ablations cover only those
+    # the current-delay group exists only at 1h, 20min and 0min, so its group ablations (step 3.1) cover only those
     late = run.step in LATE_STEPS or run.variant in LATE_VARIANTS or (run.step == "3.1" and run.variant in ("add_delay", "drop_delay"))
     expected = [pt for pt in PREDICTION_TIMES if not late or pt in CURRENT_DELAY_TIMES]
     summary = pd.read_csv(out / "summary.csv").set_index("prediction_time")
@@ -162,9 +162,9 @@ def main():
                         help="full commit hashes; each run must record one of them")
     parser.add_argument("--results-dir", type=Path, default=ADVANCED_RESULTS)
     parser.add_argument("--arm", nargs="+", choices=ARMS, default=DEFAULT_ARMS,
-                        help="audit only these arms (default: railway and observed weather)")
+                        help="audit only these feature sets (default: railway only and observed weather)")
     parser.add_argument("--accept-b17-dirty-flag", action="store_true",
-                        help=f"B17 only: accept '{B17_COMMIT[:7]} (uncommitted changes)' on the forecast arms")
+                        help=f"forecast CV runs (finishing plan B17) only: accept '{B17_COMMIT[:7]} (uncommitted changes)' on them")
     args = parser.parse_args()
     arms = [run for run in active_arms(args.steps) if run.arm in args.arm]
     failed = 0
@@ -173,7 +173,7 @@ def main():
         if problems:
             failed += 1
             print(f"FAIL {run.name}: {'; '.join(problems)}")
-    print(f"{len(arms) - failed} of {len(arms)} arms passed")
+    print(f"{len(arms) - failed} of {len(arms)} runs passed")
 
 
 if __name__ == "__main__":

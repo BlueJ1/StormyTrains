@@ -1,4 +1,4 @@
-"""Phase 4 estimators composed of existing classifier and regressor factories."""
+"""Two-stage and decomposed estimators (Phase 4), composed of existing classifier and regressor factories."""
 from __future__ import annotations
 
 import numpy as np
