@@ -1,25 +1,26 @@
-"""Forecast arms against their matched arms (step 10.9, decision D17).
+"""Forecast runs against the matching runs with other feature sets (step 10.9, decision D17).
 
-Each forecast run is paired with the run of the same step, model and variant in another arm,
-on the same rows and folds, and compared with compare.py (descriptive, minimum gain D12):
+Each forecast run is paired with the run of the same step, model and variant with another
+feature set, on the same rows and folds, and compared with compare.py (descriptive, judged by
+the minimum gain of D12: 0.1 min RMSE, 0.003 log loss):
 
     forecast_vs_railway            forecasts alone against railway only
     forecast_vs_weather            forecasts alone against observed weather
     weather_forecast_vs_weather    observations plus forecasts against observations
     weather_forecast_vs_forecast   observations plus forecasts against forecasts alone
 
-A pair is skipped when its reference arm is not registered (railway only has no 1.5, 3.2 or
-3.4 arm, and the 3.1 forecast ablations exist only in the forecast arms). Negative means favor
+A pair is skipped when the run it is compared with does not exist (railway only has no run for
+steps 1.5, 3.2 or 3.4, and the forecast group ablations of 3.1 exist only with forecasts). Negative means favor
 the forecast run (the candidate).
 
 The CSV keeps every pair; the summary leaves out the rows marked in `excluded`: the
 recorded-route leakage diagnostic of 0.7, and pairs whose two runs have the same inputs at every
-horizon (3.1 variants that offer neither arm's weather, such as timetable-only or a railway
-add-one), which test nothing. Ties between runs with different inputs are kept.
+horizon (group-ablation variants of 3.1 that contain neither run's weather, such as timetable-only
+or a railway add-one), which test nothing. Ties between runs with different inputs are kept.
 
-`configuration` says how the two runs were configured: "tuned per arm" (nested searches),
+`configuration` says how the two runs were configured: "tuned per arm" (nested searches, one per feature set),
 "same configuration", or "different flat configuration": fixed-configuration boosters take the
-flat search of their own arm (D2), so a forecast run uses the observed-weather configuration and
+flat search of their own feature set (D2), so a forecast run uses the observed-weather configuration and
 its railway-only counterpart the railway one. Such a pair compares two pipelines, not inputs alone.
 
 Usage:
@@ -58,7 +59,7 @@ def evaluation(*paths):
 
 
 def pairs():
-    """(contrast, candidate run, reference run) for every registered matched pair."""
+    """(comparison name, candidate run, run it is compared with) for every matched pair."""
     registered = {run.name: run for run in active_arms(STEPS)}
     for contrast, (candidate_arm, reference_arm) in CONTRASTS.items():
         for run in registered.values():
@@ -136,7 +137,7 @@ def family(row):
 
 
 def summary(table, by=("contrast", "family", "task")):
-    """Comparisons and how many reach D12 in each direction, without the excluded rows."""
+    """Comparisons and how many reach the minimum gain (D12) in each direction, without the excluded rows."""
     table = table[table["excluded"].fillna("").eq("")]
     threshold = table["task"].map({"severity": 0.003, "delay": 0.1})
     table = table.assign(family=table.apply(family, axis=1),

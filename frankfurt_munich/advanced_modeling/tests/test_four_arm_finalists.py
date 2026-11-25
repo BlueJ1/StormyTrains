@@ -1,7 +1,8 @@
-"""Four-arm finalists for the second hold-out evaluation (finishing plan B6, decision D17).
+"""Finalists with four feature sets for the second hold-out evaluation (finishing plan B6, decision D17).
 
-Group decisions of 24 November 2026: only pipelines with all four CV arms are candidates; the
-registered 3.3 weather arms keep all their weather groups; the hold-out set compares five pairs.
+Group decisions of 24 November 2026: only pipelines with CV results for all four feature sets are
+candidates; the registered weather versions of nested group selection (step 3.3) keep all their
+weather groups; the hold-out set compares five pairs.
 """
 import json
 
@@ -34,7 +35,7 @@ def test_candidates_need_all_four_arms(tmp_path):
     for arm, (weather, forecast) in run_final.ARMS.items():
         save_run(tmp_path, f"lightgbm_{arm}", weather=weather, forecast=forecast,
                  features={"1h": arm_features(arm)})
-    for arm in ("railway", "weather"):  # nested XGBoost has no forecast arms (10.9)
+    for arm in ("railway", "weather"):  # XGBoost with nested tuning has no forecast runs (step 10.9)
         weather, forecast = run_final.ARMS[arm]
         save_run(tmp_path, f"xgboost_{arm}", model="xgboost", weather=weather, forecast=forecast,
                  features={"1h": arm_features(arm)})
@@ -89,7 +90,7 @@ def save_scored_run(results, model, task, arm, score, *, features=None, n_config
     weather, forecast = run_final.ARMS[arm]
     search = {"n_configs": n_configs, "selection": "inner mean"}
     if weather or forecast:
-        search["weather_selection"] = "all, none or one group dropped"  # the 0.8 weather stage
+        search["weather_selection"] = "all, none or one group dropped"  # the weather selection step of step 0.8
     out = results / f"advanced_0_8_{model}_{arm}" / "20261124-000000"
     out.mkdir(parents=True)
     config = {"step": "0.8", "model": model, "task": task, "evaluation": "nested", "variant": "auto_groups",
@@ -105,10 +106,10 @@ def test_choose_finalists_ranks_matched_four_arm_pipelines_by_railway_score(tmp_
         for arm in run_final.ARMS:
             save_scored_run(tmp_path, model, task, arm, railway_score if arm == "railway" else 0.0,
                             **overrides.get(arm, {}))
-    pipeline("lightgbm", "delay", 2.0)  # weather stage recorded in the weather arms only
+    pipeline("lightgbm", "delay", 2.0)  # weather selection step recorded with weather only
     pipeline("xgboost", "delay", 3.0)
     pipeline("extra_trees", "delay", 1.0, forecast={"features": arm_features("weather")})  # wrong columns
-    for arm in ("railway", "weather", "weather_forecast"):  # no forecast arm: not a candidate
+    for arm in ("railway", "weather", "weather_forecast"):  # no forecast feature set: not a candidate
         save_scored_run(tmp_path, "catboost", "delay", arm, 0.5)
     pipeline("lightgbm_classifier", "severity", 0.4)
     pipeline("xgboost_classifier", "severity", 0.3, forecast={"n_configs": 8})  # different budget
@@ -138,7 +139,7 @@ def test_registry_has_four_matched_arms_per_slot():
     run_final.validate_registry(registration())
     missing = registration()
     missing["finalists"] = [spec for spec in missing["finalists"] if not spec["forecast"]]
-    with pytest.raises(ValueError, match="all four arms"):
+    with pytest.raises(ValueError, match="all four feature sets"):
         run_final.validate_registry(missing)
 
     def other_model(spec, arm):
@@ -191,7 +192,7 @@ def test_registration_runs_the_weather_stage_in_weather_arms_only(tmp_path, monk
     run_final.register(tmp_path / "results", tmp_path, registry)
 
     assert loaded == [(False, False), (True, False), (False, True), (True, True)]
-    assert screened[0][0] == "base" and "all_groups" in screened[0]  # railway candidates, railway arm
+    assert screened[0][0] == "base" and "all_groups" in screened[0]  # railway candidates, railway-only feature set
     assert all(variants[:2] == ["all_weather", "no_weather"] for variants in screened[1:])
     finalists = json.loads(registry.read_text())["finalists"]
     assert [spec.get("weather_variant") for spec in finalists] == [

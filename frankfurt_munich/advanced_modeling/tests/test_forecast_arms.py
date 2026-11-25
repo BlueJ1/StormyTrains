@@ -1,4 +1,4 @@
-"""The forecast arms of step 10.9 (decision D17): registration, features and runner wiring."""
+"""The forecast runs of step 10.9 (forecast decision D17): which runs exist, their features and the runner wiring."""
 from collections import Counter
 from functools import partial
 
@@ -35,7 +35,7 @@ def test_every_kept_weather_arm_gets_both_forecast_variants():
         variants = {run.name.replace("_weather", "_forecast", 1), run.name.replace("_weather", "_weather_forecast", 1)}
         assert variants <= forecasts or not variants & forecasts, run.name
         kept += variants <= forecasts
-    # 166 forecast-only arms, 76 of them in 3.1
+    # 166 forecast-only runs, 76 of them in the group ablation (step 3.1)
     assert kept == 166 - 76
 
 
@@ -85,7 +85,7 @@ def test_arm_names_and_flat_configuration_source():
     assert forecast.name == "advanced_0_7_lightgbm_forecast"
     assert Run("1.5", "lightgbm", True, "weather_change", forecast=True).name == (
         "advanced_1_5_lightgbm_weather_forecast_weather_change")
-    # Both forecast arms reuse the observed-weather flat configuration (D17).
+    # Both forecast versions reuse the observed-weather flat configuration (D17).
     assert not railway.flat_weather and weather.flat_weather and forecast.flat_weather and both.flat_weather
     assert tuning_reference(Run("6.2", LIGHTGBM[1], variant="isotonic", forecast=True)) == Run(
         "0.8", LIGHTGBM[1], nested=True, forecast=True)
@@ -155,7 +155,7 @@ def test_forecast_extremes_use_the_thresholds_of_1_5():
     assert out["forecast_heavy_rain"].tolist() == [0, 1.0, 0, 0]
     assert out["forecast_snow"].tolist() == [0, 0, 0, 1.0]
     assert not set(FORECAST) & set(out.columns)
-    assert set(WEATHER) <= set(out.columns)  # observed columns untouched (not in this arm's inputs)
+    assert set(WEATHER) <= set(out.columns)  # observed columns untouched (not in this feature set's inputs)
 
 
 def test_combined_representations_replace_both_sources():
@@ -288,7 +288,7 @@ def test_git_commit_ignores_results_outside_its_own_folder_but_not_other_changes
 def test_forecast_comparisons_pair_each_forecast_arm_with_its_registered_counterparts():
     from forecast_comparisons import pairs
     found = Counter(contrast for contrast, _, _ in pairs())
-    # railway only has no 1.5, 3.2 or 3.4 arm; the 3.1 forecast ablations exist only with forecasts
+    # railway only has no run for steps 1.5, 3.2 or 3.4; the forecast group ablations (3.1) exist only with forecasts
     assert found == {"forecast_vs_railway": 74, "forecast_vs_weather": 134,
                      "weather_forecast_vs_weather": 166, "weather_forecast_vs_forecast": 166}
     for contrast, run, reference in pairs():

@@ -1,4 +1,4 @@
-"""Check that the exact finalist registration is committed before using hold-out data."""
+"""Check that finalists.json is committed as registered, and the code unchanged since, before hold-out data are used."""
 from __future__ import annotations
 
 import hashlib
@@ -38,7 +38,7 @@ def committed_registration(path: Path = REGISTRY) -> dict:
         raise PermissionError("the committed registration must list the finalists")
     development = registration.get("development_fingerprints")
     if not isinstance(development, dict):
-        raise PermissionError("the committed registration must freeze development fingerprints")
+        raise PermissionError("the committed registration must store checksums of the development code and inputs")
     sources = {name: digest for name, digest in development.items() if name.startswith("source/")}
     if sources != source_fingerprints(HERE):
         raise PermissionError("modeling source changed after registration")

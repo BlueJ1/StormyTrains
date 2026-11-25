@@ -1,7 +1,7 @@
 """Column names of the GFS forecast inputs (build_forecast_weather.py, decision D17).
 
-Kept apart from the builder so that the feature lists, the loader and the 1.5
-representations can import them without importing the builder.
+Kept apart from the builder so that the feature lists, the loader and the weather
+representations (step 1.5) can import them without importing the builder.
 """
 FORECAST = ("forecast_origin_temperature_c", "forecast_destination_temperature_c",
             "forecast_route_temp_max_c", "forecast_route_temp_min_c",

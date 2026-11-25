@@ -1,9 +1,10 @@
-"""Register one matched finalist per task and horizon in four arms, then score it once.
+"""Register one finalist pipeline per task and horizon with four feature sets, then score it once.
 
-The arms (D17, finishing plan B6): railway only, observed weather, forecasts, and observations
-plus forecasts. Only pipelines with all four arms in CV are candidates (group decision,
-24 November 2026). The hold-out set compares five pairs (CONTRASTS), each by a paired week
-bootstrap."""
+The feature sets (forecast decision D17, finishing plan B6): railway only, observed weather,
+forecasts, and observations plus forecasts. Only pipelines with CV results for all four feature
+sets are candidates (group decision, 24 November 2026). The hold-out set compares five pairs of
+feature sets (CONTRASTS), each with a bootstrap over whole ISO weeks that uses the same weeks for
+both models."""
 from __future__ import annotations
 
 import argparse
@@ -42,11 +43,13 @@ from representations import REPRESENTATIONS, extreme_weather, route_representati
 from sequence_inputs import SEQUENCE_COLUMN
 from tuning import SCORE, sample_configs, search, select_feature_variant
 
-# Arm name: (observed weather, forecasts). Registration and scoring keep this order.
+# Feature set (called arm in the code): (observed weather, forecasts). Registration and scoring
+# keep this order.
 ARMS = {"railway": (False, False), "weather": (True, False), "forecast": (False, True),
         "weather_forecast": (True, True)}
-# Hold-out comparisons (candidate, reference), decided 24 November 2026: observed weather against
-# railway only as before, and the four forecast contrasts of the CV comparisons (step 10.9).
+# Hold-out comparisons (candidate, feature set it is compared with), decided 24 November 2026:
+# observed weather against railway only as before, and the four forecast comparisons of the CV
+# runs (step 10.9).
 CONTRASTS = (("weather", "railway"), ("forecast", "railway"), ("forecast", "weather"),
              ("weather_forecast", "weather"), ("weather_forecast", "forecast"))
 REFIT_STEPS = {"0.8", "3.3", "5.2", "6.1", "6.2", "6.3", "6.5", "7.1", "7.2", "7.3", "7.4", "7.5"}
@@ -57,7 +60,7 @@ FEATURE_FILES = {
 
 
 def arm_name(spec):
-    """The arm of a run configuration or a registered finalist; old runs have no forecast key."""
+    """The feature set of a run configuration or a registered finalist; old runs have no forecast key."""
     return next(name for name, flags in ARMS.items()
                 if flags == (bool(spec["weather"]), bool(spec.get("forecast"))))
 
@@ -68,7 +71,7 @@ def arm_weather_columns(name):
 
 
 def matched_candidates(results_dir):
-    """Pipelines registered in all four arms, as {arm name: (path, config, scores)}."""
+    """Pipelines with CV runs for all four feature sets, as {feature set: (path, config, scores)}."""
     pairs = {}
     for path, config, scores in run_index(results_dir):
         if config["step"] not in REFIT_STEPS or config["evaluation"] not in ("nested", "prespecified"):
@@ -83,7 +86,7 @@ def matched_candidates(results_dir):
 
 
 def choose_finalists(results_dir):
-    """Rank four-arm candidates by the railway-only CV score, independently by task and horizon."""
+    """Rank the candidates with all four feature sets by the railway-only CV score, independently by task and horizon."""
     pairs = matched_candidates(results_dir)
     for task in SCORE:
         metric = f"{SCORE[task]}_mean"
@@ -100,15 +103,16 @@ def choose_finalists(results_dir):
 
 
 def matched_search(railway, other):
-    """The same tuning policy and budget; the weather stage exists only in weather arms."""
+    """The same tuning policy and budget; the weather selection step exists only with weather."""
     def policy(config):
         return {key: value for key, value in config.get("search", {}).items() if key != "weather_selection"}
     return policy(railway) == policy(other)
 
 
 def weather_variant_columns(arm, prediction_time, weather_variant):
-    """The arm's weather columns left by one outcome of the weather stage of the 0.8 automatic
-    groups (experiment_specs.weather_group_variants): all groups, none, or all but one."""
+    """The weather columns of a feature set that one outcome of the weather selection step leaves
+    (automatically chosen groups, step 0.8; experiment_specs.weather_group_variants): all groups,
+    none, or all but one."""
     weather, forecast = ARMS[arm]
     railway = feature_groups(prediction_time)
     groups = {name: columns for name, columns in feature_groups(prediction_time, weather, forecast).items()
@@ -120,14 +124,14 @@ def weather_variant_columns(arm, prediction_time, weather_variant):
     elif weather_variant.startswith("drop_") and weather_variant.removeprefix("drop_") in groups:
         dropped = [weather_variant.removeprefix("drop_")]
     else:
-        raise ValueError(f"unknown weather variant {weather_variant!r} for the {arm} arm")
+        raise ValueError(f"unknown weather variant {weather_variant!r} for the {arm} feature set")
     removed = {column for group in dropped for column in (*groups[group][0], *groups[group][1])}
     return arm_weather_columns(arm) - removed
 
 
 def matched_features(railway, with_weather, arm="weather", *, weather_columns=None):
-    """Same railway inputs, plus the arm's weather columns: all of them, or exactly the ones a
-    recorded weather stage of the 0.8 automatic groups left (weather_columns)."""
+    """Same railway inputs, plus the feature set's weather columns: all of them, or exactly the ones
+    that a recorded weather selection step (step 0.8) left (weather_columns)."""
     arm_columns = arm_weather_columns(arm)
     expected = arm_columns if weather_columns is None else set(weather_columns)
     weather_numeric = {column for column in with_weather["numeric"] if column in arm_columns}
@@ -153,7 +157,7 @@ def registered_factory(spec):
 
 
 def final_group_selection(config, prediction_time, task, inputs_dir):
-    """Select railway groups on CV and reuse them in both registered arms."""
+    """Select railway groups on CV and reuse them in every registered feature set."""
     groups = feature_groups(prediction_time)
     numeric, categorical = columns_for(groups, groups)
     rows = load_advanced_rows(prediction_time, inputs_dir=inputs_dir, extra_inputs=tuple(numeric + categorical))
@@ -240,7 +244,8 @@ def register(results_dir, inputs_dir, registry, jobs=1):
             if selection is not None:
                 run = Run(config["step"], config["model"], weather, variant=variant, forecast=forecast)
                 chosen = nested_feature_variants(run, pt, task, factory)[selection]
-                # The weather stage of the 0.8 automatic groups, on this arm's CV weeks (B6).
+                # The weather selection step of the automatically chosen groups (step 0.8), on this feature
+                # set's CV weeks (finishing plan B6).
                 options = weather_group_variants(run, pt, chosen)
                 if options:
                     columns = tuple(dict.fromkeys(c for _, num, cat in options.values() for c in num + cat))
@@ -298,7 +303,7 @@ def validate_registry(registration):
     keys = [(spec["task"], spec["prediction_time"], arm_name(spec)) for spec in finalists]
     expected = {(task, pt, arm) for task in SCORE for pt in PREDICTION_TIMES for arm in ARMS}
     if len(keys) != len(expected) or set(keys) != expected:
-        raise ValueError("registration must have one pipeline in all four arms for each task and prediction time")
+        raise ValueError("registration must have one pipeline in all four feature sets for each task and prediction time")
     specs = dict(zip(keys, finalists))
     for task in SCORE:
         for pt in PREDICTION_TIMES:
@@ -383,7 +388,7 @@ def explanation(model, X, background, task):
 
 
 def score_registered_arm(registry, inputs_dir, output, index):
-    """Run one arm in its own process so its native libraries stay isolated."""
+    """Score one registered model (one feature set) in its own process so its native libraries stay isolated."""
     registration = committed_registry(registry)
     if not (output / ".evaluation.lock").is_file() or (output / "completed.txt").exists():
         raise PermissionError("no active registered hold-out evaluation")
@@ -394,7 +399,7 @@ def score_registered_arm(registry, inputs_dir, output, index):
     if provenance != evaluation_fingerprints(registration, inputs_dir):
         raise PermissionError("evaluation code or inputs changed")
     if not 0 <= index < len(registration["finalists"]):
-        raise ValueError("registered arm index is out of range")
+        raise ValueError("registered model index (--arm-index) is out of range")
     spec = registration["finalists"][index]
     arm = output / "_arms" / str(index)
     arm.mkdir(parents=True, exist_ok=True)
@@ -417,7 +422,7 @@ def score_registered_arm(registry, inputs_dir, output, index):
     background = cv.loc[cv[TARGETS[task]].notna(), features]
     shap = explanation(model, X, background, task).assign(task=task, prediction_time=pt, arm=arm_label)
     metadata = pd.DataFrame()
-    if arm_label == "weather":  # journey metadata and observed extremes, the same for every arm
+    if arm_label == "weather":  # journey metadata and observed extremes, the same for every feature set
         timetable = read_inputs(inputs_dir / "timetable_holdout.parquet", ("weather_branch",))
         metadata = merge_inputs(holdout[[*ROW_KEY, TIME_COLUMN, "severity_class"]], timetable)
         flags = extreme_weather(holdout).filter(regex=r"^weather_(heat|gust|snow|heavy_rain)$")
@@ -434,7 +439,7 @@ def score_registered_arm(registry, inputs_dir, output, index):
 
 
 def evaluation_fingerprints(registration, inputs_dir, *, splits=("cv", "holdout")):
-    """Fingerprint the pipeline source and requested model-input splits."""
+    """Checksums of the pipeline code and of the requested model-input splits."""
     required = {"timetable", "history", "weather"}
     if any(spec.get("forecast") for spec in registration["finalists"]):
         required.add("forecast_weather")
@@ -479,7 +484,7 @@ def final_evaluation(registry, results_dir, inputs_dir, distribution_python=None
         manifest.write_bytes(registry_bytes)
         provenance = output / "provenance.json"
         if not provenance.exists() and (output / "_arms").exists():
-            raise PermissionError("existing evaluation arms have no provenance")
+            raise PermissionError("existing evaluation models have no provenance")
         fingerprints = evaluation_fingerprints(registration, inputs_dir)
         if any(fingerprints.get(name) != digest for name, digest in development.items()):
             raise PermissionError("development code or inputs changed during evaluation setup")

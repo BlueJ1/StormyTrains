@@ -1,4 +1,4 @@
-"""The dataset-build rules corrected on 12 November 2026 (finishing plan, B7):
+"""The dataset-build rules corrected on 12 November 2026 (dataset corrections, finishing plan B7):
 no prediction row while a cancellation is in force (R6), no Frankfurt departure
 in current_delay (R7), cancellation_announced is the first issue time (R8)."""
 import numpy as np

@@ -31,8 +31,8 @@ NEURAL = {"7.1": ("mlp", "mlp_classifier"), "7.2": ("multitask", "multitask_clas
           "7.5": ("sequence_gru", "sequence_gru_classifier")}
 
 # The eight flat searches of the first models that supply the fixed configurations
-# (config.json) and the top-five averages of 5.2 (search_results.csv). Moved here
-# from ../modeling/results/ when the first models' results were deleted (B12).
+# (config.json) and the top-five averages of the configuration bagging, step 5.2 (search_results.csv).
+# Moved here from ../modeling/results/ when the first models' results were deleted (finishing plan B12).
 FLAT_SEARCHES = HERE / "flat_searches"
 FLAT_TIMESTAMPS = {
     "lightgbm": "20261026-092616",

@@ -1,4 +1,4 @@
-"""Phase 8.4 training pairs and nested, cross-fitted network delay predictions."""
+"""Training pairs and nested, cross-fitted predictions for the network-wide delay propagation (step 8.4)."""
 from __future__ import annotations
 
 import argparse

@@ -1,4 +1,4 @@
-"""Additional tabular estimators and robust delay targets for Phase 6."""
+"""Additional tabular estimators and robust delay targets (further model families, Phase 6)."""
 from __future__ import annotations
 
 import numpy as np

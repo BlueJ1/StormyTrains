@@ -9,8 +9,8 @@ snapshot per stop is accepted as its static schedule regardless of fetch
 time, in the legacy period and in the period with exact request stamps.
 
 The default builder reads only CV journeys and their stop IDs.  The optional
-holdout builder calls the committed-registration gate before its first holdout
-read and projects only identifiers and timetable metadata.  Plan event times
+hold-out builder checks the committed finalist list (holdout_gate.py) before its first
+hold-out read and projects only identifiers and timetable metadata.  Plan event times
 are German local wall-clock times; plan snapshot timestamps are interpreted
 as UTC.
 """
@@ -108,7 +108,7 @@ def build_timetable_features(
     replacement_context: pd.DataFrame,
     plan_snapshots: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Build one timetable row per prediction key under the registered plan policy.
+    """Build one timetable row per prediction key under the agreed plan rule.
 
     ``replacement_context`` has one row per journey and carries
     ``scheduled_origin_id``.  For ordinary trains this is the current origin
@@ -133,7 +133,7 @@ def build_timetable_features(
     target["_row_id"] = np.arange(len(target), dtype=np.int64)
     target["cutoff_utc"] = cutoff_instants(target["predicted_at"])
     target = target.merge(replacement_context, on="journey_id", how="left", validate="many_to_one")
-    # D8 defines every planned-timetable feature from the scheduled service.
+    # Decision D8 (recorded-route fields replaced): every planned-timetable feature comes from the scheduled service.
     # For ordinary services current_origin_id == scheduled_origin_id; retained
     # replacements use the matched original service at every prediction time.
     target["plan_query_id"] = target["scheduled_origin_id"]
@@ -524,9 +524,9 @@ def build_timetable_split(
     sample_journeys: int | None = None,
     registry_path: Path | None = None,
 ) -> tuple[pd.DataFrame, dict]:
-    """Build split-specific timetable inputs with a gate before holdout reads.
+    """Build split-specific timetable inputs, with a check before any hold-out data are read.
 
-    Holdout paths are not touched until the committed registration gate passes.
+    Hold-out paths are not touched until the check of the committed finalist list passes.
     Both splits project only identifiers, timetable metadata and replacement
     references; no delay, cancellation or severity columns are read here.
     """
