@@ -220,7 +220,7 @@ def test_failed_final_evaluation_rejects_changed_provenance_on_resume(tmp_path, 
     assert len(calls) == 1
     (output / "provenance.json").unlink()
     (output / "_arms").mkdir()
-    with pytest.raises(PermissionError, match="arms have no provenance"):
+    with pytest.raises(PermissionError, match="models have no provenance"):
         run_final.final_evaluation(registry, tmp_path, tmp_path)
     assert len(calls) == 1
 

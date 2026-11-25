@@ -1,4 +1,4 @@
-"""Pre-listed Phase 1 representations and their model input columns."""
+"""Feature representations of Phase 1, listed before running, and their model input columns."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -30,7 +30,7 @@ EXTREMES = {
 }
 WEATHER_LAG = tuple(f"{column}_lag24h" for column in WEATHER)
 WEATHER_CHANGE = tuple(f"{column}_change24h" for column in WEATHER)
-# The thresholds of 1.5 over the forecast journey hours (D17). There is no
+# The extreme-weather thresholds of step 1.5, over the forecast journey hours (D17). There is no
 # forecast precipitation type, so snow is forecast snow depth above 0 cm.
 FORECAST_EXTREMES = {
     "forecast_heat": ("forecast_route_temp_max_c", 30),
@@ -208,9 +208,9 @@ def route_target_columns(task):
 
 
 def weather_representation(variant, *, weather=True, forecast=False):
-    """The 1.5 representation of an arm's weather: observed, forecast or both (D17).
+    """The weather representation (step 1.5) of a feature set's weather: observed, forecast or both (D17).
 
-    With both, the observed and the forecast columns are each replaced as in their own arm."""
+    With both, the observed and the forecast columns are each replaced as in their own feature set."""
     if variant not in WEATHER_VARIANTS:
         raise ValueError(f"unknown weather representation {variant!r}")
     if weather and not forecast:

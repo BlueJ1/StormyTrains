@@ -194,7 +194,7 @@ def test_holdout_gate_failure_happens_before_any_input_read(monkeypatch, tmp_pat
         raise PermissionError("synthetic registration failure")
 
     def forbidden_read(*args, **kwargs):
-        raise AssertionError("an input was read before the gate")
+        raise AssertionError("an input was read before the finalist-list check")
 
     monkeypatch.setattr(holdout_gate, "committed_registration", reject_registration)
     monkeypatch.setattr(pd, "read_parquet", forbidden_read)

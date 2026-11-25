@@ -176,7 +176,7 @@ def nested_search(rows, prediction_time, task, factory, configs, numeric, catego
                   variants=None, weather_variants=None):
     """Search features and configurations on inner weeks, then score the outer fold.
 
-    weather_variants, if given, is a second stage after the variant choice: it maps the chosen
+    weather_variants, if given, is a second step after the variant choice (the weather selection step): it maps the chosen
     (factory, numeric, categorical) to named candidates whose first entry is that variant
     unchanged. Its screen is reused, and it wins ties."""
     tables, metrics, predictions = [], [], []
@@ -279,7 +279,7 @@ def fixed_configurations(path: Path, *, task: str, model: str, weather: bool) ->
     source = json.loads(path.read_text())
     expected = {"task": task, "model": model, "weather": weather}
     if any(source.get(key) != value for key, value in expected.items()):
-        raise ValueError(f"{path} does not match the model, task and weather arm")
+        raise ValueError(f"{path} does not match the model, task and feature set")
     chosen = source["chosen"]
     if any("params" not in value for value in chosen.values()):
         raise ValueError(f"{path} does not contain a flat search")

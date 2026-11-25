@@ -178,7 +178,7 @@ def fit_combiner(method, y, inner, members, inner_fold, task):
 
 def ensemble_recipe(run, prediction_time, results_dir):
     variant = run.variant
-    # The forecast arms reuse the observed-weather flat configurations (D17).
+    # The forecast runs reuse the observed-weather flat configurations (forecast decision D17).
     model, weather = run.model, run.flat_weather
     if variant == "seeds":
         factory = fixed_factory(model, weather, prediction_time)

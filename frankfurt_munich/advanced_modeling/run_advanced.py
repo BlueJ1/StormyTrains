@@ -1,4 +1,4 @@
-"""Run the registered cutoff-audited CV reference models and feature screens."""
+"""Run the CV experiments of the plan, with inputs checked to be known at the cutoff: the starting-score models and the feature screens."""
 from __future__ import annotations
 
 import argparse
@@ -236,7 +236,7 @@ def select_groups(run, groups):
             return dict(ablations(groups)).get(run.variant)
     if run.step == "3.4" and run.variant not in ("full", "weather_extremes"):
         railway = set(feature_groups("1h")) & groups.keys()
-        # The observed and the forecast group of the subset, as far as the arm has them.
+        # The observed and the forecast group of the subset, as far as the feature set has them.
         return railway | ({run.variant, f"forecast_{run.variant}"} & groups.keys())
     return set(groups)
 
@@ -249,7 +249,7 @@ def run_tabgns(run, rows, prediction_time, task, factory, numeric, categorical, 
                                            run.weather, calendar=run.calendar, forecast=run.forecast))
     config = json.loads((reference / "config.json").read_text())
     if config["calendar"] != (run.calendar or "native"):
-        raise ValueError("TabGNS and the MLP reference must use the same calendar encoding")
+        raise ValueError("TabGNS and the MLP baseline must use the same calendar encoding")
     search = pd.read_csv(reference / "search_results.csv")
     refit = pd.read_csv(reference / "fold_metrics.csv")
     budgets = (search.loc[search["prediction_time"].eq(prediction_time)]
@@ -369,8 +369,8 @@ def main():
                         help=f"configuration count for steps 0.8 and 6.1 (default {SEARCH_CONFIGS})")
     parser.add_argument("--model", nargs="+", choices=MODELS)
     parser.add_argument("--weather-arm", nargs="+", choices=ARMS,
-                        help="run only these arms: railway, observed weather, forecasts (D17), or both")
-    parser.add_argument("--variant", nargs="+", help="run only these registered variants")
+                        help="run only these feature sets: railway only, observed weather, forecasts (D17), or both")
+    parser.add_argument("--variant", nargs="+", help="run only these listed variants")
     parser.add_argument("--compare-only", action="store_true", help="compare saved runs without refitting")
     parser.add_argument("--calendar", choices=VARIANTS["1.1"], help="Phase 1 calendar encoding for neural runs")
     parser.add_argument("--nested-variant", choices=(*AUTO_VARIANTS, *PHASE2_GROUPS, "all_groups", *REPRESENTATIONS,

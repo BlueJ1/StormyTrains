@@ -6,7 +6,7 @@ Run from the repository root:
 
 Fig. 1 (fig_scores.pdf): cross-validation score at each prediction time.
 Fig. 2 (fig_weather.pdf): hold-out difference, railway plus weather minus railway only,
-with the paired week-bootstrap interval.
+with the 95% interval of a bootstrap over whole ISO weeks (the same weeks for both models).
 
 Only saved summaries are read; no model is fitted and no new score is computed.
 """
@@ -52,7 +52,7 @@ plt.rcParams.update({
 
 
 def latest(name):
-    """The most recent completed run of an experiment arm, as report_cv.run_index
+    """The most recent completed run of an experiment, as report_cv.run_index
     selects it: one with both config.json and summary.csv."""
     runs = sorted(p for p in (RESULTS / name).iterdir()
                   if (p / "config.json").is_file() and (p / "summary.csv").is_file())

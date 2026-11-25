@@ -170,7 +170,7 @@ def test_search_cli_passes_same_budget_to_every_weather_arm(monkeypatch, argumen
 
     run_advanced.main()
 
-    # railway, observed weather, forecasts, observations plus forecasts (D17)
+    # railway only, observed weather, forecasts, observations plus forecasts (forecast decision D17)
     assert budgets == [expected] * 4
 
 

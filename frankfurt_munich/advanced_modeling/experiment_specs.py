@@ -1,4 +1,4 @@
-"""Registered experiment names and pre-listed variants."""
+"""Experiment names and the variants listed before running."""
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
@@ -37,9 +37,9 @@ class Run:
 
     @property
     def flat_weather(self):
-        """The flat-search arm whose configuration a fixed-configuration run uses (D2).
+        """The feature set whose flat-search configuration a fixed-configuration run uses (D2).
 
-        The forecast arms reuse the observed-weather configuration (D17)."""
+        The forecast runs reuse the observed-weather configuration (forecast decision D17)."""
         return self.weather or self.forecast
 
     @property
@@ -56,9 +56,9 @@ FORECAST_ARMS = ({"weather": False, "forecast": True}, {"weather": True, "foreca
 
 
 def registered_runs(step: str):
-    """Every registered arm of a step: railway, observed weather and the forecast arms (D17)."""
+    """Every feature set run for a step: railway only, observed weather and the two forecast sets (D17)."""
     if step == "3.1":
-        # The ablations follow each arm's own groups, so the combined arm has eight more.
+        # The group ablations follow each feature set's own groups, so the set with both sources has eight more.
         yield from observed_runs(step)
         for arm in FORECAST_ARMS:
             yield from ablation_runs(**arm)
@@ -71,7 +71,7 @@ def registered_runs(step: str):
 
 
 def has_forecast_arms(run):
-    """False for nested XGBoost, CatBoost and the arms built on them (10.9, 17 November 2026)."""
+    """False for XGBoost with nested tuning, CatBoost and the runs built on them (forecast runs, step 10.9, 17 November 2026)."""
     excluded = (*XGBOOST, *CATBOOST)
     if run.model in CATBOOST or (run.nested and run.model in excluded):
         return False
@@ -90,7 +90,7 @@ def ablation_runs(weather=True, forecast=False):
 
 
 def observed_runs(step: str):
-    """The arms with railway inputs only or with observed weather, as registered before D17."""
+    """The feature sets with railway inputs only or with observed weather, as they were before forecasts were added (D17)."""
     if step == "3.1":
         yield from ablation_runs()
         return
@@ -210,22 +210,23 @@ def latest_run(results_dir, run):
     root = results_dir / run.name
     paths = [p for p in root.glob("*") if (p / "config.json").is_file()]
     if not paths:
-        raise FileNotFoundError(f"run the reference first: {root}")
+        raise FileNotFoundError(f"run the model it is compared with first: {root}")
     return max(paths)
 
 
 def tuning_reference(run):
-    """The single-booster nested reference for bagging or calibration."""
+    """The single booster with nested tuning that bagging or calibration is compared with."""
     step = "6.1" if run.model in CATBOOST else "0.8"
     return Run(step, run.model, run.weather, nested=True, forecast=run.forecast)
 
 
 def weather_group_variants(run, prediction_time, variant):
-    """Second stage of the 0.8 automatic groups (decided 23 November 2026, review of PR #18).
+    """Weather selection step of the automatically chosen feature groups (step 0.8; decided
+    23 November 2026, review of PR #18).
 
-    On the railway candidate chosen in the first stage: keep all of the arm's weather groups,
-    keep none, or drop one group at a time. The arm's observed and forecast groups count
-    separately. None for other runs and for railway-only arms."""
+    Starting from the railway groups chosen in the first step: keep all of the feature set's
+    weather groups, keep none, or drop one group at a time. Its observed and forecast groups
+    count separately. None for other runs and for railway-only runs."""
     if run.variant != "auto_groups" or not run.flat_weather:
         return None
     factory, numeric, categorical = variant
@@ -266,7 +267,7 @@ def nested_feature_variants(run, prediction_time, task, factory):
                 continue
             for name in VARIANTS[step]:
                 if name == "hour_weekday":
-                    continue  # This comparison is registered only for linear models.
+                    continue  # This comparison is listed only for linear models.
                 cat = [*categorical, "route_id"] if step == "1.3" else categorical
                 variants[name] = ((factory, numeric, cat) if name == "route_native"
                                   else route_representation(name, task).wrap(factory, numeric, cat))

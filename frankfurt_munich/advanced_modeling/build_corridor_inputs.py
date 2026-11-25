@@ -1,4 +1,4 @@
-"""Build cutoff-specific CV training rows for the auxiliary corridors in step 8.3."""
+"""Build cutoff-specific CV training rows for the auxiliary corridors (transfer from other corridors, step 8.3)."""
 from __future__ import annotations
 
 import argparse

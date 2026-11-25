@@ -1,4 +1,4 @@
-"""Analysis helpers for paired final-model predictions.
+"""Analysis helpers for the predictions of the final models, compared in pairs on the same rows.
 
 This module is deliberately data-free at import time. Functions consume
 prediction and metadata frames supplied by the runner; none open project data
@@ -62,7 +62,7 @@ def _validate_frame(frame: pd.DataFrame, task: str) -> pd.DataFrame:
 
 
 def _align(left: pd.DataFrame, right: pd.DataFrame, task: str) -> pd.DataFrame:
-    """Align one-to-one on the journey/time keys and check paired targets."""
+    """Align one-to-one on the journey/time keys and check that both models have the same targets."""
     target = _task(task)
     prediction_columns = PROBA_COLUMNS if task == "severity" else ["predicted_delay"]
     left_rows = _validate_frame(left, task).rename(
@@ -71,10 +71,10 @@ def _align(left: pd.DataFrame, right: pd.DataFrame, task: str) -> pd.DataFrame:
         columns={target: "_target_right", **{c: f"_right_{c}" for c in prediction_columns}})
     paired = left_rows.merge(right_rows, on=KEYS, how="outer", validate="one_to_one", indicator=True)
     if not paired["_merge"].eq("both").all():
-        raise ValueError("paired prediction frames must contain exactly the same keys")
+        raise ValueError("the two prediction frames must contain exactly the same keys")
     target_equal = paired["_target_left"].eq(paired["_target_right"]).fillna(False)
     if not target_equal.all():
-        raise ValueError("paired prediction frames must have identical targets")
+        raise ValueError("the two prediction frames must have identical targets")
     paired = paired.rename(columns={"_target_left": target}).drop(columns=["_target_right", "_merge"])
     return paired
 
@@ -95,7 +95,7 @@ def _score(rows: pd.DataFrame, task: str, side: str) -> tuple[float, float | Non
 
 
 def week_loss_sums(rows, task):
-    """Count rows and sum row losses separately for each arm and ISO week."""
+    """Count rows and sum row losses separately for each model and ISO week."""
     target = rows[TARGETS[task]]
     data = {"week": rows["_week"], "count": 1}
     for arm in ("_left", "_right"):
@@ -112,7 +112,7 @@ def week_loss_sums(rows, task):
 def paired_bootstrap_ci(left: pd.DataFrame, right: pd.DataFrame, task: str, *,
                         n_resamples: int = 2000, confidence: float = 0.95,
                         seed: int = SEED) -> pd.DataFrame:
-    """Return paired whole-ISO-week bootstrap intervals for log loss or RMSE.
+    """Return bootstrap intervals for log loss or RMSE, resampling whole ISO weeks (the same weeks for both models).
 
     ``delta`` is right minus left, so negative values favor the right-hand
     model for log loss and RMSE. Severity macro-F1 deltas are included as
@@ -136,7 +136,7 @@ def paired_bootstrap_ci(left: pd.DataFrame, right: pd.DataFrame, task: str, *,
         sums = week_loss_sums(rows, task)
         n_weeks = len(sums)
         if n_weeks < 2:
-            raise ValueError("paired week bootstrap needs at least two ISO weeks")
+            raise ValueError("the week bootstrap needs at least two ISO weeks")
         left_score, left_f1 = _score(rows, task, "_left")
         right_score, right_f1 = _score(rows, task, "_right")
         sampled = sums[["count", "_left", "_right"]].to_numpy()[
