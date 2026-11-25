@@ -1,20 +1,28 @@
 % Draft of the final report, Project in Data Science (1DL507), HT2026.
 % First draft: 10 November 2026. Decisions of 12 November 2026 recorded; every number is from before
-% the corrections and is replaced after the rerun (finishing plan B4, B6).
+% the corrections and is replaced after the CV rerun on the corrected inputs and the second hold-out evaluation
+% (finishing plan B4 and B6).
 % Every \todo marks something the group still has to decide,
 % check or fill in. Numbers come from the result files named in report/README.md.
 %
-% The course asks for its own LaTeX conference template (Canvas, Templates page). This file
-% uses the standard IEEE conference class as a stand-in; move the body into the course
-% template before submission.
+% Layout from the course's LaTeX conference template (Canvas, Templates page:
+% conference_101719.tex with IEEEtran.cls V1.8b, copied into this folder). Template packages
+% first, then the ones this report adds.
 \documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed for the \thanks footnote in the title.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{amsmath}
 \usepackage{booktabs}
-\usepackage{graphicx}
-\usepackage{xcolor}
 \usepackage{url}
 \usepackage{siunitx}
 \sisetup{detect-all}
@@ -25,13 +33,30 @@
 \begin{document}
 
 \title{How Early Can a Disrupted Train Journey Be Foreseen?\\
-Severity and Delay Prediction for Frankfurt--M\"unchen\\ With and Without Weather}
+Severity and Delay Prediction for Frankfurt--M\"unchen\\ With and Without Weather
+\thanks{Project in Data Science (1DL507), Uppsala University, HT2026. Supervisor: Qing He, Mid
+Sweden University. Division of work: \todo{one sentence per author, for text and for code; the
+course requires this, see ProjectInstructions.md, ``Final report'' and ``Code and scripts''}.}
+}
 
-\author{\IEEEauthorblockN{\todo{Name 1}, \todo{Name 2} and \todo{Name 3}\thanks{Division of work:
-\todo{one sentence per author, for text and for code; the course requires this, see
-ProjectInstructions.md, ``Final report'' and ``Code and scripts''}. Supervisor: Qing He, Mid Sweden
-University.}}
-\IEEEauthorblockA{Project in Data Science (1DL507), Uppsala University, HT2026}}
+\author{\IEEEauthorblockN{\todo{Name 1}}
+\IEEEauthorblockA{\textit{\todo{department}} \\
+\textit{Uppsala University}\\
+Uppsala, Sweden \\
+\todo{email address}}
+\and
+\IEEEauthorblockN{\todo{Name 2}}
+\IEEEauthorblockA{\textit{\todo{department}} \\
+\textit{Uppsala University}\\
+Uppsala, Sweden \\
+\todo{email address}}
+\and
+\IEEEauthorblockN{\todo{Name 3}}
+\IEEEauthorblockA{\textit{\todo{department}} \\
+\textit{Uppsala University}\\
+Uppsala, Sweden \\
+\todo{email address}}
+}
 
 \maketitle
 
@@ -46,10 +71,14 @@ what an archive of live updates shows was known at the prediction time. Under th
 gradient-boosted trees lower the multi-class log loss from 0.968 (class shares) to 0.920 at
 24 hours and from 0.897 to 0.819 at departure, and the delay error by 4 to 7\%. The reliability of
 the same service over the previous weeks is the most useful new input. Hourly weather observations
-along the route do not improve either prediction: on 23 held-out weeks, all ten paired 95\%
-intervals for the change include zero.\todo{After B6: one sentence on the forecasts, if the group
+along the route do not improve either prediction: on 23 held-out weeks, all ten 95\%
+intervals for the change include zero.\todo{After the second hold-out evaluation (B6): one sentence on the forecasts, if the group
 wants them in the abstract.}
 \end{abstract}
+
+\begin{IEEEkeywords}
+\todo{keywords, as in the course template}
+\end{IEEEkeywords}
 
 \section{Introduction}
 
@@ -77,7 +106,7 @@ random forests, gradient-boosted trees) and a range of further model families ar
 evaluation protocol. The comparison of railway-only models with railway-plus-weather models uses the
 same journeys, the same models and the same search budget, and is confirmed once on held-out weeks.
 
-Three results stand out. First, the predictions beat simple references at every prediction time, but
+Three results stand out. First, the predictions beat simple baselines at every prediction time, but
 by a modest margin, and journeys that end 60 minutes or more late are predicted poorly. Second,
 weather observations add nothing measurable. Third, the definition of ``known at the prediction
 time'' changes the apparent accuracy more than any choice of model does.
@@ -122,7 +151,7 @@ the error on completed journeys from the classification of disruptions.
 \section{Methodology}
 \label{sec:method}
 
-\subsection{Prediction task}
+\subsection{Problem formulation}
 
 A \emph{journey} is one dated run of one ICE or IC train that stops at Frankfurt (Main) Hbf and
 later at M\"unchen Hbf. For each journey we predict two targets. The \emph{arrival delay} is the
@@ -136,7 +165,7 @@ scheduled departure from Frankfurt. No prediction is made for a journey whose ca
 already been announced at that time, since the passenger then knows the outcome. A separate model is
 fitted for each prediction time and each target.
 
-\subsection{Inputs known at the prediction time}
+\subsection{Features}
 \label{sec:inputs}
 
 The monthly files of the source keep, for every stop, only the last reported values. They do not say
@@ -165,7 +194,7 @@ time, the number of stops reported, and the planned minutes still to run before 
 the last full hour before the prediction time: temperature at both ends, the highest and lowest
 temperature, the highest precipitation, mean wind and gust on the route in that hour and over the
 previous 24 hours, snow depth, and whether snow fell.
-\item \emph{Forecast weather} (separate arms): 9 values from the latest run of the NOAA Global
+\item \emph{Forecast weather} (separate runs): 9 values from the latest run of the NOAA Global
 Forecast System (GFS) that started by the prediction time, at the grid cells nearest the route
 stations, over the hours of the planned journey: temperature at Frankfurt at departure and at
 M\"unchen at arrival, the highest and lowest temperature, the highest hourly precipitation and the
@@ -179,13 +208,13 @@ last report and the change of the current delay between prediction times follow 
 
 The route used for the weather is a fixed list of stations for each of the two branches (via
 N\"urnberg and via Stuttgart), chosen by the timetable of the scheduled train, not by the stops the
-journey recorded. The forecasts use the same station lists. Each weather arm is run three times on
+journey recorded. The forecasts use the same station lists. Each model with weather is run three times on
 the same journeys and folds: with the observations, with the forecasts in their place, and with
 both.
 
 \subsection{Models}
 
-Two references need no features: the class shares of the training journeys, and their mean delay.
+Two baselines need no features: the class shares of the training journeys, and their mean delay.
 The standard models are multinomial logistic regression and linear regression, a random forest
 \cite{breiman2001forests}, XGBoost~\cite{chen2016xgboost}, LightGBM~\cite{ke2017lightgbm} and, for
 the delay only, support vector regression. Linear models receive standardised numeric inputs,
@@ -234,7 +263,7 @@ non-nested search.
 for each target and prediction time: the pipeline with the best railway-only CV score, and the same
 pipeline with the weather inputs added and tuned with the same budget. Each model was refitted on
 the 95 CV weeks and scored once on the 23 hold-out weeks. Intervals for the difference between the
-two arms come from 2{,}000 paired bootstrap resamples of whole weeks.
+two models come from 2{,}000 bootstrap resamples of whole ISO weeks, using the same weeks for both.
 
 \section{Results}
 \label{sec:results}
@@ -271,7 +300,7 @@ a median of 1.9~h after the prediction time. Where both versions have a value, t
 lower in 58\% of the rows and equal in about a third, and the difference grows with the age of the
 latest report, from a mean of $-1.0$~min when it is under 30 minutes old to $-11.7$~min when it is
 over four hours old. The final records thus overstate what was known: they treat every report as
-visible the moment the event happened. \todo{Q5: the group decides whether the report gives the
+visible the moment the event happened. \todo{The group decides (finishing plan Q5) whether the report gives the
 archive version only or both versions of the current delay.}
 
 \begin{table}[t]
@@ -297,16 +326,16 @@ Delay in archive (\%) & -- & -- & 39 & 43 & 52 \\
 
 All experiments ran on one laptop (\todo{model, processor, memory}; Python~3.13, scikit-learn~1.9,
 LightGBM~4.7, XGBoost~3.4, PyTorch~2.9). Models were fitted single-threaded with fixed seeds.
-The cross-validation experiments comprise 366 model arms. \todo{Total computing time, if we can
+The cross-validation experiments comprise 366 model runs. \todo{Total computing time, if we can
 reconstruct it from the run logs.}
 
 \subsection{Predictability by prediction time}
 
-Fig.~\ref{fig:scores} and Table~\ref{tab:cv} show the CV scores. All models beat the references at
+Fig.~\ref{fig:scores} and Table~\ref{tab:cv} show the CV scores. All models beat the baselines at
 every prediction time. A day ahead, LightGBM with the feature groups chosen inside each fold
 lowers the log loss from 0.968 to 0.920 and the RMSE from 25.4 to 24.4~min. At departure it reaches
-0.819 and 23.6~min. Most of the fall in log loss is not better prediction: the reference itself
-falls from 0.968 to 0.897, because announced cancellations leave the cohort. Against the reference,
+0.819 and 23.6~min. Most of the fall in log loss is not better prediction: the class-share baseline itself
+falls from 0.968 to 0.897, because announced cancellations leave the cohort. Against this baseline,
 the gain grows from 0.048 at 24~h (5\%) to 0.078 at departure (9\%). The delay scores use the same
 completed journeys at every prediction time, so their trend is not affected.
 
@@ -356,7 +385,7 @@ On the hold-out weeks the severity scores of the registered models agree with th
 recorded at registration to within 0.003. The delay errors are 0.7~min higher than those CV scores
 at every prediction time. \todo{All numbers in this section are from before the corrections decided on 12 November.
 Replace the tables, the figures and this paragraph after the rerun and the second hold-out
-evaluation (finishing plan B4, B6), and add the two reference scores on the hold-out set (class
+evaluation (finishing plan B4 and B6), and add the two baseline scores on the hold-out set (class
 shares and training mean).}
 
 \subsection{Which inputs help}
@@ -383,13 +412,13 @@ models, the mixture of experts, the distributional models, calibration, weighted
 stacking never reached it. None of the neural networks improved on LightGBM in any of 112
 comparisons on the same inputs; the closest came within 0.009 in log loss and 0.03~min. Averaging
 over seeds and configurations reached the minimum gain in 8 of 120 comparisons. Pooling the
-prediction times reached it in 6 of 20, all in the weather arm and none against the railway-only
+prediction times reached it in 6 of 20, all with weather inputs and none against the railway-only
 model per prediction time. With this many comparisons on the same five folds we do not read these
 as gains. For the delay
 at 6~h, 1~h and 20~min a linear regression on all feature groups had the best railway-only CV score
 and was registered as the final model. \todo{Decide how much of the neural-network comparison to
 report. RealMLP, TabM and the gated architecture search improved on the plain MLP in part of the
-comparisons, but not on LightGBM. Three arms did not fit properly (the mixture model of the
+comparisons, but not on LightGBM. Three runs did not fit properly (the mixture model of the
 distributional family, the explainable boosting machine with weather for delay at 24~h, the TabM
 classifier at 24~h) and should be described as failed, not as ``no gain''.}
 
@@ -404,7 +433,7 @@ gained nothing from the weather inputs, and no pre-specified subset of them (tem
 only, snow only, indicators of extremes) changed this.
 
 Forecasts for the hours of the journey were compared in cross-validation only.\todo{The hold-out
-pairs with forecasts come with B6; extend or replace this paragraph then.} For the linear models and
+pairs with forecasts come with the second hold-out evaluation (B6); extend or replace this paragraph then.} For the linear models and
 the gradient-boosted trees, forecasts in place of the observations reached the minimum gain in 43
 of 426 paired comparisons and the observations in 8. Against railway inputs alone, forecasts reached
 it in 3 of 234 comparisons and the railway-only model in 29; in 149 of these the two models also
@@ -413,7 +442,7 @@ comparisons, and adding observations to the forecasts in none of 506.
 
 \begin{table}[t]
 \caption{Hold-out set: railway plus weather minus railway only, with 95\% intervals from a
-paired bootstrap of 23 weeks. Negative values favour weather}
+bootstrap over the 23 weeks, using the same weeks for both models. Negative values favour weather}
 \label{tab:weather}
 \centering
 \footnotesize
@@ -436,8 +465,8 @@ paired bootstrap of 23 weeks. Negative values favour weather}
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figures/fig_weather.pdf}
-\caption{Hold-out change in score when weather inputs are added (points) with paired 95\% bootstrap
-intervals over weeks. Values above zero mean that weather made the prediction worse.}
+\caption{Hold-out change in score when weather inputs are added (points) with 95\% intervals from a
+bootstrap over weeks, using the same weeks for both models. Values above zero mean that weather made the prediction worse.}
 \label{fig:weather}
 \end{figure}
 
@@ -533,7 +562,7 @@ arrival delay can be predicted better than by historical averages from 24 hours 
 but only modestly: the log loss improves by 5\% a day ahead and by 9\% at departure. The recent
 reliability of the service is the most useful input beyond the timetable, gradient-boosted trees and
 linear models are close, and nothing more elaborate did better. Weather observations along the route
-gave no detectable improvement in cross-validation or on held-out weeks.\todo{After B6: one
+gave no detectable improvement in cross-validation or on held-out weeks.\todo{After the second hold-out evaluation (B6): one
 sentence on the forecasts.}
 
 \bibliographystyle{IEEEtran}
